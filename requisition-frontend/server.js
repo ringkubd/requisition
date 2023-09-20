@@ -8,8 +8,8 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const httpsOptions = {
-    key: fs.readFileSync('/home/ems/conf/web/requisition.isdb-bisew.org/ssl/requisition.isdb-bisew.org.pem'),
-    cert: fs.readFileSync('/home/ems/conf/web/requisition.isdb-bisew.org/ssl/requisition.isdb-bisew.org.key')
+    key: fs.readFileSync('./ssl/requisition.isdb-bisew.org.pem'),
+    cert: fs.readFileSync('./ssl/requisition.isdb-bisew.org.key')
 };
 
 app.prepare().then(() => {
