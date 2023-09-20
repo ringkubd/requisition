@@ -1,0 +1,52 @@
+{
+    "name": "breeze-next",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint",
+        "lint:fix": "next lint --fix",
+        "updateLink": "npm unlink unit2select && npm link unit2select"
+    },
+    "dependencies": {
+        "@headlessui/react": "^1.4.2",
+        "@reduxjs/toolkit": "^1.9.5",
+        "axios": "^0.21.1",
+        "flowbite": "^1.8.1",
+        "flowbite-react": "^0.5.0",
+        "formik": "^2.4.3",
+        "jquery": "^3.7.1",
+        "next": "^13.0.3",
+        "next-redux-wrapper": "^8.1.0",
+        "react": "^18.2.0",
+        "react-data-table-component": "^7.5.4",
+        "react-dom": "^18.2.0",
+        "react-icons": "^4.11.0",
+        "react-redux": "^8.1.2",
+        "react-toastify": "^9.1.3",
+        "reduxjs-toolkit-persist": "^7.2.1",
+        "select2": "^4.1.0-rc.0",
+        "styled-components": "^6.0.8",
+        "swr": "^1.3.0",
+        "unit2select": "^1.1.4",
+        "yup": "^1.2.0"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.22.11",
+        "@babel/eslint-parser": "^7.22.11",
+        "@babel/preset-react": "^7.18.6",
+        "@next/eslint-plugin-next": "^10.0.4",
+        "@tailwindcss/forms": "^0.5.2",
+        "autoprefixer": "^10.4.15",
+        "babel-eslint": "^10.1.0",
+        "eslint": "^8.27.0",
+        "eslint-config-next": "13.0.3",
+        "eslint-config-prettier": "^7.1.0",
+        "eslint-plugin-prettier": "^3.3.0",
+        "postcss": "^8.4.29",
+        "prettier": "2.2.1",
+        "tailwindcss": "^3.3.3"
+    }
+}
