@@ -7,7 +7,7 @@ export const ProductApiService = createApi({
     baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,
     prepareHeaders: (headers) => {
       fetch(
-        process.env.NEXT_PUBLIC_BACKEND_URL + 'sanctum/csrf-cookie',
+        process.env.NEXT_PUBLIC_BACKEND_URL + '/sanctum/csrf-cookie',
         {
           method: 'GET',
           credentials: 'include',
