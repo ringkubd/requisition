@@ -4,4 +4,9 @@ module.exports = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+    env: {
+        NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
+        NEXT_PUBLIC_BACKEND_API_URL: process.env.NEXT_PUBLIC_BACKEND_API_URL,
+        APP_NAME: process.env.APP_NAME,
+    }
 }
