@@ -19,10 +19,6 @@ Route::post('/register', [RegisteredUserController::class, 'store'])
     ->middleware('guest')
     ->name('register');
 
-Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-    ->middleware('guest')
-    ->name('login');
-
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //    $token = $request->user()->createToken($request->user()->email);
     return $request->user();
