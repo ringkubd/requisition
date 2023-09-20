@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
+require __DIR__.'/auth.php';
+
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //    $token = $request->user()->createToken($request->user()->email);
     return $request->user();
