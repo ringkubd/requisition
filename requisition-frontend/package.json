@@ -6,6 +6,7 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
+        "start_8081": "next start -p 8081",
         "lint": "next lint",
         "lint:fix": "next lint --fix",
         "updateLink": "npm unlink unit2select && npm link unit2select"
