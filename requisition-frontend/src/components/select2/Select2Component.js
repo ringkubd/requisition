@@ -31,6 +31,7 @@ const Select2Component = ({options, onChange, ...other}) => {
                 {...other}
                 onChange={onChange}
             >
+                <option value=""></option>
                 {
                     options?.map((o, index) => <option key={index} value={o.value}>{o.label}</option>)
                 }
