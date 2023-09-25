@@ -69,3 +69,17 @@
         <p>@lang('models/products.plural')</p>
     </a>
 </li>
+
+<li class="nav-item">
+    <a href="{{ route('initialRequisitions.index') }}" class="nav-link {{ Request::is('initialRequisitions*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/initialRequisitions.plural')</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('purchaseRequisitions.index') }}" class="nav-link {{ Request::is('purchaseRequisitions*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/purchaseRequisitions.plural')</p>
+    </a>
+</li>

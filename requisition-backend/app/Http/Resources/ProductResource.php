@@ -23,6 +23,7 @@ class ProductResource extends JsonResource
             'category' => $this->category,
             'product_metas' => $this->productMetas,
             'product_options' => $this->productOptions->load('option'),
+            'last_purchase' => $this->lastPurchaseRequisition,
             'description' => $this->description,
             'status' => $this->status,
             'deleted_at' => $this->deleted_at,

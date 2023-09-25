@@ -53,3 +53,21 @@ Route::resource('designations', App\Http\Controllers\API\DesignationAPIControlle
 
 Route::resource('products', App\Http\Controllers\API\ProductAPIController::class)
     ->except(['create', 'edit']);
+
+
+Route::resource('initial-requisitions', App\Http\Controllers\API\InitialRequisitionAPIController::class)
+    ->except(['create', 'edit']);
+
+
+/**
+ * Extra URL
+ */
+Route::get('product-select', [\App\Http\Controllers\API\InitialRequisitionAPIController::class, 'products']);
+Route::get('last-purchase-information', [\App\Http\Controllers\API\InitialRequisitionAPIController::class, 'lastPurchase']);
+
+/**
+ * End Extra URL
+ */
+
+Route::resource('purchase-requisitions', App\Http\Controllers\API\PurchaseRequisitionAPIController::class)
+    ->except(['create', 'edit']);

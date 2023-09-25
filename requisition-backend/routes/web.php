@@ -34,3 +34,6 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 
 Route::resource('products', App\Http\Controllers\ProductController::class);
+
+Route::resource('initial-requisitions', App\Http\Controllers\InitialRequisitionController::class);
+Route::resource('purchase-requisitions', App\Http\Controllers\PurchaseRequisitionController::class);

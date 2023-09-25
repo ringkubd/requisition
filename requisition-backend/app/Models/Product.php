@@ -115,4 +115,8 @@ use Illuminate\Database\Eloquent\Model;
     {
         return $this->hasMany(\App\Models\ProductOption::class, 'product_id');
     }
+
+    public function lastPurchaseRequisition(){
+        return $this->hasOneThrough(PurchaseRequisition::class, PurchaseRequisitionProduct::class, 'product_id', 'id', 'id', 'purchase_requisition_id');
+    }
 }
