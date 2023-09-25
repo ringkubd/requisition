@@ -89,7 +89,7 @@ const Branch = () => {
           </Head>
           <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
               <Card>
-                  <div className="flex flex-row space-x-4 space-y-4">
+                  <div className="flex flex-row space-x-4 space-y-4  shadow-lg py-4 px-4">
                       <NavLink
                           active={router.pathname === 'product/create'}
                           href={`product/create`}

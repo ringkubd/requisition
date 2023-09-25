@@ -9,7 +9,6 @@ import DropdownLink, { DropdownButton } from '@/components/DropdownLink'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
 const Navigation = ({ user }) => {
     const router = useRouter()
 
@@ -59,6 +58,12 @@ const Navigation = ({ user }) => {
                                   </button>
                               }
                             >
+                                <DropdownLink
+                                    href="/organization"
+                                    active={router.pathname.includes('organization').toString()}
+                                >
+                                    Organization
+                                </DropdownLink>
                                 <DropdownLink
                                   href="/branch"
                                   active={router.pathname.includes('branch').toString()}
@@ -194,16 +199,95 @@ const Navigation = ({ user }) => {
                             active={router.pathname === '/dashboard'}>
                             Dashboard
                         </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            href="/organization"
-                            active={router.pathname === '/organization'}>
-                            Organization
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                          href="/branch"
-                          active={router.pathname === '/branch'}>
-                            Branch
-                        </ResponsiveNavLink>
+                        <Dropdown
+                            align="right"
+                            width="48"
+                            trigger={
+                                <button className="pl-3 pr-4 py-2 border-l-4 text-base font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 flex flex-row">
+                                    <div>Organization</div>
+                                    <div className="ml-1">
+                                        <svg
+                                            className="fill-current h-4 w-4"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20">
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
+                                    </div>
+                                </button>
+                            }>
+                            <DropdownLink
+                                href="/organization"
+                                active={router.pathname.includes('organization').toString()}
+                            >
+                                Organization
+                            </DropdownLink>
+                            <DropdownLink
+                                href="/branch"
+                                active={router.pathname.includes('branch').toString()}
+                            >
+                                Branch
+                            </DropdownLink>
+                            <DropdownLink
+                                href="/department"
+                                active={router.pathname.includes('department').toString()}
+                            >
+                                Department
+                            </DropdownLink>
+                            <DropdownLink
+                                href="/designation"
+                                active={router.pathname.includes('designation').toString()}
+                            >
+                                Designation
+                            </DropdownLink>
+                        </Dropdown>
+                        <Dropdown
+                            align="right"
+                            width="48"
+                            trigger={
+                                <button className="pl-3 pr-4 py-2 border-l-4 text-base font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 flex flex-row">
+                                    <div>Products</div>
+                                    <div className="ml-1">
+                                        <svg
+                                            className="fill-current h-4 w-4"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20">
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
+                                    </div>
+                                </button>
+                            }>
+                            <DropdownLink
+                                href="/product"
+                                active={router.pathname.includes('product').toString()}
+                            >
+                                Product
+                            </DropdownLink>
+                            <DropdownLink
+                                href="/category"
+                                active={router.pathname.includes('category').toString()}
+                            >
+                                Category
+                            </DropdownLink>
+                            <DropdownLink
+                                href="/options"
+                                active={router.pathname.includes('options').toString()}
+                            >
+                                Options
+                            </DropdownLink>
+                        </Dropdown>
+                        {/*<ResponsiveNavLink*/}
+                        {/*  href="/branch"*/}
+                        {/*  active={router.pathname === '/branch'}>*/}
+                        {/*    Branch*/}
+                        {/*</ResponsiveNavLink>*/}
                     </div>
 
                     {/* Responsive Settings Options */}

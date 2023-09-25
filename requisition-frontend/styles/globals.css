@@ -292,3 +292,10 @@
     user-select: none;
     -webkit-user-select: none;
 }
+
+.shadow-md, .shadow-sm, .shadow{
+    @apply shadow-amber-200
+}
+.shadow-lg{
+    @apply shadow-amber-100
+}

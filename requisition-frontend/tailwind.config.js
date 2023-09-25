@@ -12,6 +12,10 @@ module.exports = {
             fontFamily: {
                 sans: ['Nunito', ...defaultTheme.fontFamily.sans],
             },
+            boxShadow: {
+                'sm' : 'box-shadow: 0 1px 2px 0 #f59e0b;',
+                'md' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+            }
         },
     },
     variants: {
