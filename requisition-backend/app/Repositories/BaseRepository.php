@@ -152,4 +152,10 @@ abstract class BaseRepository
 
         return $model->delete();
     }
+
+    public function whereHas(string $relation, \Closure $clouser){
+        $query = $this->model->newQuery();
+        $model = $query->whereHas($relation, $clouser);
+        return $this;
+    }
 }

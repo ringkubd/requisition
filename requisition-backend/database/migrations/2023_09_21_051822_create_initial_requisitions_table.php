@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\Department::class)->references('id')->on('departments');
             $table->string('irf_no');
             $table->string('ir_no')->default('05');
-            $table->float('estimated_cost', 10, 4)->nullable();
+            $table->float('estimated_cost', 20, 4)->nullable();
             $table->boolean('is_purchase_requisition_generated')->default(0)->comment('0 => No, 1 => Yes');
             $table->boolean('is_purchase_done')->default(0)->comment('0 => No, 1 => Yes');
             $table->softDeletes();

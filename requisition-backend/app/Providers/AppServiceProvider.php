@@ -29,5 +29,7 @@ class AppServiceProvider extends ServiceProvider
         if(!env('APP_DEBUG')){
             URL::forceScheme('https');
         }
+        \DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping('geography', 'string');
+        \DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping('geometry', 'string');
     }
 }

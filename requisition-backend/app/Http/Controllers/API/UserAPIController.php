@@ -2,35 +2,35 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Requests\API\CreateDepartmentAPIRequest;
-use App\Http\Requests\API\UpdateDepartmentAPIRequest;
-use App\Models\Department;
-use App\Repositories\DepartmentRepository;
+use App\Http\Requests\API\CreateUserAPIRequest;
+use App\Http\Requests\API\UpdateUserAPIRequest;
+use App\Models\User;
+use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
-use App\Http\Resources\DepartmentResource;
+use App\Http\Resources\UserResource;
 
 /**
- * Class DepartmentController
+ * Class UserController
  */
 
-class DepartmentAPIController extends AppBaseController
+class UserAPIController extends AppBaseController
 {
-    /** @var  DepartmentRepository */
-    private $departmentRepository;
+    /** @var  UserRepository */
+    private $userRepository;
 
-    public function __construct(DepartmentRepository $departmentRepo)
+    public function __construct(UserRepository $userRepo)
     {
-        $this->departmentRepository = $departmentRepo;
+        $this->userRepository = $userRepo;
     }
 
     /**
      * @OA\Get(
-     *      path="/departments",
-     *      summary="getDepartmentList",
-     *      tags={"Department"},
-     *      description="Get all Departments",
+     *      path="/users",
+     *      summary="getUserList",
+     *      tags={"User"},
+     *      description="Get all Users",
      *      @OA\Response(
      *          response=200,
      *          description="successful operation",
@@ -43,7 +43,7 @@ class DepartmentAPIController extends AppBaseController
      *              @OA\Property(
      *                  property="data",
      *                  type="array",
-     *                  @OA\Items(ref="#/components/schemas/Department")
+     *                  @OA\Items(ref="#/components/schemas/User")
      *              ),
      *              @OA\Property(
      *                  property="message",
@@ -55,27 +55,24 @@ class DepartmentAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $departments = $this->departmentRepository->all(
-            $request->except(['skip', 'limit']),
-            $request->get('skip'),
-            $request->get('limit')
-        );
-
+        $users = User::whereHas('branches', function($branch){
+            $branch->where('id', auth_branch_id());
+        })->get();
         return $this->sendResponse(
-            DepartmentResource::collection($departments),
-            __('messages.retrieved', ['model' => __('models/departments.plural')])
+            UserResource::collection($users),
+            __('messages.retrieved', ['model' => __('models/users.plural')])
         );
     }
 
     /**
      * @OA\Post(
-     *      path="/departments",
-     *      summary="createDepartment",
-     *      tags={"Department"},
-     *      description="Create Department",
+     *      path="/users",
+     *      summary="createUser",
+     *      tags={"User"},
+     *      description="Create User",
      *      @OA\RequestBody(
      *        required=true,
-     *        @OA\JsonContent(ref="#/components/schemas/Department")
+     *        @OA\JsonContent(ref="#/components/schemas/User")
      *      ),
      *      @OA\Response(
      *          response=200,
@@ -88,7 +85,7 @@ class DepartmentAPIController extends AppBaseController
      *              ),
      *              @OA\Property(
      *                  property="data",
-     *                  ref="#/components/schemas/Department"
+     *                  ref="#/components/schemas/User"
      *              ),
      *              @OA\Property(
      *                  property="message",
@@ -98,27 +95,31 @@ class DepartmentAPIController extends AppBaseController
      *      )
      * )
      */
-    public function store(CreateDepartmentAPIRequest $request): JsonResponse
+    public function store(CreateUserAPIRequest $request): JsonResponse
     {
         $input = $request->all();
 
-        $department = $this->departmentRepository->create($input);
+        $user = $this->userRepository->create($input);
+        $user->organizations()->sync($request->organization_id);
+        $user->branches()->sync($request->branch_id);
+        $user->departments()->sync($request->department_id);
+        $user->designations()->sync($request->designation_id);
 
         return $this->sendResponse(
-            new DepartmentResource($department),
-            __('messages.saved', ['model' => __('models/departments.singular')])
+            new UserResource($user),
+            __('messages.saved', ['model' => __('models/users.singular')])
         );
     }
 
     /**
      * @OA\Get(
-     *      path="/departments/{id}",
-     *      summary="getDepartmentItem",
-     *      tags={"Department"},
-     *      description="Get Department",
+     *      path="/users/{id}",
+     *      summary="getUserItem",
+     *      tags={"User"},
+     *      description="Get User",
      *      @OA\Parameter(
      *          name="id",
-     *          description="id of Department",
+     *          description="id of User",
      *           @OA\Schema(
      *             type="integer"
      *          ),
@@ -136,7 +137,7 @@ class DepartmentAPIController extends AppBaseController
      *              ),
      *              @OA\Property(
      *                  property="data",
-     *                  ref="#/components/schemas/Department"
+     *                  ref="#/components/schemas/User"
      *              ),
      *              @OA\Property(
      *                  property="message",
@@ -148,30 +149,30 @@ class DepartmentAPIController extends AppBaseController
      */
     public function show($id): JsonResponse
     {
-        /** @var Department $department */
-        $department = $this->departmentRepository->find($id);
+        /** @var User $user */
+        $user = $this->userRepository->find($id);
 
-        if (empty($department)) {
+        if (empty($user)) {
             return $this->sendError(
-                __('messages.not_found', ['model' => __('models/departments.singular')])
+                __('messages.not_found', ['model' => __('models/users.singular')])
             );
         }
 
         return $this->sendResponse(
-            new DepartmentResource($department),
-            __('messages.retrieved', ['model' => __('models/departments.singular')])
+            new UserResource($user),
+            __('messages.retrieved', ['model' => __('models/users.singular')])
         );
     }
 
     /**
      * @OA\Put(
-     *      path="/departments/{id}",
-     *      summary="updateDepartment",
-     *      tags={"Department"},
-     *      description="Update Department",
+     *      path="/users/{id}",
+     *      summary="updateUser",
+     *      tags={"User"},
+     *      description="Update User",
      *      @OA\Parameter(
      *          name="id",
-     *          description="id of Department",
+     *          description="id of User",
      *           @OA\Schema(
      *             type="integer"
      *          ),
@@ -180,7 +181,7 @@ class DepartmentAPIController extends AppBaseController
      *      ),
      *      @OA\RequestBody(
      *        required=true,
-     *        @OA\JsonContent(ref="#/components/schemas/Department")
+     *        @OA\JsonContent(ref="#/components/schemas/User")
      *      ),
      *      @OA\Response(
      *          response=200,
@@ -193,7 +194,7 @@ class DepartmentAPIController extends AppBaseController
      *              ),
      *              @OA\Property(
      *                  property="data",
-     *                  ref="#/components/schemas/Department"
+     *                  ref="#/components/schemas/User"
      *              ),
      *              @OA\Property(
      *                  property="message",
@@ -203,36 +204,39 @@ class DepartmentAPIController extends AppBaseController
      *      )
      * )
      */
-    public function update($id, UpdateDepartmentAPIRequest $request): JsonResponse
+    public function update($id, UpdateUserAPIRequest $request): JsonResponse
     {
         $input = $request->all();
 
-        /** @var Department $department */
-        $department = $this->departmentRepository->find($id);
+        /** @var User $user */
+        $user = $this->userRepository->find($id);
 
-        if (empty($department)) {
+        if (empty($user)) {
             return $this->sendError(
-                __('messages.not_found', ['model' => __('models/departments.singular')])
+                __('messages.not_found', ['model' => __('models/users.singular')])
             );
         }
-
-        $department = $this->departmentRepository->update($input, $id);
+        $user->organizations()->sync($request->organization_id);
+        $user->branches()->sync($request->branch_id);
+        $user->departments()->sync($request->department_id);
+        $user->designations()->sync($request->designation_id);
+        $user = $this->userRepository->update($input, $id);
 
         return $this->sendResponse(
-            new DepartmentResource($department),
-            __('messages.updated', ['model' => __('models/departments.singular')])
+            new UserResource($user),
+            __('messages.updated', ['model' => __('models/users.singular')])
         );
     }
 
     /**
      * @OA\Delete(
-     *      path="/departments/{id}",
-     *      summary="deleteDepartment",
-     *      tags={"Department"},
-     *      description="Delete Department",
+     *      path="/users/{id}",
+     *      summary="deleteUser",
+     *      tags={"User"},
+     *      description="Delete User",
      *      @OA\Parameter(
      *          name="id",
-     *          description="id of Department",
+     *          description="id of User",
      *           @OA\Schema(
      *             type="integer"
      *          ),
@@ -262,28 +266,20 @@ class DepartmentAPIController extends AppBaseController
      */
     public function destroy($id): JsonResponse
     {
-        /** @var Department $department */
-        $department = $this->departmentRepository->find($id);
+        /** @var User $user */
+        $user = $this->userRepository->find($id);
 
-        if (empty($department)) {
+        if (empty($user)) {
             return $this->sendError(
-                __('messages.not_found', ['model' => __('models/departments.singular')])
+                __('messages.not_found', ['model' => __('models/users.singular')])
             );
         }
 
-        $department->delete();
+        $user->delete();
 
         return $this->sendResponse(
             $id,
-            __('messages.deleted', ['model' => __('models/departments.singular')])
-        );
-    }
-
-    public function getDepartmentByBranchOrganization(Request $request){
-        $departments = DepartmentResource::collection(Department::where('organization_id', $request->organization_id)->where('branch_id', $request->branch_id)->get());
-        return $this->sendResponse(
-            $departments,
-            __('messages.deleted', ['model' => __('models/departments.plurals')])
+            __('messages.deleted', ['model' => __('models/users.singular')])
         );
     }
 }

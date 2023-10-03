@@ -9,9 +9,15 @@ use Illuminate\Http\Request;
 
 class OrganizationHelperApiController extends AppBaseController
 {
-    public function getBranch($organization){
-        $branches = Branch::where('organization_id', $organization)->get();
-        return $this->sendResponse( BranchResource::collection($branches),
-            __('messages.retrieved', ['model' => __('models/branches.plural')]));
+    public function getBranch(Request $request){
+        if ($request->has('organization')){
+            $organizations = explode(',', $request->organization);
+            $branches = Branch::whereIn('organization_id', $organizations)->get();
+            return $this->sendResponse( BranchResource::collection($branches),
+                __('messages.retrieved', ['model' => __('models/branches.plural')]));
+        }else{
+            return $this->sendError( __('messages.failed', ['model' => __('models/branches.plural')]),404);
+        }
+
     }
 }

@@ -12,6 +12,8 @@ class InitialRequisitionProduct extends Model
 
     protected $table = "initial_requisition_products";
 
+    protected $guarded = [];
+
     public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Product::class);

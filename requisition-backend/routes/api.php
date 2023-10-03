@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +23,7 @@ Route::post('/register', [RegisteredUserController::class, 'store'])
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //    $token = $request->user()->createToken($request->user()->email);
-    return $request->user();
+    return  new UserResource($request->user());
 });
 
 Route::middleware(['auth:sanctum'])->group(function (){
@@ -32,7 +34,7 @@ Route::middleware(['auth:sanctum'])->group(function (){
 Route::resource('branches', App\Http\Controllers\API\BranchAPIController::class)
     ->except(['create', 'edit']);
 
-Route::get('branches/{organization_id}/organization', [\App\Http\Controllers\API\OrganizationHelperApiController::class, 'getBranch'])->name('branches.branch_by_organization');
+Route::get('branches_organization', [\App\Http\Controllers\API\OrganizationHelperApiController::class, 'getBranch'])->name('branches.branch_by_organization');
 
 
 Route::resource('categories', App\Http\Controllers\API\CategoryAPIController::class)
@@ -46,9 +48,11 @@ Route::resource('product-options', App\Http\Controllers\API\ProductOptionAPICont
 
 Route::resource('departments', App\Http\Controllers\API\DepartmentAPIController::class)
     ->except(['create', 'edit']);
+Route::get('departments-by-organization-branch', [App\Http\Controllers\API\DepartmentAPIController::class, 'getDepartmentByBranchOrganization']);
 
 Route::resource('designations', App\Http\Controllers\API\DesignationAPIController::class)
     ->except(['create', 'edit']);
+Route::get('designation-by-organization-branch', [App\Http\Controllers\API\DesignationAPIController::class, 'getDesignationByBranchOrganization']);
 
 
 Route::resource('products', App\Http\Controllers\API\ProductAPIController::class)
@@ -64,10 +68,23 @@ Route::resource('initial-requisitions', App\Http\Controllers\API\InitialRequisit
  */
 Route::get('product-select', [\App\Http\Controllers\API\InitialRequisitionAPIController::class, 'products']);
 Route::get('last-purchase-information', [\App\Http\Controllers\API\InitialRequisitionAPIController::class, 'lastPurchase']);
-
+Route::post('change-branch', function (Request $request){
+    cache()->forget('select_branch');
+    cache()->put('select_branch',$request->branch_id);
+    return cache()->get('select_branch');
+});
+Route::post('change-organization', function (Request $request){
+    cache()->forget('select_organization');
+    cache()->put('select_organization',$request->organization_id);
+    return cache()->get('select_organization');
+});
 /**
  * End Extra URL
  */
 
 Route::resource('purchase-requisitions', App\Http\Controllers\API\PurchaseRequisitionAPIController::class)
+    ->except(['create', 'edit']);
+
+
+Route::resource('users', App\Http\Controllers\API\UserAPIController::class)
     ->except(['create', 'edit']);

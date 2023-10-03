@@ -9,6 +9,7 @@ use App\Models\InitialRequisition;
 use App\Models\Product;
 use App\Models\PurchaseRequisitionProduct;
 use App\Repositories\InitialRequisitionRepository;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -101,11 +102,26 @@ class InitialRequisitionAPIController extends AppBaseController
      *      )
      * )
      */
-    public function store(CreateInitialRequisitionAPIRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
-        $input = $request->all();
+        $lastRequisition = InitialRequisition::latest()->first();
+        $year = Carbon::now()->format('y');
+        $irf_no = ($lastRequisition->id ?? 1) .'/'.$year.'/'.auth_department_name();
+        $allProduct = $request->all();
+        $estimated_cost = collect($allProduct)->sum('estimated_cost');
 
-        $initialRequisition = $this->initialRequisitionRepository->create($input);
+        $initialRequisition = InitialRequisition::create([
+            'user_id' => $request->user()->id,
+            'department_id' => auth_department_id(),
+            'irf_no' => $irf_no,
+            'ir_no' => 5,
+            'estimated_cost' => $estimated_cost
+        ]);
+        $allProduct = array_map(function($p){
+            unset($p['estimated_cost']);
+            return $p;
+        }, $allProduct);
+        $initialRequisition->initialRequisitionProducts()->createMany($allProduct);
 
         return $this->sendResponse(
             new InitialRequisitionResource($initialRequisition),

@@ -26,7 +26,7 @@ class InitialRequisitionResource extends JsonResource
             'estimated_cost' => $this->estimated_cost,
             'requisition_products' => InitialRequisitionProductResource::collection($this->initialRequisitionProducts),
             'is_purchase_requisition_generated' => $this->is_purchase_requisition_generated,
-            'purchase_requisitions' => $this->purchaseRequisitions->where('status', 1),
+            'purchase_requisitions' => $this->purchaseRequisitions?->where('status', 1),
             'is_purchase_done' => $this->is_purchase_done,
             'total_required_unit' => $this->initialRequisitionProducts->sum('required_quantity'),
             'deleted_at' => $this->deleted_at,

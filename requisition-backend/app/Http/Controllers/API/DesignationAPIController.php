@@ -278,4 +278,12 @@ class DesignationAPIController extends AppBaseController
             __('messages.deleted', ['model' => __('models/designations.singular')])
         );
     }
+
+    public function getDesignationByBranchOrganization(Request $request){
+        $departments = DesignationResource::collection(Designation::where('organization_id', $request->organization_id)->where('branch_id', $request->branch_id)->get());
+        return $this->sendResponse(
+            $departments,
+            __('messages.deleted', ['model' => __('models/designations.plurals')])
+        );
+    }
 }
