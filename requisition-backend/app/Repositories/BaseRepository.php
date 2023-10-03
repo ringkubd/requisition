@@ -58,7 +58,7 @@ abstract class BaseRepository
     {
         $query = $this->allQuery();
 
-        return $query->paginate($perPage, $columns);
+        return $query->latest()->paginate($perPage, $columns);
     }
 
     /**
@@ -94,7 +94,7 @@ abstract class BaseRepository
     {
         $query = $this->allQuery($search, $skip, $limit);
 
-        return $query->get($columns);
+        return $query->latest()->get($columns);
     }
 
     /**

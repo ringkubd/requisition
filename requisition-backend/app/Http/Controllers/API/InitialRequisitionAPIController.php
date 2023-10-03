@@ -106,7 +106,7 @@ class InitialRequisitionAPIController extends AppBaseController
     {
         $lastRequisition = InitialRequisition::latest()->first();
         $year = Carbon::now()->format('y');
-        $irf_no = ($lastRequisition->id ?? 1) .'/'.$year.'/'.auth_department_name();
+        $irf_no = ($lastRequisition->id + 1 ?? 1) .'/'.$year.'/'.auth_department_name();
         $allProduct = $request->all();
         $estimated_cost = collect($allProduct)->sum('estimated_cost');
 
