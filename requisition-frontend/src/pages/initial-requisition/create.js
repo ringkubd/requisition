@@ -39,13 +39,13 @@ const InitialRequisitionCreate = (props) => {
 
     const initValues = {
         product_id: '',
-        unit: '',
         product_option_id: '',
         last_purchase_date: '',
         required_quantity: '',
         available_quantity: '',
         quantity_to_be_purchase: '',
         purpose: '',
+        estimated_cost: 0,
     }
     useEffect(() => {
         if (storeResult.isError){
@@ -56,13 +56,16 @@ const InitialRequisitionCreate = (props) => {
         }
         if (!storeResult.isLoading && storeResult.isSuccess){
             toast.success('Designation stored successfully.')
-            router.push('/designation')
+            router.push('/initial-requisition')
         }
     }, [storeResult]);
     const submit = () => {
+        // console.log(requisitionData);
         storeInitialRequisition(requisitionData)
     }
     const addItems = (values, pageProps) => {
+        values.estimated_cost = parseFloat(products.filter(p => p.id == values.product_id)[0]?.product_options.filter(o => o.id == values.product_option_id)[0].unit_price) * parseFloat(values.quantity_to_be_purchase);
+        // values.unit = products.filter(p => p.id == values.product_id)[0]?.unit;
         setRequisitionData([...requisitionData, values])
         pageProps.setSubmitting(false);
         pageProps.resetForm();
@@ -71,7 +74,6 @@ const InitialRequisitionCreate = (props) => {
     const validationSchema = Yup.object().shape({
         product_id: Yup.number().required().label('Product'),
         product_option_id: Yup.number().required().label('Variant'),
-        last_purchase_date: '',
         required_quantity: Yup.number().required().label('Required Quantity'),
         available_quantity: Yup.number().required().label('Available Quantity'),
         quantity_to_be_purchase: Yup.number().required().label('Quantity to be purchase'),
@@ -172,7 +174,7 @@ const InitialRequisitionCreate = (props) => {
                                                       }}
                                                       className={`w-full border-1 border-gray-300`}
                                                       ajax={ {
-                                                          url: process.env.NEXT_PUBLIC_BACKEND_API_URL+ `/product-select`,
+                                                          url: process.env.NEXT_PUBLIC_BACKEND_API_URL+ `product-select`,
                                                           data: function (params) {
                                                               var query = {
                                                                   search: params.term,
@@ -234,7 +236,7 @@ const InitialRequisitionCreate = (props) => {
                                                           handleChange(e)
                                                           setSelectedProductOptionId(values.product_option_id);
                                                           setFieldValue('available_quantity', products.filter(p => p.id == values.product_id)[0]?.product_options?.filter((o) => o.id == e.target.value)[0]?.stock ?? 0);
-                                                          setFieldValue('last_purchase_date', products.filter(p => p.id == values.product_id)[0]?.last_purchase?.created_at ?? 0);
+                                                          setFieldValue('last_purchase_date', products.filter(p => p.id == values.product_id)[0]?.last_purchase?.created_at ?? null);
                                                       }}
                                                       onBlur={handleChange}
                                                       id='product_option_id'

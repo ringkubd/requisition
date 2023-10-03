@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     user: "",
-    csrf_token: ""
+    csrf_token: "",
+    selected_branch: ""
 }
 
 export const userSlice = createSlice({
@@ -14,9 +15,15 @@ export const userSlice = createSlice({
         },
         setUser: (state, action) => {
             state.user = action.payload;
+        },
+        setSelectedBranch: (state, action) => {
+            state.selected_branch = action.payload;
+        },
+        getSelectedBranch: state => {
+            return state.selected_branch;
         }
     }
 });
 
-export const { getUser, setUser } =  userSlice.actions;
+export const { getUser, setUser, setSelectedBranch, getSelectedBranch } =  userSlice.actions;
 export default userSlice.reducer;

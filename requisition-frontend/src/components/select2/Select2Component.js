@@ -11,16 +11,16 @@ const Select2Component = ({options, onChange, ...other}) => {
 
         // Clean up Select2 on component unmount
         return () => {
-            $(selectRef.current).select2('destroy');
+            // $(selectRef.current).select2('destroy');
         };
     }, []);
 
     useEffect(() => {
         $(selectRef.current).on('change', function(e) {
-            onChange(e);
+            onChange(e, $(this));
         })
         $(selectRef.current).on('blur', function(e) {
-            onChange(e);
+            onChange(e, $(this));
         })
     }, []);
 
@@ -28,8 +28,8 @@ const Select2Component = ({options, onChange, ...other}) => {
         <div className="w-full">
             <select
                 ref={selectRef}
-                {...other}
                 onChange={onChange}
+                {...other}
             >
                 <option value=""></option>
                 {

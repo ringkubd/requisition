@@ -8,21 +8,25 @@ import { useRouter } from "next/router";
 import Actions from "@/components/Actions";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { useDestroyDesignationMutation, useGetDesignationQuery, getDesignation ,getRunningQueriesThunk } from "@/store/service/designation";
 import Loading from "@/components/Loading";
+import {
+    getRunningQueriesThunk,
+    getUsers,
+    useDestroyUserMutation,
+    useGetUsersQuery
+} from "@/store/service/user/management";
 
 
-const Employes = () => {
-  const router = useRouter();
-  const {data, isLoading, isError} = useGetDesignationQuery();
-  const [destroy, destroyResponse] = useDestroyDesignationMutation();
+const Employes = (props) => {
+    const router = useRouter();
+    const {data, isLoading, isError, refetch} = useGetUsersQuery();
+    const [destroy, destroyResponse] = useDestroyUserMutation();
 
-
-  useEffect(() => {
-      if (!destroyResponse.isLoading && destroyResponse.isSuccess){
-          toast.success('Department deleted.')
-      }
-  }, [destroyResponse])
+    useEffect(() => {
+        if (!destroyResponse.isLoading && destroyResponse.isSuccess){
+            toast.success('User deleted.')
+        }
+    }, [destroyResponse])
 
     const columns = [
         {
@@ -58,64 +62,64 @@ const Employes = () => {
         {
             name: 'Actions',
             cell: (row) => <Actions
-                itemId={row.id}
-                edit={`/designation/${row.id}/edit`}
-                view={`/designation/${row.id}/view`}
-                destroy={destroy}
-                progressing={destroyResponse.isLoading}
+              itemId={row.id}
+              edit={`/employees/${row.id}/edit`}
+              view={`/employees/${row.id}/view`}
+              destroy={destroy}
+              progressing={destroyResponse.isLoading}
             />,
             ignoreRowClick: true,
         }
     ];
 
-  return (
-    <>
-      <Head>
-        <title>Employee Management</title>
-      </Head>
-      <AppLayout
-          header={
-              <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                  Employee Management.
-              </h2>
-          }
-      >
+    return (
+      <>
           <Head>
-              <title>Add new designation</title>
+              <title>Employee Management</title>
           </Head>
-          <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
-              <Card>
-                  <div className="flex flex-row space-x-4 space-y-4 shadow-lg py-4 px-4">
-                      <NavLink
-                          active={router.pathname === 'designation/create'}
-                          href={`designation/create`}
-                      >
-                          <Button>Create</Button>
-                      </NavLink>
-                  </div>
-                  {
-                      !isLoading && !isError && data && (
+          <AppLayout
+            header={
+                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    Employee Management.
+                </h2>
+            }
+          >
+              <Head>
+                  <title>Add new designation</title>
+              </Head>
+              <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
+                  <Card>
+                      <div className="flex flex-row space-x-4 space-y-4 shadow-lg py-4 px-4">
+                          <NavLink
+                            active={router.pathname === 'employees/create'}
+                            href={`employees/create`}
+                          >
+                              <Button>Create</Button>
+                          </NavLink>
+                      </div>
+                      {
+                        !isLoading && !isError && data && (
                           <DataTable
-                              columns={columns}
-                              data={data.data}
-                              pagination
-                              responsive
-                              progressPending={isLoading}
-                              progressComponent={<Loading />}
-                              persistTableHead
+                            columns={columns}
+                            data={data.data}
+                            pagination
+                            responsive
+                            progressPending={isLoading}
+                            progressComponent={<Loading />}
+                            persistTableHead
                           />
-                      )
-                  }
-              </Card>
-          </div>
-      </AppLayout>
-    </>
-  )
+                        )
+                      }
+                  </Card>
+              </div>
+          </AppLayout>
+      </>
+    )
 }
 
 export const getServerSideProps = wrapper.getServerSideProps((store) => async (context) => {
     // const params = context.params
-    store.dispatch(getDesignation.initiate())
+    store.dispatch(getUsers.initiate())
     await Promise.all(store.dispatch(getRunningQueriesThunk()));
     return {
         props: {},

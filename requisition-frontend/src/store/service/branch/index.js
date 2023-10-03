@@ -31,7 +31,9 @@ export const BranchApiService = createApi({
         }),
         getBranchByOrganization: builder.query({
             query: (organization) => ({
-                url: `branches/${organization}/organization`,
+                url: `branches_organization`,
+                method: 'GET',
+                params: {organization: organization}
             }),
             providesTags: ['getBranch'],
         }),

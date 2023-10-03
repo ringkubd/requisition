@@ -58,12 +58,19 @@ export const DesignationApiService = createApi({
             }),
             invalidatesTags: ['getDesignation']
         }),
+        getDesignationByOrganizationBranch: builder.query({
+            query : (arg) => ({
+                url: `designation-by-organization-branch`,
+                params: arg,
+            }),
+        }),
     }),
 })
 
 export const {
     useGetDesignationQuery,
     useEditDesignationQuery,
+    useGetDesignationByOrganizationBranchQuery,
     useUpdateDesignationMutation,
     useStoreDesignationMutation,
     useDestroyDesignationMutation,

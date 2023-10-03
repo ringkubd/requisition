@@ -27,6 +27,8 @@ import { ProductActiveFormSlice } from "@/store/service/product/product_active_f
 import { ProductBasicFormSlice } from "@/store/service/product/product_basic_form";
 import storage from 'reduxjs-toolkit-persist/lib/storage';
 import { InitialRequisitionApi } from "@/store/service/requisitions/initial";
+import { UserManagementApi } from "@/store/service/user/management";
+import { ChangeOrganizationBranchApi } from "@/store/service/user/ChangeOrganizationBranch";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -38,6 +40,8 @@ const middlewares = [
     ProductApiService.middleware,
     ProductOptionApiService.middleware,
     InitialRequisitionApi.middleware,
+    UserManagementApi.middleware,
+    ChangeOrganizationBranchApi.middleware,
 ];
 
 const persistConfig = {
@@ -64,6 +68,8 @@ const combineReducer = combineReducers({
     product_basic_form: ProductBasicFormSlice.reducer,
     [ProductOptionApiService.reducerPath]: ProductOptionApiService.reducer,
     [InitialRequisitionApi.reducerPath]: InitialRequisitionApi.reducer,
+    [UserManagementApi.reducerPath]: UserManagementApi.reducer,
+    [ChangeOrganizationBranchApi.reducerPath]: ChangeOrganizationBranchApi.reducer,
 });
 
 const _persistedReducer = persistReducer(persistConfig, combineReducer);

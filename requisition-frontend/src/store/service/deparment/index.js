@@ -58,6 +58,13 @@ export const DepartmentApiService = createApi({
             }),
             invalidatesTags: ['getDepartment']
         }),
+        getDepartmentByOrganizationBranch: builder.query({
+            query: (arg) => ({
+                url: 'departments-by-organization-branch',
+                method: 'GET',
+                params: arg
+            })
+        })
     }),
 })
 
@@ -67,6 +74,7 @@ export const {
     useUpdateDepartmentMutation,
     useStoreDepartmentMutation,
     useDestroyDepartmentMutation,
+    useGetDepartmentByOrganizationBranchQuery,
     util: { getRunningQueriesThunk },
 } = DepartmentApiService;
 
