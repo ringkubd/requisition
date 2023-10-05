@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import $ from 'jquery'; // Import jQuery
 import 'select2/dist/js/select2';
 import 'select2/dist/css/select2.css';
+import { ref } from "yup";
 
-const Select2ComponentAjax = ({ajax, onChange, ...other}) => {
+const Select2ComponentAjax = forwardRef(({ajax, onChange,...other}, ref) => {
     const selectRef = useRef(null);
     useEffect(() => {
         // Initialize Select2 on component mount
@@ -25,18 +26,24 @@ const Select2ComponentAjax = ({ajax, onChange, ...other}) => {
             onChange(e);
         })
     }, []);
-
+    function resetSelect(){
+        $(selectRef.current).val("").trigger('change')
+    }
+    useImperativeHandle(ref, () => ({
+        resetSelect,
+    }));
     return (
         <div className="w-full">
             <select
                 ref={selectRef}
                 {...other}
-                onChange={onChange}
             >
                 <option value=""></option>
             </select>
         </div>
     );
-};
+});
 
 export default Select2ComponentAjax;
+Select2ComponentAjax.defaultProps = {
+}

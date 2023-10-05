@@ -29,6 +29,8 @@ import storage from 'reduxjs-toolkit-persist/lib/storage';
 import { InitialRequisitionApi } from "@/store/service/requisitions/initial";
 import { UserManagementApi } from "@/store/service/user/management";
 import { ChangeOrganizationBranchApi } from "@/store/service/user/ChangeOrganizationBranch";
+import { PurchaseRequisitionApi } from "@/store/service/requisitions/purchase";
+import { PurchaseRequisitionInputChangeSlice } from "@/store/service/requisitions/purchase_requisition_input_change";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -42,11 +44,12 @@ const middlewares = [
     InitialRequisitionApi.middleware,
     UserManagementApi.middleware,
     ChangeOrganizationBranchApi.middleware,
+    PurchaseRequisitionApi.middleware,
 ];
 
 const persistConfig = {
     key: 'root',
-    storage,
+    storage: storage,
     stateReconciler: autoMergeLevel2,
     transforms: [],
     blacklist: [],
@@ -55,6 +58,7 @@ const persistConfig = {
 
 const combineReducer = combineReducers({
     users: userSlice.reducer,
+    purchase_requisition_inputs: PurchaseRequisitionInputChangeSlice.reducer,
     [OrganizationApiService.reducerPath]: OrganizationApiService.reducer,
     [BranchApiService.reducerPath]: BranchApiService.reducer,
     [CategoryApiService.reducerPath]: CategoryApiService.reducer,
@@ -70,6 +74,7 @@ const combineReducer = combineReducers({
     [InitialRequisitionApi.reducerPath]: InitialRequisitionApi.reducer,
     [UserManagementApi.reducerPath]: UserManagementApi.reducer,
     [ChangeOrganizationBranchApi.reducerPath]: ChangeOrganizationBranchApi.reducer,
+    [PurchaseRequisitionApi.reducerPath]: PurchaseRequisitionApi.reducer,
 });
 
 const _persistedReducer = persistReducer(persistConfig, combineReducer);
