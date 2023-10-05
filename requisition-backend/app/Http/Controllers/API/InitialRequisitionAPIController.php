@@ -119,10 +119,10 @@ class InitialRequisitionAPIController extends AppBaseController
         ]);
         $allProduct = array_map(function($p){
             unset($p['estimated_cost']);
-            if (array_key_exists('last_purchase_date') && ($p['last_purchase_date'] == "" || $p['last_purchase_date'] == null)){
+            if (array_key_exists('last_purchase_date', $p) && ($p['last_purchase_date'] == "" || $p['last_purchase_date'] == null)){
                 $p['last_purchase_date'] = Carbon::now()->toDateString();
             }
-            if (!array_key_exists('last_purchase_date')){
+            if (!array_key_exists('last_purchase_date', $p)){
                 $p['last_purchase_date'] = Carbon::now()->toDateString();
             }
             return $p;
