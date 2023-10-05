@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreatePurchaseRequisitionAPIRequest;
 use App\Http\Requests\API\UpdatePurchaseRequisitionAPIRequest;
+use App\Http\Resources\InitialRequisitionResource;
+use App\Models\InitialRequisition;
 use App\Models\PurchaseRequisition;
 use App\Repositories\PurchaseRequisitionRepository;
 use Illuminate\Http\JsonResponse;
@@ -276,6 +278,18 @@ class PurchaseRequisitionAPIController extends AppBaseController
         return $this->sendResponse(
             $id,
             __('messages.deleted', ['model' => __('models/purchaseRequisitions.singular')])
+        );
+    }
+
+    public function getInitialRequisition(){
+        $initialRequisition = InitialRequisition::query()
+            ->whereDoesntHave('purchaseRequisitions')
+            ->where('department_id', auth_department_id())
+            ->latest()
+            ->get();
+        return $this->sendResponse(
+            InitialRequisitionResource::collection($initialRequisition),
+            __('messages.retrieved', ['model' => __('models/initialRequisitions.plural')])
         );
     }
 }

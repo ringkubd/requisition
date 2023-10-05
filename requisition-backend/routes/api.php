@@ -78,6 +78,8 @@ Route::post('change-organization', function (Request $request){
     cache()->put('select_organization',$request->organization_id);
     return cache()->get('select_organization');
 });
+
+Route::get('initial_requisition_for_initiate_purchase', [\App\Http\Controllers\API\PurchaseRequisitionAPIController::class, 'getInitialRequisition']);
 /**
  * End Extra URL
  */

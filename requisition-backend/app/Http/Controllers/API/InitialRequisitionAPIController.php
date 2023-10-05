@@ -309,11 +309,11 @@ class InitialRequisitionAPIController extends AppBaseController
         $start = ((int)$request->page - 1) * 10;
         $end = ((int)$request->page) * 10;
 
-        $products = Product::query()
+        $products = ProductResource::collection(Product::query()
             ->where('title', 'like', "%$request->search%")
             ->skip($start)
             ->limit($end)
-            ->get();
+            ->get());
 
         return $this->sendResponse(
             ProductResource::collection($products),
