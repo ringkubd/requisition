@@ -14,6 +14,7 @@ import {
 import Select2ComponentAjax from "@/components/select2/Select2ComponentAjax";
 import DataTable from "react-data-table-component";
 import Actions from "@/components/Actions";
+import moment from "moment";
 
 
 const InitialRequisitionCreate = (props) => {
@@ -260,7 +261,7 @@ const InitialRequisitionCreate = (props) => {
                                 handleChange(e)
                                 setSelectedProductOptionId(e.target.value);
                                 setFieldValue('available_quantity', products.filter(p => p.id == values.product_id)[0]?.product_options?.filter((o) => o.id == e.target.value)[0]?.stock ?? 0);
-                                setFieldValue('last_purchase_date', products.filter(p => p.id == values.product_id)[0]?.last_purchase?.created_at ?? null);
+                                setFieldValue('last_purchase_date', moment(products.filter(p => p.id == values.product_id)[0]?.last_purchase?.created_at)?.format('Y-M-DD') ?? null);
                                 console.log(products.filter(p => p.id == values.product_id)[0])
                               }}
                               onBlur={handleChange}

@@ -1,11 +1,9 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, Select, TextInput } from "flowbite-react";
+import { Button, Card, Select } from "flowbite-react";
 import NavLink from "@/components/NavLink";
 import { useRouter } from "next/router";
-import { ErrorMessage, Formik } from "formik";
-import * as Yup from 'yup';
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import DataTable from "react-data-table-component";
 import {
@@ -14,79 +12,60 @@ import {
 } from "@/store/service/requisitions/purchase";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    setPurchaseRequisitionData,
     setAllPurchaseRequisitionData,
-    updatePurchaseRequisitionData
 } from "@/store/service/requisitions/purchase_requisition_input_change";
-
-
-function objectUpdateOrAdd(obj, newItem, key){
-    const existingCheck = obj.filter((o) => o[key] == newItem[key])
-    if (existingCheck.length){
-        return obj.map(o => {
-            if (o[key] == newItem[key]){
-                return newItem
-            }else{
-                return o;
-            }
-        })
-    }else {
-        return [...obj, newItem];
-    }
-}
+import PurchaseInput from "@/components/purchase-requisition/PurchaseInput";
 
 const InitialRequisitionCreate = (props) => {
     const router = useRouter();
-    const [storeInitialRequisition, storeResult] = useStorePurchaseRequisitionMutation();
+    const [storePurchaseRequisition, storeResult] = useStorePurchaseRequisitionMutation();
     const initialRequisitionForPurchase = useGetInitialRequisitionForPurchaseQuery();
     const [selectedRequisition, setSelectedRequisition] = useState(false);
-    const [estimatedPrice, setEstimatedPrice] = useState([]);
-    const [estimatedUnitPrice, setEstimatedUniPrice] = useState([]);
     const dispatch = useDispatch();
-    const [requisitionData, setRequisitionData] = useState([]);
     const {products} = useSelector(state => state.purchase_requisition_inputs);
     const [totalPrice, setTotalPrice] = useState(0);
 
+
     useEffect(() => {
         if (initialRequisitionForPurchase.isSuccess && initialRequisitionForPurchase.data){
-            const requisition_products = initialRequisitionForPurchase.data.data.filter(it => it.id == selectedRequisition)[0]?.requisition_products
-            dispatch(setAllPurchaseRequisitionData(requisition_products))
-            setRequisitionData(requisition_products);
-            setTotalPrice(0)
+            const requisition_products = initialRequisitionForPurchase.data.data.filter(it => it.id == selectedRequisition)[0]?.requisition_products;
+            dispatch(setAllPurchaseRequisitionData(requisition_products));
+            setTotalPrice(0);
         }
     }, [selectedRequisition]);
 
+    useEffect(() => {
+        if (!products) return
+        const t = products.reduceRight((total, current) => {
+            const abc = (parseFloat(current.price) * parseFloat(current.quantity_to_be_purchase))
+            return (isNaN(abc) ? 0 : abc)  + total;
+        }, 0);
+        setTotalPrice(t);
+    }, [products]);
+
     const submit = () => {
-        if (requisitionData.length){
-            storeInitialRequisition(requisitionData)
+        if (products.length){
+            if (!totalPrice){
+                const check = confirm("Are you sure you want to submit an estimated amount of 0?");
+                if (check){
+                    toast.error("You are going to submit an estimated amount of 0?");
+                    storePurchaseRequisition(products);
+                }
+
+            }else{
+                storePurchaseRequisition(products);
+            }
         }else {
             toast.warn("Perhaps you forgot to add the item.");
         }
     }
 
-
-    const Input = ({ row, price }) => {
-        const onInputChange = async e => {
-            const {name, value} = e.target;
-            const newRow = {...row, price: value}
-            dispatch(updatePurchaseRequisitionData(newRow))
-            setTotalPrice(totalPrice + parseFloat(value) * parseFloat(row.quantity_to_be_purchase));
+    useEffect(() => {
+        if (!storeResult.isError && !storeResult.isLoading && storeResult.isSuccess){
+            toast.success("Purchase requisition successfully generated.");
+            router.push('/purchase-requisition');
         }
-        return (
-            <div>
-                <input
-                    key={row.id}
-                    row={row.id}
-                    type={"number"}
-                    step={0.1}
-                    className={`form-input rounded border max-w-[6rem]`}
-                    onChange={onInputChange}
-                    name={row.id}
-                    value={price}
-                />
-            </div>
-        )
-    }
+    }, [storeResult])
 
     const tableColumns = [
         {
@@ -121,12 +100,12 @@ const InitialRequisitionCreate = (props) => {
         },
         {
             name: 'Est. Unit Price',
-            selector: row => <Input row={row} price={row.price} />,
+            selector: row => <PurchaseInput key={row.id} row={row} price={row.price ?? 0} />,
             sortable: true,
         },
         {
             name: 'Est. Total',
-            selector: row => row.price * row.quantity_to_be_purchase,
+            selector: row => isNaN(row.price * row.quantity_to_be_purchase) ? 0 : parseFloat(row.price * row.quantity_to_be_purchase).toLocaleString(),
             sortable: true,
         },
         {
@@ -181,9 +160,12 @@ const InitialRequisitionCreate = (props) => {
                                     columns={tableColumns}
                                     data={products}
                                 />
-                                <div className={`mx-4 my-3 border-t-2`}>
-                                    <h2>Total Estimate Cost</h2>
-                                    <h2>{totalPrice}</h2>
+                                <div className={`mx-4 my-3 border-t-2 justify-items-end text-right`}>
+                                    <h2 className={`font-bold`}>Total Estimate Cost</h2>
+                                    <h2 className={`font-bold`}>{totalPrice.toLocaleString()}</h2>
+                                </div>
+                                <div className={`flex mx-4 my-3 border-t-2 justify-items-end text-right items-end flex-row justify-end`}>
+                                    <Button onClick={submit} gradientMonochrome="teal">Submit</Button>
                                 </div>
                             </div>
                         </div>

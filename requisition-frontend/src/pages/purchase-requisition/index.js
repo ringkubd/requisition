@@ -47,17 +47,7 @@ const PurchaseRequisition = () => {
                 },
                 {
                     name: 'Estimated Cost',
-                    selector: row => row.estimated_cost,
-                    sortable: true,
-                },
-                {
-                    name: 'Purchase Status',
-                    selector: row => row.is_purchase_done ? "Done" : 'No',
-                    sortable: true,
-                },
-                {
-                    name: 'Purchase Requisition',
-                    selector: row => row.is_purchase_requisition_generated ? 'Generated' : 'No',
+                    selector: row => parseFloat(row.estimated_total_amount).toLocaleString(),
                     sortable: true,
                 },
                 {
@@ -74,8 +64,8 @@ const PurchaseRequisition = () => {
                     name: 'Actions',
                     cell: (row) => <Actions
                         itemId={row.id}
-                        edit={`/initial-requisition/${row.id}/edit`}
-                        view={`/initial-requisition/${row.id}/view`}
+                        edit={`/purchase-requisition/${row.id}/edit`}
+                        view={`/purchase-requisition/${row.id}/view`}
                         destroy={destroy}
                         progressing={destroyResponse.isLoading}
                     />,
@@ -89,17 +79,17 @@ const PurchaseRequisition = () => {
     return (
         <>
             <Head>
-                <title>Initial Requisition</title>
+                <title>Purchase Requisition</title>
             </Head>
             <AppLayout
                 header={
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Initial Requisition.
+                        Purchase Requisition.
                     </h2>
                 }
             >
                 <Head>
-                    <title>Initial Requisition.</title>
+                    <title>Purchase Requisition.</title>
                 </Head>
                 <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
                     <Card>

@@ -21,7 +21,7 @@ export const PurchaseRequisitionApi = createApi({
         },
         credentials: 'include',
     }),
-    tagTypes: ['purchase-requisition', 'edit-purchase-requisition'],
+    tagTypes: ['purchase-requisition', 'edit-purchase-requisition', 'get-initial-requisition-for-purchase'],
     endpoints: build => ({
         getPurchaseRequisition: build.query({
             query: () => ({
@@ -48,7 +48,7 @@ export const PurchaseRequisitionApi = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['purchase-requisition']
+            invalidatesTags: ['purchase-requisition', 'get-initial-requisition-for-purchase']
         }),
         destroyPurchaseRequisition: build.mutation({
             query : (arg) => ({
@@ -68,7 +68,8 @@ export const PurchaseRequisitionApi = createApi({
             query: () => ({
                 url: 'initial_requisition_for_initiate_purchase',
                 method: 'GET'
-            })
+            }),
+            providesTags: ['get-initial-requisition-for-purchase']
         })
     }),
 })
