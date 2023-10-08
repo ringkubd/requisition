@@ -62,9 +62,16 @@ use Illuminate\Database\Eloquent\Model;
 
     public $fillable = [
         'initial_requisition_id',
+        'user_id',
+        'branch_id',
+        'department_id',
+        'initial_requisition_id',
+        'irf_no',
+        'ir_no',
         'estimated_total_amount',
         'received_amount',
-        'payment_type'
+        'payment_type',
+        'status',
     ];
 
     protected $casts = [
@@ -91,5 +98,14 @@ use Illuminate\Database\Eloquent\Model;
     public function purchaseRequisitionProducts(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(\App\Models\PurchaseRequisitionProduct::class, 'purchase_requisition_id');
+    }
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 }

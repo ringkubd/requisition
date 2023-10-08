@@ -57,11 +57,14 @@ class PurchaseRequisitionAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $purchaseRequisitions = $this->purchaseRequisitionRepository->all(
+        $purchaseRequisitions = $this->purchaseRequisitionRepository->allQuery(
             $request->except(['skip', 'limit']),
             $request->get('skip'),
             $request->get('limit')
-        );
+        )
+            ->where('department_id', auth_department_id())
+            ->where('branch_id', auth_branch_id())
+            ->get();
 
         return $this->sendResponse(
             PurchaseRequisitionResource::collection($purchaseRequisitions),
@@ -100,12 +103,42 @@ class PurchaseRequisitionAPIController extends AppBaseController
      *      )
      * )
      */
-    public function store(CreatePurchaseRequisitionAPIRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
         $input = $request->all();
-
-        $purchaseRequisition = $this->purchaseRequisitionRepository->create($input);
-
+        $input = array_map(function ($item){
+            $item['price'] = (array_key_exists('price', $item) ? (float)$item['price'] : 0) * (float)$item['quantity_to_be_purchase'];
+            return $item;
+        },$input);
+        $initial_requisition_id = collect($input[0])['initial_requisition_id'];
+        $initial_requisition = InitialRequisition::find($initial_requisition_id);
+        $inputCollection = collect($input);
+        $purchase = [
+            'user_id' => auth()->user()->id,
+            'branch_id' => auth_branch_id(),
+            'department_id' => auth_department_id(),
+            'initial_requisition_id' => $initial_requisition_id,
+            'irf_no' => $initial_requisition->irf_no,
+            'ir_no' => $initial_requisition->ir_no,
+            'estimated_total_amount' => $inputCollection->sum('price'),
+            'received_amount' => 0,
+            'payment_type' => 0,
+            'status' => 0,
+        ];
+        $purchaseProducts = array_map(function ($item){
+            return [
+                'product_id' => $item['product_id'],
+                'product_option_id' => $item['product_option_id'],
+                'last_purchase_date' => $item['last_purchase_date'],
+                'required_quantity' => $item['required_quantity'],
+                'available_quantity' => $item['available_quantity'],
+                'quantity_to_be_purchase' => $item['quantity_to_be_purchase'],
+                'purpose' => $item['purpose'],
+            ];
+        }, $input);
+//        return response()->json($purchaseProducts);
+        $purchaseRequisition = $this->purchaseRequisitionRepository->create($purchase);
+        $purchaseRequisition->purchaseRequisitionProducts()->createMany($purchaseProducts);
         return $this->sendResponse(
             new PurchaseRequisitionResource($purchaseRequisition),
             __('messages.saved', ['model' => __('models/purchaseRequisitions.singular')])
