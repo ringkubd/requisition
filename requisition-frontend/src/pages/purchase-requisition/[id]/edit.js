@@ -56,8 +56,8 @@ const Edit = (props) => {
           <Card className="min-h-screen">
             <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
               <NavLink
-                active={router.pathname === 'options'}
-                href={`/options`}
+                active={router.pathname === 'purchase-requisition'}
+                href={`/purchase-requisition`}
               >
                 <Button>Back</Button>
               </NavLink>

@@ -2,10 +2,12 @@ import React from "react";
 import { Button } from "flowbite-react";
 import { useRouter } from "next/router";
 import { HiEye, HiPencilSquare, HiTrash } from "react-icons/hi2";
+import { HiPrinter } from "react-icons/hi";
+import Link from "next/link";
 
 const Actions = (props) => {
     const router = useRouter();
-    const {edit, destroy, view , itemId, progressing} = props;
+    const {edit, destroy, view , itemId, progressing, print} = props;
     const submitEdit = () => {
         router.push(edit)
     }
@@ -48,6 +50,19 @@ const Actions = (props) => {
                         >
                             <HiTrash />
                         </Button>
+                    ) : <span></span>
+                }
+                {
+                    print ? (
+                        <Link href={print}>
+                            <Button
+                                gradientDuoTone="purpleToBlue"
+                                outline
+                            >
+                                <HiPrinter />
+                            </Button>
+
+                        </Link>
                     ) : <span></span>
                 }
                 {!edit && !view && !destroy ? <Button>No Action</Button> : <span></span>}

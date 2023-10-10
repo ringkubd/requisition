@@ -36,11 +36,6 @@ const InitialRequisitionCreate = (props) => {
   })
   let formikForm = useRef();
 
-  useEffect(() => {
-    console.log(!selectedProductId || !selectedProductOptionId)
-    console.log(selectedProductId, selectedProductOptionId)
-  }, [selectedProductId, selectedProductOptionId]);
-
   const initValues = {
     product_id: '',
     product_option_id: '',

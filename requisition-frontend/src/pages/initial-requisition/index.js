@@ -75,6 +75,7 @@ const InitialRequisition = () => {
                         itemId={row.id}
                         edit={`/initial-requisition/${row.id}/edit`}
                         view={`/initial-requisition/${row.id}/view`}
+                        print={`/initial-requisition/${row.id}/print_view`}
                         destroy={destroy}
                         progressing={destroyResponse.isLoading}
                     />,

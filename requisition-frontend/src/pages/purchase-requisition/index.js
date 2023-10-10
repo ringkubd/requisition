@@ -66,6 +66,7 @@ const PurchaseRequisition = () => {
                         itemId={row.id}
                         edit={`/purchase-requisition/${row.id}/edit`}
                         view={`/purchase-requisition/${row.id}/view`}
+                        print={`/purchase-requisition/${row.id}/print_view`}
                         destroy={destroy}
                         progressing={destroyResponse.isLoading}
                     />,

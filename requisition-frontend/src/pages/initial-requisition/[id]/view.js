@@ -5,7 +5,7 @@ import { Button, Card, Table } from "flowbite-react";
 import NavLink from "@/components/NavLink";
 import { useEditInitialRequisitionQuery } from "@/store/service/requisitions/initial";
 import DataTable from "react-data-table-component";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const View = (props) => {
     const router = useRouter();
@@ -77,6 +77,14 @@ const View = (props) => {
                             active={router.pathname === 'initial-requisition'}
                             href={`/initial-requisition`}>
                             <Button>Back</Button>
+                        </NavLink>
+                        <NavLink
+                          active={router.pathname === 'initial-requisition'}
+                          href={`/initial-requisition/${router.query.id}/print_view`}>
+                            <Button
+                              gradientDuoTone="purpleToBlue"
+                              outline
+                            >Print</Button>
                         </NavLink>
                     </div>
                     <div className="flex flex-col space-y-6">

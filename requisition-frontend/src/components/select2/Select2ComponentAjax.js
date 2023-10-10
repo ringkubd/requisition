@@ -9,6 +9,8 @@ const Select2ComponentAjax = forwardRef(({ajax, onChange,...other}, ref) => {
     useEffect(() => {
         // Initialize Select2 on component mount
         $(selectRef.current).select2({
+            allowClear: true,
+            async: true,
             ajax: ajax
         });
 
@@ -25,9 +27,12 @@ const Select2ComponentAjax = forwardRef(({ajax, onChange,...other}, ref) => {
         $(selectRef.current).on('blur', function(e) {
             onChange(e);
         })
+        $(selectRef.current).val("").trigger('change')
     }, []);
+
     function resetSelect(){
         $(selectRef.current).val("").trigger('change')
+        $(selectRef.current).val("").trigger('click')
     }
     useImperativeHandle(ref, () => ({
         resetSelect,
