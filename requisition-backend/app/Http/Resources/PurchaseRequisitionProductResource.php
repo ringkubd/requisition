@@ -28,6 +28,7 @@ class PurchaseRequisitionProductResource extends JsonResource
             'required_quantity' => $this->required_quantity,
             'available_quantity' => $this->available_quantity,
             'quantity_to_be_purchase' => $this->quantity_to_be_purchase,
+            'unit_price' => $this->unit_price,
             'purpose' => $this->purpose,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

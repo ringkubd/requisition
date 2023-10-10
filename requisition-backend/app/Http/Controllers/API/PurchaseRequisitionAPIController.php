@@ -8,6 +8,7 @@ use App\Http\Resources\InitialRequisitionResource;
 use App\Models\InitialRequisition;
 use App\Models\PurchaseRequisition;
 use App\Repositories\PurchaseRequisitionRepository;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -107,6 +108,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
     {
         $input = $request->all();
         $input = array_map(function ($item){
+            $item['unit_price'] = (float)$item['price'];
             $item['price'] = (array_key_exists('price', $item) ? (float)$item['price'] : 0) * (float)$item['quantity_to_be_purchase'];
             return $item;
         },$input);
@@ -129,11 +131,12 @@ class PurchaseRequisitionAPIController extends AppBaseController
             return [
                 'product_id' => $item['product_id'],
                 'product_option_id' => $item['product_option_id'],
-                'last_purchase_date' => $item['last_purchase_date'],
+                'last_purchase_date' => Carbon::parse($item['last_purchase_date'])->toDateString(),
                 'required_quantity' => $item['required_quantity'],
                 'available_quantity' => $item['available_quantity'],
                 'quantity_to_be_purchase' => $item['quantity_to_be_purchase'],
                 'purpose' => $item['purpose'],
+                'unit_price' => $item['unit_price'],
             ];
         }, $input);
 //        return response()->json($purchaseProducts);
