@@ -24,8 +24,6 @@ const Edit = (props) => {
     skip: !router.query.id
   })
   const [products, setProducts] = useState([]);
-  const [selectedProductId, setSelectedProductId] = useState("");
-  const [selectedProductOptionId, setSelectedProductOptionId] = useState("");
   const selectRef = useRef();
 
   const [requisitionData, setRequisitionData] = useState([]);
@@ -33,8 +31,12 @@ const Edit = (props) => {
 
   useEffect(() => {
     if (!isLoading && !isError && data){
-      setRequisitionData(data?.data?.requisition_products);
-      const e = new Event("change");
+      const obj = JSON.parse(JSON.stringify(data?.data?.requisition_products));
+      const abcObj = obj?.map(rp => {
+        rp['estimated_cost'] = parseFloat(rp.product_option?.unit_price) * rp.quantity_to_be_purchase
+        return rp;
+      });
+      setRequisitionData(abcObj);
       selectRef.current.resetSelect()
     }
   }, [isLoading]);
@@ -63,9 +65,10 @@ const Edit = (props) => {
       router.push('/initial-requisition')
     }
   }, [updateResult]);
-  const submit = (values, pageProps) => {
+  const submit = () => {
     if (requisitionData.length){
-      updateInitialRequisition(requisitionData)
+      const { id, ...patch } = { id: data.data.id, ...requisitionData }
+      updateInitialRequisition({id: data.data.id, ...requisitionData})
     }else {
       toast.warn("Perhaps you forgot to add the item.");
     }
@@ -95,12 +98,12 @@ const Edit = (props) => {
   const tableColumns = [
     {
       name: 'Product',
-      selector: row => products.filter(p => p.id == row.product_id)[0]?.title,
+      selector: row => products.filter(p => p.id == row.product_id)[0]?.title ?? row.product.title,
       sortable: true,
     },
     {
       name: 'Variant',
-      selector: row =>  products.filter(p => p.id == row.product_id)[0]?.product_options?.filter(o => o.id == row.product_option_id).map(o => (o.option.name + `(${o.option_value})`))[0],
+      selector: row =>  products.filter(p => p.id == row.product_id)[0]?.product_options?.filter(o => o.id == row.product_option_id).map(o => (o.option.name + `(${o.option_value})`))[0] ?? `${row?.product_option?.option_name}(${ row?.product_option?.option_value})`,
       sortable: true,
     },
     {
@@ -195,7 +198,6 @@ const Edit = (props) => {
                                   ref={selectRef}
                                   onChange={(e) => {
                                     handleChange(e)
-                                    setSelectedProductId(e.target.value);
                                   }}
                                   className={`w-full border-1 border-gray-300`}
                                   ajax={ {
@@ -259,7 +261,6 @@ const Edit = (props) => {
                                   value={values.product_option_id}
                                   onChange={(e) => {
                                     handleChange(e)
-                                    setSelectedProductOptionId(e.target.value);
                                     setFieldValue('available_quantity', products.filter(p => p.id == values.product_id)[0]?.product_options?.filter((o) => o.id == e.target.value)[0]?.stock ?? 0);
                                     setFieldValue('last_purchase_date', moment(products.filter(p => p.id == values.product_id)[0]?.last_purchase?.created_at)?.format('Y-M-DD') ?? null);
                                     console.log(products.filter(p => p.id == values.product_id)[0])

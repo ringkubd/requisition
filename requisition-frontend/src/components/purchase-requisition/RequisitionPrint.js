@@ -23,19 +23,19 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
     })
 
     return (
-        <div className={`flex flex-col w-[21cm] justify-center justify-items-center p-4 shadow-none`} ref={ref}>
+        <div className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none`} ref={ref}>
             {/*Header*/}
             <div className={`flex flex-col shadow-none`} ref={accountsCopy}>
                 <div className={`text-center font-bold`}>
                     <h2>IsDB-Bangladesh Islamic Solidarity Educational Wakf (IsDB-BISEW)</h2>
                 </div>
                 <div className={`flex justify-center items-center justify-items-center text-center`}>
-                    <h2 className={`py-1 px-4 underline bg-gray-300 w-fit`}>Purchase Requisition Form</h2>
+                    <p className={`py-1 px-4 underline bg-gray-300 w-fit`}>Purchase Requisition Form</p>
                 </div>
                 <div className={`flex justify-center items-center justify-items-center text-center`}>
-                    <i className={`py-1 px-4 w-fit font-extralight font-serif`}>(Account's Copy)</i>
+                    <i className={`px-4 w-fit font-extralight font-serif`}>(Account's Copy)</i>
                 </div>
-                <div className={`flex flex-row items-stretch justify-between my-4 w-full`}>
+                <div className={`flex flex-row items-stretch justify-between my-2 w-full`}>
                     <div className={`flex flex-row w-full justify-start`}>
                         <i className={`pr-4`}>Date: </i>
                         <p className={`underline`}>{moment(mainData?.created_at).format('DD-MMM-Y')}</p>
@@ -55,18 +55,18 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                         Please arrange estimated Tk. <strong className={`underline font-bold italic`}>{mainData?.estimated_total_amount.toLocaleString()}/-</strong> (In Word) <strong className={`underline font-bold italic`}>{mainData?.estimated_total_amount === 0 ? 'Zero' : number2wordEnglish(mainData?.estimated_total_amount ?? 0)}</strong> for purchase of the following:
                     </div>
                     <div className="relative overflow-x-auto">
-                        <table className={`my-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
+                        <table className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
                             <thead className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
                             <tr>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-6 normal-case`}>Sl.#</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 normal-case`}>Name of the Item</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-24 normal-case`}>Last Purchase Date</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-6 normal-case`}>Available Quantity</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-6 normal-case`}>Required Quantity</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-6 normal-case`}>Qty to be Purchase</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-6 normal-case`}>Unit Price</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 normal-case`}>Purpose</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-8 normal-case`}>Estimated Cost</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-6 normal-case`}>Sl.#</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 normal-case`}>Name of the Item</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-24 normal-case`}>Last Purchase Date</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-6 normal-case`}>Available Quantity</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-6 normal-case`}>Required Quantity</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-6 normal-case`}>Qty to be Purchase</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-6 normal-case`}>Unit Price</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 normal-case`}>Purpose</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-8 normal-case`}>Estimated Cost</th>
                             </tr>
                             </thead>
                             <tbody className={`shadow-none text-gray-800`}>
@@ -202,7 +202,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                 <div className={`flex justify-center items-center justify-items-center text-center`}>
                     <i className={`py-1 px-4 w-fit font-extralight font-serif`}>(Requisitor's Copy)</i>
                 </div>
-                <div className={`flex flex-row items-stretch justify-between my-4 w-full`}>
+                <div className={`flex flex-row items-stretch justify-between mt-2 w-full`}>
                     <div className={`flex flex-row w-full justify-start`}>
                         <i className={`pr-2`}>Date: </i>
                         <p className={`underline`}>{moment(mainData?.created_at).format('DD-MMM-Y')}</p>
@@ -223,18 +223,18 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                 </div>
                 <div className={`flex flex-col text-sm shadow-none`}>
                     <div className="relative overflow-x-auto">
-                        <table className={`my-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
+                        <table className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
                             <thead className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
                             <tr>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-6 normal-case`}>Sl.#</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 normal-case`}>Name of the Item</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-24 normal-case`}>Last Purchase Date</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-6 normal-case`}>Available Quantity</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-6 normal-case`}>Required Quantity</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-6 normal-case`}>Qty to be Purchase</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-6 normal-case`}>Unit Price</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 normal-case`}>Purpose</th>
-                                <th scope="col" className={`border bg-white leading-3 p-0 w-8 normal-case`}>Estimated Cost</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-6 normal-case`}>Sl.#</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 normal-case`}>Name of the Item</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-24 normal-case`}>Last Purchase Date</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-6 normal-case`}>Available Quantity</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-6 normal-case`}>Required Quantity</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-6 normal-case`}>Qty to be Purchase</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-6 normal-case`}>Unit Price</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 normal-case`}>Purpose</th>
+                                <th scope="col" className={`border bg-white leading-3 p-1 w-8 normal-case`}>Estimated Cost</th>
                             </tr>
                             </thead>
                             <tbody className={`shadow-none text-gray-800`}>

@@ -38,7 +38,8 @@ export const InitialRequisitionApi = createApi({
         updateInitialRequisition: build.mutation({
             query: ({id, ...patch}) => ({
                 url: `initial-requisitions/${id}`,
-                method: 'PATCH'
+                method: 'PATCH',
+                body: patch
             }),
             invalidatesTags: ['initial-requisition', 'edit-initial-requisition']
         }),

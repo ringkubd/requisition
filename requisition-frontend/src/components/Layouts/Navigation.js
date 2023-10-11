@@ -342,6 +342,12 @@ const Navigation = ({ user }) => {
                             >
                                 Initial
                             </DropdownLink>
+                            <DropdownLink
+                                href="/purchase-requisition"
+                                active={router.pathname.includes('purchase-requisition').toString()}
+                            >
+                                Purchase
+                            </DropdownLink>
                         </Dropdown>
                         {/*<ResponsiveNavLink*/}
                         {/*  href="/branch"*/}

@@ -50,11 +50,6 @@ const InitialRequisition = () => {
                     sortable: true,
                 },
                 {
-                    name: 'Purchase Status',
-                    selector: row => row.is_purchase_done ? "Done" : 'No',
-                    sortable: true,
-                },
-                {
                     name: 'Purchase Requisition',
                     selector: row => row.is_purchase_requisition_generated ? 'Generated' : 'No',
                     sortable: true,
@@ -73,10 +68,10 @@ const InitialRequisition = () => {
                     name: 'Actions',
                     cell: (row) => <Actions
                         itemId={row.id}
-                        edit={`/initial-requisition/${row.id}/edit`}
+                        edit={!row.is_purchase_requisition_generated ? `/initial-requisition/${row.id}/edit`: false}
                         view={`/initial-requisition/${row.id}/view`}
                         print={`/initial-requisition/${row.id}/print_view`}
-                        destroy={destroy}
+                        destroy={!row.is_purchase_requisition_generated ? destroy : false}
                         progressing={destroyResponse.isLoading}
                     />,
                     ignoreRowClick: true,
