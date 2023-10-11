@@ -228,10 +228,9 @@ class InitialRequisitionAPIController extends AppBaseController
      *      )
      * )
      */
-    public function update($id, UpdateInitialRequisitionAPIRequest $request): JsonResponse
+    public function update($id, Request $request): JsonResponse
     {
-        $input = $request->all();
-
+//        return response()->json($request->all());
         /** @var InitialRequisition $initialRequisition */
         $initialRequisition = $this->initialRequisitionRepository->find($id);
 
@@ -241,7 +240,33 @@ class InitialRequisitionAPIController extends AppBaseController
             );
         }
 
-        $initialRequisition = $this->initialRequisitionRepository->update($input, $id);
+        $allProduct = $request->all();
+        $estimated_cost = collect($allProduct)->sum('estimated_cost');
+
+        $initialRequisition = $this->initialRequisitionRepository->update([
+            'user_id' => $request->user()->id,
+            'estimated_cost' => $estimated_cost
+        ], $id);
+
+        $allProduct = array_map(function($p){
+            unset($p['estimated_cost']);
+            unset($p['title']);
+            unset($p['id']);
+            unset($p['product']);
+            unset($p['product_option']);
+            unset($p['stock']);
+            if (array_key_exists('last_purchase_date', $p) && ($p['last_purchase_date'] == "" || $p['last_purchase_date'] == null)){
+                $p['last_purchase_date'] = Carbon::now()->toDateString();
+            }else{
+                $p['last_purchase_date'] = Carbon::parse($p['last_purchase_date'])->toDateString();
+            }
+            if (!array_key_exists('last_purchase_date', $p)){
+                $p['last_purchase_date'] = Carbon::now()->toDateString();
+            }
+            return $p;
+        }, $allProduct);
+        $initialRequisition->initialRequisitionProducts()->delete();
+        $initialRequisition->initialRequisitionProducts()->createMany($allProduct);
 
         return $this->sendResponse(
             new InitialRequisitionResource($initialRequisition),

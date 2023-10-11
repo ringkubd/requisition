@@ -139,6 +139,9 @@ class PurchaseRequisitionAPIController extends AppBaseController
                 'unit_price' => $item['unit_price'],
             ];
         }, $input);
+        $initial_requisition->update([
+            'is_purchase_requisition_generated' => 1
+        ]);
 //        return response()->json($purchaseProducts);
         $purchaseRequisition = $this->purchaseRequisitionRepository->create($purchase);
         $purchaseRequisition->purchaseRequisitionProducts()->createMany($purchaseProducts);
@@ -308,6 +311,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
                 __('messages.not_found', ['model' => __('models/purchaseRequisitions.singular')])
             );
         }
+        $initialRequisition = InitialRequisition::find($purchaseRequisition->initial_requisition_id);
+        $initialRequisition->update(['is_purchase_requisition_generated' => 0]);
 
         $purchaseRequisition->delete();
 
