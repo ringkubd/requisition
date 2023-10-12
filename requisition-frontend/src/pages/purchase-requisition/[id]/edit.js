@@ -73,12 +73,7 @@ const Edit = (props) => {
           name: 'Purpose ',
           selector: row => row.purpose,
           sortable: true,
-        },
-        {
-          name: 'Actions ',
-          selector: row => row.purpose,
-          sortable: true,
-        },
+        }
       ])
     }
   }, [isLoading, isError, requisition_products])
