@@ -80,6 +80,8 @@ Route::post('change-organization', function (Request $request){
 });
 
 Route::get('initial_requisition_for_initiate_purchase', [\App\Http\Controllers\API\PurchaseRequisitionAPIController::class, 'getInitialRequisition']);
+Route::get('initial_requisition_product_suggestions', [\App\Http\Controllers\API\InitialRequisitionAPIController::class, 'purposeSuggestions']);
+Route::post('update_purchase_requisition_product_price', [\App\Http\Controllers\API\PurchaseRequisitionAPIController::class, 'updateProductPrice']);
 /**
  * End Extra URL
  */

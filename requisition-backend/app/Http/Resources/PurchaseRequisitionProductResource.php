@@ -17,6 +17,7 @@ class PurchaseRequisitionProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'purchase_requisition_id' => $this->purchase_requisition_id,
             'product_id' => $this->product_id,
             'title' => $this->product->title,
             'stock' => $this->product_variant?->stock,

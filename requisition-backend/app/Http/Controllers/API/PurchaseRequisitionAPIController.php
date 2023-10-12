@@ -65,6 +65,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
         )
             ->where('department_id', auth_department_id())
             ->where('branch_id', auth_branch_id())
+            ->latest()
             ->get();
 
         return $this->sendResponse(
@@ -314,6 +315,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $initialRequisition = InitialRequisition::find($purchaseRequisition->initial_requisition_id);
         $initialRequisition->update(['is_purchase_requisition_generated' => 0]);
 
+        $purchaseRequisition->purchaseRequisitionProducts()->delete();
         $purchaseRequisition->delete();
 
         return $this->sendResponse(
@@ -330,6 +332,25 @@ class PurchaseRequisitionAPIController extends AppBaseController
             ->get();
         return $this->sendResponse(
             InitialRequisitionResource::collection($initialRequisition),
+            __('messages.retrieved', ['model' => __('models/initialRequisitions.plural')])
+        );
+    }
+
+    public function updateProductPrice(Request $request){
+        $purchase_requisition_id = $request->purchase_requisition_id;
+        $purchase_requisition_product_id = $request->product_id;
+        $price = $request->price;
+        $requisition = PurchaseRequisition::find($purchase_requisition_id);
+        $products = $requisition->purchaseRequisitionProducts()->find($purchase_requisition_product_id);
+        $products->update(['unit_price' => $price]);
+
+        $totalPrice = $requisition->purchaseRequisitionProducts->map(function ($item) {
+            $item->price = (float)$item->unit_price * (float)$item->quantity_to_be_purchase;
+            return $item;
+        })->sum('price');
+        $requisition->update(['estimated_total_amount' => $totalPrice]);
+        return $this->sendResponse(
+            $products,
             __('messages.retrieved', ['model' => __('models/initialRequisitions.plural')])
         );
     }

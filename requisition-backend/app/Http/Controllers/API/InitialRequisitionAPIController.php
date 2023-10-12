@@ -6,6 +6,7 @@ use App\Http\Requests\API\CreateInitialRequisitionAPIRequest;
 use App\Http\Requests\API\UpdateInitialRequisitionAPIRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\InitialRequisition;
+use App\Models\InitialRequisitionProduct;
 use App\Models\Product;
 use App\Models\PurchaseRequisitionProduct;
 use App\Repositories\InitialRequisitionRepository;
@@ -366,6 +367,24 @@ class InitialRequisitionAPIController extends AppBaseController
         return $this->sendResponse(
             PurchaseRequisitionProduct::collection($requisition),
             __('messages.retrieved', ['model' => __('models/purchaseRequisitions.plural')])
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+
+    public function purposeSuggestions(Request $request): JsonResponse
+    {
+        $initialProducts = InitialRequisitionProduct::query()
+            ->where('product_id', $request->product_id)
+            ->where('product_option_id', $request->product_option_id)
+            ->selectRaw('DISTINCT purpose')
+            ->get();
+        return $this->sendResponse(
+            $initialProducts,
+            __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])
         );
     }
 }
