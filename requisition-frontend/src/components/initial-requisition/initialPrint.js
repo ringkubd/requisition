@@ -18,8 +18,6 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
         }else {
             accountsCopy.current.classList.remove('break-after-page')
         }
-
-        console.log(requisition_products)
     })
 
 

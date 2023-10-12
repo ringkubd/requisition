@@ -64,6 +64,13 @@ export const InitialRequisitionApi = createApi({
                 method: 'GET',
                 body: arg
             })
+        }),
+        getPurposeSuggestion: build.query({
+            query: (arg) => ({
+                url: 'initial_requisition_product_suggestions',
+                method: 'GET',
+                params: arg
+            })
         })
     }),
 })
@@ -75,6 +82,7 @@ export const {
     useStoreInitialRequisitionMutation,
     useDestroyInitialRequisitionMutation,
     useLastPurchaseInformationQuery,
+    useGetPurposeSuggestionQuery,
     util: { getRunningQueriesThunk },
 } = InitialRequisitionApi;
 

@@ -48,14 +48,14 @@ export const PurchaseRequisitionApi = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['purchase-requisition', 'get-initial-requisition-for-purchase']
+            invalidatesTags: ['purchase-requisition', 'get-initial-requisition-for-purchase', 'initial-requisition']
         }),
         destroyPurchaseRequisition: build.mutation({
             query : (arg) => ({
                 url: `purchase-requisitions/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['purchase-requisition']
+            invalidatesTags: ['purchase-requisition', 'get-initial-requisition-for-purchase']
         }),
         lastPurchaseInformation: build.query({
             query: (arg) => ({
@@ -70,6 +70,14 @@ export const PurchaseRequisitionApi = createApi({
                 method: 'GET'
             }),
             providesTags: ['get-initial-requisition-for-purchase']
+        }),
+        updatePurchaseRequisitionPrice: build.mutation({
+            query: (arg) => ({
+                url: 'update_purchase_requisition_product_price',
+                method: 'POST',
+                body: arg,
+            }),
+            invalidatesTags: ['purchase-requisition', 'edit-purchase-requisition']
         })
     }),
 })
@@ -82,6 +90,7 @@ export const {
     useDestroyPurchaseRequisitionMutation,
     useLastPurchaseInformationQuery,
     useGetInitialRequisitionForPurchaseQuery,
+    useUpdatePurchaseRequisitionPriceMutation,
     util: { getRunningQueriesThunk },
 } = PurchaseRequisitionApi;
 

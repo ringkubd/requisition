@@ -8,6 +8,7 @@ import * as Yup from 'yup';
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import {
+  useGetPurposeSuggestionQuery,
   useLastPurchaseInformationQuery,
   useStoreInitialRequisitionMutation
 } from "@/store/service/requisitions/initial";
@@ -15,26 +16,42 @@ import Select2ComponentAjax from "@/components/select2/Select2ComponentAjax";
 import DataTable from "react-data-table-component";
 import Actions from "@/components/Actions";
 import moment from "moment";
+import { CSSTransition, SwitchTransition } from "react-transition-group";
 
 
 const InitialRequisitionCreate = (props) => {
   const router = useRouter();
   const [storeInitialRequisition, storeResult] = useStoreInitialRequisitionMutation();
   const [products, setProducts] = useState([]);
-  const [selectedProductId, setSelectedProductId] = useState("");
-  const [selectedProductOptionId, setSelectedProductOptionId] = useState("");
   const selectRef = useRef();
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProductOption, setSelectedProductOption] = useState(null);
+
+  const suggestionQuery = useGetPurposeSuggestionQuery({
+    product_id: selectedProduct,
+    product_option_id: selectedProductOption
+  }, {
+    skip: !selectedProduct || !selectedProductOption
+  })
 
   const [requisitionData, setRequisitionData] = useState([]);
   const [submitRemoveProcessing, setSubmitRemoveProcessing] = useState(false);
 
-  const lastPurchase = useLastPurchaseInformationQuery({
-    product_id: selectedProductId,
-    product_option_id: selectedProductOptionId
-  }, {
-    skip: !selectedProductId || !selectedProductOptionId
-  })
+  const [suggestState, setSuggestState] = useState(false);
+  const nodeRef= useRef();
+  const suggestRef = useRef(false);
+  const purposRef = useRef(false);
   let formikForm = useRef();
+
+  useEffect(() => {
+    if (suggestRef.current){
+      suggestRef.current.addEventListener("click", (e) => {
+        formikForm.current.setFieldValue('purpose',e.target.innerText)
+      })
+    }
+
+  }, [suggestRef.current]);
 
   const initValues = {
     product_id: '',
@@ -82,7 +99,6 @@ const InitialRequisitionCreate = (props) => {
     quantity_to_be_purchase: Yup.number().required().label('Quantity to be purchase'),
     purpose: Yup.string().required().label('Purpose'),
   })
-
   const removeItem = (item) => {
     setSubmitRemoveProcessing(true)
     setRequisitionData(requisitionData.filter(r => item.product_id !== r.product_id && item.product_option_id !== r.product_option_id));
@@ -190,7 +206,6 @@ const InitialRequisitionCreate = (props) => {
                               ref={selectRef}
                               onChange={(e) => {
                                 handleChange(e)
-                                setSelectedProductId(e.target.value);
                               }}
                               className={`w-full border-1 border-gray-300`}
                               ajax={ {
@@ -254,10 +269,8 @@ const InitialRequisitionCreate = (props) => {
                               value={values.product_option_id}
                               onChange={(e) => {
                                 handleChange(e)
-                                setSelectedProductOptionId(e.target.value);
                                 setFieldValue('available_quantity', products.filter(p => p.id == values.product_id)[0]?.product_options?.filter((o) => o.id == e.target.value)[0]?.stock ?? 0);
                                 setFieldValue('last_purchase_date', moment(products.filter(p => p.id == values.product_id)[0]?.last_purchase?.created_at)?.format('Y-M-DD') ?? null);
-                                console.log(products.filter(p => p.id == values.product_id)[0])
                               }}
                               onBlur={handleChange}
                               id='product_option_id'
@@ -334,7 +347,7 @@ const InitialRequisitionCreate = (props) => {
                               render={(msg) => <span className='text-red-500'>{msg}</span>} />
                           </div>
                         </div>
-                        <div className="flex flex-row w-full gap-4">
+                        <div className="flex flex-row w-full gap-4 relative">
                           <div className="w-full">
                             <div className="mb-2 block">
                               <Label
@@ -342,12 +355,52 @@ const InitialRequisitionCreate = (props) => {
                                 value="Purpose"
                               />
                             </div>
-                            <TextInput
-                              value={values.purpose }
-                              id='purpose'
-                              name='purpose'
-                              onChange={handleChange}
-                            />
+                            <div>
+                              <div className="flex">
+                                <div className="relative w-full">
+                                  <input
+                                    className="block w-full border disabled:cursor-not-allowed disabled:opacity-50 bg-gray-50 border-gray-300 text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-cyan-500 dark:focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
+                                    id="purpose"
+                                    name="purpose"
+                                    ref={purposRef}
+                                    value={values.purpose}
+                                    onChange={(e) => {
+                                      handleChange(e)
+                                    }}
+                                    onFocus={() => {
+                                      setSelectedProduct(values.product_id)
+                                      setSelectedProductOption(values.product_option_id)
+                                      setSuggestState(true)
+                                    }}
+                                    onBlur={() => setSuggestState(false)}
+                                    autoComplete={`off`}
+                                  />
+                                </div>
+                              </div>
+                              <SwitchTransition>
+                                <CSSTransition
+                                  key={suggestState}
+                                  nodeRef={nodeRef}
+                                  addEndListener={(done) => nodeRef.current.addEventListener("transitionend", done, false)}
+                                  classNames='fade'
+                                >
+                                  <div ref={nodeRef}>
+                                    {
+                                      suggestState ? (!suggestionQuery.isLoading && !suggestionQuery.isError && suggestionQuery.data ? (
+                                          <ul className={`py-1 mt-1 space-y-2 bg-green-100 px-1 z-50 absolute w-full`} ref={suggestRef}>
+                                            {
+                                              suggestionQuery.data.data.map((s, i) => (
+                                                <li key={i} className={`bg-gray-300 px-2 rounded hover:drop-shadow-md hover:cursor-pointer hover:bg-gray-400`}>{s.purpose}</li>
+                                              ))
+                                            }
+                                          </ul>
+                                        ) : suggestionQuery.isLoading ? "Loading..." : '' )
+                                        : <div></div>
+                                    }
+                                  </div>
+                                </CSSTransition>
+                              </SwitchTransition>
+                            </div>
                             <ErrorMessage
                               name='purpose'
                               render={(msg) => <span className='text-red-500'>{msg}</span>} />

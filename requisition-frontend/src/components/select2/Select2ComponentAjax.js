@@ -2,7 +2,6 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef } from "react
 import $ from 'jquery'; // Import jQuery
 import 'select2/dist/js/select2';
 import 'select2/dist/css/select2.css';
-import { ref } from "yup";
 
 const Select2ComponentAjax = forwardRef(({ajax, onChange,...other}, ref) => {
     const selectRef = useRef(null);

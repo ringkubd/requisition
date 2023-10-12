@@ -14,6 +14,7 @@ import {
     useGetPurchaseRequisitionQuery,
     getRunningQueriesThunk
 } from "@/store/service/requisitions/purchase";
+import moment from "moment";
 
 const PurchaseRequisition = () => {
     const router = useRouter();
@@ -57,16 +58,16 @@ const PurchaseRequisition = () => {
                 },
                 {
                     name: 'Created at',
-                    selector: row => row.created_at,
+                    selector: row => moment(row.created_at).format("YYYY-MM-DD hh:mm:ss"),
                     sortable: true,
                 },
                 {
                     name: 'Actions',
                     cell: (row) => <Actions
                         itemId={row.id}
-                        edit={`/purchase-requisition/${row.id}/edit`}
                         view={`/purchase-requisition/${row.id}/view`}
                         print={`/purchase-requisition/${row.id}/print_view`}
+                        edit={moment(row.created_at).format("YYYY-MM-DD") == moment().format("YYYY-MM-DD") ? `/purchase-requisition/${row.id}/edit` : false}
                         destroy={destroy}
                         progressing={destroyResponse.isLoading}
                     />,
