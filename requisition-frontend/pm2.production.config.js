@@ -2,7 +2,7 @@ module.exports = {
     apps: {
         name: 'requisition',
         script: 'node_modules/next/dist/bin/next',
-        args: 'start_1080',
+        args: 'start -p 1080',
         instances: 2,
         exec_mode: 'cluster',
         autorestart: true,
