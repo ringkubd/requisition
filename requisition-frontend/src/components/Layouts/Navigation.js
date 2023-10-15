@@ -82,6 +82,12 @@ const Navigation = ({ user }) => {
                                 >
                                     Designation
                                 </DropdownLink>
+                                <DropdownLink
+                                    href="/employees"
+                                    active={router.pathname.includes('employees').toString()}
+                                >
+                                    Employees
+                                </DropdownLink>
                             </Dropdown>
                             <Dropdown
                               align="left"
@@ -275,6 +281,12 @@ const Navigation = ({ user }) => {
                                 active={router.pathname.includes('designation').toString()}
                             >
                                 Designation
+                            </DropdownLink>
+                            <DropdownLink
+                                href="/employees"
+                                active={router.pathname.includes('employees').toString()}
+                            >
+                                Employees
                             </DropdownLink>
                         </Dropdown>
                         <Dropdown
