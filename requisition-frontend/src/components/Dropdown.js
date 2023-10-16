@@ -4,7 +4,7 @@ import { Menu, Transition } from '@headlessui/react'
 const Dropdown = ({
     align = 'right',
     width = 48,
-    contentClasses = 'py-1 bg-white',
+    contentClasses = 'py-1 bg-gray-200',
     trigger,
     children,
 }) => {
@@ -25,14 +25,14 @@ const Dropdown = ({
             break
         case 'right':
         default:
-            alignmentClasses = 'origin-top-right right-0'
+            alignmentClasses = 'origin-top-right sm:right-0 left-48 sm:left-0 overflow-hidden z-[99999999]'
             break
     }
 
     const [open, setOpen] = useState(false)
 
     return (
-        <Menu as="div" className="relative">
+        <Menu as="div" className="relative z-50">
             {({ open }) => (
                 <>
                     <Menu.Button as={React.Fragment}>{trigger}</Menu.Button>
@@ -46,7 +46,7 @@ const Dropdown = ({
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95">
                         <div
-                            className={`absolute z-50 mt-2 ${width} rounded-md shadow-lg z-50 overflow-hidden ${alignmentClasses}`}>
+                            className={`absolute mt-2 ${width} rounded-md shadow-lg z-[-1] overflow-hidden ${alignmentClasses}`}>
                             <Menu.Items
                                 className={`rounded-md focus:outline-none ring-1 ring-black ring-opacity-5 z-auto overflow-hidden ${contentClasses}`}
                                 static>

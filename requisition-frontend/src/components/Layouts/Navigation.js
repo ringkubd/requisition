@@ -44,7 +44,7 @@ const Navigation = ({ user }) => {
                             <Dropdown
                               align="left"
                               width="48"
-                              contentClasses={`px-1 py-0`}
+                              contentClasses={`px-1 py-0 bg-gray-200`}
                               trigger={
                                   <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out z-40 overflow-hidden">
                                       <div>Organization</div>
@@ -88,7 +88,7 @@ const Navigation = ({ user }) => {
                             <Dropdown
                               align="left"
                               width="48"
-                              contentClasses={`px-1 py-0`}
+                              contentClasses={`px-1 py-0 bg-gray-200`}
                               trigger={
                                   <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
                                       <div>Products</div>

@@ -9,7 +9,8 @@ const Loading = () => {
                 playbackOptions={{
                     autoplay: true,
                     speed: 1,
-                    light: true
+                    light: true,
+                    loop: true
                 }}
             />
         </div>
