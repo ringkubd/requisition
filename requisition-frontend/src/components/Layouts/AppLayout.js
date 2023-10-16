@@ -3,9 +3,10 @@ import { useAuth } from '@/hooks/auth'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import OrganizationBranch from "@/components/Layouts/OrganizationBranch";
-import { Suspense, useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Loading from "@/components/Loading";
+import Player from "@/components/lottie/Player";
 
 const AppLayout = ({ header, children }) => {
     const router = useRouter();
@@ -17,29 +18,26 @@ const AppLayout = ({ header, children }) => {
 
     }
 
-    const [loading, setLoading] = useState(false);
+    const [load, setLoad] = useState(false);
     useEffect(() => {
         const handleRouteChange = (url, { shallow }) => {
-            console.log(
-                `App is changing to ${url} ${
-                    shallow ? 'with' : 'without'
-                } shallow routing`
-            )
-            setLoading(true)
+            setLoad(true)
         }
 
         router.events.on('routeChangeStart', handleRouteChange)
+        router.events.on('routeChangeComplete', () => {
+            setLoad(false);
+        })
 
         // If the component is unmounted, unsubscribe
         // from the event with the `off` method:
         return () => {
             router.events.off('routeChangeStart', handleRouteChange)
+            router.events.off('routeChangeComplete', () => {
+                setLoad(false);
+            })
         }
     }, [router])
-
-    useEffect(() => {
-        console.log(loading);
-    }, [loading])
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -53,9 +51,11 @@ const AppLayout = ({ header, children }) => {
             </header>
 
             {/* Page Content */}
-            <main fallback={<Loading />}>
+            <main>
                 <Suspense fallback={<Loading />} children={children}>
-                    {loading ? <Loading /> : children}
+                    {load ? (
+                        <Loading />
+                    ) : children}
                 </Suspense>
             </main>
             <ToastContainer
