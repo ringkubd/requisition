@@ -90,3 +90,17 @@
         <p>@lang('models/users.plural')</p>
     </a>
 </li>
+
+<li class="nav-item">
+    <a href="{{ route('suppliers.index') }}" class="nav-link {{ Request::is('suppliers*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/suppliers.plural')</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('purchases.index') }}" class="nav-link {{ Request::is('purchases*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/purchases.plural')</p>
+    </a>
+</li>

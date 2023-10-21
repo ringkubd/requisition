@@ -132,7 +132,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
             return [
                 'product_id' => $item['product_id'],
                 'product_option_id' => $item['product_option_id'],
-                'last_purchase_date' => Carbon::parse($item['last_purchase_date'])->toDateString(),
+                'last_purchase_date' => $item['last_purchase_date'] != "" && $item['last_purchase_date'] != null ? Carbon::parse($item['last_purchase_date'])->toDateString() : null,
                 'required_quantity' => $item['required_quantity'],
                 'available_quantity' => $item['available_quantity'],
                 'quantity_to_be_purchase' => $item['quantity_to_be_purchase'],
