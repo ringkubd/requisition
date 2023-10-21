@@ -1,27 +1,24 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, Select, TextInput } from "flowbite-react";
+import { Button, Card, FileInput, Label, Select, TextInput } from "flowbite-react";
 import NavLink from "@/components/NavLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
-import * as Yup from 'yup';
-import { useGetOrganizationQuery } from "@/store/service/organization";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { useGetBranchByOrganizationQuery, useGetBranchQuery, useStoreBranchMutation } from "@/store/service/branch";
-import { useStoreDepartmentMutation } from "@/store/service/deparment";
+import { useStoreSuppliersMutation } from "@/store/service/suppliers";
+import * as Yup from 'yup';
+import { toBase64 } from "@/lib/helpers";
 
 const create = (props) => {
     const router = useRouter();
-    const [storeDepartment, storeResult] = useStoreDepartmentMutation();
-    const [selectedOrganization, setSelectedOrganization] = useState(false);
-    const organizations = useGetOrganizationQuery();
-    const branch = useGetBranchByOrganizationQuery(selectedOrganization, {skip: !selectedOrganization});
+    const [storeSupplier, storeResult] = useStoreSuppliersMutation();
     let formikForm = useRef();
 
     const initValues = {
-        organization_id: '',
-        branch_id: '',
+        contact: '',
+        logo: '',
+        address: '',
         name: '',
     }
     useEffect(() => {
@@ -32,18 +29,37 @@ const create = (props) => {
             formikForm.current.setSubmitting(false)
         }
         if (!storeResult.isLoading && storeResult.isSuccess){
-            toast.success('Department stored successfully.')
-            router.push('/department')
+            toast.success('Supplier stored successfully.')
+            // router.push('/suppliers')
         }
     }, [storeResult]);
-    const submit = (values, pageProps) => {
-        storeDepartment(values)
+    const submit = async (values, pageProps) => {
+        const file = values.logo;
+        if (file instanceof File){
+            toBase64(file).then(c => values.logo = c )
+        }
+        console.log(values)
+        storeSupplier(values)
+    }
+    const MAX_FILE_SIZE = 1024000; //100KB
+
+    const validFileExtensions = { image: ['jpg', 'gif', 'png', 'jpeg', 'svg', 'webp'] };
+
+    function isValidFileType(fileName, fileType) {
+        return fileName && validFileExtensions[fileType].indexOf(fileName.split('.').pop()) > -1;
     }
 
+
     const validationSchema = Yup.object().shape({
-        organization_id: Yup.string().required().label('Organization'),
-        branch_id: Yup.string().required().label('Branch'),
-        name: Yup.string().required().label('Department Name'),
+        contact: Yup.string().label('Contact'),
+        logo: Yup.mixed()
+          .test("is-valid-type", "Not a valid image type",
+            value => isValidFileType(value && value.name.toLowerCase(), "image"))
+          .test("is-valid-size", "Max allowed size is 1000KB",
+            value => value && value.size <= MAX_FILE_SIZE)
+          .label('Logo'),
+        address: Yup.string().label('Address'),
+        name: Yup.string().required().label('Supplier Name'),
     })
 
     return (
@@ -51,19 +67,19 @@ const create = (props) => {
             <AppLayout
                 header={
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Add new department.
+                        Add new supplier.
                     </h2>
                 }
             >
                 <Head>
-                    <title>Add new department</title>
+                    <title>Add new supplier</title>
                 </Head>
                 <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
                     <Card className="min-h-screen">
                         <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
                             <NavLink
-                                active={router.pathname === 'department'}
-                                href={`/department`}
+                                active={router.pathname === 'suppliers'}
+                                href={`/suppliers`}
                             >
                                 <Button>Back</Button>
                             </NavLink>
@@ -76,74 +92,19 @@ const create = (props) => {
                                 innerRef={formikForm}
                             >
                                 {
-                                    ({handleSubmit, handleChange, handleBlur, values, errors, isSubmitting, setErrors}) => (
+                                    ({handleSubmit, handleChange, setFieldValue, handleBlur, values, errors, isSubmitting, setErrors}) => (
                                         <div className="flex flex-col gap-4 md:w-1/2 w-full">
                                             <div className="flex flex-row gap-4">
                                                 <div className="w-full">
                                                     <div className="mb-2 block">
                                                         <Label
-                                                            htmlFor="organization_id"
-                                                            value="Organization"
-                                                        />
-                                                    </div>
-                                                    <Select
-                                                        id="organization_id"
-                                                        onChange={(e) => {
-                                                            handleChange(e)
-                                                            setSelectedOrganization(e.target.value)
-                                                        }}
-                                                        onBlur={handleBlur}
-                                                        required
-                                                    >
-                                                        <option value="">Select Organization</option>
-                                                        {
-                                                            !organizations.isLoading && !organizations.isError && organizations.data.map((o) => (
-                                                                <option key={o.id} value={o.id}>{o.name}</option>
-                                                            ))
-                                                        }
-                                                    </Select>
-                                                    <ErrorMessage
-                                                        name='organization_id'
-                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-row gap-4">
-                                                <div className="w-full">
-                                                    <div className="mb-2 block">
-                                                        <Label
-                                                          htmlFor="branch_id"
-                                                          value="Branch"
-                                                        />
-                                                    </div>
-                                                    <Select
-                                                      id="branch_id"
-                                                      onChange={handleChange}
-                                                      onBlur={handleBlur}
-                                                      required
-                                                    >
-                                                        <option value="">Select Branch</option>
-                                                        {
-                                                          !branch.isLoading && !branch.isError && branch?.data?.data.map((o) => (
-                                                            <option key={o.id} value={o.id}>{o.name}</option>
-                                                          ))
-                                                        }
-                                                    </Select>
-                                                    <ErrorMessage
-                                                      name='branch_id'
-                                                      render={(msg) => <span className='text-red-500'>{msg}</span>} />
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-row gap-4">
-                                                <div className="w-full">
-                                                    <div className="mb-2 block">
-                                                        <Label
                                                             htmlFor="name"
-                                                            value="Department Name"
+                                                            value="Suppliers Name"
                                                         />
                                                     </div>
                                                     <TextInput
                                                         id="name"
-                                                        placeholder="IT"
+                                                        placeholder="Pran"
                                                         type="text"
                                                         required
                                                         onChange={handleChange}
@@ -152,6 +113,67 @@ const create = (props) => {
                                                     <ErrorMessage
                                                         name='name'
                                                         render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                </div>
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                          htmlFor="contact"
+                                                          value="Contact Address"
+                                                        />
+                                                    </div>
+                                                    <TextInput
+                                                      id="contact"
+                                                      placeholder="+8801737956549"
+                                                      type="text"
+                                                      required
+                                                      onChange={handleChange}
+                                                      onBlur={handleBlur}
+                                                    />
+                                                    <ErrorMessage
+                                                      name='contact'
+                                                      render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-row gap-4">
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                          htmlFor="address"
+                                                          value="Address"
+                                                        />
+                                                    </div>
+                                                    <TextInput
+                                                      id="address"
+                                                      placeholder="Dhaka"
+                                                      type="text"
+                                                      required
+                                                      onChange={handleChange}
+                                                      onBlur={handleBlur}
+                                                    />
+                                                    <ErrorMessage
+                                                      name='address'
+                                                      render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-row gap-4">
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                          htmlFor="logo"
+                                                          value="Logo"
+                                                        />
+                                                    </div>
+                                                    <FileInput
+                                                      id="logo"
+                                                      required
+                                                      onChange={(event) => {
+                                                          setFieldValue("logo", event.currentTarget.files[0]);
+                                                      }}
+                                                      onBlur={handleBlur}
+                                                    />
+                                                    <ErrorMessage
+                                                      name='logo'
+                                                      render={(msg) => <span className='text-red-500'>{msg}</span>} />
                                                 </div>
                                             </div>
                                             <div className="flex flex-row gap-4 justify-end">

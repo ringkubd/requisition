@@ -1,86 +1,79 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getCookie } from "@/lib/cookie";
 
-export const DesignationApiService = createApi({
-    reducerPath: 'designation',
-    baseQuery: fetchBaseQuery({
-        baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,
-        prepareHeaders: (headers) => {
-            fetch(
-                process.env.NEXT_PUBLIC_BACKEND_URL + '/sanctum/csrf-cookie',
-                {
-                    method: 'GET',
-                    credentials: 'include',
-                },
-            )
-            const token = decodeURIComponent(getCookie('XSRF-TOKEN')) // <---- CHANGED
-            headers.set('Accept', `application/json`)
-            headers.set('Content-Type', `application/json`)
-            headers.set('X-XSRF-TOKEN', token)
-            return headers
+export const SuppliersApiService = createApi({
+  reducerPath: 'suppliers',
+  baseQuery: fetchBaseQuery({
+    baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,
+    prepareHeaders: (headers) => {
+      fetch(
+        process.env.NEXT_PUBLIC_BACKEND_URL + '/sanctum/csrf-cookie',
+        {
+          method: 'GET',
+          credentials: 'include',
         },
-        credentials: 'include',
+      )
+      const token = decodeURIComponent(getCookie('XSRF-TOKEN')) // <---- CHANGED
+      headers.set('Accept', `application/json`)
+      headers.set('Content-Type', `application/json`)
+      headers.set('X-XSRF-TOKEN', token)
+      return headers
+    },
+    credentials: 'include',
+  }),
+  tagTypes: ['getSuppliers', 'editSuppliers'],
+  endpoints: builder => ({
+    getSuppliers: builder.query({
+      query: () => ({
+        url: 'suppliers',
+      }),
+      providesTags: ['getSuppliers'],
     }),
-    tagTypes: ['getDesignation', 'editDesignation'],
-    endpoints: builder => ({
-        getDesignation: builder.query({
-            query: () => ({
-                url: 'designations',
-            }),
-            providesTags: ['getDesignation'],
-        }),
-        editDesignation: builder.query({
-            query: (id) => ({
-                url: `designations/${id}`,
-            }),
-            providesTags: ['editDesignation'],
-        }),
-        updateDesignation: builder.mutation({
-            query: ({id, ...patch}) => ({
-                url: `designations/${id}`,
-                method: 'PATCH',
-                body: patch
-            }),
-            invalidatesTags: ['getDesignation', 'editDesignation']
-        }),
-        storeDesignation: builder.mutation({
-            query: arg => ({
-                url: 'designations',
-                method: 'POST',
-                body: arg,
-            }),
-            invalidatesTags: ['getDesignation']
-        }),
-        destroyDesignation: builder.mutation({
-            query : (arg) => ({
-                url: `designations/${arg}`,
-                method: 'DELETE',
-            }),
-            invalidatesTags: ['getDesignation']
-        }),
-        getDesignationByOrganizationBranch: builder.query({
-            query : (arg) => ({
-                url: `designation-by-organization-branch`,
-                params: arg,
-            }),
-        }),
+    editSuppliers: builder.query({
+      query: (id) => ({
+        url: `suppliers/${id}`,
+      }),
+      providesTags: ['editSuppliers'],
     }),
+    updateSuppliers: builder.mutation({
+      query: ({id, ...patch}) => ({
+        url: `suppliers/${id}`,
+        method: 'PATCH',
+        body: patch,
+        formData: true,
+      }),
+      invalidatesTags: ['getSuppliers', 'editSuppliers']
+    }),
+    storeSuppliers: builder.mutation({
+      query: arg => ({
+        url: 'suppliers',
+        method: 'POST',
+        body: arg,
+        formData: true,
+      }),
+      invalidatesTags: ['getSuppliers']
+    }),
+    destroySuppliers: builder.mutation({
+      query : (arg) => ({
+        url: `suppliers/${arg}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['getSuppliers']
+    })
+  }),
 })
 
 export const {
-    useGetDesignationQuery,
-    useEditDesignationQuery,
-    useGetDesignationByOrganizationBranchQuery,
-    useUpdateDesignationMutation,
-    useStoreDesignationMutation,
-    useDestroyDesignationMutation,
-    util: { getRunningQueriesThunk },
-} = DesignationApiService;
+  useGetSuppliersQuery,
+  useEditSuppliersQuery,
+  useGetSuppliersByOrganizationBranchQuery,
+  useUpdateSuppliersMutation,
+  useStoreSuppliersMutation,
+  useDestroySuppliersMutation,
+  util: { getRunningQueriesThunk },
+} = SuppliersApiService;
 
 export const {
-    getDesignation,
-    editDesignation,
-    updateDesignation,
-    storeDesignation,
-    destroyDesignation,
-} = DesignationApiService.endpoints;
+  getSuppliers,
+  editSuppliers
+} = SuppliersApiService.endpoints;
