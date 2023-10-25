@@ -9,7 +9,6 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import {
   useGetPurposeSuggestionQuery,
-  useLastPurchaseInformationQuery,
   useStoreInitialRequisitionMutation
 } from "@/store/service/requisitions/initial";
 import Select2ComponentAjax from "@/components/select2/Select2ComponentAjax";

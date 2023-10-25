@@ -48,7 +48,7 @@ export const PurchaseRequisitionApi = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['purchase-requisition', 'get-initial-requisition-for-purchase', 'initial-requisition']
+            invalidatesTags: ['purchase-requisition', 'get-initial-requisition-for-purchase']
         }),
         destroyPurchaseRequisition: build.mutation({
             query : (arg) => ({

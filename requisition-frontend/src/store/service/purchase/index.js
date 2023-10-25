@@ -1,8 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getCookie } from "@/lib/cookie";
 
-export const SuppliersApiService = createApi({
-    reducerPath: 'suppliers',
+export const PurchaseApiService = createApi({
+    reducerPath: 'purchase',
     baseQuery: fetchBaseQuery({
         baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,
         prepareHeaders: (headers) => {
@@ -21,61 +21,61 @@ export const SuppliersApiService = createApi({
         },
         credentials: 'include',
     }),
-    tagTypes: ['getSuppliers', 'editSuppliers'],
+    tagTypes: ['getPurchase', 'editPurchase'],
     endpoints: builder => ({
-        getSuppliers: builder.query({
+        getPurchase: builder.query({
             query: () => ({
-                url: 'suppliers',
+                url: 'purchases',
             }),
-            providesTags: ['getSuppliers'],
+            providesTags: ['getPurchase'],
         }),
-        editSuppliers: builder.query({
+        editPurchase: builder.query({
             query: (id) => ({
-                url: `suppliers/${id}`,
+                url: `purchases/${id}`,
             }),
-            providesTags: ['editSuppliers'],
+            providesTags: ['editPurchase'],
         }),
-        updateSuppliers: builder.mutation({
+        updatePurchase: builder.mutation({
             query: ({id, ...patch}) => ({
-                url: `suppliers/${id}`,
+                url: `purchases/${id}`,
                 method: 'PATCH',
                 body: patch,
                 formData: true,
             }),
-            invalidatesTags: ['getSuppliers', 'editSuppliers']
+            invalidatesTags: ['getPurchase', 'editPurchase']
         }),
-        storeSuppliers: builder.mutation({
+        storePurchase: builder.mutation({
             query: arg => {
                 console.log(arg.logo)
                 return {
-                    url: 'suppliers',
+                    url: 'purchases',
                     method: 'POST',
                     body: arg,
                 }
             },
-            invalidatesTags: ['getSuppliers']
+            invalidatesTags: ['getPurchase']
         }),
-        destroySuppliers: builder.mutation({
+        destroyPurchase: builder.mutation({
             query : (arg) => ({
-                url: `suppliers/${arg}`,
+                url: `purchases/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getSuppliers']
+            invalidatesTags: ['getPurchase']
         })
     }),
 })
 
 export const {
-    useGetSuppliersQuery,
-    useEditSuppliersQuery,
-    useGetSuppliersByOrganizationBranchQuery,
-    useUpdateSuppliersMutation,
-    useStoreSuppliersMutation,
-    useDestroySuppliersMutation,
+    useGetPurchaseQuery,
+    useEditPurchaseQuery,
+    useGetPurchaseByOrganizationBranchQuery,
+    useUpdatePurchaseMutation,
+    useStorePurchaseMutation,
+    useDestroyPurchaseMutation,
     util: { getRunningQueriesThunk },
-} = SuppliersApiService;
+} = PurchaseApiService;
 
 export const {
-    getSuppliers,
-    editSuppliers
-} = SuppliersApiService.endpoints;
+    getPurchase,
+    editPurchase
+} = PurchaseApiService.endpoints;

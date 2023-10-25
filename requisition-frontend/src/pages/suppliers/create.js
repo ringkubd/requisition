@@ -1,14 +1,15 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, FileInput, Label, Select, TextInput } from "flowbite-react";
+import { Button, Card, FileInput, Label, TextInput } from "flowbite-react";
 import NavLink from "@/components/NavLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { useStoreSuppliersMutation } from "@/store/service/suppliers";
 import * as Yup from 'yup';
 import { toBase64 } from "@/lib/helpers";
+import axios from "axios";
 
 const create = (props) => {
     const router = useRouter();
@@ -24,22 +25,25 @@ const create = (props) => {
     useEffect(() => {
         if (storeResult.isError){
             formikForm.current.setErrors(storeResult.error.data.errors)
+            formikForm.current.setSubmitting(false);
         }
         if (storeResult.isError || storeResult.isSuccess){
             formikForm.current.setSubmitting(false)
+            formikForm.current.setSubmitting(false);
         }
         if (!storeResult.isLoading && storeResult.isSuccess){
             toast.success('Supplier stored successfully.')
-            // router.push('/suppliers')
+            formikForm.current.setSubmitting(false);
+            router.push('/suppliers')
         }
     }, [storeResult]);
     const submit = async (values, pageProps) => {
-        const file = values.logo;
-        if (file instanceof File){
-            toBase64(file).then(c => values.logo = c )
+        pageProps.setSubmitting(true);
+        const formData = new FormData();
+        for ( let key in values ) {
+            formData.append(key, values[key]);
         }
-        console.log(values)
-        storeSupplier(values)
+        storeSupplier(formData)
     }
     const MAX_FILE_SIZE = 1024000; //100KB
 

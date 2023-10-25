@@ -8,18 +8,18 @@ import { useRouter } from "next/router";
 import Actions from "@/components/Actions";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import {
-    useDestroySuppliersMutation,
-    useGetSuppliersQuery,
-    getRunningQueriesThunk,
-    getSuppliers
-} from "@/store/service/suppliers";
 import Image from "next/image";
+import {
+    getPurchase,
+    useGetPurchaseQuery,
+    useDestroyPurchaseMutation,
+    getRunningQueriesThunk,
+} from "@/store/service/purchase";
 
-const Department = () => {
+const Purchase = () => {
   const router = useRouter();
-  const {data, isLoading, isError} = useGetSuppliersQuery();
-  const [destroy, destroyResponse] = useDestroySuppliersMutation();
+  const {data, isLoading, isError} = useGetPurchaseQuery();
+  const [destroy, destroyResponse] = useDestroyPurchaseMutation();
 
 
   useEffect(() => {
@@ -30,31 +30,41 @@ const Department = () => {
 
     const columns = [
         {
-            name: 'Supplier Name',
-            selector: row => row.name,
+            name: 'Product',
+            selector: row => row.product?.title,
             sortable: true,
         },
         {
-            name: 'logo',
-            selector: row => row.logo ? <Image width={50} height={50} alt={row.name} src={row.logo} /> : "",
+            name: 'Supplier',
+            selector: row => row.supplier?.logo ? <Image width={50} height={50} alt={row.supplier?.name} src={row.supplier?.logo} /> : "",
             sortable: true,
         },
         {
-            name: 'contact',
-            selector: row => row.contact,
+            name: 'Requisition',
+            selector: row => row.purchaseRequisition?.irf_no,
             sortable: true,
         },
         {
-            name: 'address',
-            selector: row => row.address,
+            name: 'Qty',
+            selector: row => row.qty,
+            sortable: true,
+        },
+        {
+            name: 'Unit Price',
+            selector: row => row.unit_price,
+            sortable: true,
+        },
+        {
+            name: 'Total',
+            selector: row => row.total_price,
             sortable: true,
         },
         {
             name: 'Actions',
             cell: (row) => <Actions
                 itemId={row.id}
-                edit={`/suppliers/${row.id}/edit`}
-                view={`/suppliers/${row.id}/view`}
+                // edit={`/purchase/${row.id}/edit`}
+                // view={`/purchase/${row.id}/view`}
                 destroy={destroy}
                 progressing={destroyResponse.isLoading}
             />,
@@ -65,24 +75,24 @@ const Department = () => {
   return (
     <>
       <Head>
-        <title>Suppliers Management</title>
+        <title>Purchase Management</title>
       </Head>
       <AppLayout
           header={
               <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                  Suppliers Management.
+                  Purchase Management.
               </h2>
           }
       >
           <Head>
-              <title>Add new supplier</title>
+              <title>Purchase Management.</title>
           </Head>
           <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
               <Card>
                   <div className="flex flex-row space-x-4 space-y-4  shadow-lg py-4 px-4">
                       <NavLink
-                          active={router.pathname === 'suppliers/create'}
-                          href={`suppliers/create`}
+                          active={router.pathname === 'purchase/create'}
+                          href={`purchase/create`}
                       >
                           <Button>Create</Button>
                       </NavLink>
@@ -95,7 +105,7 @@ const Department = () => {
                               pagination
                               responsive
                               progressPending={isLoading}
-                              persistTableHead
+                              persistTableHead={true}
                           />
                       )
                   }
@@ -108,11 +118,11 @@ const Department = () => {
 
 export const getServerSideProps = wrapper.getServerSideProps((store) => async (context) => {
     // const params = context.params
-    store.dispatch(getSuppliers.initiate())
+    store.dispatch(getPurchase.initiate())
     await Promise.all(store.dispatch(getRunningQueriesThunk()));
     return {
         props: {},
     };
 })
 
-export default Department;
+export default Purchase;

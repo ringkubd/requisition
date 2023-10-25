@@ -5,6 +5,12 @@ module.exports = {
         // your project has ESLint errors.
         ignoreDuringBuilds: true,
     },
+    images: {
+        domains: [
+            'localhost',
+            'requisition-api.isdb-bisew.org'
+        ],
+    },
     env: {
         NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
         NEXT_PUBLIC_BACKEND_API_URL: process.env.NEXT_PUBLIC_BACKEND_API_URL,
