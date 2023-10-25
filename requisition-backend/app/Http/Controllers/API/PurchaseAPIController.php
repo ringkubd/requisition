@@ -4,7 +4,11 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreatePurchaseAPIRequest;
 use App\Http\Requests\API\UpdatePurchaseAPIRequest;
+use App\Http\Resources\PurchaseRequisitionResource;
+use App\Http\Resources\SupplierResource;
 use App\Models\Purchase;
+use App\Models\PurchaseRequisition;
+use App\Models\Supplier;
 use App\Repositories\PurchaseRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -101,6 +105,7 @@ class PurchaseAPIController extends AppBaseController
     public function store(CreatePurchaseAPIRequest $request): JsonResponse
     {
         $input = $request->all();
+        $input['user_id'] = $request->user()->id;
 
         $purchase = $this->purchaseRepository->create($input);
 
@@ -276,6 +281,51 @@ class PurchaseAPIController extends AppBaseController
         return $this->sendResponse(
             $id,
             __('messages.deleted', ['model' => __('models/purchases.singular')])
+        );
+    }
+
+    /**
+     * Extra Options
+     */
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+
+    public function suppliers(Request $request){
+        $start = ((int)$request->page - 1) * 10;
+        $end = ((int)$request->page) * 10;
+
+        $suppliers = SupplierResource::collection(Supplier::query()
+            ->where('name', 'like', "%$request->search%")
+            ->skip($start)
+            ->limit($end)
+            ->get());
+
+        return $this->sendResponse(
+            $suppliers,
+            __('messages.retrieved', ['model' => __('models/initialRequisitions.plural')])
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function purchaseRequisition(Request $request){
+        $start = ((int)$request->page - 1) * 10;
+        $end = ((int)$request->page) * 10;
+
+        $purchase_requisition = PurchaseRequisitionResource::collection(PurchaseRequisition::query()
+            ->where('irf_no', 'like', "%$request->search%")
+            ->orWhere('ir_no', 'like', "%$request->search%")
+            ->skip($start)
+            ->limit($end)
+            ->get());
+
+        return $this->sendResponse(
+            $purchase_requisition,
+            __('messages.retrieved', ['model' => __('models/initialRequisitions.plural')])
         );
     }
 }

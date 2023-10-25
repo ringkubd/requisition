@@ -86,10 +86,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         'qty' => 'required|numeric',
         'unit_price' => 'required|numeric',
         'total_price' => 'required|numeric',
-        'user_id' => 'required',
-        'deleted_at' => 'nullable',
-        'created_at' => 'nullable',
-        'updated_at' => 'nullable'
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo

@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Requests\API\CreateSupplierAPIRequest;
 use App\Http\Requests\API\UpdateSupplierAPIRequest;
 use App\Models\Supplier;
 use App\Repositories\SupplierRepository;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\SupplierResource;
+use OpenApi\Annotations as OA;
 
 /**
  * Class SupplierController
@@ -101,7 +102,14 @@ class SupplierAPIController extends AppBaseController
     public function store(Request $request): JsonResponse
     {
         $input = $request->all();
-        return response()->json($request->logo);
+        if($request->hasFile('logo')){
+            $logo = $request->file('logo');
+            $extension = $logo->getClientOriginalExtension();
+            $currentDateTime = Carbon::now()->format("Y-m-d_h_i");
+            $name = str_replace(" ", "",$request->name)."_".$currentDateTime.".".$extension;
+            $logo->move(public_path('supliers_logo'), "$name");
+            $input['logo'] = url("/supliers_logo/$name");
+        };
         $supplier = $this->supplierRepository->create($input);
 
         return $this->sendResponse(

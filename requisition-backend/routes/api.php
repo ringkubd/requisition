@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Resources\SupplierResource;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -67,6 +68,9 @@ Route::resource('initial-requisitions', App\Http\Controllers\API\InitialRequisit
  * Extra URL
  */
 Route::get('product-select', [\App\Http\Controllers\API\InitialRequisitionAPIController::class, 'products']);
+Route::get('suppliers-select', [\App\Http\Controllers\API\PurchaseAPIController::class, 'suppliers']);
+Route::get('purchase-requisition-select', [\App\Http\Controllers\API\PurchaseAPIController::class, 'purchaseRequisition']);
+
 Route::get('last-purchase-information', [\App\Http\Controllers\API\InitialRequisitionAPIController::class, 'lastPurchase']);
 Route::post('change-branch', function (Request $request){
     cache()->forget('select_branch');
