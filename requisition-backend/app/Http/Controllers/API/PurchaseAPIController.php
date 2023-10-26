@@ -222,7 +222,7 @@ class PurchaseAPIController extends AppBaseController
 
         /** @var Purchase $purchase */
         $purchase = $this->purchaseRepository->find($id);
-
+        $oldQty = $purchase->qty;
         if (empty($purchase)) {
             return $this->sendError(
                 __('messages.not_found', ['model' => __('models/purchases.singular')])
@@ -230,6 +230,14 @@ class PurchaseAPIController extends AppBaseController
         }
 
         $purchase = $this->purchaseRepository->update($input, $id);
+
+        if ($purchase){
+            $product_option = ProductOption::query()
+                ->find($input['product_option_id']);
+            $product_option->unit_price = $input['unit_price'];
+            $product_option->stock = (float)$input['qty'] + $product_option->stock - $oldQty;
+            $product_option->save();
+        }
 
         return $this->sendResponse(
             new PurchaseResource($purchase),
@@ -284,8 +292,12 @@ class PurchaseAPIController extends AppBaseController
             );
         }
 
-        $purchase->delete();
-
+        if ($purchase->delete()){
+            $product_option = ProductOption::query()
+                ->find($purchase->product_option_id);
+            $product_option->stock = $product_option->stock - $purchase->qty;
+            $product_option->save();
+        }
         return $this->sendResponse(
             $id,
             __('messages.deleted', ['model' => __('models/purchases.singular')])
