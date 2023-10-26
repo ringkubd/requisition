@@ -6,6 +6,7 @@ use App\Http\Requests\API\CreatePurchaseAPIRequest;
 use App\Http\Requests\API\UpdatePurchaseAPIRequest;
 use App\Http\Resources\PurchaseRequisitionResource;
 use App\Http\Resources\SupplierResource;
+use App\Models\ProductOption;
 use App\Models\Purchase;
 use App\Models\PurchaseRequisition;
 use App\Models\Supplier;
@@ -106,8 +107,15 @@ class PurchaseAPIController extends AppBaseController
     {
         $input = $request->all();
         $input['user_id'] = $request->user()->id;
-
         $purchase = $this->purchaseRepository->create($input);
+
+        if ($purchase){
+            $product_option = ProductOption::query()
+                ->find($input['product_option_id']);
+            $product_option->unit_price = $input['unit_price'];
+            $product_option->stock = (float)$input['qty'] + $product_option->stock;
+            $product_option->save();
+        }
 
         return $this->sendResponse(
             new PurchaseResource($purchase),

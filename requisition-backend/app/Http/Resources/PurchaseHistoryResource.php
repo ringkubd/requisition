@@ -2,25 +2,23 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PurchaseResource extends JsonResource
+class PurchaseHistoryResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * @return array<string, mixed>
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
             'product_id' => $this->product_id,
-            'product' => $this->product,
             'product_title' => $this->product?->title,
             'product_option_id' => $this->product_option_id,
-            'productOption' => new ProductOptionResource($this->productOption),
             'supplier_id' => $this->supplier_id,
             'supplier' => $this->supplier,
             'purchase_requisition_id' => $this->purchase_requisition_id,

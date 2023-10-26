@@ -17,9 +17,11 @@ class ProductOptionResource extends JsonResource
         return [
             'id' => $this->id,
             'product_id' => $this->product_id,
+            'title' => $this->option?->name . "(".$this->option_value . ")",
             'option_id' => $this->option_id,
             'option' => $this->option,
             'option_name' => $this->option?->name,
+            'option_purchase_history' => PurchaseHistoryResource::collection($this->purchaseHistory),
             'sku' => $this->sku,
             'option_value' => $this->option_value,
             'unit_price' => $this->unit_price,

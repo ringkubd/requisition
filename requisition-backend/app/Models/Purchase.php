@@ -65,6 +65,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
     public $fillable = [
         'product_id',
+        'product_option_id',
         'supplier_id',
         'purchase_requisition_id',
         'qty',
@@ -81,6 +82,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
     public static array $rules = [
         'product_id' => 'required',
+        'product_option_id' => 'required',
         'supplier_id' => 'nullable',
         'purchase_requisition_id' => 'nullable',
         'qty' => 'required|numeric',
@@ -101,6 +103,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\Product::class, 'product_id');
+    }
+
+    public function productOption(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(ProductOption::class);
     }
 
     public function purchaseRequisition(): \Illuminate\Database\Eloquent\Relations\BelongsTo

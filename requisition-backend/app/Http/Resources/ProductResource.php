@@ -22,7 +22,7 @@ class ProductResource extends JsonResource
             'category_id' => $this->category_id,
             'category' => $this->category,
             'product_metas' => $this->productMetas,
-            'product_options' => $this->productOptions->load('option'),
+            'product_options' => ProductOptionResource::collection($this->productOptions),
             'last_purchase' => $this->lastPurchaseRequisition,
             'description' => $this->description,
             'status' => $this->status,

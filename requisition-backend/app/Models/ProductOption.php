@@ -104,4 +104,8 @@ use Illuminate\Database\Eloquent\Model;
     {
         return $this->belongsTo(\App\Models\Product::class, 'product_id');
     }
+
+    public function purchaseHistory(){
+        return $this->hasMany(Purchase::class);
+    }
 }

@@ -9,6 +9,7 @@ class PurchaseRepository extends BaseRepository
 {
     protected $fieldSearchable = [
         'product_id',
+        'product_option_id',
         'supplier_id',
         'purchase_requisition_id',
         'qty',

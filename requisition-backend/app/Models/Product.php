@@ -119,4 +119,8 @@ use Illuminate\Database\Eloquent\Model;
     public function lastPurchaseRequisition(){
         return $this->hasOneThrough(PurchaseRequisition::class, PurchaseRequisitionProduct::class, 'product_id', 'id', 'id', 'purchase_requisition_id');
     }
+
+    public function purchaseHistory(){
+        return $this->hasMany(Purchase::class);
+    }
 }
