@@ -72,8 +72,5 @@ export const {
 
 export const {
     getOptions,
-    editOptions,
-    updateOptions,
-    storeOptions,
-    destroyOptions,
+    editOptions
 } = OptionsApiService.endpoints;

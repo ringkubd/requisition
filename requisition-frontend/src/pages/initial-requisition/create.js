@@ -23,7 +23,6 @@ const InitialRequisitionCreate = (props) => {
   const [storeInitialRequisition, storeResult] = useStoreInitialRequisitionMutation();
   const [products, setProducts] = useState([]);
   const selectRef = useRef();
-  const [suggestions, setSuggestions] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProductOption, setSelectedProductOption] = useState(null);
 

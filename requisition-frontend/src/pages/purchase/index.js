@@ -35,8 +35,13 @@ const Purchase = () => {
             sortable: true,
         },
         {
+            name: 'Variant',
+            selector: row => row.productOption?.title,
+            sortable: true,
+        },
+        {
             name: 'Supplier',
-            selector: row => row.supplier?.logo ? <Image width={50} height={50} alt={row.supplier?.name} src={row.supplier?.logo} /> : "",
+            selector: row => row.supplier?.logo ? <Image width={50} height={50} alt={row.supplier?.name} src={row.supplier?.logo} /> : row.supplier?.name,
             sortable: true,
         },
         {
