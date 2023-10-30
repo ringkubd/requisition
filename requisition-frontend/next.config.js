@@ -1,14 +1,20 @@
 module.exports = {
-    swcMinify: false,
+    swcMinify: true,
     eslint: {
         // Warning: This allows production builds to successfully complete even if
         // your project has ESLint errors.
         ignoreDuringBuilds: true,
     },
     images: {
-        domains: [
-            'localhost',
-            'requisition-api.isdb-bisew.org'
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: '**.isdb-bisew.org',
+            },
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+            },
         ],
     },
     env: {

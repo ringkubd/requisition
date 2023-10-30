@@ -19,7 +19,7 @@
 
         <div class="card">
 
-            {!! Form::open(['route' => 'purchaseRequisitions.store']) !!}
+            {!! Form::open(['route' => 'purchase-requisitions.store']) !!}
 
             <div class="card-body">
 
@@ -31,7 +31,7 @@
 
             <div class="card-footer">
                 {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
-                <a href="{{ route('purchaseRequisitions.index') }}" class="btn btn-default"> @lang('crud.cancel') </a>
+                <a href="{{ route('purchase-requisitions.index') }}" class="btn btn-default"> @lang('crud.cancel') </a>
             </div>
 
             {!! Form::close() !!}

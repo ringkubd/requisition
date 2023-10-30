@@ -137,6 +137,12 @@ const Navigation = ({ user }) => {
                                     Purchase
                                 </DropdownLink>
                                 <DropdownLink
+                                    href="/issue"
+                                    active={router.pathname.includes('issue').toString()}
+                                >
+                                    Issue
+                                </DropdownLink>
+                                <DropdownLink
                                   href="/suppliers"
                                   active={router.pathname.includes('suppliers').toString()}
                                 >
@@ -305,6 +311,12 @@ const Navigation = ({ user }) => {
                               active={router.pathname.includes('purchase').toString()}
                             >
                                 Purchase
+                            </DropdownLink>
+                            <DropdownLink
+                                href="/issue"
+                                active={router.pathname.includes('issue').toString()}
+                            >
+                                Issue
                             </DropdownLink>
                             <DropdownLink
                               href="/suppliers"

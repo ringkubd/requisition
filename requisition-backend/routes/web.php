@@ -41,3 +41,4 @@ Route::resource('purchase-requisitions', App\Http\Controllers\PurchaseRequisitio
 Route::resource('users', App\Http\Controllers\UserController::class);
 Route::resource('suppliers', App\Http\Controllers\SupplierController::class);
 Route::resource('purchases', App\Http\Controllers\PurchaseController::class);
+Route::resource('product-issues', App\Http\Controllers\ProductIssueController::class);

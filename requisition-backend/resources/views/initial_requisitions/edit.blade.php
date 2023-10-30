@@ -19,7 +19,7 @@
 
         <div class="card">
 
-            {!! Form::model($initialRequisition, ['route' => ['initialRequisitions.update', $initialRequisition->id], 'method' => 'patch']) !!}
+            {!! Form::model($initialRequisition, ['route' => ['initial-requisitions.update', $initialRequisition->id], 'method' => 'patch']) !!}
 
             <div class="card-body">
                 <div class="row">
@@ -29,7 +29,7 @@
 
             <div class="card-footer">
                 {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
-                <a href="{{ route('initialRequisitions.index') }}" class="btn btn-default"> @lang('crud.cancel') </a>
+                <a href="{{ route('initial_requisitions.index') }}" class="btn btn-default"> @lang('crud.cancel') </a>
             </div>
 
             {!! Form::close() !!}

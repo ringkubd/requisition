@@ -10,7 +10,6 @@ function headers(header){
     )
     const token = decodeURIComponent(getCookie('XSRF-TOKEN')) // <---- CHANGED
     headers.set('Accept', `application/json`)
-    headers.set('Content-Type', `application/json`)
     headers.set('X-XSRF-TOKEN', token)
     return headers
 }

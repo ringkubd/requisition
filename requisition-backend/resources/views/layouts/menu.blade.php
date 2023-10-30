@@ -71,14 +71,14 @@
 </li>
 
 <li class="nav-item">
-    <a href="{{ route('initialRequisitions.index') }}" class="nav-link {{ Request::is('initialRequisitions*') ? 'active' : '' }}">
+    <a href="{{ route('initial-requisitions.index') }}" class="nav-link {{ Request::is('initial-requisitions*') ? 'active' : '' }}">
         <i class="nav-icon fas fa-home"></i>
         <p>@lang('models/initialRequisitions.plural')</p>
     </a>
 </li>
 
 <li class="nav-item">
-    <a href="{{ route('purchaseRequisitions.index') }}" class="nav-link {{ Request::is('purchaseRequisitions*') ? 'active' : '' }}">
+    <a href="{{ route('purchase-requisitions.index') }}" class="nav-link {{ Request::is('purchase-requisitions*') ? 'active' : '' }}">
         <i class="nav-icon fas fa-home"></i>
         <p>@lang('models/purchaseRequisitions.plural')</p>
     </a>
@@ -102,5 +102,12 @@
     <a href="{{ route('purchases.index') }}" class="nav-link {{ Request::is('purchases*') ? 'active' : '' }}">
         <i class="nav-icon fas fa-home"></i>
         <p>@lang('models/purchases.plural')</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('product-issues.index') }}" class="nav-link {{ Request::is('product-iIssues*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/productIssues.plural')</p>
     </a>
 </li>

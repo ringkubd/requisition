@@ -24,13 +24,13 @@
                     <td>{{ $initialRequisition->is_purchase_requisition_generated }}</td>
                     <td>{{ $initialRequisition->is_purchase_done }}</td>
                     <td  style="width: 120px">
-                        {!! Form::open(['route' => ['initialRequisitions.destroy', $initialRequisition->id], 'method' => 'delete']) !!}
+                        {!! Form::open(['route' => ['initial-requisitions.destroy', $initialRequisition->id], 'method' => 'delete']) !!}
                         <div class='btn-group'>
-                            <a href="{{ route('initialRequisitions.show', [$initialRequisition->id]) }}"
+                            <a href="{{ route('initial-requisitions.show', [$initialRequisition->id]) }}"
                                class='btn btn-default btn-xs'>
                                 <i class="far fa-eye"></i>
                             </a>
-                            <a href="{{ route('initialRequisitions.edit', [$initialRequisition->id]) }}"
+                            <a href="{{ route('initial-requisitions.edit', [$initialRequisition->id]) }}"
                                class='btn btn-default btn-xs'>
                                 <i class="far fa-edit"></i>
                             </a>

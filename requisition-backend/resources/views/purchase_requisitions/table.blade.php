@@ -18,13 +18,13 @@
                     <td>{{ $purchaseRequisition->received_amount }}</td>
                     <td>{{ $purchaseRequisition->payment_type }}</td>
                     <td  style="width: 120px">
-                        {!! Form::open(['route' => ['purchaseRequisitions.destroy', $purchaseRequisition->id], 'method' => 'delete']) !!}
+                        {!! Form::open(['route' => ['purchase-requisitions.destroy', $purchaseRequisition->id], 'method' => 'delete']) !!}
                         <div class='btn-group'>
-                            <a href="{{ route('purchaseRequisitions.show', [$purchaseRequisition->id]) }}"
+                            <a href="{{ route('purchase-requisitions.show', [$purchaseRequisition->id]) }}"
                                class='btn btn-default btn-xs'>
                                 <i class="far fa-eye"></i>
                             </a>
-                            <a href="{{ route('purchaseRequisitions.edit', [$purchaseRequisition->id]) }}"
+                            <a href="{{ route('purchase-requisitions.edit', [$purchaseRequisition->id]) }}"
                                class='btn btn-default btn-xs'>
                                 <i class="far fa-edit"></i>
                             </a>

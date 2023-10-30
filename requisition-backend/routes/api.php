@@ -103,3 +103,7 @@ Route::resource('suppliers', App\Http\Controllers\API\SupplierAPIController::cla
 
 Route::resource('purchases', App\Http\Controllers\API\PurchaseAPIController::class)
     ->except(['create', 'edit']);
+
+
+Route::resource('product-issues', App\Http\Controllers\API\ProductIssueAPIController::class)
+    ->except(['create', 'edit']);
