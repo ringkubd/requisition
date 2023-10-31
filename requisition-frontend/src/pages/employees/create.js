@@ -200,9 +200,9 @@ const create = (props) => {
                           </div>
                           <Select2Component
                             id="organization_id"
-                            onChange={(e, s) => {
-                              setFieldValue('organization_id', s.val())
-                              setSelectedOrganization(s.val())
+                            onChange={(e) => {
+                                handleChange(e)
+                                setSelectedOrganization(e.target.value)
                             }}
                             className={`w-full`}
                             onBlur={handleBlur}

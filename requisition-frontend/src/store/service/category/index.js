@@ -21,7 +21,7 @@ export const CategoryApiService = createApi({
         },
         credentials: 'include',
     }),
-    tagTypes: ['getCategory', 'editCategory'],
+    tagTypes: ['getCategory', 'editCategory', 'sub-category'],
     endpoints: builder => ({
         getCategory: builder.query({
             query: () => ({
@@ -58,6 +58,13 @@ export const CategoryApiService = createApi({
             }),
             invalidatesTags: ['getCategory']
         }),
+        getSubCategory: builder.query({
+            query: (parentId) => ({
+                url: `sub-category/${parentId}`,
+                method: 'GET'
+            }),
+            providesTags: ['sub-category']
+        })
     }),
 })
 
@@ -67,13 +74,11 @@ export const {
     useUpdateCategoryMutation,
     useStoreCategoryMutation,
     useDestroyCategoryMutation,
+    useGetSubCategoryQuery,
     util: { getRunningQueriesThunk },
 } = CategoryApiService;
 
 export const {
     getCategory,
-    editCategory,
-    updateCategory,
-    storeCategory,
-    destroyCategory,
+    editCategory
 } = CategoryApiService.endpoints;

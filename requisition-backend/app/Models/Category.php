@@ -3,7 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
- use Illuminate\Database\Eloquent\SoftDeletes; use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OpenApi\Annotations as OA;
+
 /**
  * @OA\Schema(
  *      schema="Category",
@@ -49,9 +52,11 @@ use Illuminate\Database\Eloquent\Model;
  * )
  */class Category extends Model
 {
-     use SoftDeletes;    use HasFactory;    public $table = 'categories';
+    use SoftDeletes, HasFactory;
+    public $table = 'categories';
 
     public $fillable = [
+        'parent_id',
         'title',
         'description'
     ];
@@ -62,6 +67,7 @@ use Illuminate\Database\Eloquent\Model;
     ];
 
     public static array $rules = [
+        'parent_id' => 'nullable',
         'title' => 'required|string|max:255',
         'description' => 'nullable|string|max:65535',
         'deleted_at' => 'nullable',
@@ -73,4 +79,15 @@ use Illuminate\Database\Eloquent\Model;
     {
         return $this->hasMany(\App\Models\Product::class, 'category_id');
     }
+
+    public function subCategory(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Category::class, 'parent_id');
+    }
+
+    public function parentCategory(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
 }

@@ -21,10 +21,20 @@ const Select2ComponentAjax = forwardRef(({ajax, onChange,...other}, ref) => {
 
     useEffect(() => {
         $(selectRef.current).on('change', function(e) {
-            onChange(e);
+            const data = $(this).select2('data')
+            if (other.multiple){
+                onChange(e, data);
+            }else{
+                onChange(e, data[0]);
+            }
         })
         $(selectRef.current).on('blur', function(e) {
-            onChange(e);
+            const data = $(this).select2('data')
+            if (other.multiple){
+                onChange(e, data);
+            }else{
+                onChange(e, data[0]);
+            }
         })
         $(selectRef.current).val("").trigger('change')
     }, []);
@@ -34,7 +44,7 @@ const Select2ComponentAjax = forwardRef(({ajax, onChange,...other}, ref) => {
         $(selectRef.current).val("").trigger('click')
     }
     useImperativeHandle(ref, () => ({
-        resetSelect,
+        resetSelect
     }));
     return (
         <div className="w-full">

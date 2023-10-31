@@ -3,14 +3,16 @@
         <table class="table" id="categories-table">
             <thead>
             <tr>
+                <th>Parent Id</th>
                 <th>Title</th>
                 <th>Description</th>
-                <th colspan="3">Action</th>
+                <th colspan="3">crud.action</th>
             </tr>
             </thead>
             <tbody>
             @foreach($categories as $category)
                 <tr>
+                    <td>{{ $category->parent_id }}</td>
                     <td>{{ $category->title }}</td>
                     <td>{{ $category->description }}</td>
                     <td  style="width: 120px">

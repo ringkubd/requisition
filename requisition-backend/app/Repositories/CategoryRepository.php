@@ -8,6 +8,7 @@ use App\Repositories\BaseRepository;
 class CategoryRepository extends BaseRepository
 {
     protected $fieldSearchable = [
+        'parent_id',
         'title',
         'description'
     ];

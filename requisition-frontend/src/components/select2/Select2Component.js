@@ -17,10 +17,20 @@ const Select2Component = ({options, onChange, ...other}) => {
 
     useEffect(() => {
         $(selectRef.current).on('change', function(e) {
-            onChange(e, $(this));
+            const data = $(this).select2('data')
+            if (other.multiple){
+                onChange(e, data);
+            }else{
+                onChange(e, data[0]);
+            }
         })
         $(selectRef.current).on('blur', function(e) {
-            onChange(e, $(this));
+            const data = $(this).select2('data')
+            if (other.multiple){
+                onChange(e, data);
+            }else{
+                onChange(e, data[0]);
+            }
         })
     }, []);
 

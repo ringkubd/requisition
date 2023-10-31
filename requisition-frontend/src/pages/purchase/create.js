@@ -10,6 +10,7 @@ import * as Yup from 'yup';
 import { useStorePurchaseMutation } from "@/store/service/purchase";
 import Select2ComponentAjax from "@/components/select2/Select2ComponentAjax";
 import moment from "moment/moment";
+import Select2Component from "@/components/select2/Select2Component";
 const create = (props) => {
     const router = useRouter();
     const [storeSupplier, storeResult] = useStorePurchaseMutation();
@@ -18,9 +19,18 @@ const create = (props) => {
     const supplierSelectRef = useRef();
     const purchaseRequisitionSelectRef = useRef();
     const [products, setProducts] = useState([]);
+    const [selectedProduct, setSelectedProduct] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
     const [purchaseRequisition, setPurchaseRequisition] = useState([]);
+    const [productOption, setProductOption] = useState("");
 
+    useEffect(() => {
+        if (selectedProduct){
+            formikForm.current.setFieldValue('product_option_id',products.filter((p) => parseInt(p.id) === parseInt(selectedProduct))[0]?.product_option?.id)
+            setProductOption(products.filter((p) => parseInt(p.id) === parseInt(selectedProduct))[0]?.product_option)
+            formikForm.current.setFieldValue('qty',products.filter((p) => parseInt(p.id) === parseInt(selectedProduct))[0]?.quantity_to_be_purchase)
+        }
+    }, [selectedProduct])
     const initValues = {
         product_id: '',
         supplier_id: '',
@@ -98,34 +108,33 @@ const create = (props) => {
                                                 <div className="w-full">
                                                     <div className="mb-2 block">
                                                         <Label
-                                                            htmlFor="product"
-                                                            value="Product"
+                                                            htmlFor="purchase_requisition_id"
+                                                            value="Requisition"
                                                         />
                                                     </div>
                                                     <Select2ComponentAjax
-                                                        name='product_id'
-                                                        id='product_id'
-                                                        ref={selectRef}
-                                                        onChange={(e) => {
+                                                        name='purchase_requisition_id'
+                                                        id='purchase_requisition_id'
+                                                        ref={purchaseRequisitionSelectRef}
+                                                        onChange={(e, {data}) => {
                                                             handleChange(e)
+                                                            setProducts(data)
                                                         }}
                                                         className={`w-full border-1 border-gray-300`}
                                                         ajax={ {
-                                                            url: process.env.NEXT_PUBLIC_BACKEND_API_URL+ `product-select`,
+                                                            url: process.env.NEXT_PUBLIC_BACKEND_API_URL+ `purchase-requisition-select`,
                                                             data: function (params) {
-                                                                var query = {
+                                                                return {
                                                                     search: params.term,
                                                                     page: params.page || 1
                                                                 }
-                                                                // Query parameters will be ?search=[term]&type=public
-                                                                return query;
                                                             },
                                                             processResults: function (data, params) {
                                                                 params.page = params.page || 1;
-                                                                setProducts(data.data);
+                                                                setPurchaseRequisition(data.data);
                                                                 return {
                                                                     results: data.data.map((d)=> {
-                                                                        return {text: d.title, id: d.id, unit: d.unit}
+                                                                        return {text: d.irf_no, id: d.id, data: d?.purchase_requisition_products}
                                                                     }),
                                                                     pagination: {
                                                                         more: (params.page * 10) < data.count_filtered
@@ -139,6 +148,33 @@ const create = (props) => {
                                                         name='name'
                                                         render={(msg) => <span className='text-red-500'>{msg}</span>} />
                                                 </div>
+                                            </div>
+                                            <div className="flex flex-col sm:flex-row gap-4">
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                            htmlFor="product"
+                                                            value="Product"
+                                                        />
+                                                    </div>
+                                                    <Select2Component
+                                                        name='product_id'
+                                                        id='product_id'
+                                                        ref={selectRef}
+                                                        onChange={(e) => {
+                                                            handleChange(e)
+                                                            setSelectedProduct(e.target.value);
+                                                            setFieldValue('product_option_id', products.filter((p) => parseInt(p.id) === parseInt(e.target.value))[0]?.id)
+                                                            console.log(products)
+                                                        }}
+                                                        options={products?.map((p) => ({value: p.id, label: p.title}))}
+                                                        className={`w-full border-1 border-gray-300`}
+                                                    />
+
+                                                    <ErrorMessage
+                                                        name='name'
+                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                </div>
                                                 <div className="w-full">
                                                     <div className="mb-2 block">
                                                         <Label
@@ -146,20 +182,18 @@ const create = (props) => {
                                                             value="Varient"
                                                         />
                                                     </div>
-                                                    <Select
-                                                        value={values.product_option_id}
+                                                    <TextInput
+                                                        id="product_option_id"
+                                                        placeholder="5"
+                                                        type="text"
+                                                        disabled
+                                                        required
                                                         onChange={(e) => {
-                                                            handleChange(e)
+                                                            setFieldValue('total_price', values.unit_price * values.product_option_id)
                                                         }}
-                                                        onBlur={handleChange}
-                                                        id='product_option_id'
-                                                        name="product_option_id"
-                                                    >
-                                                        <option value=""></option>
-                                                        {
-                                                            products.length ? products.filter(p => p.id == values.product_id)[0]?.product_options?.map((o) => <option key={o.id} value={o.id}>{o?.option?.name} ({o?.option_value})</option>) : ''
-                                                        }
-                                                    </Select>
+                                                        onBlur={handleBlur}
+                                                        value={productOption ? productOption.title : ''}
+                                                    />
                                                     <ErrorMessage
                                                         name='product_option_id'
                                                         render={(msg) => <span className='text-red-500'>{msg}</span>} />
@@ -208,48 +242,6 @@ const create = (props) => {
                                                         name='name'
                                                         render={(msg) => <span className='text-red-500'>{msg}</span>} />
                                                 </div>
-                                                <div className="w-full">
-                                                    <div className="mb-2 block">
-                                                        <Label
-                                                            htmlFor="purchase_requisition_id"
-                                                            value="Requisition"
-                                                        />
-                                                    </div>
-                                                    <Select2ComponentAjax
-                                                        name='purchase_requisition_id'
-                                                        id='purchase_requisition_id'
-                                                        ref={purchaseRequisitionSelectRef}
-                                                        onChange={(e) => {
-                                                            handleChange(e)
-                                                        }}
-                                                        className={`w-full border-1 border-gray-300`}
-                                                        ajax={ {
-                                                            url: process.env.NEXT_PUBLIC_BACKEND_API_URL+ `purchase-requisition-select`,
-                                                            data: function (params) {
-                                                                return {
-                                                                    search: params.term,
-                                                                    page: params.page || 1
-                                                                }
-                                                            },
-                                                            processResults: function (data, params) {
-                                                                params.page = params.page || 1;
-                                                                setPurchaseRequisition(data.data);
-                                                                return {
-                                                                    results: data.data.map((d)=> {
-                                                                        return {text: d.irf_no, id: d.id}
-                                                                    }),
-                                                                    pagination: {
-                                                                        more: (params.page * 10) < data.count_filtered
-                                                                    }
-                                                                };
-                                                            }
-                                                        }}
-                                                        data-placeholder="Select options..."
-                                                    />
-                                                    <ErrorMessage
-                                                        name='name'
-                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
-                                                </div>
                                             </div>
                                             <div className="flex flex-col sm:flex-row gap-4">
                                                 <div className="w-full">
@@ -270,6 +262,7 @@ const create = (props) => {
                                                             setFieldValue('total_price', values.unit_price * e.target.value)
                                                         }}
                                                         onBlur={handleBlur}
+                                                        value={values.qty}
                                                     />
                                                     <ErrorMessage
                                                         name='qty'

@@ -22,10 +22,12 @@ class CategoryFactory extends Factory
      */
     public function definition()
     {
-
+        
         return [
-            'title' => $this->faker->text($this->faker->numberBetween(5, 50)),
-            'description' => $this->faker->text($this->faker->numberBetween(5, 250)),
+            'parent_id' => $this->faker->word,
+            'title' => $this->faker->text($this->faker->numberBetween(5, 255)),
+            'description' => $this->faker->text($this->faker->numberBetween(5, 65535)),
+            'deleted_at' => $this->faker->date('Y-m-d H:i:s'),
             'created_at' => $this->faker->date('Y-m-d H:i:s'),
             'updated_at' => $this->faker->date('Y-m-d H:i:s')
         ];

@@ -1,21 +1,25 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, Select, Textarea, TextInput } from "flowbite-react";
+import { Button, Card, Label, Textarea, TextInput } from "flowbite-react";
 import NavLink from "@/components/NavLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
 import * as Yup from 'yup';
 import { useEffect, useRef } from "react";
 import { toast } from "react-toastify";
-import { useStoreCategoryMutation } from "@/store/service/category";
+import { useGetCategoryQuery, useStoreCategoryMutation } from "@/store/service/category";
+import Select2Component from "@/components/select2/Select2Component";
 
 const create = (props) => {
     const router = useRouter();
     const [storeCategory, storeResult] = useStoreCategoryMutation();
+    const {data: categories, isLoading, isError} = useGetCategoryQuery();
     let formikForm = useRef();
+    let selectRef = useRef();
 
     const initValues = {
         title: '',
+        parent_id: '',
         description: '',
     }
     useEffect(() => {
@@ -69,7 +73,7 @@ const create = (props) => {
                                 innerRef={formikForm}
                             >
                                 {
-                                    ({handleSubmit, handleChange, handleBlur, values, errors, isSubmitting, setErrors}) => (
+                                    ({handleSubmit, handleChange, setFieldValue, handleBlur, values, errors, isSubmitting, setErrors}) => (
                                         <div className="flex flex-col gap-4 md:w-1/2 w-full">
                                             <div className="flex flex-row gap-4">
                                                 <div className="w-full">
@@ -96,6 +100,30 @@ const create = (props) => {
                                                 <div className="w-full">
                                                     <div className="mb-2 block">
                                                         <Label
+                                                            htmlFor="parent_id"
+                                                            value="Parent Category"
+                                                        />
+                                                    </div>
+                                                    <Select2Component
+                                                        name="parent_id"
+                                                        id="parent_id"
+                                                        options={categories?.data?.map((p) => ({value: p.id, label: p.title}))}
+                                                        ref={selectRef}
+                                                        onChange={(e, s) => {
+                                                            setFieldValue('parent_id', s.val())
+                                                        }}
+                                                        className={`w-full border-1 border-gray-300`}
+                                                        data-placeholder="Select parent category..."
+                                                    />
+                                                    <ErrorMessage
+                                                        name='parent_id'
+                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-row gap-4">
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
                                                             htmlFor="description"
                                                             value="Description"
                                                         />
@@ -112,7 +140,6 @@ const create = (props) => {
                                                         name='description'
                                                         render={(msg) => <span className='text-red-500'>{msg}</span>} />
                                                 </div>
-
                                             </div>
                                             <div className="flex flex-row gap-4 justify-end">
                                                 <Button

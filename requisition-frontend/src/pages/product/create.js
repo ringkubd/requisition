@@ -100,21 +100,21 @@ const create = props => {
                                     onClick={() => setCurrentForm(1)}
                                     className={`flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b  after:border-4 after:inline-block  cursor-pointer ${activeForm === 1 ? 'text-blue-600 dark:text-blue-500 after:border-blue-100 dark:after:border-blue-800': 'dark:after:border-gray-700 after:border-gray-100'}`}>
                                     <div className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${activeForm === 1 ? 'bg-blue-200 dark:bg-blue-800' : 'bg-gray-200 dark:bg-gray-800'}`}>
-                                        <FaFontAwesome name='FaProductHunt' size={24} />
+                                        Basic
                                     </div>
                                 </li>
                                 <li
                                     onClick={() => Object.values(basic).length ? setCurrentForm(2): ''}
                                     className={`flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block cursor-pointer ${activeForm === 2 ? 'text-blue-600 dark:text-blue-500 after:border-blue-100 dark:after:border-blue-800': 'dark:after:border-gray-700 after:border-gray-100'}`}>
                                     <div className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${activeForm === 2 ? 'bg-blue-200 dark:bg-blue-800' : 'bg-gray-200 dark:bg-gray-800'}`}>
-                                        <TbHttpOptions size={24} />
+                                        Variant
                                     </div>
                                 </li>
                                 <li
                                     onClick={() => Object.values(productOptions).length ? setCurrentForm(3) : "" }
                                     className={`flex items-center w-full after:content-[''] after:w-full after:h-1 after:border-b  after:border-4 after:inline-block  cursor-pointer ${activeForm === 3 ? 'text-blue-600 dark:text-blue-500 after:border-blue-100 dark:after:border-blue-800': 'dark:after:border-gray-700 after:border-gray-100'}`}>
                                     <div className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${activeForm === 3 ? 'bg-blue-200 dark:bg-blue-800' : 'bg-gray-200 dark:bg-gray-800'}`}>
-                                        <SiMetafilter  size={24} />
+                                        Other
                                     </div>
                                 </li>
                             </ol>

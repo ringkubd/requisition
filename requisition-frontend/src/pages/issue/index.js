@@ -41,6 +41,11 @@ const ProductIssue = () => {
             sortable: true,
         },
         {
+            name: 'Qty',
+            selector: row => row.quantity,
+            sortable: true,
+        },
+        {
             name: 'Requisition',
             selector: row => row.purchase_requisition?.irf_no,
             sortable: true,
