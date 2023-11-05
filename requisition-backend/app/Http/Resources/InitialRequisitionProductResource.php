@@ -24,7 +24,7 @@ class InitialRequisitionProductResource extends JsonResource
             'product' => $this->product,
             'product_option_id' => $this->product_option_id,
             'product_option' => new ProductOptionResource($this->product_variant),
-            'last_purchase_date' => Carbon::parse($this->last_purchase_date)->format('d M Y'),
+            'last_purchase_date' => $this->last_purchase_date !=  null  ? Carbon::parse($this->last_purchase_date)->format('d M Y') : "",
             'required_quantity' => $this->required_quantity,
             'available_quantity' => $this->available_quantity,
             'quantity_to_be_purchase' => $this->quantity_to_be_purchase,

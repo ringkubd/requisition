@@ -268,7 +268,7 @@ const InitialRequisitionCreate = (props) => {
                               onChange={(e) => {
                                 handleChange(e)
                                 setFieldValue('available_quantity', products.filter(p => p.id == values.product_id)[0]?.product_options?.filter((o) => o.id == e.target.value)[0]?.stock ?? 0);
-                                setFieldValue('last_purchase_date', moment(products.filter(p => p.id == values.product_id)[0]?.last_purchase?.created_at)?.format('Y-M-DD') ?? null);
+                                setFieldValue('last_purchase_date', products.filter(p => p.id == values.product_id)[0]?.last_purchase?.created_at ? moment(products.filter(p => p.id == values.product_id)[0]?.last_purchase?.created_at)?.format('Y-M-DD') : null);
                               }}
                               onBlur={handleChange}
                               id='product_option_id'

@@ -11,6 +11,7 @@ import Select2ComponentAjax from "@/components/select2/Select2ComponentAjax";
 import Select2Component from "@/components/select2/Select2Component";
 import { useGetUsersQuery } from "@/store/service/user/management";
 import { useStoreIssueMutation } from "@/store/service/issue";
+import moment from "moment";
 const create = (props) => {
     const router = useRouter();
     const [storeProductIssue, storeResult] = useStoreIssueMutation();
@@ -131,7 +132,7 @@ const create = (props) => {
                                                                 setPurchaseRequisition(data.data);
                                                                 return {
                                                                     results: data.data.map((d)=> {
-                                                                        return {text: d.irf_no, id: d.id, options: d.options}
+                                                                        return {text: d.irf_no + " (" + moment(d.created_at).format('DD-MMM-Y@H:mm')+")", id: d.id, options: d.options}
                                                                     }),
                                                                     pagination: {
                                                                         more: (params.page * 10) < data.count_filtered

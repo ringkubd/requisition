@@ -15,6 +15,7 @@ import {
     setAllPurchaseRequisitionData,
 } from "@/store/service/requisitions/purchase_requisition_input_change";
 import PurchaseInput from "@/components/purchase-requisition/PurchaseInput";
+import moment from "moment";
 
 const InitialRequisitionCreate = (props) => {
     const router = useRouter();
@@ -149,7 +150,7 @@ const InitialRequisitionCreate = (props) => {
                                           <option value=""></option>
                                           {
                                               initialRequisitionForPurchase.data?.data?.map(r => (
-                                                <option key={r.id} value={r.id}>{r.irf_no}</option>
+                                                <option key={r.id} value={r.id}>{r.irf_no + " (" + moment(r.created_at).format('DD-MMM-Y@H:mm')+")"}</option>
                                               ))
                                           }
                                       </Select>

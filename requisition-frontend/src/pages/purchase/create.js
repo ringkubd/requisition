@@ -132,9 +132,10 @@ const create = (props) => {
                                                             processResults: function (data, params) {
                                                                 params.page = params.page || 1;
                                                                 setPurchaseRequisition(data.data);
+                                                                console.log(data.data)
                                                                 return {
                                                                     results: data.data.map((d)=> {
-                                                                        return {text: d.irf_no, id: d.id, data: d?.purchase_requisition_products}
+                                                                        return {text: d.irf_no + " (" + moment(d.created_at).format('DD-MMM-Y@H:mm')+")", id: d.id, data: d?.purchase_requisition_products}
                                                                     }),
                                                                     pagination: {
                                                                         more: (params.page * 10) < data.count_filtered
