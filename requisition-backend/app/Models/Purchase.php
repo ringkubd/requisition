@@ -58,7 +58,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *          format="date-time"
  *      )
  * )
- */class Purchase extends Model
+ */
+class Purchase extends Model
 {
     use SoftDeletes, HasFactory;
     public $table = 'purchases';
@@ -71,7 +72,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         'qty',
         'unit_price',
         'total_price',
-        'user_id'
+        'user_id',
+        'purchase_date'
     ];
 
     protected $casts = [

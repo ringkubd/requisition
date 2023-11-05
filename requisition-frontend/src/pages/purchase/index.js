@@ -60,6 +60,11 @@ const Purchase = () => {
             sortable: true,
         },
         {
+            name: 'Purchase Date',
+            selector: row => row.purchase_date,
+            sortable: true,
+        },
+        {
             name: 'Total',
             selector: row => row.total_price,
             sortable: true,

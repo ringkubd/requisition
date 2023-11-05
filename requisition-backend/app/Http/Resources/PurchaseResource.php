@@ -28,6 +28,7 @@ class PurchaseResource extends JsonResource
             'qty' => $this->qty,
             'unit_price' => $this->unit_price,
             'total_price' => $this->total_price,
+            'purchase_date' => $this->purchase_date,
             'user_id' => $this->user_id,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
