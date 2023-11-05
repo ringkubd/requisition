@@ -1,17 +1,16 @@
-import React, { useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import $ from 'jquery'; // Import jQuery
 import 'select2/dist/js/select2';
 import 'select2/dist/css/select2.css';
 
-const Select2Component = ({options, onChange, ...other}) => {
+const Select2Component = forwardRef(({options, onChange, ...other}, ref) => {
     const selectRef = useRef(null);
     useEffect(() => {
         // Initialize Select2 on component mount
         $(selectRef.current).select2();
-
         // Clean up Select2 on component unmount
         return () => {
-            // $(selectRef.current).select2('destroy');
+            $(selectRef.current).select2('destroy');
         };
     }, []);
 
@@ -34,6 +33,14 @@ const Select2Component = ({options, onChange, ...other}) => {
         })
     }, []);
 
+    function resetSelect(){
+        $(selectRef.current).val("").trigger('change')
+        $(selectRef.current).val("").trigger('click')
+    }
+    useImperativeHandle(ref, () => ({
+        resetSelect
+    }));
+
     return (
         <div className="w-full">
             <select
@@ -49,6 +56,9 @@ const Select2Component = ({options, onChange, ...other}) => {
             </select>
         </div>
     );
-};
+});
 
+Select2Component.defaultProps= {
+    onChange: (e) => {}
+}
 export default Select2Component;

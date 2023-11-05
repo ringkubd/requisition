@@ -58,6 +58,7 @@ const create = (props) => {
             formData.append(key, values[key]);
         }
         storeProductIssue(formData)
+        pageProps.resetForm();
     }
 
     const validationSchema = Yup.object().shape({
@@ -159,7 +160,7 @@ const create = (props) => {
                                                         options={products?.map((p) => ({value: p.id, label: p.title}))}
                                                         ref={selectRef}
                                                         onChange={(e, s) => {
-                                                            setFieldValue('product_id', s.val())
+                                                            setFieldValue('product_id', e.target.value)
                                                         }}
                                                         className={`w-full border-1 border-gray-300`}
                                                         data-placeholder="Select options..."

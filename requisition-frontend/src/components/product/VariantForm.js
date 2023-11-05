@@ -4,7 +4,7 @@ import { ErrorMessage, Formik } from "formik";
 import { setProductOptionsLocal } from "@/store/service/options/optionSlice";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useGetOptionsQuery } from "@/store/service/options";
 import Select2Component from "@/components/select2/Select2Component";
 import { setActiveForm } from "@/store/service/product/product_active_form";
@@ -14,11 +14,11 @@ export default function VariantForm(props) {
     const {productOptions} = useSelector((state) => state.product_option_local);
     const dispatch = useDispatch();
     const {variant} = props;
-
-    console.log(productOptions)
+    const selectRef = useRef();
 
     useEffect(() => {
         if (variant){
+            selectRef.current.resetSelect();
             dispatch(setProductOptionsLocal(...variant))
         }
     });
@@ -34,6 +34,7 @@ export default function VariantForm(props) {
     const submitOptions = (values, props) => {
         dispatch(setProductOptionsLocal(values))
         props.resetForm();
+        selectRef.current.resetSelect();
         props.setSubmitting(false);
     }
 
@@ -69,20 +70,18 @@ export default function VariantForm(props) {
         },
     ];
 
-    const optionsValidationShema = Yup.object().shape({
+    const optionsValidationSchema = Yup.object().shape({
         option_id: Yup.number().required().label('Option'),
         sku: Yup.string().nullable().label('SKU'),
-        option_value: Yup.string().when('option_id', {
-            is: true,
-            then: Yup.string().required()
-        }).label('Option Value'),
-        unit_price: Yup.string().when('option_id', {
-            is: true,
-            then: Yup.string().required()
-        }).label('Unit Price'),
+        option_value: Yup.string()
+            .when('option_id', {
+                is: (val) => val,
+                then: () => Yup.string().required().label('Option Value')
+            }).label('Option Value'),
+        unit_price: Yup.string().label('Unit Price'),
         stock: Yup.string().when('option_id', {
-            is: true,
-            then: Yup.string().required()
+            is: (val) => val,
+            then: () => Yup.string().required().label('Stock'),
         }).label('Stock'),
     });
 
@@ -95,7 +94,7 @@ export default function VariantForm(props) {
             <Formik
                 initialValues={optionInitValues}
                 onSubmit={submitOptions}
-                validationSchema={optionsValidationShema}
+                validationSchema={optionsValidationSchema}
             >
                 {({
                       handleBlur,

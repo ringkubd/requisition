@@ -142,7 +142,8 @@ return [
     |
     */
 
-    'path' => env('SESSION_PATH', '/'),
+//    'path' => env('SESSION_PATH', '/'),
+    'path' =>  parse_url(env('APP_URL'), PHP_URL_PATH),
 
     /*
     |--------------------------------------------------------------------------

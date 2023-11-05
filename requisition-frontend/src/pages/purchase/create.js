@@ -165,7 +165,6 @@ const create = (props) => {
                                                             handleChange(e)
                                                             setSelectedProduct(e.target.value);
                                                             setFieldValue('product_option_id', products.filter((p) => parseInt(p.id) === parseInt(e.target.value))[0]?.id)
-                                                            console.log(products)
                                                         }}
                                                         options={products?.map((p) => ({value: p.id, label: p.title}))}
                                                         className={`w-full border-1 border-gray-300`}

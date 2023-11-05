@@ -28,7 +28,10 @@ const InitialRequisitionCreate = (props) => {
 
     useEffect(() => {
         if (initialRequisitionForPurchase.isSuccess && initialRequisitionForPurchase.data){
-            const requisition_products = initialRequisitionForPurchase.data.data.filter(it => it.id == selectedRequisition)[0]?.requisition_products;
+            const requisition_products = initialRequisitionForPurchase.data.data.filter(it => it.id == selectedRequisition)[0]?.requisition_products?.map(p => ({
+                ...p,
+                price: p.price ?? 0
+            }));
             dispatch(setAllPurchaseRequisitionData(requisition_products));
             setTotalPrice(0);
         }
@@ -116,63 +119,63 @@ const InitialRequisitionCreate = (props) => {
     ];
 
     return (
-        <>
-            <AppLayout
-                header={
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Purchase Requisition.
-                    </h2>
-                }
-            >
-                <Head>
-                    <title>Purchase Requisition</title>
-                </Head>
-                <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
-                    <Card className="min-h-screen">
-                        <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
-                            <NavLink
-                                active={router.pathname === 'purchase-requisition'}
-                                href={`/purchase-requisition`}
-                            >
-                                <Button>Back</Button>
-                            </NavLink>
-                        </div>
-                        <div className={`flex flex-col justify-center justify-items-center items-center basis-2/4 w-full space-y-4`}>
-                            <div className={`shadow-md w-full`}>
-                                {
-                                    initialRequisitionForPurchase.isLoading ? "Loading...." : (
-                                        !initialRequisitionForPurchase.isError && initialRequisitionForPurchase.isSuccess && (
-                                            <Select onChange={(c) => setSelectedRequisition(c.target.value)}>
-                                                <option value=""></option>
-                                                {
-                                                    initialRequisitionForPurchase.data?.data?.map(r => (
-                                                        <option key={r.id} value={r.id}>{r.irf_no}</option>
-                                                    ))
-                                                }
-                                            </Select>
-                                        )
+      <>
+          <AppLayout
+            header={
+                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    Purchase Requisition.
+                </h2>
+            }
+          >
+              <Head>
+                  <title>Purchase Requisition</title>
+              </Head>
+              <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
+                  <Card className="min-h-screen">
+                      <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
+                          <NavLink
+                            active={router.pathname === 'purchase-requisition'}
+                            href={`/purchase-requisition`}
+                          >
+                              <Button>Back</Button>
+                          </NavLink>
+                      </div>
+                      <div className={`flex flex-col justify-center justify-items-center items-center basis-2/4 w-full space-y-4`}>
+                          <div className={`shadow-md w-full`}>
+                              {
+                                  initialRequisitionForPurchase.isLoading ? "Loading...." : (
+                                    !initialRequisitionForPurchase.isError && initialRequisitionForPurchase.isSuccess && (
+                                      <Select onChange={(c) => setSelectedRequisition(c.target.value)}>
+                                          <option value=""></option>
+                                          {
+                                              initialRequisitionForPurchase.data?.data?.map(r => (
+                                                <option key={r.id} value={r.id}>{r.irf_no}</option>
+                                              ))
+                                          }
+                                      </Select>
                                     )
-                                }
+                                  )
+                              }
 
-                            </div>
-                            <div className={`shadow-md w-full`}>
-                                <DataTable
-                                    columns={tableColumns}
-                                    data={products}
-                                />
-                                <div className={`mx-4 my-3 border-t-2 justify-items-end text-right`}>
-                                    <h2 className={`font-bold`}>Total Estimate Cost</h2>
-                                    <h2 className={`font-bold`}>{totalPrice.toLocaleString()}</h2>
-                                </div>
-                                <div className={`flex mx-4 my-3 border-t-2 justify-items-end text-right items-end flex-row justify-end`}>
-                                    <Button onClick={submit} gradientMonochrome="teal">Submit</Button>
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-            </AppLayout>
-        </>
+                          </div>
+                          <div className={`shadow-md w-full`}>
+                              <DataTable
+                                columns={tableColumns}
+                                data={products}
+                              />
+                              <div className={`mx-4 my-3 border-t-2 justify-items-end text-right`}>
+                                  <h2 className={`font-bold`}>Total Estimate Cost</h2>
+                                  <h2 className={`font-bold`}>{totalPrice.toLocaleString()}</h2>
+                              </div>
+                              <div className={`flex mx-4 my-3 border-t-2 justify-items-end text-right items-end flex-row justify-end`}>
+                                  <Button onClick={submit} gradientMonochrome="teal">Submit</Button>
+                              </div>
+                          </div>
+                      </div>
+                  </Card>
+              </div>
+          </AppLayout>
+      </>
     )
 }
 export default InitialRequisitionCreate;

@@ -125,6 +125,8 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         forgotPassword,
         resetPassword,
         resendEmailVerification,
-        logout,
+        logout
     }
 }
+
+export  const csrf = () => axios.get('/sanctum/csrf-cookie')

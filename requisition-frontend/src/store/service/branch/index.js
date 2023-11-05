@@ -1,26 +1,36 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getCookie } from "@/lib/cookie";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { fetchBaseQuery } from "@reduxjs/toolkit/dist/query/react";
+
+const CustomBaseQuery = fetchBaseQuery({
+    baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,
+    prepareHeaders: (headers) => {
+        fetch(
+            process.env.NEXT_PUBLIC_BACKEND_URL + '/sanctum/csrf-cookie',
+            {
+                method: 'GET',
+                credentials: 'include',
+            },
+        )
+        let cookieArray = document.cookie.split(";");
+
+        // this can probably be improved by using a regex.. but this works for now
+        for(var i = 0; i < cookieArray.length; i++) {
+            let cookiePair = cookieArray[i].split("=");
+
+            if (cookiePair[0].trim() == 'XSRF-TOKEN-PORTAL') {
+                headers.set('X-XSRF-TOKEN-PORTAL', decodeURIComponent(cookiePair[1]))
+            }
+
+        }
+        headers.set('Accept', `application/json`)
+        return headers
+    },
+    credentials: 'include',
+})
 
 export const BranchApiService = createApi({
     reducerPath: 'branch',
-    baseQuery: fetchBaseQuery({
-        baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,
-        prepareHeaders: (headers) => {
-            fetch(
-              process.env.NEXT_PUBLIC_BACKEND_URL + '/sanctum/csrf-cookie',
-              {
-                  method: 'GET',
-                  credentials: 'include',
-              },
-            )
-            const token = decodeURIComponent(getCookie('XSRF-TOKEN')) // <---- CHANGED
-            headers.set('Accept', `application/json`)
-            headers.set('Content-Type', `application/json`)
-            headers.set('X-XSRF-TOKEN', token)
-            return headers
-        },
-        credentials: 'include',
-    }),
+    baseQuery: CustomBaseQuery,
     tagTypes: ['getBranch', 'editBranch'],
     endpoints: builder => ({
         getBranch: builder.query({
@@ -86,3 +96,5 @@ export const {
     storeBranch,
     destroyBranch,
 } = BranchApiService.endpoints;
+
+export default CustomBaseQuery;

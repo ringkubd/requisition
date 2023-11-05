@@ -83,7 +83,7 @@ export default function BasicForm(props){
                                 </div>
                                 <TextInput
                                     id="title"
-                                    placeholder="Title"
+                                    placeholder="Product Name"
                                     type="text"
                                     required
                                     onChange={

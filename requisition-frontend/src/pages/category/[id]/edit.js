@@ -115,7 +115,7 @@ const Edit = (props) => {
                                                                 ref={selectRef}
                                                                 value={values.parent_id}
                                                                 onChange={(e, s) => {
-                                                                    setFieldValue('parent_id', s.val())
+                                                                    setFieldValue('parent_id', e.target.value)
                                                                 }}
                                                                 className={`w-full border-1 border-gray-300`}
                                                                 data-placeholder="Select parent category..."

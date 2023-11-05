@@ -109,8 +109,8 @@ const create = (props) => {
                                                         id="parent_id"
                                                         options={categories?.data?.map((p) => ({value: p.id, label: p.title}))}
                                                         ref={selectRef}
-                                                        onChange={(e, s) => {
-                                                            setFieldValue('parent_id', s.val())
+                                                        onChange={(e) => {
+                                                            setFieldValue('parent_id', e.target.value)
                                                         }}
                                                         className={`w-full border-1 border-gray-300`}
                                                         data-placeholder="Select parent category..."
