@@ -15,7 +15,6 @@ const View = (props) => {
     });
 
     const {product_metas, product_options} = data?.data ?? {};
-    console.log(product_options)
     return (
         <AppLayout
             header={
@@ -36,14 +35,14 @@ const View = (props) => {
                         </NavLink>
                     </div>
                     <div className="flex flex-col gap-2 space-x-4 sm:flex-row">
-                        <div className={`w-full gap-2 space-x-4 shadow  p-2`}>
+                        <div className={`w-full gap-2 space-x-4 shadow p-2 overflow-scroll`}>
                             <h2
                                 className={`w-full border-b pb-2 font-bold`}>
                                 Basic Information
                             </h2>
                             {
                                 !isLoading && !isError && data ? (
-                                        <Table>
+                                        <Table className={`overflow-x-scroll`}>
                                             <Table.Body>
                                                 <Table.Row>
                                                     <Table.HeadCell>Title</Table.HeadCell>
@@ -81,7 +80,7 @@ const View = (props) => {
                                     : <h2>Data loading or error.</h2>
                             }
                         </div>
-                        <div className={`w-full gap-2 space-x-4 shadow p-2`}>
+                        <div className={`w-full gap-2 space-x-4 shadow p-2 overflow-scroll`}>
                             <h2
                                 className={`w-full border-b pb-2 font-bold`}>
                                 Variant Information
@@ -89,7 +88,7 @@ const View = (props) => {
                             {
                                 !isLoading && !isError && product_options ? (
                                         <>
-                                            <Table>
+                                            <Table className={`table-auto overflow-x-scroll`}>
                                                 <Table.Head>
                                                     <Table.HeadCell>Sl#</Table.HeadCell>
                                                     <Table.HeadCell>Option</Table.HeadCell>
@@ -122,33 +121,34 @@ const View = (props) => {
                                     : <h2>No data found.</h2>
                             }
                         </div>
-                        <div className={`w-full gap-2 space-x-4 shadow p-2`}>
-                            <h2
-                                className={`w-full border-b pb-2 font-bold`}>
-                                Meta Information
-                            </h2>
-                            {
-                                !isLoading && !isError && product_metas ? (
-                                        <Table>
-                                            <Table.Body>
-                                                {
-                                                    product_metas.map((m, index) => (
-                                                        <Table.Row key={index}>
-                                                            <Table.HeadCell>{m.key.toUpperCase()}</Table.HeadCell>
-                                                            <Table.Cell>{m.value}</Table.Cell>
-                                                        </Table.Row>
-                                                    ))
-                                                }
-                                            </Table.Body>
-                                        </Table>
-                                    )
-                                    : <h2>No data found.</h2>
-                            }
+                        {
+                            !isLoading && !isError && product_metas?.length ? (
+                                <div className={`w-full gap-2 space-x-4 shadow p-2 overflow-scroll`}>
+                                    <h2
+                                        className={`w-full border-b pb-2 font-bold`}>
+                                        Meta Information
+                                    </h2>
 
-                        </div>
+                                    <Table className={`overflow-x-scroll`}>
+                                        <Table.Body>
+                                            {
+                                                product_metas.map((m, index) => (
+                                                    <Table.Row key={index}>
+                                                        <Table.HeadCell>{m.key.toUpperCase()}</Table.HeadCell>
+                                                        <Table.Cell>{m.value}</Table.Cell>
+                                                    </Table.Row>
+                                                ))
+                                            }
+                                        </Table.Body>
+                                    </Table>
+
+                                </div>
+                            ) : ''
+
+                        }
                     </div>
                     <div>
-                        <div className={`w-full gap-2 space-x-4 shadow p-2`}>
+                        <div className={`w-full gap-2 space-x-4 shadow p-2 overflow-scroll`}>
                             <h2
                                 className={`w-full border-b pb-2 font-bold`}>
                                 Purchase History
@@ -156,7 +156,7 @@ const View = (props) => {
                             {
                                 !isLoading && !isError && product_options ? (
                                         <>
-                                            <Table className={`border border-gray-300`} border={1}>
+                                            <Table className={`border border-gray-300 overflow-x-scroll`} border={1}>
                                                 <Table.Head>
                                                     <Table.HeadCell className={`border border-gray-300`}>Sl#</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Variant</Table.HeadCell>
@@ -164,6 +164,7 @@ const View = (props) => {
                                                     <Table.HeadCell className={`border border-gray-300`}>Requisition</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Qty</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Unit Price</Table.HeadCell>
+                                                    <Table.HeadCell className={`border border-gray-300`}>Available Qty.</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Total</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Date</Table.HeadCell>
                                                 </Table.Head>
@@ -184,6 +185,7 @@ const View = (props) => {
                                                                             <Table.Cell className={`border border-gray-300`}>{pur?.purchaseRequisition?.irf_no}</Table.Cell>
                                                                             <Table.Cell className={`border border-gray-300`}>{parseFloat(pur?.qty).toLocaleString()}</Table.Cell>
                                                                             <Table.Cell className={`border border-gray-300`}>{parseFloat(pur?.unit_price).toLocaleString()}</Table.Cell>
+                                                                            <Table.Cell className={`border border-gray-300`}>{parseFloat(pur?.available_qty).toLocaleString()}</Table.Cell>
                                                                             <Table.Cell className={`border border-gray-300`}>{parseFloat(pur?.total_price).toLocaleString()}</Table.Cell>
                                                                             <Table.Cell className={`border border-gray-300`}>{moment(pur?.created_at).format("HH:m - DD MMM YYYY")}</Table.Cell>
                                                                         </Table.Row>

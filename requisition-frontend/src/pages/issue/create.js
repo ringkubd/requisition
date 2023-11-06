@@ -134,7 +134,7 @@ const create = (props) => {
                                                                 setPurchaseRequisition(data.data);
                                                                 return {
                                                                     results: data.data.map((d)=> {
-                                                                        return {text: d.irf_no + " (" + moment(d.created_at).format('DD-MMM-Y@H:mm')+")", id: d.id, options: d.options}
+                                                                        return {text: d.irf_no + " (" + moment(d.created_at).format('DD-MMM-Y')+" by "+d?.user?.name+")", id: d.id, options: d.options}
                                                                     }),
                                                                     pagination: {
                                                                         more: (params.page * 10) < data.count_filtered

@@ -24,6 +24,7 @@ class PurchaseHistoryResource extends JsonResource
             'purchase_requisition_id' => $this->purchase_requisition_id,
             'purchaseRequisition' => $this->purchaseRequisition,
             'qty' => $this->qty,
+            'available_qty' => $this->available_qty,
             'unit_price' => $this->unit_price,
             'total_price' => $this->total_price,
             'user_id' => $this->user_id,

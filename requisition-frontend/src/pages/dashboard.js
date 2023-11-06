@@ -10,7 +10,7 @@ const Dashboard = () => {
                 </h2>
             }>
             <Head>
-                <title>Laravel - Dashboard</title>
+                <title>{process.env.APP_NAME} - Dashboard</title>
             </Head>
 
             <div className="py-12">

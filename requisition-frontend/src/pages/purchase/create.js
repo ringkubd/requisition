@@ -11,6 +11,7 @@ import { useStorePurchaseMutation } from "@/store/service/purchase";
 import Select2ComponentAjax from "@/components/select2/Select2ComponentAjax";
 import moment from "moment/moment";
 import Select2Component from "@/components/select2/Select2Component";
+import Link from "next/link";
 const create = (props) => {
     const router = useRouter();
     const [storePurchase, storeResult] = useStorePurchaseMutation();
@@ -141,9 +142,10 @@ const create = (props) => {
                                                             processResults: function (data, params) {
                                                                 params.page = params.page || 1;
                                                                 setPurchaseRequisition(data.data);
+                                                                console.log(data.data)
                                                                 return {
                                                                     results: data.data.map((d)=> {
-                                                                        return {text: d.irf_no + " (" + moment(d.created_at).format('DD-MMM-Y@H:mm')+")", id: d.id, data: d?.purchase_requisition_products}
+                                                                        return {text: d.irf_no + " (" + moment(d.created_at).format('DD-MMM-Y')+" by "+d?.user?.name+")", id: d.id, data: d?.purchase_requisition_products}
                                                                     }),
                                                                     pagination: {
                                                                         more: (params.page * 10) < data.count_filtered
@@ -209,6 +211,7 @@ const create = (props) => {
                                                             htmlFor="supplier"
                                                             value="Supplier"
                                                         />
+                                                        <Link href={'/suppliers/create'} target={`--blank`}> <button>+Add</button></Link>
                                                     </div>
                                                     <Select2ComponentAjax
                                                         name='supplier_id'
