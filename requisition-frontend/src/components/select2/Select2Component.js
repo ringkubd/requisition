@@ -50,7 +50,7 @@ const Select2Component = forwardRef(({options, onChange, ...other}, ref) => {
             >
                 <option value=""></option>
                 {
-                    options?.map((o, index) => <option key={index} value={o.value}>{o.label}</option>)
+                    options?.map((o, index) => <option key={index} data-data={o.data} value={o.value}>{o.label}</option>)
                 }
                 {/* Add more options as needed */}
             </select>

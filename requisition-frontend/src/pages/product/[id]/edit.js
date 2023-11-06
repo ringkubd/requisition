@@ -39,7 +39,7 @@ const edit = props => {
     function currentForm() {
         switch (activeForm){
             case 1:
-                return <BasicForm />
+                return <BasicForm basic={data?.data} />
             case 2:
                 return <VariantForm />
             case 3:
@@ -66,6 +66,7 @@ const edit = props => {
 
     function submitForm(){
         // storeProduct()
+        console.log(productOptions)
         storeProduct({
             id: data.data.id,
             basic,
@@ -131,7 +132,7 @@ const edit = props => {
                             <div
                                 className={`flex flex-col md:flex-row w-full md:space-x-4`}>
                                 <div className="flex flex-col gap-4 w-full border rounded p-2 shadow">
-                                    {currentForm()}
+                                    { !isLoading && !isError ? currentForm() : isLoading ? 'Loading....' : 'error'}
                                 </div>
                             </div>
                         </div>

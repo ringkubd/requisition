@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('purchases', function (Blueprint $table) {
             $table->date('purchase_date')->after('user_id')->nullable();
+            $table->double('available_qty')->after('purchase_date')->nullable();
         });
     }
 
@@ -23,6 +24,7 @@ return new class extends Migration
     {
         Schema::table('purchases', function (Blueprint $table) {
             $table->dropColumn('purchase_date');
+            $table->dropColumn('available_qty');
         });
     }
 };

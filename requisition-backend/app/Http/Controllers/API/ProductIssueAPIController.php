@@ -6,11 +6,13 @@ use App\Http\Requests\API\CreateProductIssueAPIRequest;
 use App\Http\Requests\API\UpdateProductIssueAPIRequest;
 use App\Models\ProductIssue;
 use App\Models\ProductOption;
+use App\Models\Purchase;
 use App\Repositories\ProductIssueRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductIssueResource;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class ProductIssueController
@@ -113,6 +115,26 @@ class ProductIssueAPIController extends AppBaseController
             $productOption->stock = (double)$productOption->stock - (double)$quantity;
             $productOption->save();
         }
+
+        $purchase_history = Purchase::query()
+            ->where('product_id', $input['product_id'])
+            ->where('product_option_id', $productOptionId)
+            ->where('available_qty', '>', 0)
+            ->oldest()
+            ->get();
+
+        $qty = $quantity;
+        foreach ($purchase_history as $purchase){
+            if ($qty > 0){
+                $purchase->available_qty = $quantity > $purchase->available_qty ? $quantity - $purchase->available_qty : $purchase->available_qty - $quantity;
+                $qty = $purchase->available_qty;
+                $purchase->save();
+                continue;
+            }else{
+                break;
+            }
+        }
+
         return $this->sendResponse(
             new ProductIssueResource($productIssue),
             __('messages.saved', ['model' => __('models/productIssues.singular')])

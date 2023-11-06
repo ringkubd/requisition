@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Dbal\ProductStatus;
+use App\Support\CreateUpdateOrDelete;
 use Doctrine\DBAL\Types\Type;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -31,5 +33,10 @@ class AppServiceProvider extends ServiceProvider
         }
         \DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping('geography', 'string');
         \DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping('geometry', 'string');
+
+        HasMany::macro('createUpdateOrDelete', function (iterable $records){
+            $hasMany = $this;
+            return (new CreateUpdateOrDelete($hasMany, $records))();
+        });
     }
 }

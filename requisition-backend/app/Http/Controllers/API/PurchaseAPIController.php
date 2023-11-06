@@ -107,6 +107,7 @@ class PurchaseAPIController extends AppBaseController
     {
         $input = $request->all();
         $input['user_id'] = $request->user()->id;
+        $input['available_qty'] = $input['qty'];
         $purchase = $this->purchaseRepository->create($input);
 
         if ($purchase){

@@ -120,6 +120,7 @@ export default function VariantForm(props) {
                                 </div>
                                 <Select2Component
                                     id='option_id'
+                                    ref={selectRef}
                                     name='option_id'
                                     options={options?.data?.data.map(m => ({value: m.id, label: m.name}))}
                                     loading={options.isLoading ? "": ''}

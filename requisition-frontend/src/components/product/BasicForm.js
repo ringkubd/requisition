@@ -1,6 +1,6 @@
 import { ErrorMessage, Formik } from "formik";
 import { Button, Label, Textarea, TextInput } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import unit2select from "unit2select";
 import * as Yup from "yup";
 import { useGetCategoryQuery } from "@/store/service/category";
@@ -15,6 +15,8 @@ export default function BasicForm(props){
     const [unitOptions, setUnitOptions] = useState([]);
     const dispatch = useDispatch();
     const { basic } = useSelector(state => state.product_basic_form)
+    const formikRef = useRef();
+    const {basic: basicData} = props;
 
     useEffect(() => {
         setUnitOptions(
@@ -35,11 +37,11 @@ export default function BasicForm(props){
     }, [category])
 
     const initValues = {
-        title: basic?.title ?? "",
-        sl_no: basic?.sl_no ?? "",
-        unit: basic?.unit ?? "",
-        category_id: basic?.category_id ?? "",
-        description: basic?.description ?? "",
+        title: basic?.title ?? basicData?.title ?? "",
+        sl_no: basic?.sl_no ?? basicData?.sl_no ??"",
+        unit: basic?.unit ?? basicData?.unit ?? "",
+        category_id: basic?.category_id ?? basicData?.category_id ?? "",
+        description: basic?.description ?? basicData?.description ?? "",
     }
     const validationSchema = Yup.object().shape({
         title: Yup.string().required().label('Title'),
@@ -53,6 +55,15 @@ export default function BasicForm(props){
         dispatch(setActiveForm(2));
         pageProps.setSubmitting(false);
     }
+    useEffect(() => {
+        formikRef.current.setValues({
+            title: basic?.title ?? "",
+            sl_no: basic?.sl_no  ??"",
+            unit: basic?.unit ?? "",
+            category_id: basic?.category_id ?? "",
+            description: basic?.description ?? "",
+        })
+    }, [basic]);
 
     return (
         <>
@@ -61,6 +72,7 @@ export default function BasicForm(props){
                 Basic Information
             </h2>
             <Formik
+                innerRef={formikRef}
                 initialValues={initValues}
                 onSubmit={submit}
                 validationSchema={validationSchema}>

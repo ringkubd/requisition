@@ -73,7 +73,8 @@ class Purchase extends Model
         'unit_price',
         'total_price',
         'user_id',
-        'purchase_date'
+        'purchase_date',
+        'available_qty',
     ];
 
     protected $casts = [

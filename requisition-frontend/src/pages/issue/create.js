@@ -22,6 +22,7 @@ const create = (props) => {
     const [purchaseRequisition, setPurchaseRequisition] = useState([]);
     const [selectedRequisition, setSelectedRequisition] = useState(false);
     const {data: users , isLoading: userIsLoading} = useGetUsersQuery();
+    const [selectedProductOptionId, setSelectedProductOptionId] = useState([]);
 
     useEffect(() => {
         const purchase_requisition_products = purchaseRequisition.filter(p => selectedRequisition == p.id)[0]?.purchase_requisition_products
@@ -29,6 +30,12 @@ const create = (props) => {
             setProducts(purchase_requisition_products)
         }
     }, [selectedRequisition])
+    useEffect(() => {
+        if (selectedProductOptionId){
+            formikForm.current.setFieldValue('product_id',products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.product_id)
+            formikForm.current.setFieldValue('quantity',products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.quantity_to_be_purchase)
+        }
+    }, [selectedProductOptionId])
 
     const initValues = {
         product_id: '',
@@ -54,17 +61,12 @@ const create = (props) => {
     }, [storeResult]);
     const submit = async (values, pageProps) => {
         pageProps.setSubmitting(true);
-        const formData = new FormData();
-        for ( let key in values ) {
-            formData.append(key, values[key]);
-        }
-        storeProductIssue(formData)
+        storeProductIssue(values)
         pageProps.resetForm();
     }
 
     const validationSchema = Yup.object().shape({
         purchase_requisition_id: Yup.number().required().label('Requisition'),
-        product_id: Yup.number().label('Product'),
         product_option_id: Yup.number().required().label('Product Variant'),
         quantity: Yup.number().required().label('Quantity'),
         receiver_id: Yup.number().required().label('Receiver'),
@@ -75,12 +77,12 @@ const create = (props) => {
             <AppLayout
                 header={
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Add new purchase.
+                        Issue a product.
                     </h2>
                 }
             >
                 <Head>
-                    <title>Add new purchase</title>
+                    <title> Issue a product.</title>
                 </Head>
                 <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
                     <Card className="min-h-screen">
@@ -156,48 +158,22 @@ const create = (props) => {
                                                         />
                                                     </div>
                                                     <Select2Component
-                                                        name="product_id"
-                                                        id="product_id"
-                                                        options={products?.map((p) => ({value: p.id, label: p.title}))}
+                                                        name="product_option_id"
+                                                        id="product_option_id"
+                                                        options={products?.map((p) => ({value: p.product_option_id, label: p.title+ " - "+p.product_option.title}))}
                                                         ref={selectRef}
                                                         onChange={(e, s) => {
-                                                            setFieldValue('product_id', e.target.value)
+                                                            handleChange(e);
+                                                            setSelectedProductOptionId(e.target.value)
                                                         }}
                                                         className={`w-full border-1 border-gray-300`}
                                                         data-placeholder="Select options..."
                                                     />
 
                                                     <ErrorMessage
-                                                        name='name'
-                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
-                                                </div> {/*Product*/}
-                                                <div className="w-full">
-                                                    <div className="mb-2 block">
-                                                        <Label
-                                                            htmlFor="product_option_id"
-                                                            value="Varient"
-                                                        />
-                                                    </div>
-                                                    <Select
-                                                        value={values.product_option_id}
-                                                        onChange={(e) => {
-                                                            handleChange(e)
-                                                            console.log(products.filter(p => p.id == values.product_id))
-                                                            setFieldValue('quantity', products.filter(p => p.id == values.product_id)[0].required_quantity)
-                                                        }}
-                                                        onBlur={handleChange}
-                                                        id='product_option_id'
-                                                        name="product_option_id"
-                                                    >
-                                                        <option value=""></option>
-                                                        {
-                                                            products.length ? <option key={products.filter(p => p.id == values.product_id)[0]?.product_option?.id} value={products.filter(p => p.id == values.product_id)[0]?.product_option?.id}>{products.filter(p => p.id == values.product_id)[0]?.product_option?.option?.name} ({products.filter(p => p.id == values.product_id)[0]?.product_option?.option_value})</option> : ''
-                                                        }
-                                                    </Select>
-                                                    <ErrorMessage
                                                         name='product_option_id'
                                                         render={(msg) => <span className='text-red-500'>{msg}</span>} />
-                                                </div>  {/*Variant*/}
+                                                </div> {/*Product*/}
                                             </div>
                                             <div className="flex flex-col sm:flex-row gap-4">
                                                 <div className="w-full">
@@ -216,7 +192,6 @@ const create = (props) => {
                                                         required
                                                         onChange={(e) => {
                                                             handleChange(e);
-                                                            setFieldValue('quantity', values.quantity * e.target.value)
                                                         }}
                                                         onBlur={handleBlur}
                                                         value={values.quantity}

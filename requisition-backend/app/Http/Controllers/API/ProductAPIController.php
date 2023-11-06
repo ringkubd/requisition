@@ -225,8 +225,8 @@ class ProductAPIController extends AppBaseController
         $metas = $input['metas'];
         $productOptions = $input['productOptions'];
         $product = $this->productRepository->update($base, $id);
-        $product->productMetas()->associate($metas);
-        $product->productOptions()->associate($productOptions);
+        $product->productMetas()->createUpdateOrDelete($metas, ['id']);
+        $product->productOptions()->createUpdateOrDelete($productOptions, ['id']);
 
         return $this->sendResponse(
             new ProductResource($product),
