@@ -65,6 +65,11 @@ const Purchase = () => {
             sortable: true,
         },
         {
+            name: 'Available Qty.',
+            selector: row => row.available_qty,
+            sortable: true,
+        },
+        {
             name: 'Total',
             selector: row => row.total_price,
             sortable: true,
