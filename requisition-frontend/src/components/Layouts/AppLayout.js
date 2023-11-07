@@ -6,7 +6,6 @@ import OrganizationBranch from "@/components/Layouts/OrganizationBranch";
 import React, { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Loading from "@/components/Loading";
-import Player from "@/components/lottie/Player";
 
 const AppLayout = ({ header, children }) => {
     const router = useRouter();
