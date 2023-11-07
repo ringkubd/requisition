@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateProductAPIRequest;
-use App\Http\Requests\API\UpdateProductAPIRequest;
-use App\Http\Resources\ProductPurchaseHistoryResource;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductResource;
+use OpenApi\Annotations as OA;
 
 /**
  * Class ProductController
@@ -207,10 +206,10 @@ class ProductAPIController extends AppBaseController
      *                  type="string"
      *              )
      *          )
-     *      ): JsonResponse
+     *      )
      * )
      */
-    public function update($id, Request $request)
+    public function update($id, Request $request): JsonResponse
     {
         $input = $request->all();
         /** @var Product $product */

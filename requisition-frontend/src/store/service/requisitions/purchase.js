@@ -1,5 +1,4 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getCookie } from "@/lib/cookie";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
 
 export const PurchaseRequisitionApi = createApi({
@@ -22,7 +21,8 @@ export const PurchaseRequisitionApi = createApi({
         updatePurchaseRequisition: build.mutation({
             query: ({id, ...patch}) => ({
                 url: `purchase-requisitions/${id}`,
-                method: 'PATCH'
+                method: 'PATCH',
+                body: patch
             }),
             invalidatesTags: ['purchase-requisition', 'edit-purchase-requisition']
         }),

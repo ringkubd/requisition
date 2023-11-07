@@ -96,7 +96,7 @@ class SupplierAPIController extends AppBaseController
      *                  type="string"
      *              )
      *          )
-     *      ) CreateSupplierAPIRequest
+     *      )
      * )
      */
     public function store(Request $request): JsonResponse

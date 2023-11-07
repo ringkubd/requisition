@@ -12,7 +12,6 @@ class ProductOptionRepository extends BaseRepository
         'option_id',
         'sku',
         'option_value',
-        'unit_price',
         'stock'
     ];
 

@@ -8,8 +8,6 @@ import { useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { useStoreSuppliersMutation } from "@/store/service/suppliers";
 import * as Yup from 'yup';
-import { toBase64 } from "@/lib/helpers";
-import axios from "axios";
 
 const create = (props) => {
     const router = useRouter();
@@ -57,11 +55,13 @@ const create = (props) => {
     const validationSchema = Yup.object().shape({
         contact: Yup.string().label('Contact'),
         logo: Yup.mixed()
-          .test("is-valid-type", "Not a valid image type",
-            value => isValidFileType(value && value.name.toLowerCase(), "image"))
-          .test("is-valid-size", "Max allowed size is 1000KB",
-            value => value && value.size <= MAX_FILE_SIZE)
-          .label('Logo'),
+            .nullable()
+            .notRequired()
+            .test("is-valid-type", "Not a valid image type",
+                value => !value || isValidFileType(value && value.name.toLowerCase(), "image"))
+            .test("is-valid-size", "Max allowed size is 1000KB",
+                value => !value || (value && value.size <= MAX_FILE_SIZE))
+            .label('Logo'),
         address: Yup.string().label('Address'),
         name: Yup.string().required().label('Supplier Name'),
     })

@@ -1,7 +1,7 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Requisition APIs",
+        "title": "InfyOm Laravel Generator APIs",
         "version": "1.0.0"
     },
     "servers": [
@@ -194,6 +194,221 @@
                         "name": "id",
                         "in": "path",
                         "description": "id of Branch",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/brands": {
+            "get": {
+                "tags": [
+                    "Brand"
+                ],
+                "summary": "getBrandList",
+                "description": "Get all Brands",
+                "operationId": "65b1d50722ce3246d0bdf22bd1e9e3ab",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Brand"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Brand"
+                ],
+                "summary": "createBrand",
+                "description": "Create Brand",
+                "operationId": "b0fb485721e6fac5419021a0077bd4e2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Brand"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Brand"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/brands/{id}": {
+            "get": {
+                "tags": [
+                    "Brand"
+                ],
+                "summary": "getBrandItem",
+                "description": "Get Brand",
+                "operationId": "b0811e213c4f13985e8c7dfff10885c9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Brand",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Brand"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Brand"
+                ],
+                "summary": "updateBrand",
+                "description": "Update Brand",
+                "operationId": "45d2ab737979e2b65cedcae5610e2a5c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Brand",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Brand"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Brand"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Brand"
+                ],
+                "summary": "deleteBrand",
+                "description": "Delete Brand",
+                "operationId": "2c5ac207a3a4ec05a8ba70e9fe4d53c4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Brand",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -427,6 +642,42 @@
                                         },
                                         "data": {
                                             "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/categories/{parent_category}": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "getCategoryList",
+                "description": "Get all Sub-category Categories",
+                "operationId": "53c89557607c57366e71cd963daa6126",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Category"
+                                            }
                                         },
                                         "message": {
                                             "type": "string"
@@ -870,6 +1121,651 @@
                 }
             }
         },
+        "/initial-requisitions": {
+            "get": {
+                "tags": [
+                    "InitialRequisition"
+                ],
+                "summary": "getInitialRequisitionList",
+                "description": "Get all InitialRequisitions",
+                "operationId": "8c026d01f03ee60cb9a76a1626ac231f",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/InitialRequisition"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "InitialRequisition"
+                ],
+                "summary": "createInitialRequisition",
+                "description": "Create InitialRequisition",
+                "operationId": "277ed5ec15b422fe60091de42bb3aeaf",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InitialRequisition"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/InitialRequisition"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/initial-requisitions/{id}": {
+            "get": {
+                "tags": [
+                    "InitialRequisition"
+                ],
+                "summary": "getInitialRequisitionItem",
+                "description": "Get InitialRequisition",
+                "operationId": "6f71eefb6b5e2797f7a4c0b1a318135a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of InitialRequisition",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/InitialRequisition"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "InitialRequisition"
+                ],
+                "summary": "updateInitialRequisition",
+                "description": "Update InitialRequisition",
+                "operationId": "81c28bae2e7feae73b9540c852e310ea",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of InitialRequisition",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InitialRequisition"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/InitialRequisition"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "InitialRequisition"
+                ],
+                "summary": "deleteInitialRequisition",
+                "description": "Delete InitialRequisition",
+                "operationId": "8986fb8f4e12e52ae78065b11096994c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of InitialRequisition",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "getProductList",
+                "description": "Get all Products",
+                "operationId": "15732299bdeddbb6ee6b7c56ebf56307",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Product"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "createProduct",
+                "description": "Create Product",
+                "operationId": "974b923a4f56c1e533f63ca9eb78d4a2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Product"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "getProductItem",
+                "description": "Get Product",
+                "operationId": "1d8e204f0a2534afcaefad51649010dc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Product",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "updateProduct",
+                "description": "Update Product",
+                "operationId": "c5e383dccdf04d9ccb04ffcdad51ee75",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Product",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Product"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "deleteProduct",
+                "description": "Delete Product",
+                "operationId": "2968e65018acc4a4d7877ed2321c73c2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Product",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/product-issues": {
+            "get": {
+                "tags": [
+                    "ProductIssue"
+                ],
+                "summary": "getProductIssueList",
+                "description": "Get all ProductIssues",
+                "operationId": "7fc740c3d085c55f881cbc41a15826a5",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ProductIssue"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "ProductIssue"
+                ],
+                "summary": "createProductIssue",
+                "description": "Create ProductIssue",
+                "operationId": "d49638a98126be1cb4354aff5bf459b0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductIssue"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProductIssue"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/product-issues/{id}": {
+            "get": {
+                "tags": [
+                    "ProductIssue"
+                ],
+                "summary": "getProductIssueItem",
+                "description": "Get ProductIssue",
+                "operationId": "e31865e33fd2e832826701b0d31717ed",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of ProductIssue",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProductIssue"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "ProductIssue"
+                ],
+                "summary": "updateProductIssue",
+                "description": "Update ProductIssue",
+                "operationId": "23eb37fe28a185e856cb519af1935ab7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of ProductIssue",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductIssue"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProductIssue"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "ProductIssue"
+                ],
+                "summary": "deleteProductIssue",
+                "description": "Delete ProductIssue",
+                "operationId": "1c51458d10f49930efee7b0a2d025ef2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of ProductIssue",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/product-options": {
             "get": {
                 "tags": [
@@ -1085,14 +1981,14 @@
                 }
             }
         },
-        "/products": {
+        "/purchases": {
             "get": {
                 "tags": [
-                    "Products"
+                    "Purchase"
                 ],
-                "summary": "getProductsList",
-                "description": "Get all Products",
-                "operationId": "852402c51968e8e580b2fb7b919f614c",
+                "summary": "getPurchaseList",
+                "description": "Get all Purchases",
+                "operationId": "c13b0d4a83cd673e1e13ab2c0ce7a9c6",
                 "responses": {
                     "200": {
                         "description": "successful operation",
@@ -1106,7 +2002,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/Products"
+                                                "$ref": "#/components/schemas/Purchase"
                                             }
                                         },
                                         "message": {
@@ -1122,17 +2018,17 @@
             },
             "post": {
                 "tags": [
-                    "Products"
+                    "Purchase"
                 ],
-                "summary": "createProducts",
-                "description": "Create Products",
-                "operationId": "c837201d8cab4b6b5bb4c68615248570",
+                "summary": "createPurchase",
+                "description": "Create Purchase",
+                "operationId": "4456db823f09f94e11b3004ef96e35ea",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Products"
+                                "$ref": "#/components/schemas/Purchase"
                             }
                         }
                     }
@@ -1148,7 +2044,7 @@
                                             "type": "boolean"
                                         },
                                         "data": {
-                                            "$ref": "#/components/schemas/Products"
+                                            "$ref": "#/components/schemas/Purchase"
                                         },
                                         "message": {
                                             "type": "string"
@@ -1162,19 +2058,19 @@
                 }
             }
         },
-        "/products/{id}": {
+        "/purchases/{id}": {
             "get": {
                 "tags": [
-                    "Products"
+                    "Purchase"
                 ],
-                "summary": "getProductsItem",
-                "description": "Get Products",
-                "operationId": "52228b6477828174fb0b6d0a477de71f",
+                "summary": "getPurchaseItem",
+                "description": "Get Purchase",
+                "operationId": "cb2bb025682c028062447e46509c43dc",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of Products",
+                        "description": "id of Purchase",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1192,7 +2088,7 @@
                                             "type": "boolean"
                                         },
                                         "data": {
-                                            "$ref": "#/components/schemas/Products"
+                                            "$ref": "#/components/schemas/Purchase"
                                         },
                                         "message": {
                                             "type": "string"
@@ -1207,16 +2103,16 @@
             },
             "put": {
                 "tags": [
-                    "Products"
+                    "Purchase"
                 ],
-                "summary": "updateProducts",
-                "description": "Update Products",
-                "operationId": "e5b293f2124584f2cd32ea1fff2f7ac7",
+                "summary": "updatePurchase",
+                "description": "Update Purchase",
+                "operationId": "1122d0ec2e21f29339f7e3bbc8501ce1",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of Products",
+                        "description": "id of Purchase",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1228,7 +2124,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Products"
+                                "$ref": "#/components/schemas/Purchase"
                             }
                         }
                     }
@@ -1244,7 +2140,7 @@
                                             "type": "boolean"
                                         },
                                         "data": {
-                                            "$ref": "#/components/schemas/Products"
+                                            "$ref": "#/components/schemas/Purchase"
                                         },
                                         "message": {
                                             "type": "string"
@@ -1259,16 +2155,661 @@
             },
             "delete": {
                 "tags": [
-                    "Products"
+                    "Purchase"
                 ],
-                "summary": "deleteProducts",
-                "description": "Delete Products",
-                "operationId": "e000f672b066ccf70f2edcffbcb1316e",
+                "summary": "deletePurchase",
+                "description": "Delete Purchase",
+                "operationId": "8fc4db150723a56439fc342fb6ca4e07",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of Products",
+                        "description": "id of Purchase",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/purchase-requisitions": {
+            "get": {
+                "tags": [
+                    "PurchaseRequisition"
+                ],
+                "summary": "getPurchaseRequisitionList",
+                "description": "Get all PurchaseRequisitions",
+                "operationId": "5f04e3b352dd920c5433a907912045f6",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PurchaseRequisition"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "PurchaseRequisition"
+                ],
+                "summary": "createPurchaseRequisition",
+                "description": "Create PurchaseRequisition",
+                "operationId": "50f46aa726b6fa0b8f335d94b3e99b2f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PurchaseRequisition"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/PurchaseRequisition"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/purchase-requisitions/{id}": {
+            "get": {
+                "tags": [
+                    "PurchaseRequisition"
+                ],
+                "summary": "getPurchaseRequisitionItem",
+                "description": "Get PurchaseRequisition",
+                "operationId": "6357612ebb5cf9cc597e0a29cabeac4c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of PurchaseRequisition",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/PurchaseRequisition"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "PurchaseRequisition"
+                ],
+                "summary": "updatePurchaseRequisition",
+                "description": "Update PurchaseRequisition",
+                "operationId": "7ca1e58872d3600742cc770183758f92",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of PurchaseRequisition",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PurchaseRequisition"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/PurchaseRequisition"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "PurchaseRequisition"
+                ],
+                "summary": "deletePurchaseRequisition",
+                "description": "Delete PurchaseRequisition",
+                "operationId": "3f54f8bfc88d673e4ecd3c2aba3fc9f4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of PurchaseRequisition",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/suppliers": {
+            "get": {
+                "tags": [
+                    "Supplier"
+                ],
+                "summary": "getSupplierList",
+                "description": "Get all Suppliers",
+                "operationId": "eb7f75eeba2c8414b405c322c4f83892",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Supplier"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Supplier"
+                ],
+                "summary": "createSupplier",
+                "description": "Create Supplier",
+                "operationId": "e355f338d11b4c3e8218b5918b443c4a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Supplier"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Supplier"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/suppliers/{id}": {
+            "get": {
+                "tags": [
+                    "Supplier"
+                ],
+                "summary": "getSupplierItem",
+                "description": "Get Supplier",
+                "operationId": "01de453443ec46411d6bd74d965b1fff",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Supplier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Supplier"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Supplier"
+                ],
+                "summary": "updateSupplier",
+                "description": "Update Supplier",
+                "operationId": "fcb426a049d570f8e71c952148af06bd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Supplier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Supplier"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Supplier"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Supplier"
+                ],
+                "summary": "deleteSupplier",
+                "description": "Delete Supplier",
+                "operationId": "f3452bd713141b6c0c6eee5a74cf056b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Supplier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "getUserList",
+                "description": "Get all Users",
+                "operationId": "1df092f5eddb2e29c3c5aa8043dd6d44",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/User"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "createUser",
+                "description": "Create User",
+                "operationId": "3465c05467f56755d8fde6dfe336f784",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "getUserItem",
+                "description": "Get User",
+                "operationId": "ca775ff26d0144e4b01abbd8c926f7c3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of User",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "updateUser",
+                "description": "Update User",
+                "operationId": "acefdff5c10ad10456b5e12506f8ab63",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of User",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "deleteUser",
+                "description": "Delete User",
+                "operationId": "b3671c968c691df9358298f3a285c767",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of User",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1303,6 +2844,41 @@
     },
     "components": {
         "schemas": {
+            "Auth/Role": {
+                "required": [
+                    "name",
+                    "guard_name"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "guard_name": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "created_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "Branch": {
                 "required": [
                     "organization_id",
@@ -1334,6 +2910,59 @@
                         "nullable": true
                     },
                     "location": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": true
+                    },
+                    "deleted_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Brand": {
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "logo": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": true
+                    },
+                    "contact": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": true
+                    },
+                    "address": {
                         "description": "",
                         "type": "string",
                         "readOnly": false,
@@ -1478,6 +3107,181 @@
                 },
                 "type": "object"
             },
+            "InitialRequisition": {
+                "required": [
+                    "user_id",
+                    "department_id",
+                    "irf_no",
+                    "ir_no",
+                    "is_purchase_requisition_generated",
+                    "is_purchase_done"
+                ],
+                "properties": {
+                    "irf_no": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "ir_no": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "estimated_cost": {
+                        "description": "",
+                        "type": "number",
+                        "format": "number",
+                        "readOnly": false,
+                        "nullable": true
+                    },
+                    "is_purchase_requisition_generated": {
+                        "description": "0 =&gt; No, 1 =&gt; Yes",
+                        "type": "boolean",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "is_purchase_done": {
+                        "description": "0 =&gt; No, 1 =&gt; Yes",
+                        "type": "boolean",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "deleted_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Product": {
+                "required": [
+                    "title",
+                    "unit",
+                    "category_id",
+                    "status"
+                ],
+                "properties": {
+                    "title": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "sl_no": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": true
+                    },
+                    "unit": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "description": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": true
+                    },
+                    "status": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "deleted_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ProductIssue": {
+                "required": [
+                    "purchase_requisition_id",
+                    "product_id",
+                    "product_option_id",
+                    "quantity",
+                    "receiver_id",
+                    "issuer_id"
+                ],
+                "properties": {
+                    "quantity": {
+                        "description": "",
+                        "type": "number",
+                        "format": "number",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "issue_time": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": false,
+                        "nullable": true
+                    },
+                    "deleted_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "ProductOption": {
                 "required": [
                     "product_id",
@@ -1536,52 +3340,202 @@
                 },
                 "type": "object"
             },
-            "Products": {
+            "Purchase": {
                 "required": [
-                    "title",
-                    "sl_no",
-                    "unit",
-                    "category_id",
-                    "description",
-                    "status"
+                    "product_id",
+                    "qty",
+                    "unit_price",
+                    "total_price",
+                    "user_id"
                 ],
                 "properties": {
-                    "title": {
+                    "qty": {
+                        "description": "",
+                        "type": "number",
+                        "format": "number",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "unit_price": {
+                        "description": "",
+                        "type": "number",
+                        "format": "number",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "total_price": {
+                        "description": "",
+                        "type": "number",
+                        "format": "number",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "deleted_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "PurchaseRequisition": {
+                "required": [
+                    "initial_requisition_id",
+                    "estimated_total_amount",
+                    "received_amount",
+                    "payment_type"
+                ],
+                "properties": {
+                    "estimated_total_amount": {
+                        "description": "",
+                        "type": "number",
+                        "format": "number",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "received_amount": {
+                        "description": "",
+                        "type": "number",
+                        "format": "number",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "payment_type": {
+                        "description": "Cash, Cheque, LPO, Fund available,Maybe Arranged on",
+                        "type": "boolean",
+                        "readOnly": false,
+                        "nullable": false
+                    },
+                    "deleted_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Supplier": {
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
                         "description": "",
                         "type": "string",
                         "readOnly": false,
                         "nullable": false
                     },
-                    "sl_no": {
+                    "logo": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": true
+                    },
+                    "contact": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": true
+                    },
+                    "address": {
+                        "description": "",
+                        "type": "string",
+                        "readOnly": false,
+                        "nullable": true
+                    },
+                    "deleted_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "description": "",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "required": [
+                    "name",
+                    "email",
+                    "password"
+                ],
+                "properties": {
+                    "name": {
                         "description": "",
                         "type": "string",
                         "readOnly": false,
                         "nullable": false
                     },
-                    "unit": {
+                    "email": {
                         "description": "",
                         "type": "string",
                         "readOnly": false,
                         "nullable": false
                     },
-                    "category_id": {
+                    "email_verified_at": {
                         "description": "",
-                        "type": "integer",
-                        "format": "int32",
+                        "type": "string",
+                        "format": "date-time",
                         "readOnly": false,
-                        "nullable": false
+                        "nullable": true
                     },
-                    "description": {
+                    "password": {
                         "description": "",
                         "type": "string",
                         "readOnly": false,
                         "nullable": false
                     },
-                    "status": {
+                    "remember_token": {
                         "description": "",
                         "type": "string",
                         "readOnly": false,
-                        "nullable": false
+                        "nullable": true
                     },
                     "deleted_at": {
                         "description": "",

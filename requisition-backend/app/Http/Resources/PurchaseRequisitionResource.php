@@ -23,6 +23,7 @@ class PurchaseRequisitionResource extends JsonResource
             'department' => $this->department,
             'irf_no' => $this->irf_no,
             'ir_no' => $this->ir_no,
+            'po_no' => $this->po_no,
             'estimated_total_amount' => $this->estimated_total_amount,
             'received_amount' => $this->received_amount,
             'payment_type' => $this->payment_type,

@@ -45,6 +45,11 @@ const Purchase = () => {
             sortable: true,
         },
         {
+            name: 'Brand',
+            selector: row => row.brand?.logo ? <Image width={50} height={50} alt={row.brand?.name} src={row.brand?.logo} /> : row.brand?.name,
+            sortable: true,
+        },
+        {
             name: 'Requisition',
             selector: row => row.purchaseRequisition?.irf_no,
             sortable: true,
@@ -72,6 +77,11 @@ const Purchase = () => {
         {
             name: 'Total',
             selector: row => row.total_price,
+            sortable: true,
+        },
+        {
+            name: 'Notes',
+            selector: row => row.notes,
             sortable: true,
         },
         {

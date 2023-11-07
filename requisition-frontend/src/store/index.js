@@ -34,6 +34,7 @@ import { PurchaseRequisitionInputChangeSlice } from "@/store/service/requisition
 import { SuppliersApiService } from "@/store/service/suppliers";
 import { PurchaseApiService } from "@/store/service/purchase";
 import { IssueApiService } from "@/store/service/issue";
+import { BrandsApiService } from "@/store/service/brands";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -51,6 +52,7 @@ const middlewares = [
     SuppliersApiService.middleware,
     PurchaseApiService.middleware,
     IssueApiService.middleware,
+    BrandsApiService.middleware,
 ];
 
 const persistConfig = {
@@ -84,6 +86,7 @@ const combineReducer = combineReducers({
     [SuppliersApiService.reducerPath]: SuppliersApiService.reducer,
     [PurchaseApiService.reducerPath]: PurchaseApiService.reducer,
     [IssueApiService.reducerPath]: IssueApiService.reducer,
+    [BrandsApiService.reducerPath]: BrandsApiService.reducer,
 });
 
 const _persistedReducer = persistReducer(persistConfig, combineReducer);

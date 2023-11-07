@@ -68,6 +68,7 @@ use Illuminate\Database\Eloquent\Model;
         'initial_requisition_id',
         'irf_no',
         'ir_no',
+        'po_no',
         'estimated_total_amount',
         'received_amount',
         'payment_type',

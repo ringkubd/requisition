@@ -1,6 +1,6 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, TextInput } from "flowbite-react";
+import { Button, Card, Label, Textarea, TextInput } from "flowbite-react";
 import NavLink from "@/components/NavLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
@@ -12,19 +12,23 @@ import Select2ComponentAjax from "@/components/select2/Select2ComponentAjax";
 import moment from "moment/moment";
 import Select2Component from "@/components/select2/Select2Component";
 import Link from "next/link";
+import AddSupplierModal from "@/components/suppliers/AddSupplierModal";
+import AddBrandModal from "@/components/brands/AddBrandModal";
 const create = (props) => {
     const router = useRouter();
     const [storePurchase, storeResult] = useStorePurchaseMutation();
     let formikForm = useRef();
     const selectRef = useRef();
-    const productOptionRef = useRef();
     const supplierSelectRef = useRef();
+    const brandSelectRef = useRef();
     const purchaseRequisitionSelectRef = useRef();
     const [products, setProducts] = useState([]);
     const [selectedProductOptionId, setSelectedProductOptionId] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
     const [purchaseRequisition, setPurchaseRequisition] = useState([]);
     const [productOption, setProductOption] = useState("");
+    const [openAddSupplierModal, setOpenAddSupplierModal] = useState(false);
+    const [openAddBrandModal, setOpenAddBrandModal] = useState(false);
 
     useEffect(() => {
         if (selectedProductOptionId){
@@ -46,6 +50,8 @@ const create = (props) => {
         qty: '',
         unit_price: '',
         total_price: '',
+        brand_id: '',
+        notes: '',
         purchase_date: moment().format('Y-MM-DD')
     }
     useEffect(() => {
@@ -69,6 +75,7 @@ const create = (props) => {
         storePurchase(values)
         selectRef.current.resetSelect()
         supplierSelectRef.current.resetSelect()
+        brandSelectRef.current.resetSelect()
         purchaseRequisitionSelectRef.current.resetSelect()
         pageProps.resetForm();
     }
@@ -156,7 +163,7 @@ const create = (props) => {
                                                         data-placeholder="Select options..."
                                                     />
                                                     <ErrorMessage
-                                                        name='name'
+                                                        name='purchase_requisition_id'
                                                         render={(msg) => <span className='text-red-500'>{msg}</span>} />
                                                 </div>
                                             </div>
@@ -181,7 +188,50 @@ const create = (props) => {
                                                     />
 
                                                     <ErrorMessage
-                                                        name='name'
+                                                        name='product_option_id'
+                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                </div>
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                            htmlFor="brand_id"
+                                                            value="Brand"
+                                                        />
+                                                        <button onClick={() => setOpenAddBrandModal(true)}>+Add</button>
+                                                        <AddBrandModal openModal={openAddBrandModal} setOpenModal={setOpenAddBrandModal} />
+                                                    </div>
+                                                    <Select2ComponentAjax
+                                                        name='brand_id'
+                                                        id='brand_id'
+                                                        ref={brandSelectRef}
+                                                        onChange={(e) => {
+                                                            handleChange(e)
+                                                        }}
+                                                        className={`w-full border-1 border-gray-300`}
+                                                        ajax={ {
+                                                            url: process.env.NEXT_PUBLIC_BACKEND_API_URL+ `brands`,
+                                                            data: function (params) {
+                                                                return{
+                                                                    search: params.term,
+                                                                    page: params.page || 1
+                                                                }
+                                                            },
+                                                            processResults: function (data, params) {
+                                                                params.page = params.page || 1;
+                                                                return {
+                                                                    results: data.data.map((d)=> {
+                                                                        return {text: d.name, id: d.id}
+                                                                    }),
+                                                                    pagination: {
+                                                                        more: (params.page * 10) < data.count_filtered
+                                                                    }
+                                                                };
+                                                            }
+                                                        }}
+                                                        data-placeholder="Select options..."
+                                                    />
+                                                    <ErrorMessage
+                                                        name='product_option_id'
                                                         render={(msg) => <span className='text-red-500'>{msg}</span>} />
                                                 </div>
                                             </div>
@@ -211,7 +261,8 @@ const create = (props) => {
                                                             htmlFor="supplier"
                                                             value="Supplier"
                                                         />
-                                                        <Link href={'/suppliers/create'} target={`--blank`}> <button>+Add</button></Link>
+                                                        <button onClick={() => setOpenAddSupplierModal(true)}>+Add</button>
+                                                        <AddSupplierModal openModal={openAddSupplierModal} setOpenModal={setOpenAddSupplierModal} />
                                                     </div>
                                                     <Select2ComponentAjax
                                                         name='supplier_id'
@@ -245,7 +296,7 @@ const create = (props) => {
                                                         data-placeholder="Select options..."
                                                     />
                                                     <ErrorMessage
-                                                        name='name'
+                                                        name='supplier_id'
                                                         render={(msg) => <span className='text-red-500'>{msg}</span>} />
                                                 </div>
                                             </div>
@@ -319,6 +370,26 @@ const create = (props) => {
                                                     />
                                                     <ErrorMessage
                                                         name='unit_price'
+                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col sm:flex-row gap-4">
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                            htmlFor="notes"
+                                                            value="Notes"
+                                                        />
+                                                    </div>
+                                                    <Textarea
+                                                        id="notes"
+                                                        name="notes"
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.notes}
+                                                    />
+                                                    <ErrorMessage
+                                                        name='notes'
                                                         render={(msg) => <span className='text-red-500'>{msg}</span>} />
                                                 </div>
                                             </div>

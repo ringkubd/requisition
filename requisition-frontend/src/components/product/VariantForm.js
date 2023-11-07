@@ -27,8 +27,8 @@ export default function VariantForm(props) {
         option_id: '',
         sku: '',
         option_value: '',
-        unit_price: '',
-        stock: '',
+        stock: '0',
+        notes: '',
     }
 
     const submitOptions = (values, props) => {
@@ -39,7 +39,11 @@ export default function VariantForm(props) {
     }
 
     const next = () => {
-        dispatch(setActiveForm(3));
+        if (productOptions.length){
+            dispatch(setActiveForm(3));
+        }else{
+            alert('Please add a variant.');
+        }
     }
 
     const optionsColumns = [
@@ -59,13 +63,13 @@ export default function VariantForm(props) {
             sortable: true,
         },
         {
-            name: 'Unit Price',
-            selector: row => row?.unit_price,
+            name: 'Stock',
+            selector: row => row?.stock,
             sortable: true,
         },
         {
-            name: 'Stock',
-            selector: row => row?.stock,
+            name: 'Notes',
+            selector: row => row?.notes,
             sortable: true,
         },
     ];
@@ -78,10 +82,10 @@ export default function VariantForm(props) {
                 is: (val) => val,
                 then: () => Yup.string().required().label('Option Value')
             }).label('Option Value'),
-        unit_price: Yup.string().label('Unit Price'),
+        notes: Yup.string().label('Notes'),
         stock: Yup.string().when('option_id', {
             is: (val) => val,
-            then: () => Yup.string().required().label('Stock'),
+            then: () => Yup.string().nullable().label('Stock'),
         }).label('Stock'),
     });
 
@@ -189,29 +193,6 @@ export default function VariantForm(props) {
                             <div className="w-full">
                                 <div className="mb-2 block">
                                     <Label
-                                        htmlFor="unit_price"
-                                        value="Unit Price"
-                                    />
-                                </div>
-                                <TextInput
-                                    id={`unit_price`}
-                                    name={`unit_price`}
-                                    value={values.unit_price}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                />
-                                <ErrorMessage
-                                    name="unit_price"
-                                    render={msg => (
-                                        <span className="text-red-500">{msg}</span>
-                                    )}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex flex-row gap-4">
-                            <div className="w-full">
-                                <div className="mb-2 block">
-                                    <Label
                                         htmlFor="stock"
                                         value="Stock"
                                     />
@@ -227,6 +208,29 @@ export default function VariantForm(props) {
                                 />
                                 <ErrorMessage
                                     name="stock"
+                                    render={msg => (
+                                        <span className="text-red-500">{msg}</span>
+                                    )}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-row gap-4">
+                            <div className="w-full">
+                                <div className="mb-2 block">
+                                    <Label
+                                        htmlFor="notes"
+                                        value="Notes"
+                                    />
+                                </div>
+                                <TextInput
+                                    id={`notes`}
+                                    name={`notes`}
+                                    value={values.notes}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                />
+                                <ErrorMessage
+                                    name="notes"
                                     render={msg => (
                                         <span className="text-red-500">{msg}</span>
                                     )}

@@ -46,82 +46,6 @@ const Navigation = ({ user }) => {
                               width="48"
                               contentClasses={`px-1 py-0 bg-gray-200`}
                               trigger={
-                                  <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out z-40 overflow-hidden">
-                                      <div>Organization</div>
-                                      <div className="ml-1">
-                                          <BiChevronDown />
-                                      </div>
-                                  </button>
-                              }
-                            >
-                                <DropdownLink
-                                    href="/organization"
-                                    active={router.pathname.includes('organization').toString()}
-                                >
-                                    Organization
-                                </DropdownLink>
-                                <DropdownLink
-                                  href="/branch"
-                                  active={router.pathname.includes('branch').toString()}
-                                >
-                                    Branch
-                                </DropdownLink>
-                                <DropdownLink
-                                  href="/department"
-                                  active={router.pathname.includes('department').toString()}
-                                >
-                                    Department
-                                </DropdownLink>
-                                <DropdownLink
-                                  href="/designation"
-                                  active={router.pathname.includes('designation').toString()}
-                                >
-                                    Designation
-                                </DropdownLink>
-                                <DropdownLink
-                                    href="/employees"
-                                    active={router.pathname.includes('employees').toString()}
-                                >
-                                    Employees
-                                </DropdownLink>
-                            </Dropdown>
-                            <Dropdown
-                              align="left"
-                              width="48"
-                              contentClasses={`px-1 py-0 bg-gray-200`}
-                              trigger={
-                                  <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
-                                      <div>Products</div>
-                                      <div className="ml-1">
-                                          <BiChevronDown />
-                                      </div>
-                                  </button>
-                              }
-                            >
-                                <DropdownLink
-                                    href="/product"
-                                    active={router.pathname.includes('product').toString()}
-                                >
-                                    Product
-                                </DropdownLink>
-                                <DropdownLink
-                                  href="/category"
-                                  active={router.pathname.includes('category').toString()}
-                                >
-                                    Category
-                                </DropdownLink>
-                                <DropdownLink
-                                  href="/options"
-                                  active={router.pathname.includes('options').toString()}
-                                >
-                                    Options
-                                </DropdownLink>
-                            </Dropdown>
-                            <Dropdown
-                              align="left"
-                              width="48"
-                              contentClasses={`px-1 py-0 bg-gray-200`}
-                              trigger={
                                   <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
                                       <div>Purchase</div>
                                       <div className="ml-1">
@@ -148,6 +72,12 @@ const Navigation = ({ user }) => {
                                 >
                                     Supplier
                                 </DropdownLink>
+                                <DropdownLink
+                                    href="/brands"
+                                    active={router.pathname.includes('brands').toString()}
+                                >
+                                    Brands
+                                </DropdownLink>
                             </Dropdown>
                             <Dropdown
                               align="right"
@@ -171,6 +101,82 @@ const Navigation = ({ user }) => {
                                   active={router.pathname.includes('purchase-requisition').toString()}
                                 >
                                     Purchase
+                                </DropdownLink>
+                            </Dropdown>
+                            <Dropdown
+                                align="left"
+                                width="48"
+                                contentClasses={`px-1 py-0 bg-gray-200`}
+                                trigger={
+                                    <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
+                                        <div>Products</div>
+                                        <div className="ml-1">
+                                            <BiChevronDown />
+                                        </div>
+                                    </button>
+                                }
+                            >
+                                <DropdownLink
+                                    href="/product"
+                                    active={router.pathname.includes('product').toString()}
+                                >
+                                    Product
+                                </DropdownLink>
+                                <DropdownLink
+                                    href="/category"
+                                    active={router.pathname.includes('category').toString()}
+                                >
+                                    Category
+                                </DropdownLink>
+                                <DropdownLink
+                                    href="/options"
+                                    active={router.pathname.includes('options').toString()}
+                                >
+                                    Options
+                                </DropdownLink>
+                            </Dropdown>
+                            <Dropdown
+                                align="left"
+                                width="48"
+                                contentClasses={`px-1 py-0 bg-gray-200`}
+                                trigger={
+                                    <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out z-40 overflow-hidden">
+                                        <div>Organization</div>
+                                        <div className="ml-1">
+                                            <BiChevronDown />
+                                        </div>
+                                    </button>
+                                }
+                            >
+                                <DropdownLink
+                                    href="/organization"
+                                    active={router.pathname.includes('organization').toString()}
+                                >
+                                    Organization
+                                </DropdownLink>
+                                <DropdownLink
+                                    href="/branch"
+                                    active={router.pathname.includes('branch').toString()}
+                                >
+                                    Branch
+                                </DropdownLink>
+                                <DropdownLink
+                                    href="/department"
+                                    active={router.pathname.includes('department').toString()}
+                                >
+                                    Department
+                                </DropdownLink>
+                                <DropdownLink
+                                    href="/designation"
+                                    active={router.pathname.includes('designation').toString()}
+                                >
+                                    Designation
+                                </DropdownLink>
+                                <DropdownLink
+                                    href="/employees"
+                                    active={router.pathname.includes('employees').toString()}
+                                >
+                                    Employees
                                 </DropdownLink>
                             </Dropdown>
                         </div>
@@ -319,10 +325,10 @@ const Navigation = ({ user }) => {
                                 Issue
                             </DropdownLink>
                             <DropdownLink
-                              href="/suppliers"
-                              active={router.pathname.includes('suppliers').toString()}
+                                href="/brands"
+                                active={router.pathname.includes('brands').toString()}
                             >
-                                Supplier
+                                Brands
                             </DropdownLink>
                         </Dropdown>
                         <Dropdown

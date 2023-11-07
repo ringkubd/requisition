@@ -15,6 +15,7 @@ import {
     getRunningQueriesThunk
 } from "@/store/service/requisitions/purchase";
 import moment from "moment";
+import UpdatePno from "@/components/purchase-requisition/UpdatePno";
 
 const PurchaseRequisition = () => {
     const router = useRouter();
@@ -34,6 +35,11 @@ const PurchaseRequisition = () => {
                 {
                     name: 'I.R.F. No.',
                     selector: row => row.irf_no,
+                    sortable: true,
+                },
+                {
+                    name: 'P.O. No.',
+                    selector: row => <UpdatePno value={row.po_no} created={row.created_at} requisition_id={row.id} />,
                     sortable: true,
                 },
                 {

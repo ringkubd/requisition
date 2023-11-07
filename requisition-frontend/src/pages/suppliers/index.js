@@ -53,8 +53,6 @@ const Department = () => {
             name: 'Actions',
             cell: (row) => <Actions
                 itemId={row.id}
-                edit={`/suppliers/${row.id}/edit`}
-                view={`/suppliers/${row.id}/view`}
                 destroy={destroy}
                 progressing={destroyResponse.isLoading}
             />,

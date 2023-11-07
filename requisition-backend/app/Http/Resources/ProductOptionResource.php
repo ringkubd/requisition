@@ -24,8 +24,8 @@ class ProductOptionResource extends JsonResource
             'option_purchase_history' => PurchaseHistoryResource::collection($this->purchaseHistory),
             'sku' => $this->sku,
             'option_value' => $this->option_value,
-            'unit_price' => $this->unit_price,
             'stock' => $this->stock,
+            'notes' => $this->notes,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

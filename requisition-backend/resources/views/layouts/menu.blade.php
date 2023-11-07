@@ -118,3 +118,10 @@
         <p>@lang('models/categories.plural')</p>
     </a>
 </li>
+
+<li class="nav-item">
+    <a href="{{ route('brands.index') }}" class="nav-link {{ Request::is('brands*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/brands.plural')</p>
+    </a>
+</li>

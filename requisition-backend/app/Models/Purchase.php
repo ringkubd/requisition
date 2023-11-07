@@ -75,6 +75,8 @@ class Purchase extends Model
         'user_id',
         'purchase_date',
         'available_qty',
+        'brand_id',
+        'notes',
     ];
 
     protected $casts = [
@@ -116,5 +118,10 @@ class Purchase extends Model
     public function purchaseRequisition(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\PurchaseRequisition::class, 'purchase_requisition_id');
+    }
+
+    public function brand(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Brand::class);
     }
 }

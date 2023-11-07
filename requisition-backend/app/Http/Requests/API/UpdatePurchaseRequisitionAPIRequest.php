@@ -25,7 +25,7 @@ class UpdatePurchaseRequisitionAPIRequest extends APIRequest
     public function rules()
     {
         $rules = PurchaseRequisition::$rules;
-        
-        return $rules;
+
+        return [];
     }
 }

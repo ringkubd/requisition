@@ -94,8 +94,8 @@ const View = (props) => {
                                                     <Table.HeadCell>Option</Table.HeadCell>
                                                     <Table.HeadCell>Value</Table.HeadCell>
                                                     <Table.HeadCell>SKU</Table.HeadCell>
-                                                    <Table.HeadCell>Unit Price</Table.HeadCell>
                                                     <Table.HeadCell>Stock</Table.HeadCell>
+                                                    <Table.HeadCell>Notes</Table.HeadCell>
                                                     <Table.HeadCell>Actions</Table.HeadCell>
                                                 </Table.Head>
                                                 <Table.Body>
@@ -106,8 +106,8 @@ const View = (props) => {
                                                                 <Table.Cell>{p?.option?.name}</Table.Cell>
                                                                 <Table.Cell>{p.option_value}</Table.Cell>
                                                                 <Table.Cell>{p?.sku}</Table.Cell>
-                                                                <Table.Cell>{p?.unit_price}</Table.Cell>
                                                                 <Table.Cell>{p.stock}</Table.Cell>
+                                                                <Table.Cell>{p?.notes}</Table.Cell>
                                                                 <Table.Cell>
                                                                     <Actions />
                                                                 </Table.Cell>

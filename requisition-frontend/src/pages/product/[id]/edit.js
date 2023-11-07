@@ -24,7 +24,7 @@ import { resetProductOptionsLocal, setProductOptionsLocal, setEditProductOptions
 const edit = props => {
     const router = useRouter();
     const dispatch = useDispatch();
-    const [storeProduct, storeResult] = useUpdateProductMutation()
+    const [updateProduct, storeResult] = useUpdateProductMutation()
     const {activeForm} = useSelector(state => state.product_active_form);
 
     const {data, isLoading, isError} = useEditProductQuery(router.query.id, {
@@ -66,8 +66,7 @@ const edit = props => {
 
     function submitForm(){
         // storeProduct()
-        console.log(productOptions)
-        storeProduct({
+        updateProduct({
             id: data.data.id,
             basic,
             metas,

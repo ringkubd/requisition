@@ -23,14 +23,6 @@ use Illuminate\Database\Eloquent\Model;
  *          type="string",
  *      ),
  *      @OA\Property(
- *          property="unit_price",
- *          description="",
- *          readOnly=false,
- *          nullable=true,
- *          type="number",
- *          format="number"
- *      ),
- *      @OA\Property(
  *          property="stock",
  *          description="",
  *          readOnly=false,
@@ -72,14 +64,13 @@ use Illuminate\Database\Eloquent\Model;
         'option_id',
         'sku',
         'option_value',
-        'unit_price',
+        'notes',
         'stock'
     ];
 
     protected $casts = [
         'sku' => 'string',
         'option_value' => 'string',
-        'unit_price' => 'float',
         'stock' => 'float'
     ];
 
@@ -88,8 +79,7 @@ use Illuminate\Database\Eloquent\Model;
         'option_id' => 'required',
         'sku' => 'nullable|string|max:255',
         'option_value' => 'required|string|max:255',
-        'unit_price' => 'nullable|numeric',
-        'stock' => 'required|numeric',
+        'stock' => 'nullable|numeric',
         'deleted_at' => 'nullable',
         'created_at' => 'nullable',
         'updated_at' => 'nullable'
