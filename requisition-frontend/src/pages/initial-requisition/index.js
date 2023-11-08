@@ -1,7 +1,7 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { wrapper } from "@/store";
-import { Button, Card } from "flowbite-react";
+import { Button, Card, Datepicker, TextInput } from "flowbite-react";
 import DataTable from 'react-data-table-component';
 import NavLink from "@/components/NavLink";
 import { useRouter } from "next/router";
@@ -13,12 +13,16 @@ import {
     useDestroyInitialRequisitionMutation,
     useGetInitialRequisitionQuery
 } from "@/store/service/requisitions/initial";
+import { HiSearch, HiShoppingBag } from "react-icons/hi";
+import moment from "moment";
 
 const InitialRequisition = () => {
     const router = useRouter();
-    const {data, isLoading, isError} = useGetInitialRequisitionQuery();
     const [destroy, destroyResponse] = useDestroyInitialRequisitionMutation();
     const [columns, setColumns] = useState([]);
+
+    const [search, setSearch] = useState({});
+    const {data, isLoading, isError, refetch} = useGetInitialRequisitionQuery(search);
 
 
     useEffect(() => {
@@ -69,10 +73,16 @@ const InitialRequisition = () => {
                     cell: (row) => <Actions
                         itemId={row.id}
                         edit={!row.is_purchase_requisition_generated ? `/initial-requisition/${row.id}/edit`: false}
-                        view={`/initial-requisition/${row.id}/view`}
                         print={`/initial-requisition/${row.id}/print_view`}
                         destroy={!row.is_purchase_requisition_generated ? destroy : false}
                         progressing={destroyResponse.isLoading}
+                        view={!row.is_purchase_requisition_generated ? (
+                            <Button
+                                gradientMonochrome={`cyan`}
+                                onClick={() => router.push(`/initial-requisition/${row.id}/create_purchase`)}>
+                                <HiShoppingBag />
+                            </Button>
+                        ) : false}
                     />,
                     ignoreRowClick: true,
                 }
@@ -80,6 +90,18 @@ const InitialRequisition = () => {
         }
     }, [isLoading, isError, data]);
 
+    const changeSearchInput = (e) => {
+        setSearch({search: e.target.value})
+        if (e.target.value){
+            refetch();
+        }
+    }
+
+    useEffect(() => {
+        if (search.length){
+            refetch();
+        }
+    }, [search]);
 
     return (
         <>
@@ -105,6 +127,17 @@ const InitialRequisition = () => {
                             >
                                 <Button>Create</Button>
                             </NavLink>
+                            <div>
+                                <Datepicker
+                                    onSelectedDateChanged={(date) => setSearch({...search, date: moment(date).format('Y-MM-DD')})}
+                                />
+                            </div>
+                            <div>
+                                <TextInput
+                                    icon={HiSearch}
+                                    onBlur={changeSearchInput}
+                                />
+                            </div>
                         </div>
                         <DataTable
                             columns={columns}

@@ -8,8 +8,9 @@ export const InitialRequisitionApi = createApi({
     tagTypes: ['initial-requisition', 'edit-initial-requisition'],
     endpoints: build => ({
         getInitialRequisition: build.query({
-            query: () => ({
-                url: 'initial-requisitions'
+            query: (params) => ({
+                url: 'initial-requisitions',
+                params,
             }),
             providesTags: ['initial-requisition']
         }),

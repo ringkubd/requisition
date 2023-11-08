@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { HiEye, HiPencilSquare, HiTrash } from "react-icons/hi2";
 import { HiPrinter } from "react-icons/hi";
 import Link from "next/link";
+import { isElement, isReactComponent } from "@/lib/helpers";
 
 const Actions = (props) => {
     const router = useRouter();
@@ -22,14 +23,14 @@ const Actions = (props) => {
         <>
             <Button.Group>
                 {
-                    view ?  (
+                    view && !isElement(view) ?  (
                         <Button
                             onClick={submitView}
                             gradientMonochrome={`cyan`}
                         >
                             <HiEye />
                         </Button>
-                    ) : <span></span>
+                    ) :  view && isElement(view) ? {...view} : <span></span>
                 }
                 {
                     edit ? (
@@ -65,7 +66,7 @@ const Actions = (props) => {
                         </Link>
                     ) : <span></span>
                 }
-                {!edit && !view && !destroy ? <Button>No Action</Button> : <span></span>}
+                {!edit && !view && !destroy && !print ? <Button>No Action</Button> : <span></span>}
             </Button.Group>
         </>
     )
