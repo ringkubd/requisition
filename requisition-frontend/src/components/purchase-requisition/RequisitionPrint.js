@@ -75,7 +75,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                     <tr className={`border text-center bg-white`} key={index}>
                                         <td className={`border p-0`}>{index + 1}</td>
                                         <td className={`border p-0`}>{rp.title}</td>
-                                        <td className={`border p-0`}>{moment(rp.last_purchase_date).format('DD-MMM-YY')}</td>
+                                        <td className={`border p-0`}>{rp.last_purchase_date ? moment(rp.last_purchase_date).format('DD-MMM-YY') : ''}</td>
                                         <td className={`border p-0`}>{rp.available_quantity}</td>
                                         <td className={`border p-0`}>{rp.required_quantity}</td>
                                         <td className={`border p-0`}>{rp.quantity_to_be_purchase}</td>
