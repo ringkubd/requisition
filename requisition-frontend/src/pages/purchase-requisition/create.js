@@ -12,7 +12,8 @@ import {
 } from "@/store/service/requisitions/purchase";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    setAllPurchaseRequisitionData,
+    removePurchaseRequisitionData,
+    setAllPurchaseRequisitionData
 } from "@/store/service/requisitions/purchase_requisition_input_change";
 import PurchaseInput from "@/components/purchase-requisition/PurchaseInput";
 import moment from "moment";
@@ -67,6 +68,7 @@ const InitialRequisitionCreate = (props) => {
     useEffect(() => {
         if (!storeResult.isError && !storeResult.isLoading && storeResult.isSuccess){
             toast.success("Purchase requisition successfully generated.");
+            dispatch(removePurchaseRequisitionData());
             router.push('/purchase-requisition');
         }
     }, [storeResult])

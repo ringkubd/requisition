@@ -24,9 +24,18 @@ export const PurchaseRequisitionInputChangeSlice = createSlice({
                 }
                 return p;
             })
+        },
+        removePurchaseRequisitionData: (state) => {
+            state.products = [];
         }
     }
 });
 
-export const { getPurchaseRequisitionData, setPurchaseRequisitionData,setAllPurchaseRequisitionData, updatePurchaseRequisitionData } =  PurchaseRequisitionInputChangeSlice.actions;
+export const {
+    getPurchaseRequisitionData,
+    setPurchaseRequisitionData,
+    setAllPurchaseRequisitionData,
+    updatePurchaseRequisitionData ,
+    removePurchaseRequisitionData,
+} =  PurchaseRequisitionInputChangeSlice.actions;
 export default PurchaseRequisitionInputChangeSlice.reducer;

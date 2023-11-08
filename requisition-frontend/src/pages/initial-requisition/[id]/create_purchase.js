@@ -3,7 +3,10 @@ import { useRouter } from "next/router";
 import { useEditInitialRequisitionQuery } from "@/store/service/requisitions/initial";
 import PurchaseInput from "@/components/purchase-requisition/PurchaseInput";
 import React, { useEffect, useState } from "react";
-import { setAllPurchaseRequisitionData } from "@/store/service/requisitions/purchase_requisition_input_change";
+import {
+    removePurchaseRequisitionData,
+    setAllPurchaseRequisitionData
+} from "@/store/service/requisitions/purchase_requisition_input_change";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useStorePurchaseRequisitionMutation } from "@/store/service/requisitions/purchase";
@@ -32,7 +35,6 @@ export default function create_purchase(props){
             }))
             dispatch(setAllPurchaseRequisitionData(requisition_products));
             setTotalPrice(0);
-            console.log(requisition_products)
         }
     },[initialRequisitionId, isLoading])
 
@@ -49,6 +51,7 @@ export default function create_purchase(props){
         if (!storeResult.isError && !storeResult.isLoading && storeResult.isSuccess){
             toast.success("Purchase requisition successfully generated.");
             const {data} = storeResult;
+            dispatch(removePurchaseRequisitionData());
             router.push(`/purchase-requisition/${data.data.id}/print_view`);
         }
     }, [storeResult])
