@@ -30,7 +30,7 @@ const Actions = (props) => {
                         >
                             <HiEye />
                         </Button>
-                    ) :  view && isElement(view) ? {...view} : <span></span>
+                    ) :  view && isElement(view) ? {...view} : <></>
                 }
                 {
                     edit ? (
@@ -40,7 +40,7 @@ const Actions = (props) => {
                         >
                             <HiPencilSquare />
                         </Button>
-                    ) : <span></span>
+                    ) : <></>
                 }
                 {
                     destroy ?  (
@@ -51,7 +51,7 @@ const Actions = (props) => {
                         >
                             <HiTrash />
                         </Button>
-                    ) : <span></span>
+                    ) : <></>
                 }
                 {
                     print ? (
@@ -64,9 +64,9 @@ const Actions = (props) => {
                             </Button>
 
                         </Link>
-                    ) : <span></span>
+                    ) : <></>
                 }
-                {!edit && !view && !destroy && !print ? <Button>No Action</Button> : <span></span>}
+                {!edit && !view && !destroy && !print ? <Button>No Action</Button> : <></>}
             </Button.Group>
         </>
     )

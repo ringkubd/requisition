@@ -5,7 +5,7 @@ import { Button, Card } from "flowbite-react";
 import NavLink from "@/components/NavLink";
 import { useEditInitialRequisitionQuery } from "@/store/service/requisitions/initial";
 import React, { useRef } from "react";
-import InitialPrint from "@/components/initial-requisition/initialPrint";
+import InitialPrint from "@/components/initial-requisition/InitialPrint";
 import { useReactToPrint } from "react-to-print";
 
 const PrintView = (props) => {

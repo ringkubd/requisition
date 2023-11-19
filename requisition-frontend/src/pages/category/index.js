@@ -36,6 +36,11 @@ const Branch = () => {
                     sortable: true,
                 },
                 {
+                    name: 'Code',
+                    selector: row => row.code,
+                    sortable: true,
+                },
+                {
                     name: 'Parent',
                     selector: row => row.parent?.title,
                     sortable: true,

@@ -8,7 +8,6 @@ import { useRouter } from "next/router";
 import Actions from "@/components/Actions";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import Image from "next/image";
 import {
     useGetIssueQuery,
     useEditIssueQuery,
@@ -46,11 +45,6 @@ const ProductIssue = () => {
             sortable: true,
         },
         {
-            name: 'Requisition',
-            selector: row => row.purchase_requisition?.irf_no,
-            sortable: true,
-        },
-        {
             name: 'Receiver',
             selector: row => row.receiver?.name,
             sortable: true,
@@ -59,6 +53,21 @@ const ProductIssue = () => {
             name: 'Issuer',
             selector: row => row.issuer?.name,
             sortable: true,
+        },
+        {
+            name: 'Purpose',
+            selector: row => row.purpose,
+            sortable: false,
+        },
+        {
+            name: 'Uses Area',
+            selector: row => row.uses_area,
+            sortable: false,
+        },
+        {
+            name: 'Note',
+            selector: row => row.note,
+            sortable: false,
         },
         {
             name: 'Issue Time',

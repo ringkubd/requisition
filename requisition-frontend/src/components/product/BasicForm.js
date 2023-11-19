@@ -1,30 +1,25 @@
 import { ErrorMessage, Formik } from "formik";
 import { Button, Label, Textarea, TextInput } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
-import unit2select from "unit2select";
 import * as Yup from "yup";
 import { useGetCategoryQuery } from "@/store/service/category";
 import { useDispatch, useSelector } from "react-redux";
 import { setProductBasicInfo } from "@/store/service/product/product_basic_form";
 import MySelect2Component from "@/components/select2/Select2Component";
 import { setActiveForm } from "@/store/service/product/product_active_form";
+import { useGetCountriesQuery } from "@/store/service/country";
+import Select2Component from "@/components/select2/Select2Component";
+import { useGetUnitsQuery } from "@/store/service/units";
 
 export default function BasicForm(props){
     const category = useGetCategoryQuery()
     const [categoryOptions, setCategoryOptions] = useState([]);
-    const [unitOptions, setUnitOptions] = useState([]);
     const dispatch = useDispatch();
     const { basic } = useSelector(state => state.product_basic_form)
     const formikRef = useRef();
     const {basic: basicData} = props;
-
-    useEffect(() => {
-        setUnitOptions(
-            unit2select(true)
-                .filter(f => f.value)
-                .map(i => ({ value: i.value, label: i.text })),
-        )
-    }, [])
+    const {data: countries, isLoading: countryLoading, isSuccess: countryIsSuccess, isError: countryIsError} = useGetCountriesQuery();
+    const {data: units, isLoading: unitLoading, isSuccess: unitIsSuccess, isError: unitIsError} = useGetUnitsQuery();
 
     useEffect(() => {
         if (!category.isError && !category.isLoading) {
@@ -38,14 +33,15 @@ export default function BasicForm(props){
 
     const initValues = {
         title: basic?.title ?? basicData?.title ?? "",
-        sl_no: basic?.sl_no ?? basicData?.sl_no ??"",
+        origin: basic?.sl_no ?? basicData?.sl_no ??"",
         unit: basic?.unit ?? basicData?.unit ?? "",
         category_id: basic?.category_id ?? basicData?.category_id ?? "",
         description: basic?.description ?? basicData?.description ?? "",
+        chalan_no: basic?.chalan_no ?? basicData?.chalan_no ?? "",
     }
     const validationSchema = Yup.object().shape({
         title: Yup.string().required().label('Title'),
-        sl_no: Yup.string().nullable().label('Serial No.'),
+        origin: Yup.string().nullable().label('Origin'),
         unit: Yup.string().required().label('Unit'),
         category_id: Yup.string().required().label('Category'),
         description: Yup.string().nullable().label('Description'),
@@ -58,10 +54,11 @@ export default function BasicForm(props){
     useEffect(() => {
         formikRef.current.setValues({
             title: basic?.title ?? "",
-            sl_no: basic?.sl_no  ??"",
+            origin: basic?.origin  ??"",
             unit: basic?.unit ?? "",
             category_id: basic?.category_id ?? "",
             description: basic?.description ?? "",
+            chalan_no: basic?.chalan_no ?? "",
         })
     }, [basic]);
 
@@ -95,6 +92,7 @@ export default function BasicForm(props){
                                 </div>
                                 <TextInput
                                     id="title"
+                                    name="title"
                                     placeholder="Product Name"
                                     type="text"
                                     required
@@ -114,35 +112,7 @@ export default function BasicForm(props){
                                 />
                             </div>
                         </div>
-                        <div className="flex flex-row gap-4">
-                            <div className="w-full">
-                                <div className="mb-2 block">
-                                    <Label
-                                        htmlFor="sl_no"
-                                        value="Sl. No."
-                                    />
-                                </div>
-                                <TextInput
-                                    id="sl_no"
-                                    placeholder="Serial No"
-                                    type="text"
-                                    required
-                                    onChange={
-                                        handleChange
-                                    }
-                                    onBlur={handleBlur}
-                                    value={values.sl_no}
-                                />
-                                <ErrorMessage
-                                    name="sl_no"
-                                    render={msg => (
-                                        <span className="text-red-500">
-                                                                    {msg}
-                                                                </span>
-                                    )}
-                                />
-                            </div>
-                        </div>
+
                         <div className="flex flex-row gap-4">
                             <div className="w-full">
                                 <div className="mb-2 block">
@@ -180,10 +150,10 @@ export default function BasicForm(props){
                                         value="Unit"
                                     />
                                 </div>
-                                <MySelect2Component
+                                <Select2Component
                                     name={`unit`}
                                     id={`unit`}
-                                    options={unitOptions}
+                                    options={units?.data?.map((u) => ({label: u.unit_code + ` (${u.unit_name})`, value: u.unit_code}) )}
                                     value={values.unit}
                                     onChange={handleChange}
                                     data-placeholder="Select options..."
@@ -191,11 +161,57 @@ export default function BasicForm(props){
                                 />
                                 <ErrorMessage
                                     name="unit"
-                                    render={msg => (
-                                        <span className="text-red-500">
+                                    render={msg => (<span className="text-red-500">{msg}</span>)}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-row gap-4">
+                            <div className="w-full">
+                                <div className="mb-2 block">
+                                    <Label
+                                      htmlFor="origin"
+                                      value="Origin"
+                                    />
+                                </div>
+                                <Select2Component
+                                  options={countries?.data?.map((c) => ({label: c.country_name, value: c.country_name}))}
+                                  onChange={handleChange}
+                                  name='origin'
+                                  id='origin'
+                                  className={`w-full border-1 border-gray-300`}
+                                  value={values.origin}
+                                />
+                                <ErrorMessage
+                                  name="description"
+                                  render={msg => (
+                                    <span className="text-red-500">{msg}</span>
+                                  )}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-row gap-4">
+                            <div className="w-full">
+                                <div className="mb-2 block">
+                                    <Label
+                                      htmlFor="chalan_no"
+                                      value="Chalan Number"
+                                    />
+                                </div>
+                                <TextInput
+                                  id="chalan_no"
+                                  name="chalan_no"
+                                  placeholder="Chalan number."
+                                  type="text"
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                />
+                                <ErrorMessage
+                                  name="chalan_no"
+                                  render={msg => (
+                                    <span className="text-red-500">
                                                                     {msg}
                                                                 </span>
-                                    )}
+                                  )}
                                 />
                             </div>
                         </div>
@@ -209,6 +225,7 @@ export default function BasicForm(props){
                                 </div>
                                 <Textarea
                                     id="description"
+                                    name="description"
                                     placeholder="All kind of detergent products."
                                     type="text"
                                     onChange={handleChange}

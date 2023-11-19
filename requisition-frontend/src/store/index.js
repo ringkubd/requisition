@@ -20,12 +20,12 @@ import {
     REGISTER,
     persistStore
 } from "reduxjs-toolkit-persist";
-import autoMergeLevel2 from "reduxjs-toolkit-persist/lib/stateReconciler/autoMergeLevel2";
+import autoMergeLevel1 from "reduxjs-toolkit-persist/lib/stateReconciler/autoMergeLevel1";
 import { ProductOptionApiService } from "@/store/service/product/product_option";
 import { optionSlice } from '@/store/service/options/optionSlice'
 import { ProductActiveFormSlice } from "@/store/service/product/product_active_form";
 import { ProductBasicFormSlice } from "@/store/service/product/product_basic_form";
-import storage from 'reduxjs-toolkit-persist/lib/storage';
+
 import { InitialRequisitionApi } from "@/store/service/requisitions/initial";
 import { UserManagementApi } from "@/store/service/user/management";
 import { ChangeOrganizationBranchApi } from "@/store/service/user/ChangeOrganizationBranch";
@@ -35,6 +35,9 @@ import { SuppliersApiService } from "@/store/service/suppliers";
 import { PurchaseApiService } from "@/store/service/purchase";
 import { IssueApiService } from "@/store/service/issue";
 import { BrandsApiService } from "@/store/service/brands";
+import storage from "@/store/persistStorage";
+import { CountryApiService } from "@/store/service/country";
+import { UnitsApiService } from "@/store/service/units";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -53,12 +56,14 @@ const middlewares = [
     PurchaseApiService.middleware,
     IssueApiService.middleware,
     BrandsApiService.middleware,
+    CountryApiService.middleware,
+    UnitsApiService.middleware,
 ];
 
 const persistConfig = {
     key: 'root',
     storage: storage,
-    stateReconciler: autoMergeLevel2,
+    stateReconciler: autoMergeLevel1,
     transforms: [],
     blacklist: [],
 };
@@ -87,6 +92,8 @@ const combineReducer = combineReducers({
     [PurchaseApiService.reducerPath]: PurchaseApiService.reducer,
     [IssueApiService.reducerPath]: IssueApiService.reducer,
     [BrandsApiService.reducerPath]: BrandsApiService.reducer,
+    [CountryApiService.reducerPath]: CountryApiService.reducer,
+    [UnitsApiService.reducerPath]: UnitsApiService.reducer,
 });
 
 const _persistedReducer = persistReducer(persistConfig, combineReducer);

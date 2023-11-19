@@ -27,7 +27,6 @@ export default function VariantForm(props) {
         option_id: '',
         sku: '',
         option_value: '',
-        stock: '0',
         notes: '',
     }
 
@@ -63,11 +62,6 @@ export default function VariantForm(props) {
             sortable: true,
         },
         {
-            name: 'Stock',
-            selector: row => row?.stock,
-            sortable: true,
-        },
-        {
             name: 'Notes',
             selector: row => row?.notes,
             sortable: true,
@@ -82,11 +76,7 @@ export default function VariantForm(props) {
                 is: (val) => val,
                 then: () => Yup.string().required().label('Option Value')
             }).label('Option Value'),
-        notes: Yup.string().label('Notes'),
-        stock: Yup.string().when('option_id', {
-            is: (val) => val,
-            then: () => Yup.string().nullable().label('Stock'),
-        }).label('Stock'),
+        notes: Yup.string().label('Notes')
     });
 
     return (
@@ -183,31 +173,6 @@ export default function VariantForm(props) {
                                 />
                                 <ErrorMessage
                                     name="sku"
-                                    render={msg => (
-                                        <span className="text-red-500">{msg}</span>
-                                    )}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex flex-row gap-4">
-                            <div className="w-full">
-                                <div className="mb-2 block">
-                                    <Label
-                                        htmlFor="stock"
-                                        value="Stock"
-                                    />
-                                </div>
-                                <TextInput
-                                    type={`number`}
-                                    step={0.1}
-                                    id={`stock`}
-                                    name={`stock`}
-                                    value={values.stock}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                />
-                                <ErrorMessage
-                                    name="stock"
                                     render={msg => (
                                         <span className="text-red-500">{msg}</span>
                                     )}

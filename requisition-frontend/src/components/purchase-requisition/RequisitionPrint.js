@@ -74,7 +74,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                 requisition_products?.map((rp, index) => (
                                     <tr className={`border text-center bg-white`} key={index}>
                                         <td className={`border p-0`}>{index + 1}</td>
-                                        <td className={`border p-0`}>{rp.title}</td>
+                                        <td className={`border p-0`}>{rp.title + ` - ${rp.product_option.title}`}</td>
                                         <td className={`border p-0`}>{rp.last_purchase_date ? moment(rp.last_purchase_date).format('DD-MMM-YY') : ''}</td>
                                         <td className={`border p-0`}>{rp.available_quantity}</td>
                                         <td className={`border p-0`}>{rp.required_quantity}</td>
@@ -242,7 +242,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                 requisition_products?.map((rp, index) => (
                                     <tr className={`border text-center bg-white`} key={index}>
                                         <td className={`border p-0`}>{index + 1}</td>
-                                        <td className={`border p-0`}>{rp.title}</td>
+                                        <td className={`border p-0`}>{rp.title + ` - ${rp.product_option.title}`}</td>
                                         <td className={`border p-0`}>{rp.last_purchase_date ? moment(rp.last_purchase_date).format('DD-MMM-YY') : ''}</td>
                                         <td className={`border p-0`}>{rp.available_quantity}</td>
                                         <td className={`border p-0`}>{rp.required_quantity}</td>

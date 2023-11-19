@@ -49,16 +49,20 @@ const View = (props) => {
                                                     <Table.Cell>{data?.data?.title}</Table.Cell>
                                                 </Table.Row>
                                                 <Table.Row>
-                                                    <Table.HeadCell>Sl. No.</Table.HeadCell>
-                                                    <Table.Cell>{data?.data?.sl_no}</Table.Cell>
+                                                    <Table.HeadCell>Category</Table.HeadCell>
+                                                    <Table.Cell>{data?.data?.category?.title}</Table.Cell>
                                                 </Table.Row>
                                                 <Table.Row>
                                                     <Table.HeadCell>Unit</Table.HeadCell>
-                                                    <Table.Cell>{data?.data?.title}</Table.Cell>
+                                                    <Table.Cell>{data?.data?.unit}</Table.Cell>
                                                 </Table.Row>
                                                 <Table.Row>
-                                                    <Table.HeadCell>Category</Table.HeadCell>
-                                                    <Table.Cell>{data?.data?.category?.title}</Table.Cell>
+                                                    <Table.HeadCell>Origin</Table.HeadCell>
+                                                    <Table.Cell>{data?.data?.origin}</Table.Cell>
+                                                </Table.Row>
+                                                <Table.Row>
+                                                    <Table.HeadCell>Chalan</Table.HeadCell>
+                                                    <Table.Cell>{data?.data?.chalan_no}</Table.Cell>
                                                 </Table.Row>
                                                 <Table.Row>
                                                     <Table.HeadCell>Description</Table.HeadCell>

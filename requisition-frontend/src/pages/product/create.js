@@ -5,9 +5,6 @@ import NavLink from '@/components/NavLink'
 import { useRouter } from 'next/router'
 import VariantForm from "@/components/product/VariantForm";
 import MetaForm from "@/components/product/MetaForm";
-import { FaFontAwesome } from "react-icons/fa";
-import { SiMetafilter } from "react-icons/si";
-import { TbHttpOptions } from "react-icons/tb";
 import BasicForm from "@/components/product/BasicForm";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveForm } from "@/store/service/product/product_active_form";
@@ -99,21 +96,21 @@ const create = props => {
                                 <li
                                     onClick={() => setCurrentForm(1)}
                                     className={`flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b  after:border-4 after:inline-block  cursor-pointer ${activeForm === 1 ? 'text-blue-600 dark:text-blue-500 after:border-blue-100 dark:after:border-blue-800': 'dark:after:border-gray-700 after:border-gray-100'}`}>
-                                    <div className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${activeForm === 1 ? 'bg-blue-200 dark:bg-blue-800' : 'bg-gray-200 dark:bg-gray-800'}`}>
+                                    <div className={`flex items-center justify-center w-10 h-10 rounded-full shadow-lg ring-amber-100 border-2 border-blue-300 lg:h-12 lg:w-24 shrink-0 ${activeForm === 1 ? 'bg-blue-200 dark:bg-blue-800' : 'bg-gray-200 dark:bg-gray-800'}`}>
                                         Basic
                                     </div>
                                 </li>
                                 <li
                                     onClick={() => Object.values(basic).length ? setCurrentForm(2): ''}
                                     className={`flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block cursor-pointer ${activeForm === 2 ? 'text-blue-600 dark:text-blue-500 after:border-blue-100 dark:after:border-blue-800': 'dark:after:border-gray-700 after:border-gray-100'}`}>
-                                    <div className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${activeForm === 2 ? 'bg-blue-200 dark:bg-blue-800' : 'bg-gray-200 dark:bg-gray-800'}`}>
+                                    <div className={`flex items-center justify-center w-10 h-10 shadow-lg ring-amber-100 border-2 border-blue-300 rounded-full lg:h-12 lg:w-24 shrink-0 ${activeForm === 2 ? 'bg-blue-200 dark:bg-blue-800' : 'bg-gray-200 dark:bg-gray-800'}`}>
                                         Variant
                                     </div>
                                 </li>
                                 <li
                                     onClick={() => Object.values(productOptions).length ? setCurrentForm(3) : "" }
                                     className={`flex items-center w-full after:content-[''] after:w-full after:h-1 after:border-b  after:border-4 after:inline-block  cursor-pointer ${activeForm === 3 ? 'text-blue-600 dark:text-blue-500 after:border-blue-100 dark:after:border-blue-800': 'dark:after:border-gray-700 after:border-gray-100'}`}>
-                                    <div className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${activeForm === 3 ? 'bg-blue-200 dark:bg-blue-800' : 'bg-gray-200 dark:bg-gray-800'}`}>
+                                    <div className={`flex items-center justify-center w-16 h-10 rounded-full shadow-lg ring-amber-100 border-2 border-blue-300 lg:h-12 lg:w-24 shrink-0 ${activeForm === 3 ? 'bg-blue-200 dark:bg-blue-800' : 'bg-gray-200 dark:bg-gray-800'}`}>
                                         Other
                                     </div>
                                 </li>

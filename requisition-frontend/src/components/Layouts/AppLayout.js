@@ -14,8 +14,10 @@ const AppLayout = ({ header, children }) => {
         if (effect){
             router.reload();
         }
-
     }
+    useEffect(() => {
+      // router.push('/login')
+    })
 
     const [load, setLoad] = useState(false);
     useEffect(() => {

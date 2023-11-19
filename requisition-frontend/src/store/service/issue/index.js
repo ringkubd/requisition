@@ -1,17 +1,16 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getCookie } from "@/lib/cookie";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
 
 export const IssueApiService = createApi({
     reducerPath: 'issue',
     baseQuery: CustomBaseQuery,
-    tagTypes: ['getIssue', 'editIssue'],
+    tagTypes: ['issue', 'editIssue'],
     endpoints: builder => ({
         getIssue: builder.query({
             query: () => ({
                 url: 'product-issues',
             }),
-            providesTags: ['getIssue'],
+            providesTags: ['issue'],
         }),
         editIssue: builder.query({
             query: (id) => ({
@@ -26,7 +25,7 @@ export const IssueApiService = createApi({
                 body: patch,
                 formData: true,
             }),
-            invalidatesTags: ['getIssue', 'editIssue']
+            invalidatesTags: ['issue', 'editIssue']
         }),
         storeIssue: builder.mutation({
             query: arg => {
@@ -36,14 +35,14 @@ export const IssueApiService = createApi({
                     body: arg,
                 }
             },
-            invalidatesTags: ['getIssue']
+            invalidatesTags: ['issue']
         }),
         destroyIssue: builder.mutation({
             query : (arg) => ({
                 url: `product-issues/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getIssue']
+            invalidatesTags: ['issue']
         })
     }),
 })

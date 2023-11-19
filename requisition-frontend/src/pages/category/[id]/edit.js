@@ -104,6 +104,29 @@ const Edit = (props) => {
                                                         <div className="w-full">
                                                             <div className="mb-2 block">
                                                                 <Label
+                                                                  htmlFor="code"
+                                                                  value="Code"
+                                                                />
+                                                            </div>
+                                                            <TextInput
+                                                              id="code"
+                                                              name="code"
+                                                              placeholder="Category ShortCode Like Ci/HW"
+                                                              type="text"
+                                                              required
+                                                              onChange={handleChange}
+                                                              onBlur={handleBlur}
+                                                              value={values.code}
+                                                            />
+                                                            <ErrorMessage
+                                                              name='code'
+                                                              render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-row gap-4">
+                                                        <div className="w-full">
+                                                            <div className="mb-2 block">
+                                                                <Label
                                                                     htmlFor="parent_id"
                                                                     value="Parent Category"
                                                                 />

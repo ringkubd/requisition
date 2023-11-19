@@ -11,7 +11,6 @@ import { useStorePurchaseMutation } from "@/store/service/purchase";
 import Select2ComponentAjax from "@/components/select2/Select2ComponentAjax";
 import moment from "moment/moment";
 import Select2Component from "@/components/select2/Select2Component";
-import Link from "next/link";
 import AddSupplierModal from "@/components/suppliers/AddSupplierModal";
 import AddBrandModal from "@/components/brands/AddBrandModal";
 const create = (props) => {
