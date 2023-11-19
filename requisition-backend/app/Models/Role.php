@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Models\Auth;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use OpenApi\Annotations as OA;
-
 /**
  * @OA\Schema(
- *      schema="Auth/Role",
+ *      schema="Role",
  *      required={"name","guard_name"},
  *      @OA\Property(
  *          property="name",
@@ -41,9 +39,9 @@ use OpenApi\Annotations as OA;
  *          format="date-time"
  *      )
  * )
- */
-class Role extends \Spatie\Permission\Models\Role
+ */class Role extends \Spatie\Permission\Models\Role
 {
+    use SoftDeletes;
     use HasFactory;
     public $table = 'roles';
 

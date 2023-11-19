@@ -70,15 +70,20 @@ use Illuminate\Database\Eloquent\Model;
  * )
  */class Product extends Model
 {
-     use SoftDeletes;    use HasFactory;    public $table = 'products';
+     use SoftDeletes;
+     use HasFactory;
+
+     public $table = 'products';
 
     public $fillable = [
         'title',
-        'sl_no',
         'unit',
         'category_id',
         'description',
-        'status'
+        'status',
+        'origin',
+        'bill_no',
+        'chalan_no',
     ];
 
     protected $casts = [

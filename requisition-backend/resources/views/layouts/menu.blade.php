@@ -125,3 +125,31 @@
         <p>@lang('models/brands.plural')</p>
     </a>
 </li>
+
+<li class="nav-item">
+    <a href="{{ route('roles.index') }}" class="nav-link {{ Request::is('roles*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/roles.plural')</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('permissions.index') }}" class="nav-link {{ Request::is('permissions*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/permissions.plural')</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('countries.index') }}" class="nav-link {{ Request::is('countries*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/countries.plural')</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('measurementUnits.index') }}" class="nav-link {{ Request::is('measurementUnits*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/measurementUnits.plural')</p>
+    </a>
+</li>

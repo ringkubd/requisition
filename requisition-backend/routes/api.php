@@ -113,3 +113,15 @@ Route::resource('product-issues', App\Http\Controllers\API\ProductIssueAPIContro
 
 Route::resource('brands', App\Http\Controllers\API\BrandAPIController::class)
     ->except(['create', 'edit']);
+
+Route::resource('roles', App\Http\Controllers\API\RoleAPIController::class)
+    ->except(['create', 'edit']);
+
+Route::resource('permissions', App\Http\Controllers\API\PermissionAPIController::class)
+    ->except(['create', 'edit']);
+
+Route::resource('countries', App\Http\Controllers\API\CountryAPIController::class)
+    ->except(['create', 'edit']);
+
+Route::resource('measurement-units', App\Http\Controllers\API\MeasurementUnitAPIController::class)
+    ->except(['create', 'edit']);

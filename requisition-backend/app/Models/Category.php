@@ -58,7 +58,8 @@ use OpenApi\Annotations as OA;
     public $fillable = [
         'parent_id',
         'title',
-        'description'
+        'description',
+        'code'
     ];
 
     protected $casts = [

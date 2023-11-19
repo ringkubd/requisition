@@ -44,3 +44,7 @@ Route::resource('purchases', App\Http\Controllers\PurchaseController::class);
 Route::resource('product-issues', App\Http\Controllers\ProductIssueController::class);
 
 Route::resource('brands', App\Http\Controllers\BrandController::class);
+Route::resource('roles', App\Http\Controllers\RoleController::class);
+Route::resource('permissions', App\Http\Controllers\PermissionController::class);
+Route::resource('countries', App\Http\Controllers\CountryController::class);
+Route::resource('measurement-units', App\Http\Controllers\MeasurementUnitController::class);

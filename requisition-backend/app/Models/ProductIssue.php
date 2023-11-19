@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 /**
  * @OA\Schema(
  *      schema="ProductIssue",
- *      required={"purchase_requisition_id","product_id","product_option_id","quantity","receiver_id","issuer_id"},
+ *      required={"product_id","product_option_id","quantity","receiver_id","issuer_id"},
  *      @OA\Property(
  *          property="quantity",
  *          description="",
@@ -57,13 +57,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     public $table = 'product_issues';
 
     public $fillable = [
-        'purchase_requisition_id',
         'product_id',
         'product_option_id',
         'quantity',
         'receiver_id',
         'issuer_id',
-        'issue_time'
+        'issue_time',
+        'purpose',
+        'uses_area',
+        'note',
     ];
 
     protected $casts = [
@@ -72,7 +74,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     ];
 
     public static array $rules = [
-        'purchase_requisition_id' => 'required',
         'product_id' => 'required',
         'product_option_id' => 'required',
         'quantity' => 'required|numeric',
@@ -93,12 +94,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     {
         return $this->belongsTo(\App\Models\ProductOption::class, 'product_option_id');
     }
-
-    public function purchaseRequisition(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(\App\Models\PurchaseRequisition::class, 'purchase_requisition_id');
-    }
-
     public function receiver(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'receiver_id');

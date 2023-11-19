@@ -8,13 +8,15 @@ use App\Repositories\BaseRepository;
 class ProductIssueRepository extends BaseRepository
 {
     protected $fieldSearchable = [
-        'purchase_requisition_id',
         'product_id',
         'product_option_id',
         'quantity',
         'receiver_id',
         'issuer_id',
-        'issue_time'
+        'issue_time',
+        'purpose',
+        'uses_area',
+        'note',
     ];
 
     public function getFieldsSearchable(): array

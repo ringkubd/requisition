@@ -9,7 +9,8 @@ class ProductRepository extends BaseRepository
 {
     protected $fieldSearchable = [
         'title',
-        'sl_no',
+        'origin',
+        'chalan_no',
         'unit',
         'category_id',
         'description',
