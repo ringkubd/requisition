@@ -24,6 +24,12 @@ class BrandAPIController extends AppBaseController
     public function __construct(BrandRepository $brandRepo)
     {
         $this->brandRepository = $brandRepo;
+
+        $this->middleware('auth:sanctum');
+        $this->middleware('role_or_permission:Super Admin|view_brands|update_purchases|create_purchases', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Super Admin|update_brands', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|create_brands', ['only' => ['store']]);
+        $this->middleware('role_or_permission:Super Admin|delete_brands', ['only' => ['delete']]);
     }
 
     /**

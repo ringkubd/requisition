@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import OrganizationBranch from "@/components/Layouts/OrganizationBranch";
 import React, { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Loading from "@/components/Loading";
+import Loading from "@/components/loading";
 
 const AppLayout = ({ header, children }) => {
     const router = useRouter();

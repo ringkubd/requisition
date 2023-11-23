@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { fetchBaseQuery } from "@reduxjs/toolkit/dist/query/react";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 const CustomBaseQuery = fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,
@@ -38,28 +39,32 @@ export const BranchApiService = createApi({
                 url: 'branches',
             }),
             providesTags: ['getBranch'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         getBranchByOrganization: builder.query({
-            query: (organization) => ({
+            query: organization => ({
                 url: `branches_organization`,
                 method: 'GET',
-                params: {organization: organization}
+                params: { organization: organization },
             }),
             providesTags: ['getBranch'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         editBranch: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `branches/${id}`,
             }),
             providesTags: ['editBranch'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         updateBranch: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `branches/${id}`,
                 method: 'PATCH',
-                body: patch
+                body: patch,
             }),
-            invalidatesTags: ['getBranch', 'editBranch']
+            invalidatesTags: ['getBranch', 'editBranch'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         storeBranch: builder.mutation({
             query: arg => ({
@@ -67,14 +72,16 @@ export const BranchApiService = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['getBranch']
+            invalidatesTags: ['getBranch'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyBranch: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `branches/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getBranch']
+            invalidatesTags: ['getBranch'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
     }),
 })

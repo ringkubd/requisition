@@ -23,6 +23,11 @@ class CategoryAPIController extends AppBaseController
     public function __construct(CategoryRepository $categoryRepo)
     {
         $this->categoryRepository = $categoryRepo;
+        $this->middleware('auth:sanctum');
+        $this->middleware('role_or_permission:Super Admin|view_categories', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Super Admin|update_categories', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|create_categories', ['only' => ['store']]);
+        $this->middleware('role_or_permission:Super Admin|delete_categories', ['only' => ['delete']]);
     }
 
     /**

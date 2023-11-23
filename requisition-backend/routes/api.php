@@ -1,12 +1,14 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\API\CategoryAPIController;
+use App\Http\Controllers\API\InitialRequisitionAPIController;
+use App\Http\Controllers\API\PurchaseAPIController;
+use App\Http\Controllers\API\PurchaseRequisitionAPIController;
+use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Resources\SupplierResource;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,15 +29,13 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return  new UserResource($request->user());
 });
 
-Route::middleware(['auth:sanctum'])->group(function (){
-    Route::apiResource('organization', \App\Http\Controllers\API\OrganizationApiController::class);
-});
-
+Route::resource('organization', App\Http\Controllers\API\OrganizationApiController::class)->except(['create', 'edit']);
 
 Route::resource('branches', App\Http\Controllers\API\BranchAPIController::class)
     ->except(['create', 'edit']);
 
-Route::get('branches_organization', [\App\Http\Controllers\API\OrganizationHelperApiController::class, 'getBranch'])->name('branches.branch_by_organization');
+Route::get('branches_organization', [App\Http\Controllers\API\OrganizationHelperApiController::class, 'getBranch'])
+    ->name('branches.branch_by_organization');
 
 
 Route::resource('categories', App\Http\Controllers\API\CategoryAPIController::class)
@@ -67,11 +67,11 @@ Route::resource('initial-requisitions', App\Http\Controllers\API\InitialRequisit
 /**
  * Extra URL
  */
-Route::get('product-select', [\App\Http\Controllers\API\InitialRequisitionAPIController::class, 'products']);
-Route::get('suppliers-select', [\App\Http\Controllers\API\PurchaseAPIController::class, 'suppliers']);
-Route::get('purchase-requisition-select', [\App\Http\Controllers\API\PurchaseAPIController::class, 'purchaseRequisition']);
+Route::get('product-select', [InitialRequisitionAPIController::class, 'products']);
+Route::get('suppliers-select', [PurchaseAPIController::class, 'suppliers']);
+Route::get('purchase-requisition-select', [PurchaseAPIController::class, 'purchaseRequisition']);
 
-Route::get('last-purchase-information', [\App\Http\Controllers\API\InitialRequisitionAPIController::class, 'lastPurchase']);
+Route::get('last-purchase-information', [InitialRequisitionAPIController::class, 'lastPurchase']);
 Route::post('change-branch', function (Request $request){
     cache()->forget('select_branch');
     cache()->put('select_branch',$request->branch_id);
@@ -83,11 +83,11 @@ Route::post('change-organization', function (Request $request){
     return cache()->get('select_organization');
 });
 
-Route::get('initial_requisition_for_initiate_purchase', [\App\Http\Controllers\API\PurchaseRequisitionAPIController::class, 'getInitialRequisition']);
-Route::get('initial_requisition_product_suggestions', [\App\Http\Controllers\API\InitialRequisitionAPIController::class, 'purposeSuggestions']);
-Route::post('update_purchase_requisition_product_price', [\App\Http\Controllers\API\PurchaseRequisitionAPIController::class, 'updateProductPrice']);
+Route::get('initial_requisition_for_initiate_purchase', [PurchaseRequisitionAPIController::class, 'getInitialRequisition']);
+Route::get('initial_requisition_product_suggestions', [InitialRequisitionAPIController::class, 'purposeSuggestions']);
+Route::post('update_purchase_requisition_product_price', [PurchaseRequisitionAPIController::class, 'updateProductPrice']);
 
-Route::get('sub-category/{parent}', [\App\Http\Controllers\API\CategoryAPIController::class, 'subCategory']);
+Route::get('sub-category/{parent}', [CategoryAPIController::class, 'subCategory']);
 /**
  * End Extra URL
  */
@@ -116,6 +116,9 @@ Route::resource('brands', App\Http\Controllers\API\BrandAPIController::class)
 
 Route::resource('roles', App\Http\Controllers\API\RoleAPIController::class)
     ->except(['create', 'edit']);
+
+Route::get('permission_for_role', [RoleAPIController::class, 'permissions']);
+Route::post('role_permission_update/{role}', [RoleAPIController::class, 'rolePermissionUpdate']);
 
 Route::resource('permissions', App\Http\Controllers\API\PermissionAPIController::class)
     ->except(['create', 'edit']);

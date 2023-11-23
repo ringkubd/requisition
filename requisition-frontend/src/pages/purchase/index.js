@@ -3,9 +3,9 @@ import AppLayout from "@/components/Layouts/AppLayout";
 import { wrapper } from "@/store";
 import { Button, Card } from "flowbite-react";
 import DataTable from 'react-data-table-component';
-import NavLink from "@/components/NavLink";
+import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
-import Actions from "@/components/Actions";
+import Actions from "@/components/actions";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import Image from "next/image";
@@ -70,6 +70,11 @@ const Purchase = () => {
             sortable: true,
         },
         {
+            name: 'Expiry Date',
+            selector: row => row.expiry_date,
+            sortable: true,
+        },
+        {
             name: 'Available Qty.',
             selector: row => row.available_qty,
             sortable: true,
@@ -77,6 +82,16 @@ const Purchase = () => {
         {
             name: 'Total',
             selector: row => row.total_price,
+            sortable: true,
+        },
+        {
+            name: 'Chalan',
+            selector: row => row.chalan_no,
+            sortable: true,
+        },
+        {
+            name: 'Origin',
+            selector: row => row.origin,
             sortable: true,
         },
         {

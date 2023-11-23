@@ -1,7 +1,7 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { Button, Card, Select } from "flowbite-react";
-import NavLink from "@/components/NavLink";
+import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";

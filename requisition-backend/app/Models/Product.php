@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
- use Illuminate\Database\Eloquent\SoftDeletes; use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 /**
  * @OA\Schema(
  *      schema="Product",
@@ -70,10 +71,10 @@ use Illuminate\Database\Eloquent\Model;
  * )
  */class Product extends Model
 {
-     use SoftDeletes;
-     use HasFactory;
+    use SoftDeletes;
+    use HasFactory;
 
-     public $table = 'products';
+    public $table = 'products';
 
     public $fillable = [
         'title',
@@ -81,9 +82,6 @@ use Illuminate\Database\Eloquent\Model;
         'category_id',
         'description',
         'status',
-        'origin',
-        'bill_no',
-        'chalan_no',
     ];
 
     protected $casts = [

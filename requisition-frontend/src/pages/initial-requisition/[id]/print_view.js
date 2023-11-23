@@ -2,10 +2,10 @@ import AppLayout from "@/components/Layouts/AppLayout";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { Button, Card } from "flowbite-react";
-import NavLink from "@/components/NavLink";
+import NavLink from "@/components/navLink";
 import { useEditInitialRequisitionQuery } from "@/store/service/requisitions/initial";
 import React, { useRef } from "react";
-import InitialPrint from "@/components/initial-requisition/InitialPrint";
+import InitialPrint from "@/components/initial-requisition/initialPrint";
 import { useReactToPrint } from "react-to-print";
 
 const PrintView = (props) => {

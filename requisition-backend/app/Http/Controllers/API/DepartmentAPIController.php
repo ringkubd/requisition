@@ -23,6 +23,12 @@ class DepartmentAPIController extends AppBaseController
     public function __construct(DepartmentRepository $departmentRepo)
     {
         $this->departmentRepository = $departmentRepo;
+
+        $this->middleware('auth:sanctum');
+        $this->middleware('role_or_permission:Super Admin|view_departments', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Super Admin|update_departments', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|create_departments', ['only' => ['store']]);
+        $this->middleware('role_or_permission:Super Admin|delete_departments', ['only' => ['delete']]);
     }
 
     /**

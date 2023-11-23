@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateRoleAPIRequest;
 use App\Http\Requests\API\UpdateRoleAPIRequest;
+use App\Http\Resources\PermissionResource;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Repositories\RoleRepository;
 use Illuminate\Http\JsonResponse;
@@ -23,6 +25,12 @@ class RoleAPIController extends AppBaseController
     public function __construct(RoleRepository $roleRepo)
     {
         $this->roleRepository = $roleRepo;
+
+        $this->middleware('auth:sanctum');
+        $this->middleware('role_or_permission:Super Admin|view_roles', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Super Admin|update_roles', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|create_roles', ['only' => ['store']]);
+        $this->middleware('role_or_permission:Super Admin|delete_roles', ['only' => ['delete']]);
     }
 
     /**
@@ -276,6 +284,27 @@ class RoleAPIController extends AppBaseController
         return $this->sendResponse(
             $id,
             __('messages.deleted', ['model' => __('models/roles.singular')])
+        );
+    }
+
+    public function permissions(){
+        $permissions = Permission::all()->groupBy('module');
+        return $this->sendResponse(
+            $permissions,
+            __('messages.updated', ['model' => __('models/roles.singular')])
+        );
+    }
+
+    public function rolePermissionUpdate(Role $role, Request $request){
+        if ($request->update_type == "attach"){
+            $role->permissions()->attach($request->permission);
+        }else{
+            $role->permissions()->detach($request->permission);
+        }
+        app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        return $this->sendResponse(
+            new RoleResource($role),
+            __('messages.updated', ['model' => __('models/roles.singular')])
         );
     }
 }

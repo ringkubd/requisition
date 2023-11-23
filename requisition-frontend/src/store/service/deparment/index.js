@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 export const DepartmentApiService = createApi({
     reducerPath: 'department',
@@ -11,12 +12,14 @@ export const DepartmentApiService = createApi({
                 url: 'departments',
             }),
             providesTags: ['getDepartment'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         editDepartment: builder.query({
             query: (id) => ({
                 url: `departments/${id}`,
             }),
             providesTags: ['editDepartment'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         updateDepartment: builder.mutation({
             query: ({id, ...patch}) => ({
@@ -24,7 +27,8 @@ export const DepartmentApiService = createApi({
                 method: 'PATCH',
                 body: patch
             }),
-            invalidatesTags: ['getDepartment', 'editDepartment']
+            invalidatesTags: ['getDepartment', 'editDepartment'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         storeDepartment: builder.mutation({
             query: arg => ({
@@ -32,21 +36,24 @@ export const DepartmentApiService = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['getDepartment']
+            invalidatesTags: ['getDepartment'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyDepartment: builder.mutation({
             query : (arg) => ({
                 url: `departments/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getDepartment']
+            invalidatesTags: ['getDepartment'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         getDepartmentByOrganizationBranch: builder.query({
             query: (arg) => ({
                 url: 'departments-by-organization-branch',
                 method: 'GET',
                 params: arg
-            })
+            }),
+            onQueryStarted: onQueryStartedErrorToast,
         })
     }),
 })

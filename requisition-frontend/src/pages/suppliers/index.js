@@ -3,9 +3,9 @@ import AppLayout from "@/components/Layouts/AppLayout";
 import { wrapper } from "@/store";
 import { Button, Card } from "flowbite-react";
 import DataTable from 'react-data-table-component';
-import NavLink from "@/components/NavLink";
+import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
-import Actions from "@/components/Actions";
+import Actions from "@/components/actions";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import {
@@ -73,7 +73,7 @@ const Department = () => {
           }
       >
           <Head>
-              <title>Add new supplier</title>
+              <title>Suppliers Management.</title>
           </Head>
           <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
               <Card>

@@ -23,6 +23,12 @@ class UserAPIController extends AppBaseController
     public function __construct(UserRepository $userRepo)
     {
         $this->userRepository = $userRepo;
+
+        $this->middleware('auth:sanctum');
+        $this->middleware('role_or_permission:Super Admin|view_users', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Super Admin|update_users', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|create_users', ['only' => ['store']]);
+        $this->middleware('role_or_permission:Super Admin|delete_users', ['only' => ['delete']]);
     }
 
     /**
@@ -55,6 +61,8 @@ class UserAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
+        $user = \request()->user();
+        $user->can('Super Admin');
         $users = User::whereHas('branches', function($branch){
             $branch->where('id', auth_branch_id());
         })->get();
@@ -104,6 +112,11 @@ class UserAPIController extends AppBaseController
         $user->branches()->sync($request->branch_id);
         $user->departments()->sync($request->department_id);
         $user->designations()->sync($request->designation_id);
+
+        if ($request->has('roles')){
+            $user->roles()->sync($request->roles);
+            app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        }
 
         return $this->sendResponse(
             new UserResource($user),
@@ -220,6 +233,9 @@ class UserAPIController extends AppBaseController
         $user->branches()->sync($request->branch_id);
         $user->departments()->sync($request->department_id);
         $user->designations()->sync($request->designation_id);
+        if ($request->has('roles')){
+            $user->roles()->sync($request->roles);
+        }
         $user = $this->userRepository->update($input, $id);
 
         return $this->sendResponse(

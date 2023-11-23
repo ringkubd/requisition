@@ -1,7 +1,7 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { Button, Card, Label, Select, TextInput } from "flowbite-react";
-import NavLink from "@/components/NavLink";
+import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
 import * as Yup from 'yup';
@@ -13,6 +13,7 @@ import { useStoreUserMutation } from "@/store/service/user/management";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 import { useGetDesignationByOrganizationBranchQuery } from "@/store/service/designation";
 import Select2Component from "@/components/select2/Select2Component";
+import { useGetRolesQuery } from "@/store/service/roles";
 
 const create = (props) => {
   const router = useRouter();
@@ -32,6 +33,8 @@ const create = (props) => {
     organization_id: selectedOrganization,
     branch_id: selectedBranch
   }, {skip: !selectedOrganization || !selectedBranch});
+
+  const {data: roles, isLoading: rolesLoading, isError: rolesError} = useGetRolesQuery();
 
   let formikForm = useRef();
 
@@ -59,6 +62,7 @@ const create = (props) => {
     password: '',
     designation_id: [],
     department_id: [],
+    roles: [],
   };
 
   const validationSchema = Yup.object().shape({
@@ -293,6 +297,30 @@ const create = (props) => {
                           />
                           <ErrorMessage
                             name='designation_id'
+                            render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                        </div>
+                      </div>
+                      <div className="flex flex-col md:flex-row gap-4">
+                        <div className="w-full">
+                          <div className="mb-2 block">
+                            <Label
+                              htmlFor="roles"
+                              value="Roles"
+                            />
+                          </div>
+                          <Select2Component
+                            id="roles"
+                            name="roles"
+                            className={`w-full`}
+                            options={roles?.data?.map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                            required
+                            multiple
+                            onBlur={handleBlur}
+                            value={values.roles}
+                            onChange={handleChange}
+                          />
+                          <ErrorMessage
+                            name='roles'
                             render={(msg) => <span className='text-red-500'>{msg}</span>} />
                         </div>
                       </div>

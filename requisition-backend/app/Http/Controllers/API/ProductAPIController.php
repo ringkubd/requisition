@@ -23,6 +23,12 @@ class ProductAPIController extends AppBaseController
     public function __construct(ProductRepository $productRepo)
     {
         $this->productRepository = $productRepo;
+
+        $this->middleware('auth:sanctum');
+        $this->middleware('role_or_permission:Super Admin|view_products', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Super Admin|update_products', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|create_products', ['only' => ['store']]);
+        $this->middleware('role_or_permission:Super Admin|delete_products', ['only' => ['delete']]);
     }
 
     /**

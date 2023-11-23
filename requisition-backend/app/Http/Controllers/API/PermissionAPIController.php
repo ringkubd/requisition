@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\PermissionResource;
+use Illuminate\Support\Facades\Route;
 
 /**
  * Class PermissionController
@@ -23,6 +24,11 @@ class PermissionAPIController extends AppBaseController
     public function __construct(PermissionRepository $permissionRepo)
     {
         $this->permissionRepository = $permissionRepo;
+        $this->middleware('auth:sanctum');
+        $this->middleware('role_or_permission:Super Admin|view_permissions', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Super Admin|update_permissions', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|create_permissions', ['only' => ['store']]);
+        $this->middleware('role_or_permission:Super Admin|delete_permissions', ['only' => ['delete']]);
     }
 
     /**
@@ -60,6 +66,8 @@ class PermissionAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         );
+
+        $this->createAutoPermissions($this->module());
 
         return $this->sendResponse(
             PermissionResource::collection($permissions),
@@ -277,5 +285,57 @@ class PermissionAPIController extends AppBaseController
             $id,
             __('messages.deleted', ['model' => __('models/permissions.singular')])
         );
+    }
+
+    /**
+     * @return array
+     */
+    protected function module(){
+        $routes = Route::getRoutes();
+        $routeName = [];
+        $numberOfDevide = [];
+        foreach ($routes as $route){
+            $module =  explode('.',$route->getName());
+            $numberOfDevide[$route->getName()] = count($module);
+            if (count($module) > 1 && !in_array($module[0], $routeName)) {
+                if (count($module) == 2) {
+                    $routeName [] = $module[0];
+                }else{
+                    $routeName [] = $module[0].'_'.$module[1];
+                }
+            }elseif (count($module) > 2 && !in_array($module[1], $routeName)){
+                $routeName [] = $module[1];
+            }
+        }
+        return $routeName;
+    }
+
+    /**
+     * @param array $modules
+     * @return mixed
+     */
+    protected function createAutoPermissions(Array $modules){
+        $permissions = Permission::whereIn('module', $modules)->get()->groupBy('module')->keys()->toArray();
+        $exclude = config('custom.excluded_from_create_permission');
+        $newModule = array_diff($modules, $exclude, $permissions);
+        $defaultPermissions = config('custom.default_permissions');
+        $newPermissions = [];
+        $i = 0;
+        foreach ($newModule as $module) {
+            if (count($defaultPermissions) > 0) {
+                $newP = array_map(function ($v) use($module, $i){
+                    return [
+                        'name' => $v.'_'.$module,
+                        'guard_name' => 'web',
+                        'module' => $module,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }, $defaultPermissions);
+                $permissions = Permission::insert($newP);
+            }
+            $i++;
+        }
+        return $permissions;
     }
 }

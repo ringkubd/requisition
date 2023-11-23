@@ -1,13 +1,14 @@
 import AppLayout from "@/components/Layouts/AppLayout";
 import Head from "next/head";
-import NavLink from "@/components/NavLink";
+import NavLink from "@/components/navLink";
 import { Button, Card } from "flowbite-react";
 import DataTable from "react-data-table-component";
 import { useEffect, useState } from "react";
-import { useDeleteUnitsMutation, useGetUnitsQuery } from "@/store/service/units";
+import { getUnits, useDeleteUnitsMutation, useGetUnitsQuery, getRunningQueriesThunk } from "@/store/service/units";
 import { toast } from "react-toastify";
-import Actions from "@/components/Actions";
+import Actions from "@/components/actions";
 import { useRouter } from "next/router";
+import { wrapper } from "@/store";
 
 export default function Units(){
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function Units(){
 
   useEffect(() => {
     if (!destroyResponse.isLoading && destroyResponse.isSuccess){
-      toast.success('Category deleted.')
+      toast.success('Unit deleted.')
     }
   }, [destroyResponse])
 
@@ -85,3 +86,11 @@ export default function Units(){
     </AppLayout>
   )
 }
+export const getServerSideProps = wrapper.getServerSideProps((store) => async (context) => {
+    // const params = context.params
+    store.dispatch(getUnits.initiate())
+    await Promise.all(store.dispatch(getRunningQueriesThunk()));
+    return {
+        props: {},
+    };
+})

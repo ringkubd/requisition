@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 export const SuppliersApiService = createApi({
     reducerPath: 'suppliers',
@@ -11,12 +12,14 @@ export const SuppliersApiService = createApi({
                 url: 'suppliers',
             }),
             providesTags: ['getSuppliers'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         editSuppliers: builder.query({
             query: (id) => ({
                 url: `suppliers/${id}`,
             }),
             providesTags: ['editSuppliers'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         updateSuppliers: builder.mutation({
             query: ({id, ...patch}) => ({
@@ -25,7 +28,8 @@ export const SuppliersApiService = createApi({
                 body: patch,
                 formData: true,
             }),
-            invalidatesTags: ['getSuppliers', 'editSuppliers']
+            invalidatesTags: ['getSuppliers', 'editSuppliers'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         storeSuppliers: builder.mutation({
             query: arg => {
@@ -36,14 +40,16 @@ export const SuppliersApiService = createApi({
                     body: arg,
                 }
             },
-            invalidatesTags: ['getSuppliers']
+            invalidatesTags: ['getSuppliers'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         destroySuppliers: builder.mutation({
             query : (arg) => ({
                 url: `suppliers/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getSuppliers']
+            invalidatesTags: ['getSuppliers'],
+            onQueryStarted: onQueryStartedErrorToast,
         })
     }),
 })

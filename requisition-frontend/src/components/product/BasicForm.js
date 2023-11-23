@@ -18,7 +18,6 @@ export default function BasicForm(props){
     const { basic } = useSelector(state => state.product_basic_form)
     const formikRef = useRef();
     const {basic: basicData} = props;
-    const {data: countries, isLoading: countryLoading, isSuccess: countryIsSuccess, isError: countryIsError} = useGetCountriesQuery();
     const {data: units, isLoading: unitLoading, isSuccess: unitIsSuccess, isError: unitIsError} = useGetUnitsQuery();
 
     useEffect(() => {
@@ -33,15 +32,12 @@ export default function BasicForm(props){
 
     const initValues = {
         title: basic?.title ?? basicData?.title ?? "",
-        origin: basic?.sl_no ?? basicData?.sl_no ??"",
         unit: basic?.unit ?? basicData?.unit ?? "",
         category_id: basic?.category_id ?? basicData?.category_id ?? "",
         description: basic?.description ?? basicData?.description ?? "",
-        chalan_no: basic?.chalan_no ?? basicData?.chalan_no ?? "",
     }
     const validationSchema = Yup.object().shape({
         title: Yup.string().required().label('Title'),
-        origin: Yup.string().nullable().label('Origin'),
         unit: Yup.string().required().label('Unit'),
         category_id: Yup.string().required().label('Category'),
         description: Yup.string().nullable().label('Description'),
@@ -54,11 +50,9 @@ export default function BasicForm(props){
     useEffect(() => {
         formikRef.current.setValues({
             title: basic?.title ?? "",
-            origin: basic?.origin  ??"",
             unit: basic?.unit ?? "",
             category_id: basic?.category_id ?? "",
             description: basic?.description ?? "",
-            chalan_no: basic?.chalan_no ?? "",
         })
     }, [basic]);
 
@@ -162,56 +156,6 @@ export default function BasicForm(props){
                                 <ErrorMessage
                                     name="unit"
                                     render={msg => (<span className="text-red-500">{msg}</span>)}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex flex-row gap-4">
-                            <div className="w-full">
-                                <div className="mb-2 block">
-                                    <Label
-                                      htmlFor="origin"
-                                      value="Origin"
-                                    />
-                                </div>
-                                <Select2Component
-                                  options={countries?.data?.map((c) => ({label: c.country_name, value: c.country_name}))}
-                                  onChange={handleChange}
-                                  name='origin'
-                                  id='origin'
-                                  className={`w-full border-1 border-gray-300`}
-                                  value={values.origin}
-                                />
-                                <ErrorMessage
-                                  name="description"
-                                  render={msg => (
-                                    <span className="text-red-500">{msg}</span>
-                                  )}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex flex-row gap-4">
-                            <div className="w-full">
-                                <div className="mb-2 block">
-                                    <Label
-                                      htmlFor="chalan_no"
-                                      value="Chalan Number"
-                                    />
-                                </div>
-                                <TextInput
-                                  id="chalan_no"
-                                  name="chalan_no"
-                                  placeholder="Chalan number."
-                                  type="text"
-                                  onChange={handleChange}
-                                  onBlur={handleBlur}
-                                />
-                                <ErrorMessage
-                                  name="chalan_no"
-                                  render={msg => (
-                                    <span className="text-red-500">
-                                                                    {msg}
-                                                                </span>
-                                  )}
                                 />
                             </div>
                         </div>

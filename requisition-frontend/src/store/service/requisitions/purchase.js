@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 export const PurchaseRequisitionApi = createApi({
     reducerPath: 'purchase-requisition',
@@ -10,13 +11,15 @@ export const PurchaseRequisitionApi = createApi({
             query: () => ({
                 url: 'purchase-requisitions'
             }),
-            providesTags: ['purchase-requisition']
+            providesTags: ['purchase-requisition'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         editPurchaseRequisition: build.query({
             query: (id) => ({
                 url: `purchase-requisitions/${id}`
             }),
-            providesTags: ['edit-purchase-requisition']
+            providesTags: ['edit-purchase-requisition'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         updatePurchaseRequisition: build.mutation({
             query: ({id, ...patch}) => ({
@@ -24,7 +27,8 @@ export const PurchaseRequisitionApi = createApi({
                 method: 'PATCH',
                 body: patch
             }),
-            invalidatesTags: ['purchase-requisition', 'edit-purchase-requisition']
+            invalidatesTags: ['purchase-requisition', 'edit-purchase-requisition'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         storePurchaseRequisition: build.mutation({
             query: arg => ({
@@ -32,28 +36,32 @@ export const PurchaseRequisitionApi = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['purchase-requisition', 'get-initial-requisition-for-purchase']
+            invalidatesTags: ['purchase-requisition', 'get-initial-requisition-for-purchase'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyPurchaseRequisition: build.mutation({
             query : (arg) => ({
                 url: `purchase-requisitions/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['purchase-requisition', 'get-initial-requisition-for-purchase']
+            invalidatesTags: ['purchase-requisition', 'get-initial-requisition-for-purchase'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         lastPurchaseInformation: build.query({
             query: (arg) => ({
                 url: 'last-purchase-information',
                 method: 'GET',
                 body: arg
-            })
+            }),
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         getInitialRequisitionForPurchase: build.query({
             query: () => ({
                 url: 'initial_requisition_for_initiate_purchase',
                 method: 'GET'
             }),
-            providesTags: ['get-initial-requisition-for-purchase']
+            providesTags: ['get-initial-requisition-for-purchase'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         updatePurchaseRequisitionPrice: build.mutation({
             query: (arg) => ({
@@ -61,7 +69,8 @@ export const PurchaseRequisitionApi = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['purchase-requisition', 'edit-purchase-requisition']
+            invalidatesTags: ['purchase-requisition', 'edit-purchase-requisition'],
+            onQueryStarted: onQueryStartedErrorToast,
         })
     }),
 })

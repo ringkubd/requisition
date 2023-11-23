@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 export const ProductApiService = createApi({
     reducerPath: 'product',
@@ -11,12 +12,14 @@ export const ProductApiService = createApi({
                 url: 'products',
             }),
             providesTags: ['getProduct'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         editProduct: builder.query({
             query: (id) => ({
                 url: `products/${id}`,
             }),
             providesTags: ['editProduct'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         singleProduct: builder.query({
             query: (id) => ({
@@ -29,7 +32,8 @@ export const ProductApiService = createApi({
                 method: 'PATCH',
                 body: patch
             }),
-            invalidatesTags: ['getProduct', 'editProduct']
+            invalidatesTags: ['getProduct', 'editProduct'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         storeProduct: builder.mutation({
             query: arg => ({
@@ -37,14 +41,16 @@ export const ProductApiService = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['getProduct']
+            invalidatesTags: ['getProduct'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyProduct: builder.mutation({
             query : (arg) => ({
                 url: `products/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getProduct']
+            invalidatesTags: ['getProduct'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
     }),
 })

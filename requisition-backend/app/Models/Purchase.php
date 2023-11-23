@@ -77,6 +77,10 @@ class Purchase extends Model
         'available_qty',
         'brand_id',
         'notes',
+        'origin',
+        'bill_no',
+        'chalan_no',
+        'expiry_date',
     ];
 
     protected $casts = [

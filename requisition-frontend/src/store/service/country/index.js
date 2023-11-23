@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 export const CountryApiService = createApi({
   reducerPath: 'countries',
@@ -9,6 +10,7 @@ export const CountryApiService = createApi({
       query: () => ({
         url: 'countries',
       }),
+        onQueryStarted: onQueryStartedErrorToast,
     })
   })
 });

@@ -2,6 +2,7 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef } from "react
 import $ from 'jquery'; // Import jQuery
 import 'select2/dist/js/select2';
 import 'select2/dist/css/select2.css';
+import axios from "@/lib/axios";
 
 const Select2ComponentAjax = forwardRef(({ajax, onChange,...other}, ref) => {
     const selectRef = useRef(null);
@@ -10,7 +11,20 @@ const Select2ComponentAjax = forwardRef(({ajax, onChange,...other}, ref) => {
         $(selectRef.current).select2({
             allowClear: true,
             async: true,
-            ajax: ajax
+            ajax: {...ajax, transport: function (params, success, failure) {
+                    let paramType = 'params';
+                    if (params.type.toUpperCase() !== 'GET'){
+                        paramType = 'body';
+                    }
+                    params[paramType] = params['data'];
+                    var $request = axios(params);
+
+                    $request.then((data) => {
+                        success(data.data)
+                    });
+                    $request.catch((error) => failure(error));
+                    return $request;
+                }}
         });
 
         // Clean up Select2 on component unmount
@@ -47,14 +61,14 @@ const Select2ComponentAjax = forwardRef(({ajax, onChange,...other}, ref) => {
         resetSelect
     }));
     return (
-        <div className="w-full">
-            <select
-                ref={selectRef}
-                {...other}
-            >
-                <option value=""></option>
-            </select>
-        </div>
+      <div className="w-full">
+          <select
+            ref={selectRef}
+            {...other}
+          >
+              <option value=""></option>
+          </select>
+      </div>
     );
 });
 

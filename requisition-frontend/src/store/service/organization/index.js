@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getCookie } from "@/lib/cookie";
 import CustomBaseQuery from "@/store/service/branch";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 export const OrganizationApiService = createApi({
     reducerPath: 'organization',
@@ -12,12 +13,14 @@ export const OrganizationApiService = createApi({
                 url: 'organization',
             }),
             providesTags: ['getOrganization'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         editOrganization: builder.query({
             query: (id) => ({
                 url: `organization/${id}`,
             }),
             providesTags: ['editOrganization'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         updateOrganization: builder.mutation({
             query: ({id, ...patch}) => ({
@@ -25,7 +28,8 @@ export const OrganizationApiService = createApi({
                 method: 'PATCH',
                 body: patch
             }),
-            invalidatesTags: ['getOrganization', 'editOrganization']
+            invalidatesTags: ['getOrganization', 'editOrganization'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         storeOrganization: builder.mutation({
             query: arg => ({
@@ -33,14 +37,16 @@ export const OrganizationApiService = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['getOrganization']
+            invalidatesTags: ['getOrganization'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyOrganization: builder.mutation({
             query : (arg) => ({
                 url: `organization/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getOrganization']
+            invalidatesTags: ['getOrganization'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
     }),
 })

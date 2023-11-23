@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getCookie } from "@/lib/cookie";
 import CustomBaseQuery from "@/store/service/branch";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 export const OptionsApiService = createApi({
     reducerPath: 'options',
@@ -12,12 +13,14 @@ export const OptionsApiService = createApi({
                 url: 'options',
             }),
             providesTags: ['getOptions'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         editOptions: builder.query({
             query: (id) => ({
                 url: `options/${id}`,
             }),
             providesTags: ['editOptions'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         updateOptions: builder.mutation({
             query: ({id, ...patch}) => ({
@@ -25,7 +28,8 @@ export const OptionsApiService = createApi({
                 method: 'PATCH',
                 body: patch
             }),
-            invalidatesTags: ['getOptions', 'editOptions']
+            invalidatesTags: ['getOptions', 'editOptions'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         storeOptions: builder.mutation({
             query: arg => ({
@@ -33,14 +37,16 @@ export const OptionsApiService = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['getOptions']
+            invalidatesTags: ['getOptions'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyOptions: builder.mutation({
             query : (arg) => ({
                 url: `options/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getOptions']
+            invalidatesTags: ['getOptions'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
     }),
 })

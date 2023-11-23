@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getCookie } from "@/lib/cookie";
 import CustomBaseQuery from "@/store/service/branch";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 export const CategoryApiService = createApi({
     reducerPath: 'category',
@@ -12,12 +13,14 @@ export const CategoryApiService = createApi({
                 url: 'categories',
             }),
             providesTags: ['getCategory'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         editCategory: builder.query({
             query: (id) => ({
                 url: `categories/${id}`,
             }),
             providesTags: ['editCategory'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         updateCategory: builder.mutation({
             query: ({id, ...patch}) => ({
@@ -25,7 +28,8 @@ export const CategoryApiService = createApi({
                 method: 'PATCH',
                 body: patch
             }),
-            invalidatesTags: ['getCategory', 'editCategory']
+            invalidatesTags: ['getCategory', 'editCategory'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         storeCategory: builder.mutation({
             query: arg => ({
@@ -33,21 +37,24 @@ export const CategoryApiService = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['getCategory']
+            invalidatesTags: ['getCategory'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyCategory: builder.mutation({
             query : (arg) => ({
                 url: `categories/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getCategory']
+            invalidatesTags: ['getCategory'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         getSubCategory: builder.query({
             query: (parentId) => ({
                 url: `sub-category/${parentId}`,
                 method: 'GET'
             }),
-            providesTags: ['sub-category']
+            providesTags: ['sub-category'],
+            onQueryStarted: onQueryStartedErrorToast,
         })
     }),
 })

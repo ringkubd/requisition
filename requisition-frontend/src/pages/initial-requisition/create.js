@@ -1,7 +1,7 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { Button, Card, Label, Select, TextInput } from "flowbite-react";
-import NavLink from "@/components/NavLink";
+import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
 import * as Yup from 'yup';
@@ -13,7 +13,7 @@ import {
 } from "@/store/service/requisitions/initial";
 import Select2ComponentAjax from "@/components/select2/Select2ComponentAjax";
 import DataTable from "react-data-table-component";
-import Actions from "@/components/Actions";
+import Actions from "@/components/actions";
 import moment from "moment";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 

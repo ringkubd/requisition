@@ -6,6 +6,13 @@ use App\Http\Controllers\Controller;use App\Models\Organization;use Illuminate\H
 
 class OrganizationApiController extends Controller
 {
+    public function __construct(){
+        $this->middleware('auth:sanctum');
+        $this->middleware('role_or_permission:Super Admin|view_organization', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Super Admin|update_organization', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|create_organization', ['only' => ['store']]);
+        $this->middleware('role_or_permission:Super Admin|delete_organization', ['only' => ['delete']]);
+    }
     /**
      * Display a listing of the resource.
      */

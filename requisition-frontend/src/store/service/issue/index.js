@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 export const IssueApiService = createApi({
     reducerPath: 'issue',
@@ -11,12 +12,14 @@ export const IssueApiService = createApi({
                 url: 'product-issues',
             }),
             providesTags: ['issue'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         editIssue: builder.query({
             query: (id) => ({
                 url: `product-issues/${id}`,
             }),
             providesTags: ['editIssue'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         updateIssue: builder.mutation({
             query: ({id, ...patch}) => ({
@@ -25,7 +28,8 @@ export const IssueApiService = createApi({
                 body: patch,
                 formData: true,
             }),
-            invalidatesTags: ['issue', 'editIssue']
+            invalidatesTags: ['issue', 'editIssue'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         storeIssue: builder.mutation({
             query: arg => {
@@ -35,14 +39,16 @@ export const IssueApiService = createApi({
                     body: arg,
                 }
             },
-            invalidatesTags: ['issue']
+            invalidatesTags: ['issue'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyIssue: builder.mutation({
             query : (arg) => ({
                 url: `product-issues/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['issue']
+            invalidatesTags: ['issue'],
+            onQueryStarted: onQueryStartedErrorToast,
         })
     }),
 })

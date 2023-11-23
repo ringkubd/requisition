@@ -25,6 +25,12 @@ class ProductIssueAPIController extends AppBaseController
     public function __construct(ProductIssueRepository $productIssueRepo)
     {
         $this->productIssueRepository = $productIssueRepo;
+
+        $this->middleware('auth:sanctum');
+        $this->middleware('role_or_permission:Super Admin|view_product-issues', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Super Admin|update_product-issues', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|create_product-issues', ['only' => ['store']]);
+        $this->middleware('role_or_permission:Super Admin|delete_product-issues', ['only' => ['delete']]);
     }
 
     /**

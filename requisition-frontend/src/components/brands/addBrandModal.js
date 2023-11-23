@@ -62,7 +62,7 @@ export default function AddBrandModal({setOpenModal, openModal}){
     })
     return (
         <Modal show={openModal} onClose={() => setOpenModal(false)}>
-            <Modal.Header>Add New Supplier</Modal.Header>
+            <Modal.Header>Add New Brand</Modal.Header>
             <Modal.Body>
                 <div className={`flex flex-col justify-center justify-items-center items-center basis-2/4 w-full`}>
                     <Formik

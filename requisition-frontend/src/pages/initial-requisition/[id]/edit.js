@@ -1,7 +1,7 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { Button, Card, Label, Select, TextInput } from "flowbite-react";
-import NavLink from "@/components/NavLink";
+import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
 import * as Yup from 'yup';
@@ -11,11 +11,11 @@ import {
     useEditInitialRequisitionQuery,
     useUpdateInitialRequisitionMutation
 } from "@/store/service/requisitions/initial";
-import Actions from "@/components/Actions";
+import Actions from "@/components/actions";
 import DataTable from "react-data-table-component";
 import Select2ComponentAjax from "@/components/select2/Select2ComponentAjax";
 import moment from "moment/moment";
-import UpdateVariantForm from "@/components/initial-requisition/UpdateVariantForm";
+import UpdateVariantForm from "@/components/initial-requisition/updateVariantForm";
 
 const Edit = (props) => {
     const router = useRouter();

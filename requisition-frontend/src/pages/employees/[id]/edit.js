@@ -1,7 +1,7 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { Button, Card, Label, Select, TextInput } from "flowbite-react";
-import NavLink from "@/components/NavLink";
+import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
 import * as Yup from 'yup';
@@ -13,6 +13,7 @@ import { useEditUserQuery, useUpdateUserMutation } from "@/store/service/user/ma
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 import { useGetDesignationByOrganizationBranchQuery } from "@/store/service/designation";
 import Select2Component from "@/components/select2/Select2Component";
+import { useGetRolesQuery } from "@/store/service/roles";
 
 const Edit = (props) => {
     const router = useRouter();
@@ -26,6 +27,7 @@ const Edit = (props) => {
         organization_id: selectedOrganization,
         branch_id: selectedBranch
     }, {skip: !selectedOrganization || !selectedBranch});
+    const {data: roles, isLoading: rolesLoading, isError: rolesError} = useGetRolesQuery();
 
     const designation = useGetDesignationByOrganizationBranchQuery({
         organization_id: selectedOrganization,
@@ -225,9 +227,9 @@ const Edit = (props) => {
                                                                 multiple
                                                                 onBlur={handleBlur}
                                                                 value={values.branch_id}
-                                                                onChange={(e, s) => {
-                                                                    setFieldValue('branch_id', s.val())
-                                                                    setSelectedBranch(s.val())
+                                                                onChange={(e) => {
+                                                                    setFieldValue('branch_id',  e.target.value)
+                                                                    setSelectedBranch(e.target.value)
                                                                 }}
                                                             />
                                                             <ErrorMessage
@@ -252,7 +254,7 @@ const Edit = (props) => {
                                                                 onBlur={handleBlur}
                                                                 value={values.branch_id}
                                                                 onChange={(e, s) => {
-                                                                    setFieldValue('department_id', s.val())
+                                                                    setFieldValue('department_id', e.target.value)
                                                                 }}
                                                             />
                                                             <ErrorMessage
@@ -274,13 +276,37 @@ const Edit = (props) => {
                                                                 multiple
                                                                 onBlur={handleBlur}
                                                                 value={values.branch_id}
-                                                                onChange={(e, s) => {
-                                                                    setFieldValue('designation_id', s.val())
+                                                                onChange={(e) => {
+                                                                    setFieldValue('designation_id',  e.target.value)
                                                                 }}
                                                             />
                                                             <ErrorMessage
                                                                 name='designation_id'
                                                                 render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col md:flex-row gap-4">
+                                                        <div className="w-full">
+                                                            <div className="mb-2 block">
+                                                                <Label
+                                                                  htmlFor="roles"
+                                                                  value="Roles"
+                                                                />
+                                                            </div>
+                                                            <Select2Component
+                                                              id="roles"
+                                                              name="roles"
+                                                              className={`w-full`}
+                                                              options={roles?.data?.map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                              required
+                                                              multiple
+                                                              onBlur={handleBlur}
+                                                              value={values.roles}
+                                                              onChange={handleChange}
+                                                            />
+                                                            <ErrorMessage
+                                                              name='roles'
+                                                              render={(msg) => <span className='text-red-500'>{msg}</span>} />
                                                         </div>
                                                     </div>
                                                     <div className="flex flex-col md:flex-row gap-4 justify-end">

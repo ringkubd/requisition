@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->string('origin')->nullable()->after('category_id');
-            $table->string('bill_no')->nullable()->after('origin');
-            $table->string('chalan_no')->nullable()->after('bill_no');
+        Schema::table('purchases', function (Blueprint $table) {
+            $table->string('origin')->nullable()->after('supplier_id')->index();
+            $table->string('bill_no')->nullable()->after('origin')->index();
+            $table->string('chalan_no')->nullable()->after('bill_no')->index();
+            $table->date('expiry_date')->nullable()->after('chalan_no');
         });
     }
 
@@ -23,10 +24,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
+        Schema::table('purchases', function (Blueprint $table) {
             $table->dropColumn('origin');
             $table->dropColumn('bill_no');
             $table->dropColumn('chalan_no');
+            $table->dropColumn('expiry_date');
         });
     }
 };

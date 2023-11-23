@@ -39,20 +39,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *          format="date-time"
  *      )
  * )
- */class Permission extends \Spatie\Permission\Models\Permission
+ */
+class Permission extends \Spatie\Permission\Models\Permission
 {
-    use SoftDeletes;
     use HasFactory;
     public $table = 'permissions';
 
     public $fillable = [
         'name',
-        'guard_name'
+        'guard_name',
+        'module',
     ];
 
     protected $casts = [
         'name' => 'string',
-        'guard_name' => 'string'
+        'guard_name' => 'string',
+        'module' => 'string'
     ];
 
     public static array $rules = [

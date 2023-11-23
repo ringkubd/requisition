@@ -1,7 +1,7 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { Button, Card, Label, Select, TextInput } from "flowbite-react";
-import NavLink from "@/components/NavLink";
+import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
 import * as Yup from 'yup';
@@ -13,17 +13,12 @@ import { useEditBranchQuery, useUpdateBranchMutation } from "@/store/service/bra
 const Edit = (props) => {
   const router = useRouter();
   const [updateBranch, updateResult] = useUpdateBranchMutation();
-  const { data, isLoading, isError } = useEditBranchQuery(router.query.id)
+  const { data, isLoading, isError, error } = useEditBranchQuery(router.query.id, {
+      skip: !router.query.id
+  })
   const organizations = useGetOrganizationQuery();
   let formikForm = useRef();
 
-  const initValues = {
-    organization_id: '',
-    name: '',
-    email: '',
-    contact_no: '',
-    address: ''
-  }
   useEffect(() => {
     if (updateResult.isError){
       formikForm.current.setErrors(updateResult.error.data.errors)
@@ -72,7 +67,7 @@ const Edit = (props) => {
             </div>
             <div className={`flex flex-col justify-center justify-items-center items-center basis-2/4 w-full`}>
               {
-                !isLoading && !isError && (
+                !isLoading && !isError && data && (
                   <Formik
                     initialValues={data.data}
                     onSubmit={submit}

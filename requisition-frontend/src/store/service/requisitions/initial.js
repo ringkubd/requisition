@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getCookie } from "@/lib/cookie";
 import CustomBaseQuery from "@/store/service/branch";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 export const InitialRequisitionApi = createApi({
     reducerPath: 'initial-requisition',
@@ -12,13 +13,15 @@ export const InitialRequisitionApi = createApi({
                 url: 'initial-requisitions',
                 params,
             }),
-            providesTags: ['initial-requisition']
+            providesTags: ['initial-requisition'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         editInitialRequisition: build.query({
             query: (id) => ({
                 url: `initial-requisitions/${id}`
             }),
-            providesTags: ['edit-initial-requisition']
+            providesTags: ['edit-initial-requisition'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         updateInitialRequisition: build.mutation({
             query: ({id, ...patch}) => ({
@@ -26,7 +29,8 @@ export const InitialRequisitionApi = createApi({
                 method: 'PATCH',
                 body: patch
             }),
-            invalidatesTags: ['initial-requisition', 'edit-initial-requisition']
+            invalidatesTags: ['initial-requisition', 'edit-initial-requisition'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         storeInitialRequisition: build.mutation({
             query: arg => ({
@@ -34,28 +38,32 @@ export const InitialRequisitionApi = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['initial-requisition']
+            invalidatesTags: ['initial-requisition'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyInitialRequisition: build.mutation({
             query : (arg) => ({
                 url: `initial-requisitions/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['initial-requisition']
+            invalidatesTags: ['initial-requisition'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         lastPurchaseInformation: build.query({
             query: (arg) => ({
                 url: 'last-purchase-information',
                 method: 'GET',
                 body: arg
-            })
+            }),
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         getPurposeSuggestion: build.query({
             query: (arg) => ({
                 url: 'initial_requisition_product_suggestions',
                 method: 'GET',
                 params: arg
-            })
+            }),
+            onQueryStarted: onQueryStartedErrorToast,
         })
     }),
 })

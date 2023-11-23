@@ -3,9 +3,9 @@ import AppLayout from "@/components/Layouts/AppLayout";
 import { wrapper } from "@/store";
 import { Button, Card } from "flowbite-react";
 import DataTable from 'react-data-table-component';
-import NavLink from "@/components/NavLink";
+import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
-import Actions from "@/components/Actions";
+import Actions from "@/components/actions";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
@@ -15,7 +15,7 @@ import {
   useGetOptionsQuery
 } from "@/store/service/options";
 
-const Branch = () => {
+const Options = () => {
   const router = useRouter();
   const {data, isLoading, isError} = useGetOptionsQuery();
   const [destroy, destroyResponse] = useDestroyOptionsMutation();
@@ -106,4 +106,4 @@ export const getServerSideProps = wrapper.getServerSideProps((store) => async (c
     };
 })
 
-export default Branch;
+export default Options;

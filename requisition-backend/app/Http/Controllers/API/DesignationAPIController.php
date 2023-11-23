@@ -23,6 +23,11 @@ class DesignationAPIController extends AppBaseController
     public function __construct(DesignationRepository $designationRepo)
     {
         $this->designationRepository = $designationRepo;
+        $this->middleware('auth:sanctum');
+        $this->middleware('role_or_permission:Super Admin|view_designations', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Super Admin|update_designations', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|create_designations', ['only' => ['store']]);
+        $this->middleware('role_or_permission:Super Admin|delete_designations', ['only' => ['delete']]);
     }
 
     /**

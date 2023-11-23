@@ -1,25 +1,33 @@
-import ApplicationLogo from '@/components/ApplicationLogo'
-import Dropdown from '@/components/Dropdown'
+import ApplicationLogo from '@/components/applicationLogo'
+import Dropdown from '@/components/dropdown'
 import Link from 'next/link'
-import NavLink from '@/components/NavLink'
+import NavLink from '@/components/navLink'
 import ResponsiveNavLink, {
     ResponsiveNavButton,
-} from '@/components/ResponsiveNavLink'
-import DropdownLink, { DropdownButton } from '@/components/DropdownLink'
+} from '@/components/responsiveNavLink'
+import DropdownLink, { DropdownButton } from '@/components/dropdownLink'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { AiFillCaretDown, AiOutlineArrowDown, AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
-import { BiCaretDown, BiChevronDown, BiCross, BiSelectMultiple } from "react-icons/bi";
-import { BsArchive, BsCaretDown, BsChevronBarDown } from "react-icons/bs";
-import { FaRegSquareCaretDown } from "react-icons/fa6";
-import { LiaNeos } from "react-icons/lia";
+import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
+import { BiChevronDown } from "react-icons/bi";
+
 const Navigation = ({ user }) => {
     const router = useRouter()
 
     const { logout } = useAuth()
 
     const [open, setOpen] = useState(false)
+
+    function checkPermission(permission){
+        if (user){
+            const roles = user.role
+            if (user.role_object.filter(r => r.name === "Super Admin").length){
+                return true;
+            }
+        }
+        return false;
+    }
 
     return (
         <nav className="bg-white border-b border-gray-100">
@@ -185,6 +193,18 @@ const Navigation = ({ user }) => {
                                 >
                                     Employees
                                 </DropdownLink>
+                                <DropdownLink
+                                  href="/roles"
+                                  active={router.pathname.includes('roles').toString()}
+                                >
+                                    Roles
+                                </DropdownLink>
+                                <DropdownLink
+                                    href="/permissions"
+                                    active={router.pathname.includes('permissions').toString()}
+                                >
+                                    Permissions
+                                </DropdownLink>
                             </Dropdown>
                         </div>
                     </div>
@@ -274,6 +294,12 @@ const Navigation = ({ user }) => {
                                 active={router.pathname.includes('employees').toString()}
                             >
                                 Employees
+                            </DropdownLink>
+                            <DropdownLink
+                              href="/roles"
+                              active={router.pathname.includes('roles').toString()}
+                            >
+                                Roles
                             </DropdownLink>
                         </Dropdown>
                         <Dropdown

@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import { useEditProductQuery } from "@/store/service/product/product";
 import Head from "next/head";
 import { Button, Card, Table } from "flowbite-react";
-import NavLink from "@/components/NavLink";
-import Actions from "@/components/Actions";
+import NavLink from "@/components/navLink";
+import Actions from "@/components/actions";
 import Image from "next/image";
 import moment from "moment";
 
@@ -55,14 +55,6 @@ const View = (props) => {
                                                 <Table.Row>
                                                     <Table.HeadCell>Unit</Table.HeadCell>
                                                     <Table.Cell>{data?.data?.unit}</Table.Cell>
-                                                </Table.Row>
-                                                <Table.Row>
-                                                    <Table.HeadCell>Origin</Table.HeadCell>
-                                                    <Table.Cell>{data?.data?.origin}</Table.Cell>
-                                                </Table.Row>
-                                                <Table.Row>
-                                                    <Table.HeadCell>Chalan</Table.HeadCell>
-                                                    <Table.Cell>{data?.data?.chalan_no}</Table.Cell>
                                                 </Table.Row>
                                                 <Table.Row>
                                                     <Table.HeadCell>Description</Table.HeadCell>
@@ -164,13 +156,16 @@ const View = (props) => {
                                                 <Table.Head>
                                                     <Table.HeadCell className={`border border-gray-300`}>Sl#</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Variant</Table.HeadCell>
+                                                    <Table.HeadCell className={`border border-gray-300`}>Origin</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Supplier</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Requisition</Table.HeadCell>
+                                                    <Table.HeadCell className={`border border-gray-300`}>Chalan</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Qty</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Unit Price</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Available Qty.</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Total</Table.HeadCell>
-                                                    <Table.HeadCell className={`border border-gray-300`}>Date</Table.HeadCell>
+                                                    <Table.HeadCell className={`border border-gray-300`}>Purchase Date</Table.HeadCell>
+                                                    <Table.HeadCell className={`border border-gray-300`}>Expiry Date</Table.HeadCell>
                                                 </Table.Head>
                                                 <Table.Body className={`border border-gray-300`}>
                                                     {
@@ -183,15 +178,18 @@ const View = (props) => {
                                                                 {
                                                                     p?.option_purchase_history?.map((pur,i) => (
                                                                         <Table.Row className={`border border-gray-300`} key={i}>
+                                                                            <Table.Cell className={`border border-gray-300`}>{pur?.origin}</Table.Cell>
                                                                             <Table.Cell className={`flex align-middle justify-center items-center`}>
                                                                                 {pur?.supplier && pur?.supplier?.logo ? <Image src={pur?.supplier?.logo} alt={pur?.supplier?.name} width={50} height={50} /> : pur?.supplier?.name }
                                                                             </Table.Cell>
                                                                             <Table.Cell className={`border border-gray-300`}>{pur?.purchaseRequisition?.irf_no}</Table.Cell>
+                                                                            <Table.Cell className={`border border-gray-300`}>{pur?.chalan_no}</Table.Cell>
                                                                             <Table.Cell className={`border border-gray-300`}>{parseFloat(pur?.qty).toLocaleString()}</Table.Cell>
                                                                             <Table.Cell className={`border border-gray-300`}>{parseFloat(pur?.unit_price).toLocaleString()}</Table.Cell>
                                                                             <Table.Cell className={`border border-gray-300`}>{parseFloat(pur?.available_qty).toLocaleString()}</Table.Cell>
                                                                             <Table.Cell className={`border border-gray-300`}>{parseFloat(pur?.total_price).toLocaleString()}</Table.Cell>
                                                                             <Table.Cell className={`border border-gray-300`}>{moment(pur?.created_at).format("HH:m - DD MMM YYYY")}</Table.Cell>
+                                                                            <Table.Cell className={`border border-gray-300`}>{pur.expiry_date ? moment(pur.expiry_date).format("DD MMM YYYY") : ''}</Table.Cell>
                                                                         </Table.Row>
                                                                     ))
                                                                 }

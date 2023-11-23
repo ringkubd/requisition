@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getCookie } from "@/lib/cookie";
 import CustomBaseQuery from "@/store/service/branch";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 export const PurchaseApiService = createApi({
     reducerPath: 'purchase',
@@ -12,12 +13,14 @@ export const PurchaseApiService = createApi({
                 url: 'purchases',
             }),
             providesTags: ['getPurchase'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         editPurchase: builder.query({
             query: (id) => ({
                 url: `purchases/${id}`,
             }),
             providesTags: ['editPurchase'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         updatePurchase: builder.mutation({
             query: ({id, ...patch}) => ({
@@ -26,7 +29,8 @@ export const PurchaseApiService = createApi({
                 body: patch,
                 formData: true,
             }),
-            invalidatesTags: ['getPurchase', 'editPurchase']
+            invalidatesTags: ['getPurchase', 'editPurchase'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         storePurchase: builder.mutation({
             query: arg => {
@@ -37,14 +41,16 @@ export const PurchaseApiService = createApi({
                     body: arg,
                 }
             },
-            invalidatesTags: ['getPurchase']
+            invalidatesTags: ['getPurchase'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyPurchase: builder.mutation({
             query : (arg) => ({
                 url: `purchases/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getPurchase']
+            invalidatesTags: ['getPurchase'],
+            onQueryStarted: onQueryStartedErrorToast,
         })
     }),
 })

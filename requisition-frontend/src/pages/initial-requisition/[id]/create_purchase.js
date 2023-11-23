@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useStorePurchaseRequisitionMutation } from "@/store/service/requisitions/purchase";
 import Head from "next/head";
-import NavLink from "@/components/NavLink";
+import NavLink from "@/components/navLink";
 import { Button, Card } from "flowbite-react";
 import DataTable from "react-data-table-component";
 

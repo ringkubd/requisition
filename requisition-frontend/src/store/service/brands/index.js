@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
+import { onQueryStartedErrorToast } from "@/lib/helpers";
 
 export const BrandsApiService = createApi({
     reducerPath: 'brands',
@@ -11,12 +12,14 @@ export const BrandsApiService = createApi({
                 url: 'brands',
             }),
             providesTags: ['getBrands'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         editBrands: builder.query({
             query: (id) => ({
                 url: `brands/${id}`,
             }),
             providesTags: ['editBrands'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         updateBrands: builder.mutation({
             query: ({id, ...patch}) => ({
@@ -25,7 +28,8 @@ export const BrandsApiService = createApi({
                 body: patch,
                 formData: true,
             }),
-            invalidatesTags: ['getBrands', 'editBrands']
+            invalidatesTags: ['getBrands', 'editBrands'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         storeBrands: builder.mutation({
             query: arg => {
@@ -36,14 +40,16 @@ export const BrandsApiService = createApi({
                     body: arg,
                 }
             },
-            invalidatesTags: ['getBrands']
+            invalidatesTags: ['getBrands'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyBrands: builder.mutation({
             query : (arg) => ({
                 url: `brands/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getBrands']
+            invalidatesTags: ['getBrands'],
+            onQueryStarted: onQueryStartedErrorToast,
         })
     }),
 })
