@@ -1,4 +1,7 @@
-module.exports = {
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: process.env.ANALYZE === 'true',
+})
+module.exports = withBundleAnalyzer({
     swcMinify: true,
     compress: true,
     eslint: {
@@ -22,5 +25,6 @@ module.exports = {
         NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
         NEXT_PUBLIC_BACKEND_API_URL: process.env.NEXT_PUBLIC_BACKEND_API_URL,
         APP_NAME: process.env.APP_NAME,
+        ANALYZE: process.env.ANALYZE,
     }
-}
+})

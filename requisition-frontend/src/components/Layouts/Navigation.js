@@ -9,8 +9,7 @@ import DropdownLink, { DropdownButton } from '@/components/dropdownLink'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
-import { BiChevronDown } from "react-icons/bi";
+import { AiOutlineClose, AiOutlineMenu, AiOutlineCaretDown } from "react-icons/ai";
 
 const Navigation = ({ user }) => {
     const router = useRouter()
@@ -76,7 +75,7 @@ const Navigation = ({ user }) => {
                                       <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
                                           <div>Requisition</div>
                                           <div className="ml-1">
-                                              <BiChevronDown />
+                                              <AiOutlineCaretDown />
                                           </div>
                                       </button>
                                   }>
@@ -132,7 +131,7 @@ const Navigation = ({ user }) => {
                                       <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
                                           <div>Inventory</div>
                                           <div className="ml-1">
-                                              <BiChevronDown />
+                                              <AiOutlineCaretDown />
                                           </div>
                                       </button>
                                   }
@@ -190,7 +189,7 @@ const Navigation = ({ user }) => {
                                       <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
                                           <div>Product Management</div>
                                           <div className="ml-1">
-                                              <BiChevronDown />
+                                              <AiOutlineCaretDown />
                                           </div>
                                       </button>
                                   }
@@ -279,7 +278,7 @@ const Navigation = ({ user }) => {
                                   <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out z-40 overflow-hidden">
                                       <div>Organization</div>
                                       <div className="ml-1">
-                                          <BiChevronDown />
+                                          <AiOutlineCaretDown />
                                       </div>
                                   </button>
                               }
@@ -341,7 +340,7 @@ const Navigation = ({ user }) => {
                                 <div>{user?.name}</div>
 
                                 <div className="ml-1">
-                                    <BiChevronDown />
+                                    <AiOutlineCaretDown />
                                 </div>
                             </button>
                         }>
@@ -383,7 +382,7 @@ const Navigation = ({ user }) => {
                           <button className="pl-3 pr-4 py-2 border-l-4 text-base font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 flex flex-row">
                               <div>Organization</div>
                               <div className="ml-1">
-                                  <BiChevronDown  className="fill-current h-4 w-4" />
+                                  <AiOutlineCaretDown  className="fill-current h-4 w-4" />
                               </div>
                           </button>
                       }>
@@ -431,7 +430,7 @@ const Navigation = ({ user }) => {
                           <button className="pl-3 pr-4 py-2 border-l-4 text-base font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 flex flex-row">
                               <div>Products</div>
                               <div className="ml-1">
-                                  <BiChevronDown  className="fill-current h-4 w-4" />
+                                  <AiOutlineCaretDown  className="fill-current h-4 w-4" />
                               </div>
                           </button>
                       }>
@@ -462,7 +461,7 @@ const Navigation = ({ user }) => {
                           <button  className="pl-3 pr-4 py-2 border-l-4 text-base font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 flex flex-row">
                               <div>Store</div>
                               <div className="ml-1">
-                                  <BiChevronDown />
+                                  <AiOutlineCaretDown />
                               </div>
                           </button>
                       }
@@ -499,7 +498,7 @@ const Navigation = ({ user }) => {
                           <button className="pl-3 pr-4 py-2 border-l-4 text-base font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 flex flex-row">
                               <div>Requisition</div>
                               <div className="ml-1">
-                                  <BiChevronDown  className="fill-current h-4 w-4" />
+                                  <AiOutlineCaretDown  className="fill-current h-4 w-4" />
                               </div>
                           </button>
                       }>
@@ -527,7 +526,7 @@ const Navigation = ({ user }) => {
                 <div className="pt-4 pb-1 border-t border-gray-200">
                     <div className="flex items-center px-4">
                         <div className="flex-shrink-0">
-                            <BiChevronDown  className="fill-current h-4 w-4" />
+                            <AiOutlineCaretDown  className="fill-current h-4 w-4" />
                         </div>
 
                         <div className="ml-3">

@@ -13,7 +13,7 @@ import {
     useDestroyInitialRequisitionMutation,
     useGetInitialRequisitionQuery
 } from "@/store/service/requisitions/initial";
-import { HiSearch, HiShoppingBag } from "react-icons/hi";
+import {AiFillShopping, AiOutlineSearch} from 'react-icons/ai';
 import moment from "moment";
 
 const InitialRequisition = () => {
@@ -81,7 +81,7 @@ const InitialRequisition = () => {
                             <Button
                                 gradientMonochrome={`cyan`}
                                 onClick={() => router.push(`/initial-requisition/${row.id}/create_purchase`)}>
-                                <HiShoppingBag />
+                                <AiFillShopping />
                             </Button>
                         ) : false}
                     />,
@@ -135,7 +135,7 @@ const InitialRequisition = () => {
                             </div>
                             <div>
                                 <TextInput
-                                    icon={HiSearch}
+                                    icon={AiOutlineSearch}
                                     onBlur={changeSearchInput}
                                 />
                             </div>

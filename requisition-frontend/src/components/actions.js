@@ -1,8 +1,7 @@
 import React from "react";
 import { Button } from "flowbite-react";
 import { useRouter } from "next/router";
-import { HiEye, HiPencilSquare, HiTrash } from "react-icons/hi2";
-import { HiAdjustments, HiPrinter } from "react-icons/hi";
+import { AiFillSetting , AiFillPrinter, AiFillEye, AiFillEdit, AiFillDelete } from "react-icons/ai";
 import Link from "next/link";
 import { isElement } from "@/lib/helpers";
 import { useAuth } from "@/hooks/auth";
@@ -45,7 +44,7 @@ const Actions = ({edit, destroy, view , itemId, progressing, print, other, permi
                             onClick={submitView}
                             gradientMonochrome={`cyan`}
                         >
-                            <HiEye />
+                            <AiFillEye />
                         </Button>
                     ) :  view && isElement(view) ? {...view} : <></> : <></>
                 }
@@ -56,7 +55,7 @@ const Actions = ({edit, destroy, view , itemId, progressing, print, other, permi
                             onClick={submitEdit}
                             gradientMonochrome={`lime`}
                         >
-                            <HiPencilSquare />
+                            <AiFillEdit />
                         </Button>
                     ) : <></> : <></>
                 }
@@ -68,7 +67,7 @@ const Actions = ({edit, destroy, view , itemId, progressing, print, other, permi
                             gradientMonochrome={`failure`}
                             isProcessing={progressing}
                         >
-                            <HiTrash />
+                            <AiFillDelete />
                         </Button>
                     ) : <></> : <></>
                 }
@@ -79,7 +78,7 @@ const Actions = ({edit, destroy, view , itemId, progressing, print, other, permi
                             <Button
                               gradientMonochrome="info"
                             >
-                                <HiPrinter />
+                                <AiFillPrinter />
                             </Button>
 
                         </Link>
@@ -92,7 +91,7 @@ const Actions = ({edit, destroy, view , itemId, progressing, print, other, permi
                           <Button
                             gradientMonochrome="teal"
                           >
-                              <HiAdjustments />
+                              <AiFillSetting />
                           </Button>
 
                       </Link>
