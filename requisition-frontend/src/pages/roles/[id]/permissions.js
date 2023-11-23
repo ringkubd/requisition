@@ -28,7 +28,7 @@ export default function Permissions(){
     }, [permissionsIsLaoding, permissions])
 
     useEffect(() => {
-        if (role && selectedPermissions.length){
+        if (role && selectedPermissions.length && permissions){
             const permissionsData = permissions.data;
             let newPermissionModel = [];
             let removePermissionModel = [];
@@ -51,6 +51,7 @@ export default function Permissions(){
     useEffect(() => {
         if (role){
             setSelectedPermissions(role.data.permissions_array);
+            console.log(role)
         }
     }, [role, roleIsLoading, roleIsError]);
 
@@ -92,11 +93,11 @@ export default function Permissions(){
     return (
         <AppLayout
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                Role Permissions.
+                Permissions for role <strong className={`underline`}>{role?.data?.name?.toUpperCase()} </strong>
             </h2>}
         >
             <Head>
-                <title>Permissions update for role {role?.name} .</title>
+                <title>Permissions update for role {role?.data?.name?.toUpperCase()} .</title>
             </Head>
             <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
                 <Card>

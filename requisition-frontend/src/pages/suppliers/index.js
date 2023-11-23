@@ -55,6 +55,7 @@ const Department = () => {
                 itemId={row.id}
                 destroy={destroy}
                 progressing={destroyResponse.isLoading}
+                permissionModule={`suppliers`}
             />,
             ignoreRowClick: true,
         }

@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getCookie } from "@/lib/cookie";
 import CustomBaseQuery from "@/store/service/branch";
-import { onQueryStartedErrorToast } from "@/lib/helpers";
+import { onQueryStartedErrorToast } from "@/lib/clientHelper";
 
 export const CategoryApiService = createApi({
     reducerPath: 'category',

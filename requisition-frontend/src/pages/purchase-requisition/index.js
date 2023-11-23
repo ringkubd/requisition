@@ -76,6 +76,7 @@ const PurchaseRequisition = () => {
                         edit={moment(row.created_at).format("YYYY-MM-DD") == moment().format("YYYY-MM-DD") ? `/purchase-requisition/${row.id}/edit` : false}
                         destroy={destroy}
                         progressing={destroyResponse.isLoading}
+                        permissionModule={`purchase-requisitions`}
                     />,
                     ignoreRowClick: true,
                 }

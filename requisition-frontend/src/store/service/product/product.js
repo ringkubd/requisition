@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
-import { onQueryStartedErrorToast } from "@/lib/helpers";
+import { onQueryStartedErrorToast } from "@/lib/clientHelper";
 
 export const ProductApiService = createApi({
     reducerPath: 'product',

@@ -50,6 +50,7 @@ const Branch = () => {
                 edit={`/branch/${row.id}/edit`}
                 view={`/branch/${row.id}/view`}
                 destroy={destroy}
+                permissionModule={`branches`}
                 progressing={destroyResponse.isLoading}
             />,
             ignoreRowClick: true,

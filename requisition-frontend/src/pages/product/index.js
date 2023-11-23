@@ -59,6 +59,7 @@ const Branch = () => {
             view={`/product/${row.id}/view`}
             destroy={destroy}
             progressing={destroyResponse.isLoading}
+            permissionModule={`products`}
           />,
           ignoreRowClick: true,
         }

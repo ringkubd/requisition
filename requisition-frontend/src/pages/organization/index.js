@@ -56,6 +56,7 @@ const Organization = () => {
                 view={`/organization/${row.id}/view`}
                 destroy={destroy}
                 progressing={destroyResponse.isLoading}
+                permissionModule={`organization`}
             />,
             ignoreRowClick: true,
         }

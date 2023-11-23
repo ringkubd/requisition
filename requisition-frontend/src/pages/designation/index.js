@@ -46,6 +46,7 @@ const Department = () => {
                 edit={`/designation/${row.id}/edit`}
                 view={`/designation/${row.id}/view`}
                 destroy={destroy}
+                permissionModule={`designations`}
                 progressing={destroyResponse.isLoading}
             />,
             ignoreRowClick: true,

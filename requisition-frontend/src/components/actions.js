@@ -2,27 +2,44 @@ import React from "react";
 import { Button } from "flowbite-react";
 import { useRouter } from "next/router";
 import { HiEye, HiPencilSquare, HiTrash } from "react-icons/hi2";
-import { HiPrinter } from "react-icons/hi";
+import { HiAdjustments, HiPrinter } from "react-icons/hi";
 import Link from "next/link";
-import { isElement, isReactComponent } from "@/lib/helpers";
+import { isElement } from "@/lib/helpers";
+import { useAuth } from "@/hooks/auth";
 
-const Actions = (props) => {
+const Actions = ({edit, destroy, view , itemId, progressing, print, other, permissionModule}) => {
     const router = useRouter();
-    const {edit, destroy, view , itemId, progressing, print} = props;
+    const { user } = useAuth({ middleware: 'auth' });
     const submitEdit = () => {
         router.push(edit)
     }
     const submitDestroy = () => {
-        const yes = confirm('Are you sure?')
+        const yes = confirm('Are you sure?');
         destroy && yes && destroy(itemId);
     }
     const submitView = () => {
         router.push(view);
     }
+
+    function checkPermission(permission){
+        if (user){
+            const roles = user.role_object
+            const permissions = user.permissions;
+            if (roles.filter(r => r.name === "Super Admin").length){
+                return true;
+            }else{
+                return permissions.filter((p) => {
+                        return permission+'_'+permissionModule === p.name ? p.name: null;
+                }).length
+            }
+        }
+        return false;
+    }
     return (
         <>
             <Button.Group>
                 {
+                    checkPermission('view') ?
                     view && !isElement(view) ?  (
                         <Button
                             onClick={submitView}
@@ -30,20 +47,22 @@ const Actions = (props) => {
                         >
                             <HiEye />
                         </Button>
-                    ) :  view && isElement(view) ? {...view} : <></>
+                    ) :  view && isElement(view) ? {...view} : <></> : <></>
                 }
                 {
-                    edit ? (
+                    checkPermission('update') ?
+                      edit ? (
                         <Button
                             onClick={submitEdit}
                             gradientMonochrome={`lime`}
                         >
                             <HiPencilSquare />
                         </Button>
-                    ) : <></>
+                    ) : <></> : <></>
                 }
                 {
-                    destroy ?  (
+                    checkPermission('delete') ?
+                      destroy ?  (
                         <Button
                             onClick={submitDestroy}
                             gradientMonochrome={`failure`}
@@ -51,22 +70,35 @@ const Actions = (props) => {
                         >
                             <HiTrash />
                         </Button>
-                    ) : <></>
+                    ) : <></> : <></>
                 }
                 {
-                    print ? (
+                    checkPermission('view') ?
+                      print ? (
                         <Link href={print}>
                             <Button
-                                gradientDuoTone="purpleToBlue"
-                                outline
+                              gradientMonochrome="info"
                             >
                                 <HiPrinter />
                             </Button>
 
                         </Link>
-                    ) : <></>
+                    ) : <></> : <></>
                 }
-                {!edit && !view && !destroy && !print ? <Button>No Action</Button> : <></>}
+                {
+                    checkPermission('view') ?
+                      other ? (
+                      <Link href={other}>
+                          <Button
+                            gradientMonochrome="teal"
+                          >
+                              <HiAdjustments />
+                          </Button>
+
+                      </Link>
+                    ) : <></> : <></>
+                }
+                {!edit && !view && !destroy && !print && !other ? <Button>No Action</Button> : <></>}
             </Button.Group>
         </>
     )
@@ -78,5 +110,10 @@ Actions.defaultProps = {
     view : false,
     itemId : false,
     progressing: false,
+    other: false,
+    createPermission: false,
+    editPermission: false,
+    deletePermission: false,
+    viewPermission: false
 }
 export default Actions;

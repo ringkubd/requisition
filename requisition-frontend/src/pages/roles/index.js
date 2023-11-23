@@ -41,6 +41,8 @@ export default function Roles(){
             edit={`/roles/${row.id}/edit`}
             destroy={destroy}
             progressing={destroyResponse.isLoading}
+            other={`/roles/${row.id}/permissions`}
+            permissionModule={`roles`}
           />,
           ignoreRowClick: true,
         }

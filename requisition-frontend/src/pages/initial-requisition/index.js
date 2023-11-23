@@ -76,6 +76,7 @@ const InitialRequisition = () => {
                         print={`/initial-requisition/${row.id}/print_view`}
                         destroy={!row.is_purchase_requisition_generated ? destroy : false}
                         progressing={destroyResponse.isLoading}
+                        permissionModule={`initial-requisitions`}
                         view={!row.is_purchase_requisition_generated ? (
                             <Button
                                 gradientMonochrome={`cyan`}

@@ -1,5 +1,4 @@
 import React from "react";
-import Router from 'next/router'
 const toBase64 = file => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -40,25 +39,6 @@ function isCompositeTypeElement(element) {
     return isElement(element) && typeof element.type === 'function';
 }
 
-const onQueryStartedErrorToast = async (args, { queryFulfilled }) => {
-    try {
-        await queryFulfilled;
-    } catch (error) {
-        // handle error here, dispatch toast message
-        const {error: baseError} = error;
-        if (baseError){
-            switch (baseError.status) {
-                case 403:
-                    typeof window !== 'undefined' && Router.push('/403');
-                    break;
-                default:
-                    typeof window !== 'undefined' && Router.push('/404');
-            }
-        }
-    }
-};
-
-
 export {
     toBase64,
     isClassComponent,
@@ -66,6 +46,5 @@ export {
     isDOMTypeElement,
     isElement,
     isFunctionComponent,
-    isReactComponent,
-    onQueryStartedErrorToast
+    isReactComponent
 }

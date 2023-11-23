@@ -71,6 +71,7 @@ const Employes = (props) => {
               edit={`/employees/${row.id}/edit`}
               view={`/employees/${row.id}/view`}
               destroy={destroy}
+              permissionModule={`users`}
               progressing={destroyResponse.isLoading}
             />,
             ignoreRowClick: true,

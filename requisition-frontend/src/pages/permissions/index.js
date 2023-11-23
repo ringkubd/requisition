@@ -49,6 +49,7 @@ export default function Permissions(){
                         itemId={row.id}
                         destroy={destroy}
                         progressing={destroyResponse.isLoading}
+                        permissionModule={`permissions`}
                     />,
                     ignoreRowClick: true,
                 }

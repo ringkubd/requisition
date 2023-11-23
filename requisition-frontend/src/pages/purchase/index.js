@@ -107,6 +107,7 @@ const Purchase = () => {
                 // view={`/purchase/${row.id}/view`}
                 destroy={destroy}
                 progressing={destroyResponse.isLoading}
+                permissionModule={`purchases`}
             />,
             ignoreRowClick: true,
         }

@@ -48,6 +48,7 @@ const Options = () => {
             view={`/options/${row.id}/view`}
             destroy={destroy}
             progressing={destroyResponse.isLoading}
+            permissionModule={`options`}
           />,
           ignoreRowClick: true,
         }

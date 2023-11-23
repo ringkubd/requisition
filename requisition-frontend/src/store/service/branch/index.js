@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { fetchBaseQuery } from "@reduxjs/toolkit/dist/query/react";
-import { onQueryStartedErrorToast } from "@/lib/helpers";
+import { onQueryStartedErrorToast } from "@/lib/clientHelper";
 
 const CustomBaseQuery = fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,

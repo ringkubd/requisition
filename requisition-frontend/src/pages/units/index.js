@@ -43,12 +43,12 @@ export default function Units(){
               // view={`/category/${row.id}/view`}
             destroy={destroy}
             progressing={destroyResponse.isLoading}
+            permissionModule={`measurement-units`}
           />,
           ignoreRowClick: true,
         }
       ]);
     }
-    console.log(isLoading)
   }, [isLoading, isError, data]);
   return (
     <AppLayout
