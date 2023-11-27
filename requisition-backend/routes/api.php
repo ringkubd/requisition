@@ -25,7 +25,6 @@ Route::post('/register', [RegisteredUserController::class, 'store'])
     ->name('register');
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-//    $token = $request->user()->createToken($request->user()->email);
     return  new UserResource($request->user());
 });
 
@@ -81,6 +80,11 @@ Route::post('change-organization', function (Request $request){
     cache()->forget('select_organization');
     cache()->put('select_organization',$request->organization_id);
     return cache()->get('select_organization');
+});
+Route::post('change-departments', function (Request $request){
+    cache()->forget('select_department');
+    cache()->put('select_department',$request->department_id);
+    return cache()->get('select_department');
 });
 
 Route::get('initial_requisition_for_initiate_purchase', [PurchaseRequisitionAPIController::class, 'getInitialRequisition']);

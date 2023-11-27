@@ -9,8 +9,9 @@ export const UserManagementApi = createApi({
     tagTypes: ['getAllUsers'],
     endpoints: builder => ({
         getUsers: builder.query({
-            query: () => ({
+            query: (arg) => ({
                 url: 'users',
+                params: arg
             }),
             providesTags: ['getAllUsers'],
             onQueryStarted: onQueryStartedErrorToast,

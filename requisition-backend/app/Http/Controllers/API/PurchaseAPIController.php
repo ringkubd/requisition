@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\PurchaseResource;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class PurchaseController
@@ -115,16 +116,13 @@ class PurchaseAPIController extends AppBaseController
         $input = $request->all();
         $input['user_id'] = $request->user()->id;
         $input['available_qty'] = $input['qty'];
+        DB::beginTransaction();
+        $product_option = ProductOption::query()
+            ->find($input['product_option_id']);
         $purchase = $this->purchaseRepository->create($input);
-
-        if ($purchase){
-            $product_option = ProductOption::query()
-                ->find($input['product_option_id']);
-            $product_option->unit_price = $input['unit_price'];
-            $product_option->stock = (float)$input['qty'] + $product_option->stock;
-            $product_option->save();
-        }
-
+        $stock = (float)$input['qty'] + $product_option->stock;
+        $update = $product_option->update(['stock' => $stock]);
+        DB::commit();
         return $this->sendResponse(
             new PurchaseResource($purchase),
             __('messages.saved', ['model' => __('models/purchases.singular')])

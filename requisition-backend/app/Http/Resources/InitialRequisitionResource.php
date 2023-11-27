@@ -19,6 +19,7 @@ class InitialRequisitionResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'user' => $this->user,
+            'branch' => $this->branch,
             'department_id' => $this->department_id,
             'department' => $this->department,
             'irf_no' => $this->irf_no,

@@ -22,6 +22,8 @@ class DepartmentResource extends JsonResource
             'branch_id' => $this->branch_id,
             'branch' => $this->branch,
             'branch_name' => $this->branch?->name,
+            'head_of_department' => $this->head_of_department,
+            'departmentHead' => $this->departmentHead,
             'name' => $this->name,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,

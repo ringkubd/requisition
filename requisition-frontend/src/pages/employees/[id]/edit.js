@@ -1,9 +1,9 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, Select, TextInput } from "flowbite-react";
+import { Button, Card, Label, TextInput } from "flowbite-react";
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
-import { ErrorMessage, Formik } from "formik";
+import { ErrorMessage, Form, Formik } from "formik";
 import * as Yup from 'yup';
 import { useGetOrganizationQuery } from "@/store/service/organization";
 import { useEffect, useRef, useState } from "react";
@@ -12,13 +12,17 @@ import { useGetBranchByOrganizationQuery } from "@/store/service/branch";
 import { useEditUserQuery, useUpdateUserMutation } from "@/store/service/user/management";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 import { useGetDesignationByOrganizationBranchQuery } from "@/store/service/designation";
-import Select2Component from "@/components/select2/Select2Component";
 import { useGetRolesQuery } from "@/store/service/roles";
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 
+const animatedComponents = makeAnimated();
 const Edit = (props) => {
     const router = useRouter();
     const [updateUser, updateResult] = useUpdateUserMutation();
-    const { data, isLoading, isError } = useEditUserQuery(router.query.id)
+    const { data, isLoading, isError } = useEditUserQuery(router.query.id, {
+        skip: !router.query.id
+    })
     const [selectedOrganization, setSelectedOrganization] = useState(false);
     const [selectedBranch, setSelectedBranch] = useState(false);
     const organizations = useGetOrganizationQuery();
@@ -44,6 +48,12 @@ const Edit = (props) => {
     }, [data, isLoading, isError]);
 
     useEffect(() => {
+        if (!branch.isLoading && !branch.isError && branch.data){
+            // branch.refetch()
+        }
+    }, [selectedOrganization]);
+
+    useEffect(() => {
         if (updateResult.isError){
             formikForm.current.setErrors(updateResult.error.data.errors)
         }
@@ -52,9 +62,11 @@ const Edit = (props) => {
             router.push('/employees')
         }
     }, [updateResult]);
+
     const submit = (values, pageProps) => {
         updateUser(values)
         pageProps.resetForm();
+        // console.log(values)
     }
     const validationSchema = Yup.object().shape({
         organization_id: Yup.array().required().label('Organization'),
@@ -95,7 +107,7 @@ const Edit = (props) => {
                         </div>
                         <div className={`flex flex-col justify-center justify-items-center items-center basis-2/4 w-full`}>
                             {
-                                !isLoading && !isError && (
+                                !isLoading && !isError && data && (
                                     <Formik
                                         initialValues={{...data.data, 'confirm_password': ''}}
                                         onSubmit={submit}
@@ -105,7 +117,10 @@ const Edit = (props) => {
                                     >
                                         {
                                             ({handleSubmit, handleChange, handleBlur, setFieldValue, values, errors, isSubmitting, setErrors}) => (
-                                                <div className="flex flex-col gap-4 md:w-1/2 w-full">
+                                                <Form
+                                                    className="flex flex-col gap-4 md:w-1/2 w-full"
+                                                    onChange={(e) => console}
+                                                >
                                                     <div className="flex flex-col md:flex-row gap-4">
                                                         <div className="w-full">
                                                             <div className="mb-2 block">
@@ -195,18 +210,27 @@ const Edit = (props) => {
                                                                     value="Organization"
                                                                 />
                                                             </div>
-                                                            <Select2Component
-                                                                id="organization_id"
-                                                                onChange={(e) => {
-                                                                    handleChange(e)
-                                                                    setSelectedOrganization(e.target.value)
+                                                            <Select
+                                                                className={`select`}
+                                                                classNames={{
+                                                                    control: (state) => 'select'
                                                                 }}
-                                                                className={`w-full`}
+                                                                id="organization_id"
+                                                                name="organization_id"
+                                                                closeMenuOnSelect={false}
+                                                                components={animatedComponents}
+                                                                value={organizations?.data?.filter((r) => {
+                                                                    return values.organization_id.filter(v => v === r.id).length;
+                                                                }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                isMulti
+                                                                options={organizations?.data?.map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                onChange={(newValue, actionMeta) => {
+                                                                    setFieldValue('organization_id',newValue.map((v) => v.value));
+                                                                    setSelectedOrganization(newValue.map((v) => v.value));
+                                                                }}
+                                                                menuPlacement={`bottom`}
                                                                 onBlur={handleBlur}
-                                                                required
-                                                                multiple
-                                                                value={values.organization_id}
-                                                                options={organizations?.data?.map((o) => ({value: o.id, label: o.name}))}
+                                                                menuShouldScrollIntoView={true}
                                                             />
                                                             <ErrorMessage
                                                                 name='organization_id'
@@ -219,18 +243,26 @@ const Edit = (props) => {
                                                                     value="Branch"
                                                                 />
                                                             </div>
-                                                            <Select2Component
-                                                                id="branch_id"
-                                                                className={`w-full`}
-                                                                options={branch?.data?.data.map((o) => ({value: o.id, label: o.name}))}
-                                                                required
-                                                                multiple
-                                                                onBlur={handleBlur}
-                                                                value={values.branch_id}
-                                                                onChange={(e) => {
-                                                                    setFieldValue('branch_id',  e.target.value)
-                                                                    setSelectedBranch(e.target.value)
+                                                            <Select
+                                                                className={`select`}
+                                                                classNames={{
+                                                                    control: (state) => 'select'
                                                                 }}
+                                                                id="branch_id"
+                                                                name="branch_id"
+                                                                closeMenuOnSelect={false}
+                                                                components={animatedComponents}
+                                                                value={branch?.data?.data?.filter((r) => {
+                                                                    return values.branch_id.filter(v => v === r.id).length;
+                                                                }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                isMulti
+                                                                options={branch?.data?.data.map((o) => ({value: o.id, label: o.name}))}
+                                                                onChange={(newValue, actionMeta) => {
+                                                                    setFieldValue('branch_id',newValue.map((v) => v.value))
+                                                                }}
+                                                                menuPlacement={`bottom`}
+                                                                onBlur={handleBlur}
+                                                                menuShouldScrollIntoView={true}
                                                             />
                                                             <ErrorMessage
                                                                 name='branch_id'
@@ -245,17 +277,26 @@ const Edit = (props) => {
                                                                     value="Department"
                                                                 />
                                                             </div>
-                                                            <Select2Component
-                                                                id="department_id"
-                                                                className={`w-full`}
-                                                                options={department?.data?.data.map((o) => ({value: o.id, label: o.name}))}
-                                                                required
-                                                                multiple
-                                                                onBlur={handleBlur}
-                                                                value={values.branch_id}
-                                                                onChange={(e, s) => {
-                                                                    setFieldValue('department_id', e.target.value)
+                                                            <Select
+                                                                className={`select`}
+                                                                classNames={{
+                                                                    control: (state) => 'select'
                                                                 }}
+                                                                id="department_id"
+                                                                name="department_id"
+                                                                closeMenuOnSelect={false}
+                                                                components={animatedComponents}
+                                                                value={department?.data?.data?.filter((r) => {
+                                                                    return values.department_id.filter(v => v === r.id).length;
+                                                                }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                isMulti
+                                                                options={department?.data?.data.map((o) => ({value: o.id, label: o.name}))}
+                                                                onChange={(newValue, actionMeta) => {
+                                                                    setFieldValue('department_id',newValue.map((v) => v.value))
+                                                                }}
+                                                                menuPlacement={`bottom`}
+                                                                onBlur={handleBlur}
+                                                                menuShouldScrollIntoView={true}
                                                             />
                                                             <ErrorMessage
                                                                 name='department_id'
@@ -268,17 +309,26 @@ const Edit = (props) => {
                                                                     value="Designation"
                                                                 />
                                                             </div>
-                                                            <Select2Component
-                                                                id="designation_id"
-                                                                className={`w-full`}
-                                                                options={designation?.data?.data.map((o) => ({value: o.id, label: o.name}))}
-                                                                required
-                                                                multiple
-                                                                onBlur={handleBlur}
-                                                                value={values.branch_id}
-                                                                onChange={(e) => {
-                                                                    setFieldValue('designation_id',  e.target.value)
+                                                            <Select
+                                                                className={`select`}
+                                                                classNames={{
+                                                                    control: (state) => 'select'
                                                                 }}
+                                                                id="designation_id"
+                                                                name="designation_id"
+                                                                closeMenuOnSelect={false}
+                                                                components={animatedComponents}
+                                                                isMulti
+                                                                options={designation?.data?.data.map((o) => ({value: o.id, label: o.name}))}
+                                                                onChange={(newValue, actionMeta) => {
+                                                                    setFieldValue('designation_id',newValue.map((v) => v.value));
+                                                                }}
+                                                                value={designation?.data?.data?.filter((r) => {
+                                                                    return values.designation_id.filter(v => v === r.id).length;
+                                                                }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                menuPlacement={`bottom`}
+                                                                onBlur={handleBlur}
+                                                                menuShouldScrollIntoView={true}
                                                             />
                                                             <ErrorMessage
                                                                 name='designation_id'
@@ -289,24 +339,34 @@ const Edit = (props) => {
                                                         <div className="w-full">
                                                             <div className="mb-2 block">
                                                                 <Label
-                                                                  htmlFor="roles"
-                                                                  value="Roles"
+                                                                    htmlFor="roles"
+                                                                    value="Roles"
                                                                 />
                                                             </div>
-                                                            <Select2Component
-                                                              id="roles"
-                                                              name="roles"
-                                                              className={`w-full`}
-                                                              options={roles?.data?.map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
-                                                              required
-                                                              multiple
-                                                              onBlur={handleBlur}
-                                                              value={values.roles}
-                                                              onChange={handleChange}
+                                                            <Select
+                                                                className={`select`}
+                                                                classNames={{
+                                                                    control: (state) => 'select'
+                                                                }}
+                                                                id="roles"
+                                                                name="roles"
+                                                                closeMenuOnSelect={false}
+                                                                components={animatedComponents}
+                                                                value={roles?.data?.filter((r) => {
+                                                                    return values.roles.filter(v => v === r.id).length;
+                                                                }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                isMulti
+                                                                options={roles?.data?.map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                onChange={(newValue, actionMeta) => {
+                                                                    setFieldValue('roles',newValue.map((v) => v.value));
+                                                                }}
+                                                                menuPlacement={`bottom`}
+                                                                onBlur={handleBlur}
+                                                                menuShouldScrollIntoView={true}
                                                             />
                                                             <ErrorMessage
-                                                              name='roles'
-                                                              render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                                name='roles'
+                                                                render={(msg) => <span className='text-red-500'>{msg}</span>} />
                                                         </div>
                                                     </div>
                                                     <div className="flex flex-col md:flex-row gap-4 justify-end">
@@ -316,7 +376,7 @@ const Edit = (props) => {
                                                             type='submit'
                                                             color={`success`}>Submit</Button>
                                                     </div>
-                                                </div>
+                                                </Form>
                                             )
                                         }
 

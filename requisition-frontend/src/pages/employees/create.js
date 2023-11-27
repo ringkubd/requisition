@@ -1,6 +1,6 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, Select, TextInput } from "flowbite-react";
+import { Button, Card, Label, TextInput } from "flowbite-react";
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
@@ -12,9 +12,12 @@ import { useGetBranchByOrganizationQuery } from "@/store/service/branch";
 import { useStoreUserMutation } from "@/store/service/user/management";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 import { useGetDesignationByOrganizationBranchQuery } from "@/store/service/designation";
-import Select2Component from "@/components/select2/Select2Component";
 import { useGetRolesQuery } from "@/store/service/roles";
 
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
+
+const animatedComponents = makeAnimated();
 const create = (props) => {
   const router = useRouter();
   const [storeEmployee, storeResult] = useStoreUserMutation();
@@ -202,26 +205,25 @@ const create = (props) => {
                               value="Organization"
                             />
                           </div>
-                          <Select2Component
-                            id="organization_id"
-                            onChange={(e) => {
-                                handleChange(e)
-                                setSelectedOrganization(e.target.value)
-                            }}
-                            className={`w-full`}
-                            onBlur={handleBlur}
-                            required
-                            multiple
-                            value={values.organization_id}
-                            options={organizations?.data?.map((o) => ({value: o.id, label: o.name}))}
-                          >
-                            <option value="">Select Organization</option>
-                            {
-                              !organizations.isLoading && !organizations.isError && organizations.data.map((o) => (
-                                <option key={o.id} value={o.id}>{o.name}</option>
-                              ))
-                            }
-                          </Select2Component>
+                          <Select
+                              id="organization_id"
+                              name="organization_id"
+                              className={`select`}
+                              closeMenuOnSelect={false}
+                              components={animatedComponents}
+                              value={organizations?.data?.filter((r) => {
+                                return values.organization_id.filter(v => v === r.id).length;
+                              }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                              isMulti
+                              options={organizations?.data?.map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                              onChange={(newValue, actionMeta) => {
+                                setFieldValue('organization_id',newValue.map((v) => v.value));
+                                setSelectedOrganization(newValue.map((v) => v.value));
+                              }}
+                              menuPlacement={`bottom`}
+                              onBlur={handleBlur}
+                              menuShouldScrollIntoView={true}
+                          />
                           <ErrorMessage
                             name='organization_id'
                             render={(msg) => <span className='text-red-500'>{msg}</span>} />
@@ -233,18 +235,23 @@ const create = (props) => {
                               value="Branch"
                             />
                           </div>
-                          <Select2Component
-                            id="branch_id"
-                            className={`w-full`}
-                            options={branch?.data?.data.map((o) => ({value: o.id, label: o.name}))}
-                            required
-                            multiple
-                            onBlur={handleBlur}
-                            value={values.branch_id}
-                            onChange={(e, s) => {
-                              setFieldValue('branch_id', s.val())
-                              setSelectedBranch(s.val())
-                            }}
+                          <Select
+                              id="branch_id"
+                              name="branch_id"
+                              className={`select`}
+                              closeMenuOnSelect={false}
+                              components={animatedComponents}
+                              value={branch?.data?.data?.filter((r) => {
+                                return values.branch_id.filter(v => v === r.id).length;
+                              }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                              isMulti
+                              options={branch?.data?.data.map((o) => ({value: o.id, label: o.name}))}
+                              onChange={(newValue, actionMeta) => {
+                                setFieldValue('branch_id',newValue.map((v) => v.value))
+                              }}
+                              menuPlacement={`bottom`}
+                              onBlur={handleBlur}
+                              menuShouldScrollIntoView={true}
                           />
                           <ErrorMessage
                             name='branch_id'
@@ -259,17 +266,23 @@ const create = (props) => {
                               value="Department"
                             />
                           </div>
-                          <Select2Component
-                            id="department_id"
-                            className={`w-full`}
-                            options={department?.data?.data.map((o) => ({value: o.id, label: o.name}))}
-                            required
-                            multiple
-                            onBlur={handleBlur}
-                            value={values.branch_id}
-                            onChange={(e, s) => {
-                              setFieldValue('department_id', s.val())
-                            }}
+                          <Select
+                              className={`select`}
+                              id="department_id"
+                              name="department_id"
+                              closeMenuOnSelect={false}
+                              components={animatedComponents}
+                              value={department?.data?.data?.filter((r) => {
+                                return values.department_id.filter(v => v === r.id).length;
+                              }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                              isMulti
+                              options={department?.data?.data.map((o) => ({value: o.id, label: o.name}))}
+                              onChange={(newValue, actionMeta) => {
+                                setFieldValue('department_id',newValue.map((v) => v.value))
+                              }}
+                              menuPlacement={`bottom`}
+                              onBlur={handleBlur}
+                              menuShouldScrollIntoView={true}
                           />
 
                           <ErrorMessage
@@ -283,17 +296,23 @@ const create = (props) => {
                               value="Designation"
                             />
                           </div>
-                          <Select2Component
-                            id="designation_id"
-                            className={`w-full`}
-                            options={designation?.data?.data.map((o) => ({value: o.id, label: o.name}))}
-                            required
-                            multiple
-                            onBlur={handleBlur}
-                            value={values.branch_id}
-                            onChange={(e, s) => {
-                              setFieldValue('designation_id', s.val())
-                            }}
+                          <Select
+                              className={`select`}
+                              id="designation_id"
+                              name="designation_id"
+                              closeMenuOnSelect={false}
+                              components={animatedComponents}
+                              isMulti
+                              options={designation?.data?.data.map((o) => ({value: o.id, label: o.name}))}
+                              onChange={(newValue, actionMeta) => {
+                                setFieldValue('designation_id',newValue.map((v) => v.value));
+                              }}
+                              value={designation?.data?.data?.filter((r) => {
+                                return values.designation_id.filter(v => v === r.id).length;
+                              }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                              menuPlacement={`bottom`}
+                              onBlur={handleBlur}
+                              menuShouldScrollIntoView={true}
                           />
                           <ErrorMessage
                             name='designation_id'
@@ -308,16 +327,23 @@ const create = (props) => {
                               value="Roles"
                             />
                           </div>
-                          <Select2Component
-                            id="roles"
-                            name="roles"
-                            className={`w-full`}
-                            options={roles?.data?.map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
-                            required
-                            multiple
-                            onBlur={handleBlur}
-                            value={values.roles}
-                            onChange={handleChange}
+                          <Select
+                              className={`select`}
+                              id="roles"
+                              name="roles"
+                              closeMenuOnSelect={false}
+                              components={animatedComponents}
+                              value={roles?.data?.filter((r) => {
+                                return values.roles.filter(v => v === r.id).length;
+                              }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                              isMulti
+                              options={roles?.data?.map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                              onChange={(newValue, actionMeta) => {
+                                setFieldValue('roles',newValue.map((v) => v.value));
+                              }}
+                              menuPlacement={`bottom`}
+                              onBlur={handleBlur}
+                              menuShouldScrollIntoView={true}
                           />
                           <ErrorMessage
                             name='roles'

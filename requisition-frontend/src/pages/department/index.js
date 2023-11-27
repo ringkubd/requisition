@@ -34,6 +34,11 @@ const Department = () => {
             sortable: true,
         },
         {
+            name: 'Head of Department',
+            selector: row => row.departmentHead?.name,
+            sortable: true,
+        },
+        {
             name: 'Branch',
             selector: row => row.branch_name,
             sortable: true,

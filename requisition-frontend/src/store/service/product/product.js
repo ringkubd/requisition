@@ -5,13 +5,13 @@ import { onQueryStartedErrorToast } from "@/lib/clientHelper";
 export const ProductApiService = createApi({
     reducerPath: 'product',
     baseQuery: CustomBaseQuery,
-    tagTypes: ['getProduct', 'editProduct'],
+    tagTypes: ['product', 'editProduct'],
     endpoints: builder => ({
         getProduct: builder.query({
             query: () => ({
                 url: 'products',
             }),
-            providesTags: ['getProduct'],
+            providesTags: ['product'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editProduct: builder.query({
@@ -32,7 +32,7 @@ export const ProductApiService = createApi({
                 method: 'PATCH',
                 body: patch
             }),
-            invalidatesTags: ['getProduct', 'editProduct'],
+            invalidatesTags: ['product', 'editProduct'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         storeProduct: builder.mutation({
@@ -41,7 +41,7 @@ export const ProductApiService = createApi({
                 method: 'POST',
                 body: arg,
             }),
-            invalidatesTags: ['getProduct'],
+            invalidatesTags: ['product'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyProduct: builder.mutation({
@@ -49,7 +49,7 @@ export const ProductApiService = createApi({
                 url: `products/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getProduct'],
+            invalidatesTags: ['product'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
     }),

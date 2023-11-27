@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
- use Illuminate\Database\Eloquent\SoftDeletes; use Illuminate\Database\Eloquent\Factories\HasFactory;
+ use Illuminate\Database\Eloquent\SoftDeletes;
+ use Illuminate\Database\Eloquent\Factories\HasFactory;
 /**
  * @OA\Schema(
  *      schema="Department",
@@ -47,7 +48,8 @@ use Illuminate\Database\Eloquent\Model;
     public $fillable = [
         'organization_id',
         'branch_id',
-        'name'
+        'name',
+        'head_of_department',
     ];
 
     protected $casts = [
@@ -71,5 +73,10 @@ use Illuminate\Database\Eloquent\Model;
     public function organization(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\Organization::class, 'organization_id');
+    }
+
+    public function departmentHead(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'head_of_department');
     }
 }

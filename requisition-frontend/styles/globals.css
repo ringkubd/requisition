@@ -333,7 +333,7 @@
 .fade-exit-active{
     transition: opacity 500ms;
 }
-input:not([type=checkbox]):not([type=radio]), textarea, .select2-selection, select {
+input:not([type=checkbox]):not([type=radio]), textarea, .select2-selection, select, .select {
     @apply !bg-slate-100 !shadow-xl focus:!bg-slate-100
 }
 .select2-container--default .select2-selection--single {

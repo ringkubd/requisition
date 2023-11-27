@@ -64,14 +64,17 @@ class InitialRequisitionAPIController extends AppBaseController
      *      )
      * )
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request) : JsonResponse
     {
-        $initialRequisitions = $this->initialRequisitionRepository->all(
+        $initialRequisitions = $this->initialRequisitionRepository->allQuery(
             $request->except(['skip', 'limit']),
             $request->get('skip'),
             $request->get('limit')
-        );
-
+        )
+            ->where('department_id', auth_department_id())
+            ->where('branch_id', auth_branch_id())
+            ->latest()
+            ->get();
         return $this->sendResponse(
             InitialRequisitionResource::collection($initialRequisitions),
             __('messages.retrieved', ['model' => __('models/initialRequisitions.plural')])
@@ -120,6 +123,7 @@ class InitialRequisitionAPIController extends AppBaseController
         $initialRequisition = InitialRequisition::create([
             'user_id' => $request->user()->id,
             'department_id' => auth_department_id(),
+            'branch_id' => auth_branch_id(),
             'irf_no' => $irf_no,
             'ir_no' => 5,
             'estimated_cost' => $estimated_cost

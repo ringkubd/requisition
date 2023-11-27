@@ -31,15 +31,16 @@ const create = (props) => {
 
     useEffect(() => {
         if (selectedProductOptionId){
+            const unitPrice = products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.unit_price;
+            const quantity = products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.quantity_to_be_purchase;
+
             formikForm.current.setFieldValue('product_id',products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.product_id)
-            formikForm.current.setFieldValue('qty',products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.quantity_to_be_purchase)
-            formikForm.current.setFieldValue('unit_price',products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.unit_price)
+            formikForm.current.setFieldValue('qty',quantity?.toString())
+            formikForm.current.setFieldValue('unit_price',unitPrice?.toString())
+            formikForm.current.setFieldValue('total_price',(quantity * unitPrice)?.toString())
+            console.log(quantity * unitPrice)
         }
     }, [selectedProductOptionId])
-
-    useEffect(() => {
-        formikForm.current.setFieldValue('total_price',formikForm.current.values?.qty * formikForm.current.values?.unit_price);
-    }, [formikForm.current?.values])
 
     const initValues = {
         product_id: '',

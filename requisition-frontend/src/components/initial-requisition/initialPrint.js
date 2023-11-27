@@ -175,10 +175,10 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                             <h2 className={`border-t border-black px-4`}>Requisitor</h2>
                         </div>
                         <div>
-                            <h2 className={`border-t border-black px-4`}>Store</h2>
+                            <h2 className={`border-t border-black px-10`}>Store</h2>
                         </div>
                         <div>
-                            <h2 className={`border-t border-black px-4`}>Projects Department</h2>
+                            <h2 className={`border-t border-black px-10`}>Projects</h2>
                         </div>
                         <div>
                             <h2 className={`border-t border-black px-4`}>Chief Executive Officer</h2>

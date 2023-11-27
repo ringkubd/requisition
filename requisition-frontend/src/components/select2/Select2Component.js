@@ -19,7 +19,6 @@ const Select2Component = forwardRef(({options, onChange, ...other}, ref) => {
       const optionSelected = $("option:selected", this).data();
       const {data} = $(this).data()
       onChange(e, data, optionSelected);
-
     })
     $(selectRef.current).on('blur', function(e) {
       const {data} = $(this).data()
@@ -37,20 +36,23 @@ const Select2Component = forwardRef(({options, onChange, ...other}, ref) => {
   }));
 
   return (
-    <div className="w-full">
-      <select
-        ref={selectRef}
-        onChange={onChange}
-        {...other}
-      >
-        <option value=""></option>
-        {
-          options?.map((o, index) => <option data-other={JSON.stringify(o.other)} key={index} value={o.value}>{o.label}</option>)
-        }
-        {/* Add more options as needed */}
-      </select>
-    </div>
-  );
+      <div className="w-full">
+          <select
+              ref={selectRef}
+              {...other}>
+              <option value=""></option>
+              {options?.map((o, index) => (
+                  <option
+                      data-other={JSON.stringify(o.other)}
+                      key={index}
+                      value={o.value}>
+                      {o.label}
+                  </option>
+              ))}
+              {/* Add more options as needed */}
+          </select>
+      </div>
+  )
 });
 
 Select2Component.defaultProps= {

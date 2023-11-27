@@ -71,10 +71,13 @@ use Illuminate\Database\Eloquent\Model;
  * )
  */class InitialRequisition extends Model
 {
-     use SoftDeletes;    use HasFactory;    public $table = 'initial_requisitions';
+     use SoftDeletes;
+     use HasFactory;
+     public $table = 'initial_requisitions';
 
     public $fillable = [
         'user_id',
+        'branch_id',
         'department_id',
         'irf_no',
         'ir_no',
@@ -107,6 +110,11 @@ use Illuminate\Database\Eloquent\Model;
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'user_id');
+    }
+
+    public function branch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo

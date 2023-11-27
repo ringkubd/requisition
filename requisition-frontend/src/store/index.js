@@ -40,6 +40,7 @@ import { CountryApiService } from "@/store/service/country";
 import { UnitsApiService } from "@/store/service/units";
 import { RolesApiService } from "@/store/service/roles";
 import { PermissionsApiService } from "@/store/service/permissions";
+import { errorSlice } from "@/store/slice/errorSlice";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -75,6 +76,7 @@ const persistConfig = {
 
 const combineReducer = combineReducers({
     users: userSlice.reducer,
+    errors: errorSlice.reducer,
     purchase_requisition_inputs: PurchaseRequisitionInputChangeSlice.reducer,
     [OrganizationApiService.reducerPath]: OrganizationApiService.reducer,
     [BranchApiService.reducerPath]: BranchApiService.reducer,

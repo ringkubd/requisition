@@ -15,10 +15,6 @@ const AppLayout = ({ header, children }) => {
             router.reload();
         }
     }
-    useEffect(() => {
-      // router.push('/login')
-    })
-
     const [load, setLoad] = useState(false);
     useEffect(() => {
         const handleRouteChange = (url, { shallow }) => {

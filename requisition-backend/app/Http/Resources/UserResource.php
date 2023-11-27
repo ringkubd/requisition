@@ -33,6 +33,7 @@ class UserResource extends JsonResource
             'departments' => $this->departments,
             'department_name' => ucwords(implode(',',$this->departments->pluck('name')->toArray())),
             'department_id' => $this->departments->pluck('id')->toArray(),
+            'selected_department' => auth_department_id(),
             'designations' => $this->designations,
             'designation_name' => implode(',',$this->designations->pluck('name')->toArray()),
             'designation_id' => $this->designations->pluck('id')->toArray(),

@@ -64,12 +64,6 @@ const View = (props) => {
                                                     <Table.HeadCell>Status</Table.HeadCell>
                                                     <Table.Cell>{data?.data?.status}</Table.Cell>
                                                 </Table.Row>
-                                                <Table.Row>
-                                                    <Table.HeadCell>Action</Table.HeadCell>
-                                                    <Table.Cell>
-                                                        <Actions />
-                                                    </Table.Cell>
-                                                </Table.Row>
                                             </Table.Body>
                                         </Table>
                                     )
@@ -92,7 +86,6 @@ const View = (props) => {
                                                     <Table.HeadCell>SKU</Table.HeadCell>
                                                     <Table.HeadCell>Stock</Table.HeadCell>
                                                     <Table.HeadCell>Notes</Table.HeadCell>
-                                                    <Table.HeadCell>Actions</Table.HeadCell>
                                                 </Table.Head>
                                                 <Table.Body>
                                                     {
@@ -104,9 +97,6 @@ const View = (props) => {
                                                                 <Table.Cell>{p?.sku}</Table.Cell>
                                                                 <Table.Cell>{p.stock}</Table.Cell>
                                                                 <Table.Cell>{p?.notes}</Table.Cell>
-                                                                <Table.Cell>
-                                                                    <Actions />
-                                                                </Table.Cell>
                                                             </Table.Row>
                                                         ))
                                                     }

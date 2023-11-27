@@ -57,9 +57,11 @@ use Illuminate\Database\Eloquent\Model;
  * )
  */class ProductOption extends Model
 {
-     use SoftDeletes;    use HasFactory;    public $table = 'product_options';
+     use SoftDeletes;
+     use HasFactory;
+     public $table = 'product_options';
 
-    public $fillable = [
+    protected $fillable = [
         'product_id',
         'option_id',
         'sku',

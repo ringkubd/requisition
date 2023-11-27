@@ -63,8 +63,12 @@ class UserAPIController extends AppBaseController
     {
         $user = \request()->user();
         $user->can('Super Admin');
-        $users = User::whereHas('branches', function($branch){
-            $branch->where('id', auth_branch_id());
+        $users = User::whereHas('branches', function($branch) use ($request){
+            $branch->when($request->branch_id, function ($q, $b){
+                $q->where('id', $b);
+            }, function ($q){
+                $q->where('id', auth_branch_id());
+            });
         })->get();
         return $this->sendResponse(
             UserResource::collection($users),
@@ -297,5 +301,9 @@ class UserAPIController extends AppBaseController
             $id,
             __('messages.deleted', ['model' => __('models/users.singular')])
         );
+    }
+
+    public function userByBranch(){
+
     }
 }

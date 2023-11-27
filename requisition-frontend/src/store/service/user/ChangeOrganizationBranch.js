@@ -24,12 +24,20 @@ export const ChangeOrganizationBranchApi = createApi({
                 body: arg,
             }),
         }),
+        setDepartment: builder.mutation({
+            query: arg => ({
+                url: 'change-departments',
+                method: 'POST',
+                body: arg,
+            }),
+        }),
     }),
 })
 
 export const {
   useSetBranchMutation,
   useSetOrganizationMutation,
+  useSetDepartmentMutation,
   util: {
     getRunningQueriesThunk
   }
