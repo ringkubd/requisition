@@ -33,6 +33,7 @@ const Edit = (props) => {
   useEffect(() => {
     if (!isError && !isLoading && data){
       setSelectedOrganization(data?.data?.organization_id);
+      setSelectedBranch(data?.data?.branch_id)
     }
   }, [data, isLoading, isError]);
   useEffect(() => {
