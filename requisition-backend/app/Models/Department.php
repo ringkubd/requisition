@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
- use Illuminate\Database\Eloquent\SoftDeletes;
- use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OpenApi\Annotations as OA;
+
 /**
  * @OA\Schema(
  *      schema="Department",
- *      required={"organization_id","branch_id","name"},
+ *      required={"organization_id","branch_id","name", "head_of_department"},
  *      @OA\Property(
  *          property="name",
  *          description="",
@@ -40,10 +43,17 @@ use Illuminate\Database\Eloquent\Model;
  *          type="string",
  *          format="date-time"
  *      )
- * )
- */class Department extends Model
+ *      @QA\Property(
+ *          property="head_of_department",
+ *          description="",
+ *          readOnly=true,
+ *          nullable=true,
+ *          type=integer,
+ *      )
+ */
+class Department extends Model
 {
-     use SoftDeletes;    use HasFactory;    public $table = 'departments';
+    use SoftDeletes;    use HasFactory;    public $table = 'departments';
 
     public $fillable = [
         'organization_id',
@@ -75,6 +85,9 @@ use Illuminate\Database\Eloquent\Model;
         return $this->belongsTo(\App\Models\Organization::class, 'organization_id');
     }
 
+    /**
+     * @return BelongsTo
+     */
     public function departmentHead(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'head_of_department');

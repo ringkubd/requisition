@@ -75,6 +75,7 @@ const PurchaseRequisition = () => {
                         print={`/purchase-requisition/${row.id}/print_view`}
                         edit={moment(row.created_at).format("YYYY-MM-DD") == moment().format("YYYY-MM-DD") ? `/purchase-requisition/${row.id}/edit` : false}
                         destroy={destroy}
+                        item={row}
                         progressing={destroyResponse.isLoading}
                         permissionModule={`purchase-requisitions`}
                     />,

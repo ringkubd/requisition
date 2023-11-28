@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateInitialRequisitionAPIRequest;
 use App\Http\Requests\API\UpdateInitialRequisitionAPIRequest;
 use App\Http\Resources\ProductResource;
+use App\Models\Department;
 use App\Models\InitialRequisition;
 use App\Models\InitialRequisitionProduct;
 use App\Models\Product;
@@ -15,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\InitialRequisitionResource;
+use OpenApi\Annotations as OA;
 
 /**
  * Class InitialRequisitionController
@@ -241,11 +243,17 @@ class InitialRequisitionAPIController extends AppBaseController
      */
     public function update($id, Request $request): JsonResponse
     {
-//        return response()->json($request->all());
         /** @var InitialRequisition $initialRequisition */
         $initialRequisition = $this->initialRequisitionRepository->find($id);
 
         if (empty($initialRequisition)) {
+            return $this->sendError(
+                __('messages.not_found', ['model' => __('models/initialRequisitions.singular')])
+            );
+        }
+        $user = $request->user();
+        $department = Department::find(auth_department_id());
+        if ($initialRequisition->user_id !== $user->id && !$user->hasRole('Super Admin') && !$user->hasRole('Store Manager') && $department->head_of_department !=  $user->id){
             return $this->sendError(
                 __('messages.not_found', ['model' => __('models/initialRequisitions.singular')])
             );
@@ -255,7 +263,7 @@ class InitialRequisitionAPIController extends AppBaseController
         $estimated_cost = collect($allProduct)->sum('estimated_cost');
 
         $initialRequisition = $this->initialRequisitionRepository->update([
-            'user_id' => $request->user()->id,
+            'user_id' => $user->id,
             'estimated_cost' => $estimated_cost
         ], $id);
 

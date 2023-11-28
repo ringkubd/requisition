@@ -145,6 +145,7 @@ const InitialRequisitionCreate = (props) => {
       cell: (row) => <Actions
         itemId={row.id}
         destroy={() => removeItem(row)}
+        permissionModule={`add`}
         progressing={submitRemoveProcessing}
       />,
       ignoreRowClick: true,
