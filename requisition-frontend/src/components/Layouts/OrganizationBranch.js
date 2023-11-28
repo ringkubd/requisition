@@ -1,18 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { Label, Select } from "flowbite-react";
+import { Select } from "flowbite-react";
 import {
     useSetBranchMutation,
     useSetDepartmentMutation,
     useSetOrganizationMutation
 } from "@/store/service/user/ChangeOrganizationBranch";
+import {
+    useGetNavigationBranchQuery,
+    useGetNavigationDepartmentQuery,
+    useGetNavigationOrganizationQuery
+} from "@/store/service/navigation";
 export default function OrganizationBranch({user, changingEffect}){
-    const { organizations, branches, selected_organization, selected_branch, departments, selected_department } = user ?? {};
+    const { selected_organization, selected_branch, selected_department } = user ?? {};
     const [organization_id, setOrganizationId] = useState(selected_organization);
     const [branch_id, setBranchId] = useState(selected_branch);
     const [department_id, setDepartmentId] = useState(selected_department);
     const [updateOrganization, updateOrganizationResult] = useSetOrganizationMutation();
     const [updateBranch, updateBranchResult] = useSetBranchMutation();
     const [updateDepartment, updateDepartmentResult] = useSetDepartmentMutation();
+    const {data: organizations, isLoading: organizationISLoading} = useGetNavigationOrganizationQuery();
+    const {data: branches, isLoading: branchISLoading} = useGetNavigationBranchQuery({organization_id}, {
+        skip: !selected_organization
+    });
+    const {data: departments, isLoading: departmentISLoading} = useGetNavigationDepartmentQuery({branch_id}, {
+        skip: !branch_id
+    });
 
     useEffect(() => {
         if (selected_branch){
@@ -34,7 +46,7 @@ export default function OrganizationBranch({user, changingEffect}){
     return (
         <div className="max-w-7xl flex flex-row mx-auto py-6 px-4 my-1 sm:px-6 lg:px-8 gap-2">
             {
-                organizations?.length > 1 && (
+                organizations?.data?.length > 1 && (
                     <label htmlFor={`user_organization_id`} className={`flex flex-row items-center`}>
                         Organization
                         <Select
@@ -47,14 +59,14 @@ export default function OrganizationBranch({user, changingEffect}){
                         >
                             <option></option>
                             {
-                                organizations?.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)
+                                organizations?.data?.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)
                             }
                         </Select>
                     </label>
                 )
             }
             {
-                branches?.length > 1 && (
+                branches?.data?.length > 1 && (
                     <label htmlFor={'user_branch_id'} className={`flex flex-row items-center`}>
                         Branch
                         <Select
@@ -67,14 +79,14 @@ export default function OrganizationBranch({user, changingEffect}){
                         >
                             <option></option>
                             {
-                                branches?.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)
+                                branches?.data?.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)
                             }
                         </Select>
                     </label>
                 )
             }
             {
-                departments?.length > 1 && (
+                departments?.data?.length > 1 && (
                     <label htmlFor={`user_department_id`} className={`flex flex-row items-center`}>
                         Departments
                         <Select
@@ -87,7 +99,7 @@ export default function OrganizationBranch({user, changingEffect}){
                         >
                             <option></option>
                             {
-                                departments?.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)
+                                departments?.data?.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)
                             }
                         </Select>
                     </label>

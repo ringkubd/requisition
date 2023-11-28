@@ -15,8 +15,7 @@ const onQueryStartedErrorToast = async (args, {  dispatch,
     } catch (error) {
         const {error: baseError} = error;
         if (baseError){
-            dispatch(setError({status: baseError.status, message: baseError.data.message}));
-            console.log(baseError.status, Math.random())
+            dispatch(setError({status: baseError?.status ?? null, message: baseError?.data?.message ?? null}));
             switch (baseError.status) {
                 case 403:
                     typeof window !== 'undefined' && Router.push('/403');

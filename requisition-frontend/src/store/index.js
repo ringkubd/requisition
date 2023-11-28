@@ -41,6 +41,7 @@ import { UnitsApiService } from "@/store/service/units";
 import { RolesApiService } from "@/store/service/roles";
 import { PermissionsApiService } from "@/store/service/permissions";
 import { errorSlice } from "@/store/slice/errorSlice";
+import { NavigationAPIService } from "@/store/service/navigation";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -62,7 +63,8 @@ const middlewares = [
     CountryApiService.middleware,
     UnitsApiService.middleware,
     RolesApiService.middleware,
-    PermissionsApiService.middleware
+    PermissionsApiService.middleware,
+    NavigationAPIService.middleware,
 ];
 
 const persistConfig = {
@@ -102,6 +104,7 @@ const combineReducer = combineReducers({
     [UnitsApiService.reducerPath]: UnitsApiService.reducer,
     [RolesApiService.reducerPath]: RolesApiService.reducer,
     [PermissionsApiService.reducerPath]: PermissionsApiService.reducer,
+    [NavigationAPIService.reducerPath]: NavigationAPIService.reducer,
 });
 
 const _persistedReducer = persistReducer(persistConfig, combineReducer);
