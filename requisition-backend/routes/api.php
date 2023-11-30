@@ -71,15 +71,19 @@ Route::get('suppliers-select', [PurchaseAPIController::class, 'suppliers']);
 Route::get('purchase-requisition-select', [PurchaseAPIController::class, 'purchaseRequisition']);
 
 Route::get('last-purchase-information', [InitialRequisitionAPIController::class, 'lastPurchase']);
-Route::post('change-branch', function (Request $request){
-    cache()->forget('select_branch');
-    cache()->put('select_branch',$request->branch_id);
-    return cache()->get('select_branch');
-});
+
 Route::post('change-organization', function (Request $request){
     cache()->forget('select_organization');
     cache()->put('select_organization',$request->organization_id);
+    cache()->forget('select_branch');
+    cache()->forget('select_department');
     return cache()->get('select_organization');
+});
+Route::post('change-branch', function (Request $request){
+    cache()->forget('select_branch');
+    cache()->forget('select_department');
+    cache()->put('select_branch',$request->branch_id);
+    return cache()->get('select_branch');
 });
 Route::post('change-departments', function (Request $request){
     cache()->forget('select_department');

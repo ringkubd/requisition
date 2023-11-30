@@ -73,13 +73,14 @@ class InitialRequisitionAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
-            ->where('department_id', auth_department_id())
+//            ->where('department_id', auth_department_id())
             ->where('branch_id', auth_branch_id())
             ->latest()
             ->get();
+        $branch_id = auth_department_id();
         return $this->sendResponse(
             InitialRequisitionResource::collection($initialRequisitions),
-            __('messages.retrieved', ['model' => __('models/initialRequisitions.plural')])
+            __("messages.retrieved $branch_id", ['model' => __('models/initialRequisitions.plural')])
         );
     }
 
