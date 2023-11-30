@@ -21,7 +21,7 @@ const Actions = ({edit, destroy, view , itemId, progressing, print, other, permi
     }
 
     function checkPermission(permission){
-        const selected_department = user.departments.filter(d => d.id === parseInt(user.selected_department))[0]
+        const selected_department = user?.departments?.filter(d => d.id === parseInt(user.selected_department))[0]
         if (user){
             const roles = user.role_object
             const permissions = user.permissions;

@@ -75,7 +75,7 @@ const Organization = () => {
           }
       >
           <Head>
-              <title>Add new organization</title>
+              <title>Organization Management.</title>
           </Head>
           <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
               <Card>

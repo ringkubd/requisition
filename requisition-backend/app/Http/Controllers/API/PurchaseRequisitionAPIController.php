@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Requests\API\CreatePurchaseRequisitionAPIRequest;
 use App\Http\Requests\API\UpdatePurchaseRequisitionAPIRequest;
 use App\Http\Resources\InitialRequisitionResource;
 use App\Models\InitialRequisition;
@@ -13,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\PurchaseRequisitionResource;
+use OpenApi\Annotations as OA;
 
 /**
  * Class PurchaseRequisitionController

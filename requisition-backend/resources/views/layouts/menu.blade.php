@@ -153,3 +153,24 @@
         <p>@lang('models/measurementUnits.plural')</p>
     </a>
 </li>
+
+<li class="nav-item">
+    <a href="{{ route('cashProducts.index') }}" class="nav-link {{ Request::is('cashProducts*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/cashProducts.plural')</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('cashRequisitions.index') }}" class="nav-link {{ Request::is('cashRequisitions*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/cashRequisitions.plural')</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('cashRequisitionItems.index') }}" class="nav-link {{ Request::is('cashRequisitionItems*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/cashRequisitionItems.plural')</p>
+    </a>
+</li>

@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\IrfNo;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use InfyOm\Generator\Utils\ResponseUtil;
 
 /**
@@ -31,5 +35,18 @@ class AppBaseController extends Controller
             'success' => true,
             'message' => $message
         ], 200);
+    }
+
+    public function newIRFNO(){
+        $id = DB::table('irf_nos')->max('id');
+        if (!$id){
+            $statement = DB::select("show table status like 'irf_nos'");
+            $id = $statement[0]->Auto_increment;
+        }else{
+            $id++;
+        }
+        $year = Carbon::now()->format('y');
+        $department = auth_department_name();
+        return $id.'/'.$year.'/'.$department;
     }
 }

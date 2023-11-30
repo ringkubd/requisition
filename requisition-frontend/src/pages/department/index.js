@@ -75,7 +75,7 @@ const Department = () => {
           }
       >
           <Head>
-              <title>Add new department</title>
+              <title>Department Management.</title>
           </Head>
           <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
               <Card>

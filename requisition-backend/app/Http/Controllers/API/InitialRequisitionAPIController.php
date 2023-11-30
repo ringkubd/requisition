@@ -116,9 +116,7 @@ class InitialRequisitionAPIController extends AppBaseController
      */
     public function store(Request $request): JsonResponse
     {
-        $lastRequisition = InitialRequisition::latest()->first();
-        $year = Carbon::now()->format('y');
-        $irf_no = ($lastRequisition?->id ?? 0 + 1) .'/'.$year.'/'.auth_department_name();
+        $irf_no = $this->newIRFNO();
         $allProduct = $request->all();
         $estimated_cost = collect($allProduct)->sum('estimated_cost');
 
@@ -129,6 +127,9 @@ class InitialRequisitionAPIController extends AppBaseController
             'irf_no' => $irf_no,
             'ir_no' => 5,
             'estimated_cost' => $estimated_cost
+        ]);
+        $initialRequisition->irfNos()->create([
+            'irf_no' => $irf_no
         ]);
         $allProduct = array_map(function($p){
             unset($p['estimated_cost']);

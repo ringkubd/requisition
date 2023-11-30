@@ -131,4 +131,8 @@ use Illuminate\Database\Eloquent\Model;
     {
         return $this->hasOne(\App\Models\PurchaseRequisition::class, 'initial_requisition_id');
     }
+    public function irfNos(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(IrfNo::class, 'model');
+    }
 }

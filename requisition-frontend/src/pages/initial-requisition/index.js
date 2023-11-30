@@ -27,7 +27,7 @@ const InitialRequisition = () => {
 
     useEffect(() => {
         if (!destroyResponse.isLoading && destroyResponse.isSuccess){
-            toast.success('Options deleted.')
+            toast.success('Requisition deleted.')
         }
     }, [destroyResponse])
     useEffect(() => {

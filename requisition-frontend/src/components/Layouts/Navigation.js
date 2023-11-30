@@ -108,6 +108,21 @@ const Navigation = ({ user }) => {
                                           </DropdownLink>
                                         ): ""
                                     }
+                                    {
+                                        checkPermission([
+                                            'view_cash-requisitions',
+                                            'create_cash-requisitions',
+                                            'update_cash-requisitions',
+                                            'delete_cash-requisitions',
+                                        ]) ?(
+                                            <DropdownLink
+                                                href="/cash-requisition"
+                                                active={router.pathname.includes('cash-requisition').toString()}
+                                            >
+                                                Cash
+                                            </DropdownLink>
+                                        ) : ""
+                                    }
                                 </Dropdown>
                               ): ""
                           }

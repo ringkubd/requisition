@@ -42,6 +42,7 @@ import { RolesApiService } from "@/store/service/roles";
 import { PermissionsApiService } from "@/store/service/permissions";
 import { errorSlice } from "@/store/slice/errorSlice";
 import { NavigationAPIService } from "@/store/service/navigation";
+import { CashRequisitionAPIService } from "@/store/service/cash/Index";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -65,6 +66,7 @@ const middlewares = [
     RolesApiService.middleware,
     PermissionsApiService.middleware,
     NavigationAPIService.middleware,
+    CashRequisitionAPIService.middleware,
 ];
 
 const persistConfig = {
@@ -105,6 +107,7 @@ const combineReducer = combineReducers({
     [RolesApiService.reducerPath]: RolesApiService.reducer,
     [PermissionsApiService.reducerPath]: PermissionsApiService.reducer,
     [NavigationAPIService.reducerPath]: NavigationAPIService.reducer,
+    [CashRequisitionAPIService.reducerPath]: CashRequisitionAPIService.reducer,
 });
 
 const _persistedReducer = persistReducer(persistConfig, combineReducer);

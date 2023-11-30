@@ -48,3 +48,6 @@ Route::resource('roles', App\Http\Controllers\RoleController::class);
 Route::resource('permissions', App\Http\Controllers\PermissionController::class);
 Route::resource('countries', App\Http\Controllers\CountryController::class);
 Route::resource('measurement-units', App\Http\Controllers\MeasurementUnitController::class);
+Route::resource('cash-products', App\Http\Controllers\CashProductController::class);
+Route::resource('cash-requisitions', App\Http\Controllers\CashRequisitionController::class);
+Route::resource('cash-requisition-items', App\Http\Controllers\CashRequisitionItemController::class);

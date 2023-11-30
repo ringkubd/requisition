@@ -137,3 +137,13 @@ Route::resource('countries', App\Http\Controllers\API\CountryAPIController::clas
 
 Route::resource('measurement-units', App\Http\Controllers\API\MeasurementUnitAPIController::class)
     ->except(['create', 'edit']);
+
+
+Route::resource('cash-products', App\Http\Controllers\API\CashProductAPIController::class)
+    ->except(['create', 'edit']);
+
+Route::resource('cash-requisitions', App\Http\Controllers\API\CashRequisitionAPIController::class)
+    ->except(['create', 'edit']);
+
+Route::resource('cash-requisition-items', App\Http\Controllers\API\CashRequisitionItemAPIController::class)
+    ->except(['create', 'edit']);

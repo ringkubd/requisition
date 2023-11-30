@@ -23,6 +23,8 @@ const onQueryStartedErrorToast = async (args, {  dispatch,
                 case 500:
                     typeof window !== 'undefined' && Router.push('/500');
                     break;
+                case 422:
+                    break;
                 default:
                     typeof window !== 'undefined' && Router.push('/404');
             }

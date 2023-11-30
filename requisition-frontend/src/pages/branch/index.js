@@ -70,7 +70,7 @@ const Branch = () => {
           }
       >
           <Head>
-              <title>Add new branch</title>
+              <title>Branch Management.</title>
           </Head>
           <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
               <Card>
