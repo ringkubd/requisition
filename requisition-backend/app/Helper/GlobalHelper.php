@@ -50,7 +50,7 @@ if (!function_exists('auth_branch_id')){
         if (Cache::has('select_branch')) {
             return Cache::get('select_branch');
         }
-        return auth()->user()->branches->first()?->id; // login branch organization id
+        return auth()->user()->branches->where('organization_id', auth_organization_id())->first()?->id; // login branch organization id
     }
 }
 
@@ -59,7 +59,7 @@ if (!function_exists('auth_department_id')){
         if (Cache::has('select_department')) {
             return Cache::get('select_department');
         }
-        return auth()->user()->departments->first()?->id; // login branch organization id
+        return auth()->user()->departments->where('branch_id', auth_branch_id())->first()?->id; // login department id
     }
 }
 if (!function_exists('auth_department_name')){
