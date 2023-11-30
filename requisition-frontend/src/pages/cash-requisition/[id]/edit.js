@@ -63,7 +63,7 @@ const Edit = (props) => {
     }
     if (!updateResult.isLoading && updateResult.isSuccess){
       toast.success('Product Options stored successfully.')
-      router.push('/initial-requisition')
+      router.push('/cash-requisition')
     }
   }, [updateResult]);
   const submit = () => {

@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\CashRequisitionResource;
+use OpenApi\Annotations as OA;
 
 /**
  * Class CashRequisitionController
@@ -217,7 +218,7 @@ class CashRequisitionAPIController extends AppBaseController
      *      )
      * )
      */
-    public function update($id, UpdateCashRequisitionAPIRequest $request): JsonResponse
+    public function update($id, Request $request): JsonResponse
     {
         $input = $request->all();
 
@@ -230,7 +231,18 @@ class CashRequisitionAPIController extends AppBaseController
             );
         }
 
-        $cashRequisition = $this->cashRequisitionRepository->update($input, $id);
+        $cashRequisition = $this->cashRequisitionRepository->update([
+            'total_cost' => collect($input)->sum('cost')
+        ], $id);
+
+        $newItems =collect($input)->map(function ($a) {
+            return collect($a)->except(['cost']);
+        });
+
+        if ($cashRequisition){
+            $cashRequisition->cashRequisitionItems()->delete();
+            $cashRequisition->cashRequisitionItems()->createMany($newItems->toArray());
+        }
 
         return $this->sendResponse(
             new CashRequisitionResource($cashRequisition),

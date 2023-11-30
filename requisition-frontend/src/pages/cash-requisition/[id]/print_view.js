@@ -6,7 +6,6 @@ import NavLink from "@/components/navLink";
 import React, { useRef } from "react";
 
 import { useReactToPrint } from "react-to-print";
-import CashPrintOld from "@/components/cash-requisition/CashPrintOld";
 import { useGetSingleCashRequisitionQuery } from "@/store/service/cash/Index";
 import CashPrint from "@/components/cash-requisition/CashPrint";
 

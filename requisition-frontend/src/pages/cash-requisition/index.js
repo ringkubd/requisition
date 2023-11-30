@@ -3,7 +3,7 @@ import Head from "next/head";
 import { Button, Card, Datepicker, TextInput } from "flowbite-react";
 import NavLink from "@/components/navLink";
 import moment from "moment/moment";
-import { AiFillShopping, AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineSearch } from "react-icons/ai";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
