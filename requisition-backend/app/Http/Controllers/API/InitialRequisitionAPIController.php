@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\InitialRequisitionEvent;
 use App\Http\Requests\API\CreateInitialRequisitionAPIRequest;
 use App\Http\Requests\API\UpdateInitialRequisitionAPIRequest;
 use App\Http\Resources\ProductResource;
@@ -76,7 +77,7 @@ class InitialRequisitionAPIController extends AppBaseController
             ->when($request->date, function ($q, $date){
                 $q->whereRaw("date(created_at) = '$date'");
             })
-//            ->where('department_id', auth_department_id())
+            ->where('department_id', auth_department_id())
             ->where('branch_id', auth_branch_id())
             ->latest()
             ->get();
@@ -146,7 +147,7 @@ class InitialRequisitionAPIController extends AppBaseController
             return $p;
         }, $allProduct);
         $initialRequisition->initialRequisitionProducts()->createMany($allProduct);
-
+        broadcast(new InitialRequisitionEvent());
         return $this->sendResponse(
             new InitialRequisitionResource($initialRequisition),
             __('messages.saved', ['model' => __('models/initialRequisitions.singular')])

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\CategoryAPIController;
 use App\Http\Controllers\API\InitialRequisitionAPIController;
+use App\Http\Controllers\API\NavigationAPIController;
 use App\Http\Controllers\API\PurchaseAPIController;
 use App\Http\Controllers\API\PurchaseRequisitionAPIController;
 use App\Http\Controllers\API\RoleAPIController;
@@ -91,9 +92,9 @@ Route::post('change-departments', function (Request $request){
     return cache()->get('select_department');
 });
 
-Route::get('navigation-organization', [\App\Http\Controllers\API\NavigationAPIController::class, 'organization']);
-Route::get('navigation-branch', [\App\Http\Controllers\API\NavigationAPIController::class, 'branch']);
-Route::get('navigation-department', [\App\Http\Controllers\API\NavigationAPIController::class, 'department']);
+Route::get('navigation-organization', [NavigationAPIController::class, 'organization']);
+Route::get('navigation-branch', [NavigationAPIController::class, 'branch']);
+Route::get('navigation-department', [NavigationAPIController::class, 'department']);
 
 
 Route::get('initial_requisition_for_initiate_purchase', [PurchaseRequisitionAPIController::class, 'getInitialRequisition']);
