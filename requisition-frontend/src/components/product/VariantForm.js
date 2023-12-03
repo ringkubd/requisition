@@ -5,9 +5,9 @@ import { setProductOptionsLocal } from "@/store/service/options/optionSlice";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef } from "react";
-import { useGetOptionsQuery } from "@/store/service/options";
-import Select2Component from "@/components/select2/Select2Component";
+import { useGetOptionsQuery, useStoreOptionsMutation } from "@/store/service/options";
 import { setActiveForm } from "@/store/service/product/product_active_form";
+import Creatable from 'react-select/creatable';
 
 export default function VariantForm(props) {
     const options = useGetOptionsQuery();
@@ -15,6 +15,7 @@ export default function VariantForm(props) {
     const dispatch = useDispatch();
     const {variant} = props;
     const selectRef = useRef();
+    const [createOption, createOptionResponse] = useStoreOptionsMutation();
 
     useEffect(() => {
         if (variant){
@@ -28,6 +29,7 @@ export default function VariantForm(props) {
         sku: '',
         option_value: '',
         notes: '',
+        stock: ''
     }
 
     const submitOptions = (values, props) => {
@@ -59,6 +61,11 @@ export default function VariantForm(props) {
         {
             name: 'SKU',
             selector: row => row?.sku,
+            sortable: true,
+        },
+        {
+            name: 'Stock',
+            selector: row => row?.stock,
             sortable: true,
         },
         {
@@ -112,16 +119,21 @@ export default function VariantForm(props) {
                                         value="Option"
                                     />
                                 </div>
-                                <Select2Component
+                                <Creatable
                                     id='option_id'
                                     ref={selectRef}
                                     name='option_id'
                                     options={options?.data?.data.map(m => ({value: m.id, label: m.name}))}
                                     loading={options.isLoading ? "": ''}
-                                    onChange={handleChange}
-                                    value={values.opiton_id}
+                                    onChange={(newValue) => setFieldValue('option_id', newValue?.value)}
+                                    value={options?.data?.data.filter(od => parseInt(od.id) === parseInt(values.opiton_id))[0]}
                                     data-placeholder="Select options..."
-                                    className={`w-full border-1 border-gray-300`}
+                                    className={`select`}
+                                    isClearable
+                                    onCreateOption={(inputValue) => createOption({name: inputValue})}
+                                    classNames={{
+                                        control: state => 'select'
+                                    }}
                                 />
                                 <ErrorMessage
                                     name="opiton_id"
@@ -196,6 +208,31 @@ export default function VariantForm(props) {
                                 />
                                 <ErrorMessage
                                     name="notes"
+                                    render={msg => (
+                                        <span className="text-red-500">{msg}</span>
+                                    )}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-row gap-4">
+                            <div className="w-full">
+                                <div className="mb-2 block">
+                                    <Label
+                                        htmlFor="stock"
+                                        value="Stock"
+                                    />
+                                </div>
+                                <TextInput
+                                    id={`stock`}
+                                    name={`stock`}
+                                    type={`number`}
+                                    step={0.1}
+                                    value={values.stock}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                />
+                                <ErrorMessage
+                                    name="stock"
                                     render={msg => (
                                         <span className="text-red-500">{msg}</span>
                                     )}

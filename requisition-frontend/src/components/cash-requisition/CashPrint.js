@@ -119,7 +119,7 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         <div className={`flex flex-col`}>
                                             <div className={`flex flex-row justify-between`}>
                                                 <div>
-                                                    <input type="checkbox" className={`form-checkbox mr-2`} />
+                                                    <input type="checkbox" checked={true} className={`form-checkbox mr-2`} />
                                                     <label htmlFor="">Cash</label>
                                                 </div>
                                                 <div>

@@ -53,16 +53,16 @@ const CashRequisition = () => {
         },
         {
           name: 'Created at',
-          selector: row => row.created_at,
+          selector: row => moment(row.created_at).format("Y-MM-DD mm:ss"),
           sortable: true,
         },
         {
           name: 'Actions',
           cell: (row) => <Actions
             itemId={row.id}
-            edit={!row.is_purchase_requisition_generated ? `/cash-requisition/${row.id}/edit`: false}
+            edit={!moment(row.created_at).diff(moment(), 'days') > 1 ? `/cash-requisition/${row.id}/edit`: false}
             print={`/cash-requisition/${row.id}/print_view`}
-            destroy={!row.is_purchase_requisition_generated ? destroy : false}
+            destroy={!moment(row.created_at).diff(moment(), 'days') > 1 ? destroy : false}
             progressing={destroyResponse.isLoading}
             permissionModule={`cash-requisitions`}
             item={row}
@@ -96,24 +96,27 @@ const CashRequisition = () => {
             </Head>
           <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
             <Card>
-              <div className="flex flex-row space-x-4 space-y-4 shadow-lg py-4 px-4">
+              <div className="flex flex-row space-x-4 shadow-lg py-4 px-4">
                 <NavLink
                   active={router.pathname === 'cash-requisition/create'}
                   href={`cash-requisition/create`}
                 >
                   <Button>Create</Button>
                 </NavLink>
-                <div>
-                  <Datepicker
-                    onSelectedDateChanged={(date) => setSearch({...search, date: moment(date).format('Y-MM-DD')})}
-                  />
-                </div>
-                <div>
-                  <TextInput
-                    icon={AiOutlineSearch}
-                    onBlur={changeSearchInput}
-                  />
-                </div>
+                  <div className={`flex flex-row px-1 leading-5`}>
+                      <div>
+                          <Datepicker
+                              onSelectedDateChanged={(date) => setSearch({...search, date: moment(date).format('Y-MM-DD')})}
+                              datepicker-format="mm-yyyy"
+                          />
+                      </div>
+                      <div>
+                          <TextInput
+                              icon={AiOutlineSearch}
+                              onBlur={changeSearchInput}
+                          />
+                      </div>
+                  </div>
               </div>
               <DataTable
                 columns={columns}

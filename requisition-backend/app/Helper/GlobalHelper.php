@@ -1,12 +1,14 @@
 <?php
 
+use App\Models\Branch;
+use App\Models\Organization;
 use Illuminate\Support\Facades\Cache;
 
 if (!function_exists('auth_organizations')) {
     function auth_organizations()
     {
         if (auth()->user()->hasRole('administrator')) {
-            return \App\Models\Organization::get();
+            return Organization::get();
         }
         return auth()->user()->organizations;
     }
@@ -28,7 +30,7 @@ if (!function_exists('auth_organization_name')) {
     {
         if (Cache::has('select_organization')) {
             $organizationId = Cache::get('select_organization');
-            return \App\Models\Organization::where('id', $organizationId)->first()->name ?? 'Not Found';
+            return Organization::where('id', $organizationId)->first()->name ?? 'Not Found';
         }
 
         return auth()->user()->organizations->first()?->name ?? 'Fail To set'; // login branch organization name
@@ -39,7 +41,7 @@ if (!function_exists('auth_branches')){
         $organization_id = auth_organization_id();
 
         if (auth()->user()->hasRole('administrator')) {
-            return \App\Models\Branch::where('organization_id', $organization_id)->get();
+            return Branch::where('organization_id', $organization_id)->get();
         }
         return auth()->user()->branches->where('organization_id', $organization_id);
     }

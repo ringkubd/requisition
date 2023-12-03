@@ -56,11 +56,16 @@ class CashRequisitionAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $cashRequisitions = $this->cashRequisitionRepository->all(
+        $cashRequisitions = $this->cashRequisitionRepository->allQuery(
             $request->except(['skip', 'limit']),
             $request->get('skip'),
             $request->get('limit')
-        );
+        )
+            ->when($request->date, function ($q, $date){
+                $q->whereRaw("date(created_at) = '$date'");
+            })
+            ->latest()
+            ->get();
 
         return $this->sendResponse(
             CashRequisitionResource::collection($cashRequisitions),
