@@ -86,7 +86,7 @@ export default function OrganizationBranch({user, changingEffect}){
                 )
             }
             {
-                departments?.data?.length > 1 && (
+
                     <label htmlFor={`user_department_id`} className={`flex flex-row items-center`}>
                         Departments
                         <Select
@@ -103,7 +103,7 @@ export default function OrganizationBranch({user, changingEffect}){
                             }
                         </Select>
                     </label>
-                )
+
             }
         </div>
     )
