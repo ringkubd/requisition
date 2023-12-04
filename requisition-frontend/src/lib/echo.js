@@ -7,10 +7,11 @@ const EchoConfig = () =>{
         broadcaster: 'pusher',
         cluster: 'ap2',
         key: '90c92a8a0e2ca163bdb3',// same key used in the pusher key
-        wsHost: process.env.SOKETI_URL,// host when you deploy would be your domain
-        wsPort: process.env.SOKETI_PORT,// same port
-        forceTLS: false, // force https to false
+        wsHost: 'soketi.isdb-bisew.org',// host when you deploy would be your domain
+        wsPort: 443,// same port
+        forceTLS: true, // force https to false
         disableStats: true, // don't send stats to pusher because we aren't using pusher
+        enabledTransports: ['ws', 'wss'],
         authorizer: (channel, option) => {
             return {
                 authorize: (socketId, callback) => {
