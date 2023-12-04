@@ -147,7 +147,7 @@ class InitialRequisitionAPIController extends AppBaseController
             return $p;
         }, $allProduct);
         $initialRequisition->initialRequisitionProducts()->createMany($allProduct);
-        broadcast(new InitialRequisitionEvent());
+        broadcast(new InitialRequisitionEvent($initialRequisition));
         return $this->sendResponse(
             new InitialRequisitionResource($initialRequisition),
             __('messages.saved', ['model' => __('models/initialRequisitions.singular')])
