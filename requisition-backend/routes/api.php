@@ -9,6 +9,7 @@ use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,6 +29,8 @@ Route::post('/register', [RegisteredUserController::class, 'store'])
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return  new UserResource($request->user());
 });
+
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 Route::resource('organization', App\Http\Controllers\API\OrganizationApiController::class)->except(['create', 'edit']);
 

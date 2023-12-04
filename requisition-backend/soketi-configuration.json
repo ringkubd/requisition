@@ -1,17 +1,11 @@
 {
     "debug": true,
-    "port": 6001,
+    "port": 6002,
     "appManager.array.apps": [
         {
-            "id": "TsUskOS9Bj",
-            "key": "Jk5HTL5yiA",
-            "secret": "PnV72dOCOR931zx2uwMRbkrz7RujjLVe",
-            "webhooks": [
-                {
-                    "url": "https://",
-                    "event_types": ["channel_occupied"]
-                }
-            ]
+            "id": "1718610",
+            "key": "90c92a8a0e2ca163bdb3",
+            "secret": "514e77c814fa952a294a"
         }
     ]
 }

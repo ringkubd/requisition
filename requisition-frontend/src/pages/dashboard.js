@@ -1,7 +1,18 @@
 import AppLayout from '@/components/Layouts/AppLayout'
 import Head from 'next/head'
+import { useEffect } from "react";
+import { EchoConfig } from "@/lib/echo";
 
 const Dashboard = () => {
+
+  useEffect(() => {
+     EchoConfig();
+     window.Echo.private('initial_requisition')
+         .listen('InitialRequisitionEvent', e => {
+             console.log(e)
+         })
+  }, [])
+
     return (
         <AppLayout
             header={
