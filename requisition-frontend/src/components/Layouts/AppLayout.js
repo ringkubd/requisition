@@ -1,14 +1,18 @@
 import Navigation from '@/components/Layouts/Navigation'
 import { useAuth } from '@/hooks/auth'
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import OrganizationBranch from "@/components/Layouts/OrganizationBranch";
 import React, { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Loading from "@/components/loading";
+import { EchoConfig } from "@/lib/echo";
+import { useDispatch } from "react-redux";
+import { setSingleInitialRequisition } from "@/store/slice/dashboardSlice";
 
 const AppLayout = ({ header, children }) => {
     const router = useRouter();
+    const dispatch = useDispatch();
     const { user } = useAuth({ middleware: 'auth' })
     const changingEffect = (effect) => {
         if (effect){
@@ -35,6 +39,16 @@ const AppLayout = ({ header, children }) => {
             })
         }
     }, [router])
+
+    useEffect(() => {
+        EchoConfig();
+        window.Echo.private('initial_requisition')
+            .listen('InitialRequisitionEvent', e => {
+                toast.success(`A new requisition is initialised by ${e.requisition?.user?.name}`)
+                dispatch(setSingleInitialRequisition(e.requisition))
+            })
+    }, [])
+
 
     return (
         <div className="min-h-screen bg-gray-100">

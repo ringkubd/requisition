@@ -5,8 +5,6 @@ module.exports = withBundleAnalyzer({
     swcMinify: true,
     compress: true,
     eslint: {
-        // Warning: This allows production builds to successfully complete even if
-        // your project has ESLint errors.
         ignoreDuringBuilds: true,
     },
     images: {
@@ -28,5 +26,6 @@ module.exports = withBundleAnalyzer({
         ANALYZE: process.env.ANALYZE,
         SOKETI_URL: process.env.SOKETI_URL,
         SOKETI_PORT: process.env.SOKETI_PORT,
+        SOKETI_FORCE_TLS: process.env.SOKETI_FORCE_TLS,
     }
 })

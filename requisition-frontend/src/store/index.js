@@ -43,6 +43,7 @@ import { PermissionsApiService } from "@/store/service/permissions";
 import { errorSlice } from "@/store/slice/errorSlice";
 import { NavigationAPIService } from "@/store/service/navigation";
 import { CashRequisitionAPIService } from "@/store/service/cash/Index";
+import DashboardSlice from "@/store/slice/dashboardSlice";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -81,6 +82,7 @@ const persistConfig = {
 const combineReducer = combineReducers({
     users: userSlice.reducer,
     errors: errorSlice.reducer,
+    dashboard: DashboardSlice.reducer,
     purchase_requisition_inputs: PurchaseRequisitionInputChangeSlice.reducer,
     [OrganizationApiService.reducerPath]: OrganizationApiService.reducer,
     [BranchApiService.reducerPath]: BranchApiService.reducer,

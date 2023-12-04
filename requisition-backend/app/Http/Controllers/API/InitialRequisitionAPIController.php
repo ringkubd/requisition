@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Events\InitialRequisitionEvent;
-use App\Http\Requests\API\CreateInitialRequisitionAPIRequest;
-use App\Http\Requests\API\UpdateInitialRequisitionAPIRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Department;
 use App\Models\InitialRequisition;
@@ -147,7 +145,8 @@ class InitialRequisitionAPIController extends AppBaseController
             return $p;
         }, $allProduct);
         $initialRequisition->initialRequisitionProducts()->createMany($allProduct);
-        broadcast(new InitialRequisitionEvent($initialRequisition));
+        broadcast(new InitialRequisitionEvent(new InitialRequisitionResource($initialRequisition)));
+
         return $this->sendResponse(
             new InitialRequisitionResource($initialRequisition),
             __('messages.saved', ['model' => __('models/initialRequisitions.singular')])

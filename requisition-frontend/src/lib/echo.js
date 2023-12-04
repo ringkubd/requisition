@@ -1,5 +1,6 @@
 import Echo from 'laravel-echo';
 import axios from "@/lib/axios";
+import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 
 const EchoConfig = () =>{
     window.Pusher = require('pusher-js');
@@ -7,9 +8,9 @@ const EchoConfig = () =>{
         broadcaster: 'pusher',
         cluster: 'ap2',
         key: '90c92a8a0e2ca163bdb3',// same key used in the pusher key
-        wsHost: 'soketi.isdb-bisew.org',// host when you deploy would be your domain
-        wsPort: 443,// same port
-        forceTLS: true, // force https to false
+        wsHost: process.env.SOKETI_URL ?? 'soketi.isdb-bisew.org',// host when you deploy would be your domain
+        wsPort: process.env.SOKETI_PORT ?? 443,// same port
+        forceTLS: process.env.SOKETI_FORCE_TLS !== "false", // force https to false
         disableStats: true, // don't send stats to pusher because we aren't using pusher
         enabledTransports: ['ws', 'wss'],
         authorizer: (channel, option) => {
@@ -33,24 +34,4 @@ const EchoConfig = () =>{
 
 export {
     EchoConfig
-}
-
-const EchoServer = () => {
-    window.Pusher = require('pusher-js');
-  return new Echo({
-    broadcaster: 'pusher',
-    key: '90c92a8a0e2ca163bdb3',
-    httpHost: '127.0.0.1',
-    wsHost: '127.0.0.1',
-    wsPort: 6001,
-    wssPort: 6001,
-    forceTLS: false,
-    encrypted: false,
-    disableStats: true,
-    enabledTransports: ['ws', 'wss'],
-  });
-}
-
-export {
-  EchoServer
 }

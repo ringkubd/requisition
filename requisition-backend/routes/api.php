@@ -155,3 +155,5 @@ Route::resource('cash-requisitions', App\Http\Controllers\API\CashRequisitionAPI
 
 Route::resource('cash-requisition-items', App\Http\Controllers\API\CashRequisitionItemAPIController::class)
     ->except(['create', 'edit']);
+
+Route::get('dashboard-data', [\App\Http\Controllers\API\DashboardAPIController::class, 'index']);

@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\InitialRequisition;
+use App\Http\Resources\InitialRequisitionResource;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -15,11 +15,11 @@ class InitialRequisitionEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public InitialRequisition $requisition;
+    public InitialRequisitionResource $requisition;
     /**
      * Create a new event instance.
      */
-    public function __construct(InitialRequisition $requisition)
+    public function __construct(InitialRequisitionResource $requisition)
     {
         $this->requisition = $requisition;
     }
