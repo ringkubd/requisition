@@ -7,7 +7,7 @@ const EchoConfig = () =>{
         broadcaster: 'pusher',
         cluster: 'ap2',
         key: '90c92a8a0e2ca163bdb3',// same key used in the pusher key
-        wsHost:"localhost",// host when you deploy would be your domain
+        wsHost: process.env.SOKETI_URL,// host when you deploy would be your domain
         wsPort: 6002,// same port
         forceTLS: false, // force https to false
         disableStats: true, // don't send stats to pusher because we aren't using pusher
