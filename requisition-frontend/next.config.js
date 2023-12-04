@@ -26,6 +26,7 @@ module.exports = withBundleAnalyzer({
         NEXT_PUBLIC_BACKEND_API_URL: process.env.NEXT_PUBLIC_BACKEND_API_URL,
         APP_NAME: process.env.APP_NAME,
         ANALYZE: process.env.ANALYZE,
-        SOKETI_URL: process.env.SOKETI_URL
+        SOKETI_URL: process.env.SOKETI_URL,
+        SOKETI_PORT: process.env.SOKETI_PORT,
     }
 })
