@@ -29,7 +29,7 @@ export default function VariantForm(props) {
         sku: '',
         option_value: '',
         notes: '',
-        stock: ''
+        stock: 0
     }
 
     const submitOptions = (values, props) => {
@@ -83,7 +83,8 @@ export default function VariantForm(props) {
                 is: (val) => val,
                 then: () => Yup.string().required().label('Option Value')
             }).label('Option Value'),
-        notes: Yup.string().label('Notes')
+        notes: Yup.string().label('Notes'),
+        stock: Yup.number().nullable().label('Notes'),
     });
 
     return (
@@ -225,8 +226,7 @@ export default function VariantForm(props) {
                                 <TextInput
                                     id={`stock`}
                                     name={`stock`}
-                                    type={`number`}
-                                    step={0.1}
+                                    type={`text`}
                                     value={values.stock}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
