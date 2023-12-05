@@ -58,9 +58,11 @@ use Illuminate\Database\Eloquent\Model;
  * )
  */class PurchaseRequisition extends Model
 {
-     use SoftDeletes;    use HasFactory;    public $table = 'purchase_requisitions';
+     use SoftDeletes;
+     use HasFactory;
+     public $table = 'purchase_requisitions';
 
-    public $fillable = [
+    protected $fillable = [
         'initial_requisition_id',
         'user_id',
         'branch_id',

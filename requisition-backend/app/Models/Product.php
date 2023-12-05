@@ -71,12 +71,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * )
  */class Product extends Model
 {
-    use SoftDeletes;
-    use HasFactory;
+    use SoftDeletes, HasFactory;
 
     public $table = 'products';
 
-    public $fillable = [
+    protected $fillable = [
         'title',
         'unit',
         'category_id',
