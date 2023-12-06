@@ -62,7 +62,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *          format="date-time"
  *      )
  * )
- */class Supplier extends Model
+ */class Supplier extends BaseModel
 {
     use SoftDeletes, HasFactory;
     public $table = 'suppliers';

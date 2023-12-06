@@ -20,3 +20,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('initial_requisition', function (){
     return true;
 });
+Broadcast::channel('activity', function ($user){
+    return true;
+});

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use OpenApi\Annotations as OA;
@@ -36,7 +35,7 @@ use OpenApi\Annotations as OA;
  *      )
  * )
  */
-class CashProduct extends Model
+class CashProduct extends BaseModel
 {
     use HasFactory;
     protected $table = 'cash_products';

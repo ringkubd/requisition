@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use OpenApi\Annotations as OA;
@@ -58,7 +57,7 @@ use OpenApi\Annotations as OA;
  *          format="date-time"
  *      )
  * )
- */class CashRequisition extends Model
+ */class CashRequisition extends BaseModel
 {
     use SoftDeletes;
     use HasFactory;

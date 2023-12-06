@@ -41,7 +41,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *      )
  * )
  */
-class Country extends Model
+class Country extends BaseModel
 {
     use HasFactory;
     public $table = 'countries';

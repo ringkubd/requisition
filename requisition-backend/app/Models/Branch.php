@@ -3,7 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
- use Illuminate\Database\Eloquent\SoftDeletes; use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+
 /**
  * @OA\Schema(
  *      schema="Branch",
@@ -68,11 +71,12 @@ use Illuminate\Database\Eloquent\Model;
  *          format="date-time"
  *      )
  * )
- */class Branch extends Model
+ */class Branch extends BaseModel
 {
-     use SoftDeletes;    use HasFactory;    public $table = 'branches';
+    use SoftDeletes, HasFactory;
+    public $table = 'branches';
 
-    public $fillable = [
+    protected $fillable = [
         'organization_id',
         'name',
         'email',

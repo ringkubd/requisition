@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductResource;
 use OpenApi\Annotations as OA;
+use Spatie\Activitylog\Facades\LogBatch;
 
 /**
  * Class ProductController
@@ -66,7 +67,10 @@ class ProductAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )->when($request->search, function ($q, $v){
-            $q->where('title', 'like', "%$v%");
+            $q->where('title', 'like', "%$v%")
+                ->orWhereHas('category', function ($q) use($v){
+                    $q->where('title', 'like', "%$v%");
+                });
         })
             ->latest()
             ->get();
@@ -110,6 +114,7 @@ class ProductAPIController extends AppBaseController
      */
     public function store(Request $request): JsonResponse
     {
+        LogBatch::startBatch();
         $input = $request->all();
         $basic = $input['basic'];
         $metas = $input['metas'];
@@ -119,7 +124,7 @@ class ProductAPIController extends AppBaseController
         $product = $this->productRepository->create($basic);
         $product->productMetas()->createMany($metas);
         $product->productOptions()->createMany($productOptions);
-
+        LogBatch::endBatch();
         return $this->sendResponse(
             new ProductResource($product),
             __('messages.saved', ['model' => __('models/products.singular')])
@@ -221,6 +226,7 @@ class ProductAPIController extends AppBaseController
      */
     public function update($id, Request $request): JsonResponse
     {
+        LogBatch::startBatch();
         $input = $request->all();
         /** @var Product $product */
         $product = $this->productRepository->find($id);
@@ -236,7 +242,7 @@ class ProductAPIController extends AppBaseController
         $product = $this->productRepository->update($base, $id);
         $product->productMetas()->createUpdateOrDelete($metas, ['id']);
         $product->productOptions()->createUpdateOrDelete($productOptions, ['id']);
-
+        LogBatch::endBatch();
         return $this->sendResponse(
             new ProductResource($product),
             __('messages.updated', ['model' => __('models/products.singular')])

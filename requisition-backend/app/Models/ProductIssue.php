@@ -50,7 +50,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *          format="date-time"
  *      )
  * )
- */class ProductIssue extends Model
+ */class ProductIssue extends BaseModel
 {
     use SoftDeletes;
     use HasFactory;

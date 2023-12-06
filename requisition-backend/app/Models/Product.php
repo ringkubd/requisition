@@ -69,7 +69,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *          format="date-time"
  *      )
  * )
- */class Product extends Model
+ */class Product extends BaseModel
 {
     use SoftDeletes, HasFactory;
 

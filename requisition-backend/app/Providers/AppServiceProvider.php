@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\Dbal\ProductStatus;
+use App\Observers\ActivityObserver;
 use App\Support\CreateUpdateOrDelete;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Spatie\Activitylog\Models\Activity;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,5 +40,7 @@ class AppServiceProvider extends ServiceProvider
             $hasMany = $this;
             return (new CreateUpdateOrDelete($hasMany, $records))();
         });
+
+        Activity::observe(ActivityObserver::class);
     }
 }

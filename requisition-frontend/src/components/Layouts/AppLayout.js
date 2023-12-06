@@ -9,6 +9,7 @@ import Loading from "@/components/loading";
 import { EchoConfig } from "@/lib/echo";
 import { useDispatch } from "react-redux";
 import { setSingleInitialRequisition } from "@/store/slice/dashboardSlice";
+import { setSingleActivity } from "@/store/slice/activitySlice";
 
 const AppLayout = ({ header, children }) => {
     const router = useRouter();
@@ -46,6 +47,10 @@ const AppLayout = ({ header, children }) => {
             .listen('InitialRequisitionEvent', e => {
                 toast.success(`A new requisition is initialised by ${e.requisition?.user?.name}`)
                 dispatch(setSingleInitialRequisition(e.requisition))
+            })
+        window.Echo.private('activity')
+            .listen('ActivityEvent', event => {
+                dispatch(setSingleActivity(event.activity))
             })
     }, [])
 

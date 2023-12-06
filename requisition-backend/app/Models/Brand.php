@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
- use Illuminate\Database\Eloquent\SoftDeletes; use Illuminate\Database\Eloquent\Factories\HasFactory;
+ use Illuminate\Database\Eloquent\SoftDeletes;
+ use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 /**
  * @OA\Schema(
  *      schema="Brand",
@@ -61,11 +62,13 @@ use Illuminate\Database\Eloquent\Model;
  *          format="date-time"
  *      )
  * )
- */class Brand extends Model
+ */
+class Brand extends BaseModel
 {
-     use SoftDeletes;    use HasFactory;    public $table = 'brands';
+     use SoftDeletes, HasFactory;
+     public $table = 'brands';
 
-    public $fillable = [
+    protected $fillable = [
         'name',
         'logo',
         'contact',
@@ -88,6 +91,4 @@ use Illuminate\Database\Eloquent\Model;
         'created_at' => 'nullable',
         'updated_at' => 'nullable'
     ];
-
-    
 }

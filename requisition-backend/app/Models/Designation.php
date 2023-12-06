@@ -40,7 +40,7 @@ use Illuminate\Database\Eloquent\Model;
  *          format="date-time"
  *      )
  * )
- */class Designation extends Model
+ */class Designation extends BaseModel
 {
      use SoftDeletes;    use HasFactory;    public $table = 'designations';
 

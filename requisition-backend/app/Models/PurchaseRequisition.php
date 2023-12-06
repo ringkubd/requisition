@@ -56,7 +56,7 @@ use Illuminate\Database\Eloquent\Model;
  *          format="date-time"
  *      )
  * )
- */class PurchaseRequisition extends Model
+ */class PurchaseRequisition extends BaseModel
 {
      use SoftDeletes;
      use HasFactory;

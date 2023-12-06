@@ -73,7 +73,7 @@ use OpenApi\Annotations as OA;
  *          format="date-time"
  *      )
  * )
- */class CashRequisitionItem extends Model
+ */class CashRequisitionItem extends BaseModel
 {
     use SoftDeletes;
     use HasFactory;

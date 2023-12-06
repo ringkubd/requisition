@@ -59,7 +59,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *      )
  * )
  */
-class Purchase extends Model
+class Purchase extends BaseModel
 {
     use SoftDeletes, HasFactory;
     public $table = 'purchases';

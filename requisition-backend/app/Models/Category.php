@@ -50,7 +50,7 @@ use OpenApi\Annotations as OA;
  *          format="date-time"
  *      )
  * )
- */class Category extends Model
+ */class Category extends BaseModel
 {
     use SoftDeletes, HasFactory;
     public $table = 'categories';

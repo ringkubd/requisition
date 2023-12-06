@@ -41,7 +41,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *      )
  * )
  */
-class MeasurementUnit extends Model
+class MeasurementUnit extends BaseModel
 {
      use HasFactory;
      public $table = 'measurement_units';

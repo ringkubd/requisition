@@ -51,7 +51,7 @@ use OpenApi\Annotations as OA;
  *          type=integer,
  *      )
  */
-class Department extends Model
+class Department extends BaseModel
 {
     use SoftDeletes;    use HasFactory;    public $table = 'departments';
 
