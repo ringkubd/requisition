@@ -59,11 +59,6 @@ const Activity = () => {
                     sortable: true,
                 },
                 {
-                    name: 'New',
-                    selector: row =><pre>{JSON.stringify(row.properties?.new, null, 2)}</pre>,
-                    sortable: true,
-                },
-                {
                     name: 'Created at',
                     selector: row => moment(row.created_at).format('hh:mm DD-MMM-Y'),
                     sortable: true,
