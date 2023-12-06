@@ -8,8 +8,9 @@ export const ProductApiService = createApi({
     tagTypes: ['product', 'editProduct'],
     endpoints: builder => ({
         getProduct: builder.query({
-            query: () => ({
+            query: (arg) => ({
                 url: 'products',
+                params: arg
             }),
             providesTags: ['product'],
             onQueryStarted: onQueryStartedErrorToast,

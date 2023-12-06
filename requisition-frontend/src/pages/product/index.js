@@ -1,7 +1,7 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { wrapper } from "@/store";
-import { Button, Card } from "flowbite-react";
+import { Button, Card, Label } from "flowbite-react";
 import DataTable from 'react-data-table-component';
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
@@ -15,14 +15,17 @@ import {
     useGetProductQuery
 } from "@/store/service/product/product";
 import moment from "moment";
+import Select from "react-select";
+import { useGetCategoryQuery } from "@/store/service/category";
 
 
 const Product = () => {
     const router = useRouter();
-    const {data, isLoading, isError} = useGetProductQuery();
+    const [searchParams, setSearchParams] = useState({});
+    const {data, isLoading, isError} = useGetProductQuery(searchParams);
     const [destroy, destroyResponse] = useDestroyProductMutation();
     const [columns, setColumns] = useState([]);
-
+    const {data: category, isLoading: categoryISLoading} = useGetCategoryQuery();
 
     useEffect(() => {
         if (!destroyResponse.isLoading && destroyResponse.isSuccess){
@@ -73,6 +76,10 @@ const Product = () => {
         }
     }, [isLoading, isError, data]);
 
+    const changeSearchParams = (key, value) => {
+        setSearchParams({...searchParams, [key]: value});
+    }
+
 
     return (
         <>
@@ -91,13 +98,37 @@ const Product = () => {
                 </Head>
                 <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
                     <Card>
-                        <div className="flex flex-row space-x-4 space-y-4  shadow-lg py-4 px-4">
+                        <div className="flex flex-row space-x-4 shadow-lg py-4 px-4">
                             <NavLink
                                 active={router.pathname === 'product/create'}
                                 href={`product/create`}
                             >
                                 <Button>Create</Button>
                             </NavLink>
+                            <div className={`flex flex-row justify-center space-x-4 items-center`}>
+                                <Label htmlFor={`category`} value={`Category`} />
+                                <Select
+                                    id={`category`}
+                                    className={`select !min-w-[70px]`}
+                                    classNames={{
+                                        control: state => 'select'
+                                    }}
+                                    options={category?.data?.filter((c) => !c.parent_id).map((c) => {
+                                        const sub = c.subCategory?.map((s) => ({label: '=> ' + s.title, value: s.id}))
+                                        return {
+                                            label: c.title,
+                                            options: [
+                                                {label: c.title, value: c.id},
+                                                ...sub
+                                            ]
+                                        };
+                                    })}
+                                    isLoading={categoryISLoading}
+                                    isSearchable
+                                    isClearable
+                                    onChange={(newValue) => changeSearchParams('category_id', newValue?.value)}
+                                />
+                            </div>
                         </div>
                         <DataTable
                             columns={columns}
