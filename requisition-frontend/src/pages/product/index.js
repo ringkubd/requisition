@@ -1,7 +1,7 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { wrapper } from "@/store";
-import { Button, Card, Label } from "flowbite-react";
+import { Button, Card, Label, TextInput } from "flowbite-react";
 import DataTable from 'react-data-table-component';
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
@@ -128,6 +128,10 @@ const Product = () => {
                                     isClearable
                                     onChange={(newValue) => changeSearchParams('category_id', newValue?.value)}
                                 />
+                            </div>
+                            <div className={`flex flex-row justify-center space-x-4 items-center`}>
+                                <Label htmlFor={`search`} value={`Search`} />
+                                <TextInput onChange={(e) => e.target.value.length > 1 ? changeSearchParams('search',e.target.value) : ''} />
                             </div>
                         </div>
                         <DataTable

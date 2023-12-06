@@ -61,11 +61,15 @@ class ProductAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $products = $this->productRepository->all(
+        $products = $this->productRepository->allQuery(
             $request->except(['skip', 'limit']),
             $request->get('skip'),
             $request->get('limit')
-        );
+        )->when($request->search, function ($q, $v){
+            $q->where('title', 'like', "%$v%");
+        })
+            ->latest()
+            ->get();
 
         return $this->sendResponse(
             ProductResource::collection($products),
