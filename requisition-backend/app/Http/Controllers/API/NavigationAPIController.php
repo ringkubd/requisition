@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
-use Illuminate\Http\Request;
+use App\Models\Branch;
+use App\Models\Department;
 
 class NavigationAPIController extends AppBaseController
 {
@@ -16,9 +17,16 @@ class NavigationAPIController extends AppBaseController
     }
 
     public function branch(){
-        $branches = \request()->user()->branches()->when(\request()->organization_id, function ($q, $o){
-            $q->where('organization_id', $o);
-        })->get();
+        if (\request()->user()->hasRole('Super Admin')){
+            $branches = Branch::when(\request()->organization_id, function ($q, $o){
+                $q->where('organization_id', $o);
+            })->get();
+        }else{
+            $branches = \request()->user()->branches()->when(\request()->organization_id, function ($q, $o){
+                $q->where('organization_id', $o);
+            })->get();
+        }
+
         return $this->sendResponse(
             $branches,
             __('messages.retrieved', ['model' => __('models/branch.plural')])
@@ -26,9 +34,15 @@ class NavigationAPIController extends AppBaseController
     }
 
     public function department(){
-        $departments = \request()->user()->departments()->when(\request()->branch_id, function ($q, $b){
-            $q->where('branch_id', $b);
-        })->get();
+        if (\request()->user()->hasRole('Super Admin')){
+            $departments = Department::when(\request()->branch_id, function ($q, $b){
+                $q->where('branch_id', $b);
+            })->get();
+        }else{
+            $departments = \request()->user()->departments()->when(\request()->branch_id, function ($q, $b){
+                $q->where('branch_id', $b);
+            })->get();
+        }
         return $this->sendResponse(
             $departments,
             __("messages.retrieved".\request()->branch_id, ['model' => __('models/department.plural')])

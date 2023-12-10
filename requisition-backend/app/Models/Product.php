@@ -118,11 +118,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         return $this->hasMany(\App\Models\ProductOption::class, 'product_id');
     }
 
-    public function lastPurchaseRequisition(){
+    public function lastPurchaseRequisition(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    {
         return $this->hasOneThrough(PurchaseRequisition::class, PurchaseRequisitionProduct::class, 'product_id', 'id', 'id', 'purchase_requisition_id');
     }
 
-    public function purchaseHistory(){
+    public function purchaseHistory(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
         return $this->hasMany(Purchase::class);
     }
+
+    public function issues(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProductIssue::class);
+    }
+
+    public function purchaseRequisition(){
+        return $this->hasManyThrough(PurchaseRequisition::class, PurchaseRequisitionProduct::class, 'product_id', 'id', 'id', 'purchase_requisition_id');
+    }
+
+
 }

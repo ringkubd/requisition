@@ -17,7 +17,6 @@ const Dashboard = () => {
             .then(({data}) => {
                 dispatch(setInitialRequisition(data?.initial))
             })
-            .catch(e => console.log(e))
     }
 
     useEffect(() => {
@@ -26,7 +25,6 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (dashboardData && dashboardData?.initial){
-            console.log(dashboardData?.initial)
             setInitialColumns([
                 {
                     name: 'IRF No',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateProductAPIRequest;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -66,12 +67,16 @@ class ProductAPIController extends AppBaseController
             $request->except(['skip', 'limit']),
             $request->get('skip'),
             $request->get('limit')
-        )->when($request->search, function ($q, $v){
-            $q->where('title', 'like', "%$v%")
-                ->orWhereHas('category', function ($q) use($v){
-                    $q->where('title', 'like', "%$v%");
-                });
-        })
+        )
+            ->when($request->search, function ($q, $v){
+                $q->where('title', 'like', "%$v%")
+                    ->orWhereHas('category', function ($q) use($v){
+                        $q->where('title', 'like', "%$v%");
+                    });
+            })
+            ->when($request->category, function ($q) use ($request){
+                $q->whereIn('category_id', explode(',',$request->category));
+            })
             ->latest()
             ->get();
 
@@ -302,5 +307,71 @@ class ProductAPIController extends AppBaseController
             $id,
             __('messages.deleted', ['model' => __('models/products.singular')])
         );
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/product_reports",
+     *     summary="GenerateProductUsage&PurchaseReport.",
+     *     tags="Products",
+     *     description="Generate product usage and purchase report.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     ),
+     *     @OA\Response(
+     *           response=200,
+     *           description="successful operation",
+     *           @OA\JsonContent(
+     *               type="object",
+     *               @OA\Property(
+     *                   property="success",
+     *                   type="boolean"
+     *               ),
+     *               @OA\Property(
+     *                   property="data",
+     *                   ref="#/components/schemas/Product"
+     *               ),
+     *               @OA\Property(
+     *                   property="message",
+     *                   type="string"
+     *               )
+     *           )
+     *       )
+     *  )
+     */
+    public function report(Request $request){
+        $categories = explode(',',$request->category);
+        $products = explode(',',$request->product);
+        $department = $request->department;
+        $report_type = $request->report_type;
+        $last = $request->end_date;
+        $first = $request->start_date;
+
+        $product = Product::query()
+            ->when($request->category, function ($q) use($categories){
+                $q->whereIn('category_id', $categories);
+            })
+            ->when($request->product, function ($q) use($products){
+                $q->whereIn('id', $products);
+            })
+            ->with(['category', 'purchaseRequisition', 'purchaseHistory', 'issues'])
+            ->when($report_type == "usage", function ($q) use($first, $last, $department){
+                $q->whereHas('issues', function ($q) use($first, $last, $department){
+                    $q->whereRaw("date(issue_time) between '$first' and '$last'")
+                        ->when($department, function ($q) use($department){
+                            $q->where('receiver_department_id', $department);
+                        });
+                });
+            })
+            ->when($report_type == "purchase", function ($q) use($first, $last, $department){
+                $q->whereHas('purchaseHistory', function ($q) use($first, $last){
+                    $q->whereRaw("purchase_date between '$first' and '$last'");
+                });
+            })
+            ->latest()
+            ->get();
+
+        return $this->sendResponse($product,   __('messages.report', ['model' => __('models/products.singular')]));
     }
 }

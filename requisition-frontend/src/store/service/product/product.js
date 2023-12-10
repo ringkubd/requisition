@@ -53,6 +53,14 @@ export const ProductApiService = createApi({
             invalidatesTags: ['product'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
+        report: builder.mutation({
+            query: (arg) => ({
+                url: `product_report`,
+                method: 'GET',
+                params: arg
+            }),
+            onQueryStarted: onQueryStartedErrorToast
+        })
     }),
 })
 
@@ -63,6 +71,7 @@ export const {
     useStoreProductMutation,
     useDestroyProductMutation,
     useSingleProductQuery,
+    useReportMutation,
     util: { getRunningQueriesThunk },
 } = ProductApiService;
 

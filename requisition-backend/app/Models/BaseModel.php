@@ -15,7 +15,7 @@ class BaseModel extends Model
         // TODO: Implement getActivitylogOptions() method.
         $model  = get_class($this);
         return LogOptions::defaults()
-            ->setDescriptionForEvent(fn(string $eventName) => "$model has been {$eventName}")
+            ->setDescriptionForEvent(fn(string $eventName) => "The model has been {$eventName}")
             ->logFillable();
     }
 }

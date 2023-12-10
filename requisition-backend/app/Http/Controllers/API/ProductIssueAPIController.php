@@ -7,6 +7,7 @@ use App\Http\Requests\API\UpdateProductIssueAPIRequest;
 use App\Models\ProductIssue;
 use App\Models\ProductOption;
 use App\Models\Purchase;
+use App\Models\User;
 use App\Repositories\ProductIssueRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -113,6 +114,9 @@ class ProductIssueAPIController extends AppBaseController
         $input['issue_time'] = now()->toDateTimeString();
         $productOptionId = $input['product_option_id'];
         $quantity = $input['quantity'];
+        $receiver = User::find($request->receiver_id);
+        $input['receiver_branch_id'] = $receiver->branches()->first()->id;
+        $input['receiver_department_id'] = $receiver->departments()->first()->id;
 
         $productIssue = $this->productIssueRepository->create($input);
         if ($productIssue){

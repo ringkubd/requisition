@@ -61,6 +61,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         'product_option_id',
         'quantity',
         'receiver_id',
+        'receiver_branch_id',
+        'receiver_department_id',
         'issuer_id',
         'issue_time',
         'purpose',
