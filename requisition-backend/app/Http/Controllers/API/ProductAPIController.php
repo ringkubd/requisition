@@ -364,9 +364,14 @@ class ProductAPIController extends AppBaseController
                         });
                 });
             })
-            ->when($report_type == "purchase", function ($q) use($first, $last, $department){
-                $q->whereHas('purchaseHistory', function ($q) use($first, $last){
-                    $q->whereRaw("purchase_date between '$first' and '$last'");
+            ->when($report_type == "purchase", function ($q) use($first, $last, $request){
+                $q->whereHas('purchaseHistory', function ($q) use($first, $last, $request){
+                    $q->whereRaw("purchase_date between '$first' and '$last'")
+                        ->when($request->department, function ($q, $v){
+                            $q->whereHas('purchaseRequisition', function ($q) use ($v){
+                                $q->where('department_id', $v);
+                            });
+                        });
                 });
             })
             ->latest()

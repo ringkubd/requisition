@@ -68,7 +68,7 @@ const Report = () => {
         department:  Yup.number(),
         start_date: Yup.date(),
         end_date: Yup.date(),
-        product: Yup.mixed().atLeastOneOf(['department', 'start_date', 'product', 'category']),
+        product: Yup.mixed().atLeastOneOf(['department', 'start_date', 'end_date', 'product', 'category']),
         report_type: Yup.string().required().label('Report Type'),
     });
     return (
@@ -113,7 +113,7 @@ const Report = () => {
                                                     id="purchase"
                                                     name="report_type"
                                                     value="purchase"
-                                                    defaultChecked
+                                                    defaultChecked={values.report_type === "purchase"}
                                                     onChange={handleChange}
                                                 />
                                                 <Label htmlFor="purchase" className={`font-bold`}>
@@ -125,6 +125,7 @@ const Report = () => {
                                                     id="usage"
                                                     name="report_type"
                                                     value="usage"
+                                                    defaultChecked={values.report_type === "usage"}
                                                     onChange={handleChange}
                                                 />
                                                 <Label htmlFor="usage" className={`font-bold`}>
@@ -177,6 +178,7 @@ const Report = () => {
                                                         newValue?.value ?? '',
                                                     )
                                                 }
+                                                isClearable={true}
                                             />
                                             <ErrorMessage name={'department'} />
                                         </div>
@@ -287,6 +289,9 @@ const Report = () => {
                                 </div>
                             )}
                         </Formik>
+                    </div>
+                    <div>
+
                     </div>
                 </Card>
             </div>

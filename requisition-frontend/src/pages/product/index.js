@@ -125,6 +125,7 @@ const Product = () => {
                                     })}
                                     isLoading={categoryISLoading}
                                     isSearchable
+                                    placeholder={`Search by category`}
                                     isClearable
                                     onChange={(newValue) => changeSearchParams('category_id', newValue?.value)}
                                 />
