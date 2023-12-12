@@ -67,13 +67,12 @@ use OpenApi\Annotations as OA;
         'user_id',
         'branch_id',
         'department_id',
-        'irf_no',
+        'prf_no',
         'ir_no',
-        'total_cost'
+        'total_cost',
     ];
 
     protected $casts = [
-        'irf_no' => 'string',
         'ir_no' => 'string',
         'total_cost' => 'float'
     ];
@@ -82,7 +81,7 @@ use OpenApi\Annotations as OA;
         'user_id' => 'required',
         'branch_id' => 'required',
         'department_id' => 'required',
-        'irf_no' => 'required|string|max:255',
+        'prf_no' => 'required|string|max:255',
         'ir_no' => 'required|string|max:255',
         'total_cost' => 'required|numeric',
         'deleted_at' => 'nullable',
@@ -109,9 +108,8 @@ use OpenApi\Annotations as OA;
     {
         return $this->hasMany(\App\Models\CashRequisitionItem::class, 'cash_requisition_id');
     }
-
-    public function irfNos(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    public function prfNOS(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        return $this->morphOne(IrfNo::class, 'model');
+        return $this->morphOne(PRFNo::class, 'model');
     }
 }

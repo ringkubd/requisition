@@ -23,3 +23,6 @@ Broadcast::channel('initial_requisition', function (){
 Broadcast::channel('activity', function ($user){
     return true;
 });
+Broadcast::channel('query_monitoring', function ($user){
+    return true;
+});

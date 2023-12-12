@@ -23,7 +23,7 @@ class CashRequisitionResource extends JsonResource
             'department' => $this->department,
             'department_id' => $this->department_id,
             'items' => CashRequisitionItemResource::collection($this->cashRequisitionItems),
-            'irf_no' => $this->irf_no,
+            'prf_no' => $this->prf_no,
             'ir_no' => $this->ir_no,
             'total_cost' => $this->total_cost,
             'deleted_at' => $this->deleted_at,

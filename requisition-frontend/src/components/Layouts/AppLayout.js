@@ -52,6 +52,10 @@ const AppLayout = ({ header, children }) => {
             .listen('ActivityEvent', event => {
                 dispatch(setSingleActivity(event.activity))
             })
+        window.Echo.private('query_monitoring')
+            .listen('QueryMonitorEvent', event => {
+                console.log(event)
+            })
     }, [])
 
 

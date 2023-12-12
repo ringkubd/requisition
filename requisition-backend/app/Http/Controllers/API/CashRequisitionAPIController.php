@@ -107,22 +107,23 @@ class CashRequisitionAPIController extends AppBaseController
     public function store(Request $request): JsonResponse
     {
         $input = $request->all();
-        $irf_nos = $this->newIRFNO();
+        $prf_no = $this->newPRFNO();
         $cashRequisition = $this->cashRequisitionRepository->create([
-            'irf_no' => $irf_nos,
             'ir_no' => 5,
+            'prf_no' => $prf_no,
             'total_cost' => collect($input)->sum('cost'),
             'user_id' => $request->user()->id,
             'branch_id' => auth_branch_id(),
             'department_id' => auth_department_id()
         ]);
-
-        $cashRequisition->irfNos()->create(['irf_no' => $irf_nos]);
-
         $newItems =collect($input)->map(function ($a) {
             return collect($a)->except(['cost']);
         });
         $cashRequisition->cashRequisitionItems()->createMany($newItems->toArray());
+        $cashRequisition->prfNOS()->create([
+            'prf_no' => $prf_no,
+            'total' => collect($input)->sum('cost')
+        ]);
 
         return $this->sendResponse(
             new CashRequisitionResource($cashRequisition),

@@ -357,21 +357,24 @@ class InitialRequisitionAPIController extends AppBaseController
      */
     /**
      * @param Request $request
-     * @return void
+     * @return JsonResponse
      */
 
-    public function products(Request $request){
+    public function products(Request $request): JsonResponse
+    {
         $start = ((int)$request->page - 1) * 10;
-        $end = ((int)$request->page) * 10;
 
         $products = ProductResource::collection(Product::query()
-            ->where('title', 'like', "%$request->search%")
+            ->when($request->search, function ($q, $s){
+                $q->where('title', 'like', "%$s%");
+            })
+            ->with('category')
             ->skip($start)
-            ->limit($end)
+            ->limit(10)
             ->get());
 
         return $this->sendResponse(
-            ProductResource::collection($products),
+            $products,
             __('messages.retrieved', ['model' => __('models/initialRequisitions.plural')])
         );
     }

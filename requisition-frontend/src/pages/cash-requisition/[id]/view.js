@@ -97,7 +97,7 @@ const View = (props) => {
                                 !isLoading && !isError && data ? (
                                         <Table>
                                             <Table.Head>
-                                                <Table.HeadCell>I.R.F. No</Table.HeadCell>
+                                                <Table.HeadCell>P.R.F. NO.</Table.HeadCell>
                                                 <Table.HeadCell>Department</Table.HeadCell>
                                                 <Table.HeadCell>Estimated Cost</Table.HeadCell>
                                                 <Table.HeadCell>Purchase Status</Table.HeadCell>
@@ -107,7 +107,7 @@ const View = (props) => {
                                             </Table.Head>
                                             <Table.Body>
                                                 <Table.Row>
-                                                    <Table.Cell>{data?.data?.irf_no}</Table.Cell>
+                                                    <Table.Cell>{data?.data?.prf_no}</Table.Cell>
                                                     <Table.Cell>{data?.data?.department?.name}</Table.Cell>
                                                     <Table.Cell>{data?.data?.estimated_cost}</Table.Cell>
                                                     <Table.Cell>{data?.data?.is_purchase_done ? "Done" : 'No'}</Table.Cell>

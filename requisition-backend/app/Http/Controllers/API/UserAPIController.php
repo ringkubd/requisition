@@ -63,9 +63,9 @@ class UserAPIController extends AppBaseController
     {
         $user = \request()->user();
         $user->can('Super Admin');
-        $users = User::whereHas('branches', function($branch) use ($request){
-            $branch->when($request->branch_id, function ($q, $b){
-                $q->where('id', $b);
+        $users = User::whereHas('branches', function($branch) use ($request, $user){
+            $branch->when($request->branch_id, function ($q) use ($request){
+                $q->where('id', $request->branch_id);
             }, function ($q){
                 $q->where('id', auth_branch_id());
             });

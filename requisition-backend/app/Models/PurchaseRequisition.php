@@ -67,6 +67,7 @@ use Illuminate\Database\Eloquent\Model;
         'user_id',
         'branch_id',
         'department_id',
+        'prf_no',
         'initial_requisition_id',
         'irf_no',
         'ir_no',
@@ -110,5 +111,9 @@ use Illuminate\Database\Eloquent\Model;
     public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Department::class);
+    }
+    public function prfNOS(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(PRFNo::class, 'model');
     }
 }

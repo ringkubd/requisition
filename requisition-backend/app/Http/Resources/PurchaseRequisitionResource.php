@@ -21,6 +21,7 @@ class PurchaseRequisitionResource extends JsonResource
             'user' => $this->user,
             'department_id' => $this->department_id,
             'department' => $this->department,
+            'prf_no' => $this->prf_no,
             'irf_no' => $this->irf_no,
             'ir_no' => $this->ir_no,
             'po_no' => $this->po_no,

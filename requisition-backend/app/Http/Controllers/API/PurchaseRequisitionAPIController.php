@@ -113,6 +113,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
      */
     public function store(Request $request): JsonResponse
     {
+        $prfNo = $this->newPRFNO();
         $input = $request->all();
         $input = array_map(function ($item){
             $item['unit_price'] = (float)$item['price'];
@@ -124,6 +125,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $inputCollection = collect($input);
         $purchase = [
             'user_id' => auth()->user()->id,
+            'prf_no' => $prfNo,
             'branch_id' => auth_branch_id(),
             'department_id' => auth_department_id(),
             'initial_requisition_id' => $initial_requisition_id,
@@ -149,9 +151,12 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $initial_requisition->update([
             'is_purchase_requisition_generated' => 1
         ]);
-//        return response()->json($purchaseProducts);
         $purchaseRequisition = $this->purchaseRequisitionRepository->create($purchase);
         $purchaseRequisition->purchaseRequisitionProducts()->createMany($purchaseProducts);
+        $purchaseRequisition->prfNOS()->create([
+            'prf_no' => $prfNo,
+            'total' => $inputCollection->sum('price')
+        ]);
         return $this->sendResponse(
             new PurchaseRequisitionResource($purchaseRequisition),
             __('messages.saved', ['model' => __('models/purchaseRequisitions.singular')])

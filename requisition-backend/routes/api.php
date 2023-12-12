@@ -158,4 +158,8 @@ Route::resource('cash-requisition-items', App\Http\Controllers\API\CashRequisiti
 
 Route::get('dashboard-data', [\App\Http\Controllers\API\DashboardAPIController::class, 'index']);
 Route::get('activity', [\App\Http\Controllers\API\ActivityController::class, 'index']);
-Route::get('product_report', [\App\Http\Controllers\API\ProductAPIController::class, 'report']);
+
+Route::prefix('report')->group(function (){
+    Route::get('product', [\App\Http\Controllers\API\ProductAPIController::class, 'report']);
+    Route::get('daily', [\App\Http\Controllers\API\ReportAPIController::class, 'dailyReport']);
+});

@@ -50,7 +50,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                         <p className={`underline`}>{moment(mainData?.created_at).format('DD-MMM-Y')}</p>
                     </div>
                     <div className={`flex flex-row w-full justify-end`}>
-                        <i className={`pr-2`}>I.R.F. no. </i>
+                        <i className={`pr-2`}>I.R.F. NO. </i>
                         <p className={`underline`}>{mainData?.irf_no}</p>
                     </div>
                 </div>
@@ -132,7 +132,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                             <p className={`underline`}>{moment(mainData?.created_at).format('DD-MMM-Y')}</p>
                         </div>
                         <div className={`flex flex-row w-full justify-end`}>
-                            <i className={`pr-2`}>I.R.F. no. </i>
+                            <i className={`pr-2`}>I.R.F. NO. </i>
                             <p className={`underline`}>{mainData?.irf_no}</p>
                         </div>
                     </div>

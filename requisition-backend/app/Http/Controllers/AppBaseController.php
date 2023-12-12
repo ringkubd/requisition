@@ -38,15 +38,21 @@ class AppBaseController extends Controller
     }
 
     public function newIRFNO(){
-        $id = DB::table('irf_nos')->max('id');
-        if (!$id){
-            $statement = DB::select("show table status like 'irf_nos'");
-            $id = $statement[0]->Auto_increment;
-        }else{
-            $id++;
-        }
-        $year = Carbon::now()->format('y');
+        $year = Carbon::now();
+        $lastYear = Carbon::now()->subYear();
+        $lastYearMax = DB::table('irf_nos')->whereRaw("year(created_at) = $lastYear->year")->max('id') ?? 0;
+        $id = DB::table('irf_nos')->whereRaw("year(created_at) = $year->year")->max('id') - $lastYearMax;
+        $id = $id < 1 ? 1 : $id++;
         $department = auth_department_name();
-        return $id.'/'.$year.'/'.$department;
+        return $id.'/'.$year->format('y').'/'.$department;
+    }
+
+    public function newPRFNO(){
+        $year = Carbon::now();
+        $lastYear = Carbon::now()->subYear()->year;
+        $lastYearMax = DB::table('p_r_f_nos')->whereRaw("year(created_at) = $lastYear")->max('id');
+        $id = DB::table('p_r_f_nos')->whereRaw("year(created_at) = $year->year")->max('id') - $lastYearMax;
+        $id = $id < 1 ? 1 : $id++;
+        return $id.'/'.$year->format('y');
     }
 }

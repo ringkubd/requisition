@@ -32,8 +32,8 @@ const CashRequisition = () => {
     if (!isLoading && !isError && data){
       setColumns([
         {
-          name: 'I.R.F. No.',
-          selector: row => row.irf_no,
+          name: 'P.R.F. NO.',
+          selector: row => row.prf_no,
           sortable: true,
         },
         {

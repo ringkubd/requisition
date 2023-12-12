@@ -51,3 +51,7 @@ Route::resource('measurement-units', App\Http\Controllers\MeasurementUnitControl
 Route::resource('cash-products', App\Http\Controllers\CashProductController::class);
 Route::resource('cash-requisitions', App\Http\Controllers\CashRequisitionController::class);
 Route::resource('cash-requisition-items', App\Http\Controllers\CashRequisitionItemController::class);
+
+Route::prefix('import')->group(function (){
+    Route::get('branch', [\App\Http\Controllers\API\ImportUsersFromEMSController::class, 'importBranch']);
+});

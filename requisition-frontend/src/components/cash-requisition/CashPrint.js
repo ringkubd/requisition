@@ -23,142 +23,291 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
     })
 
     return (
-        <div className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none`} ref={ref}>
+        <div
+            className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none`}
+            ref={ref}>
             {/*Header*/}
             <div className={`flex flex-col shadow-none`} ref={accountsCopy}>
                 <div className={`text-center font-bold`}>
-                    <h2>IsDB-Bangladesh Islamic Solidarity Educational Wakf (IsDB-BISEW)</h2>
+                    <h2>
+                        IsDB-Bangladesh Islamic Solidarity Educational Wakf
+                        (IsDB-BISEW)
+                    </h2>
                 </div>
-                <div className={`flex justify-center items-center justify-items-center text-center`}>
-                    <p className={`py-1 px-4 underline bg-gray-300 w-fit`}>Purchase Requisition Form</p>
+                <div
+                    className={`flex flex-col justify-center items-center justify-items-center text-center`}>
+                    <p className={`py-1 px-4 underline bg-gray-300 w-fit`}>
+                        Purchase Requisition Form
+                    </p>
                 </div>
-                <div className={`flex justify-center items-center justify-items-center text-center`}>
-                    <i className={`px-4 w-fit font-extralight font-serif`}>(Account's Copy)</i>
+                <div
+                    className={`flex justify-center items-center justify-items-center text-center`}>
+                    <i className={`px-4 w-fit font-extralight font-serif`}>
+                        (Account's Copy)
+                    </i>
                 </div>
-                <div className={`flex flex-row items-stretch justify-between my-2 w-full`}>
+                <div
+                    className={`flex flex-row items-stretch justify-between my-2 w-full`}>
                     <div className={`flex flex-row w-full justify-start`}>
                         <i className={`pr-4`}>Date: </i>
-                        <p className={`underline`}>{moment(mainData?.created_at).format('DD-MMM-Y')}</p>
-                    </div>
-                    <div className={`flex flex-row w-full justify-center`}>
-                        <i className={`pr-2`}>I.R.F. no. </i>
-                        <p className={`underline`}>{mainData?.irf_no}</p>
+                        <p className={`underline`}>
+                            {moment(mainData?.created_at).format('DD-MMM-Y')}
+                        </p>
                     </div>
                     <div className={`flex flex-row w-full justify-end`}>
-                        <i className={`pr-4`}>P.O. No. </i>
-                        <p className={`border-b border-black w-24`}></p>
-                        <p>/{moment().format('YY')}</p>
+                        <i className={`pr-2`}>P.R.F. NO. </i>
+                        <p className={`underline`}>{mainData?.prf_no}</p>
                     </div>
                 </div>
                 <div className={`flex flex-col text-sm shadow-none`}>
                     <div>
-                        Please arrange estimated Tk. <strong className={`underline font-bold italic`}>{mainData?.total_cost.toLocaleString()}/-</strong> (In Word) <strong className={`underline font-bold italic`}>{mainData?.total_cost === 0 ? 'Zero' : number2wordEnglish(mainData?.total_cost ?? 0)}</strong> for purchase of the following:
+                        Please arrange estimated Tk.{' '}
+                        <strong className={`underline font-bold italic`}>
+                            {mainData?.total_cost.toLocaleString()}/-
+                        </strong>{' '}
+                        (In Word){' '}
+                        <strong className={`underline font-bold italic`}>
+                            {mainData?.total_cost === 0
+                                ? 'Zero'
+                                : number2wordEnglish(mainData?.total_cost ?? 0)}
+                        </strong>{' '}
+                        for purchase of the following:
                     </div>
                     <div className="relative overflow-x-auto">
-                        <table className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
-                            <thead className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
-                            <tr>
-                                <th scope="col" className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>Sl.#</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-2 normal-case`}>Name of the Item</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-2 normal-case`}>Last Purchase Date</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-0 normal-case`}>Unit</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-2 normal-case`}>Required Quantity</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-2 normal-case`}>Unit Price</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-2 normal-case`}>Total</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-2 normal-case`}>Purpose</th>
-                            </tr>
+                        <table
+                            className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
+                            <thead
+                                className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
+                                <tr>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                                        Sl.#
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Name of the Item
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Last Purchase Date
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-0 normal-case`}>
+                                        Unit
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Required Quantity
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Unit Price
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Total
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Purpose
+                                    </th>
+                                </tr>
                             </thead>
                             <tbody className={`shadow-none text-gray-800`}>
-                            {
-                                requisition_products?.map((rp, index) => (
-                                    <tr className={`border text-center bg-white`} key={index}>
-                                        <td className={`border p-0`}>{index + 1}</td>
-                                        <td className={`border p-0 text-left`}>{rp.item}</td>
-                                        <td className={`border p-0`}>{rp.last_purchase_date ? moment(rp.last_purchase_date).format('DD MMM Y') : null}</td>
-                                        <td className={`border p-0`}>{rp?.unit}</td>
-                                        <td className={`border p-0`}>{rp.required_unit}</td>
-                                        <td className={`border p-0`}>{rp.unit_price}</td>
-                                        <td className={`border p-0`}>{parseFloat(rp.unit_price) * parseFloat(rp.required_unit)}</td>
-                                        <td className={`border p-0`}>{rp.purpose}</td>
+                                {requisition_products?.map((rp, index) => (
+                                    <tr
+                                        className={`border text-center bg-white`}
+                                        key={index}>
+                                        <td className={`border p-0`}>
+                                            {index + 1}
+                                        </td>
+                                        <td className={`border p-0 text-left`}>
+                                            {rp.item}
+                                        </td>
+                                        <td className={`border p-0`}>
+                                            {rp.last_purchase_date
+                                                ? moment(
+                                                      rp.last_purchase_date,
+                                                  ).format('DD MMM Y')
+                                                : null}
+                                        </td>
+                                        <td className={`border p-0`}>
+                                            {rp?.unit}
+                                        </td>
+                                        <td className={`border p-0`}>
+                                            {rp.required_unit}
+                                        </td>
+                                        <td className={`border p-0`}>
+                                            {rp.unit_price}
+                                        </td>
+                                        <td className={`border p-0`}>
+                                            {parseFloat(rp.unit_price) *
+                                                parseFloat(rp.required_unit)}
+                                        </td>
+                                        <td className={`border p-0`}>
+                                            {rp.purpose}
+                                        </td>
                                     </tr>
-                                ))
-                            }
-                            <tr>
-                                <th colSpan={7} className={`border py-0 px-2 text-right bg-white`}>Total: </th>
-                                <td className={`border py-0 px-2 text-center`}>{mainData?.total_cost.toLocaleString()}</td>
-                            </tr>
+                                ))}
+                                <tr>
+                                    <th
+                                        colSpan={7}
+                                        className={`border py-0 px-2 text-right bg-white`}>
+                                        Total:{' '}
+                                    </th>
+                                    <td
+                                        className={`border py-0 px-2 text-center`}>
+                                        {mainData?.total_cost.toLocaleString()}
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                     <div className={`my-1`}></div>
                     {/*Table Two*/}
                     <div className="relative overflow-x-auto">
-                        <table className={`w-full text-left text-gray-800 dark:text-gray-400 text-xs shadow-none`}>
+                        <table
+                            className={`w-full text-left text-gray-800 dark:text-gray-400 text-xs shadow-none`}>
                             <tbody className={`shadow-none`}>
                                 <tr>
                                     <td className={`border px-2 py-2`}>
                                         <div className={`flex flex-col`}>
                                             <div>
-                                                Requisitioned by <span className={`underline`}>{mainData?.user?.name}</span>
+                                                Requisitioned by{' '}
+                                                <span className={`underline`}>
+                                                    {mainData?.user?.name}
+                                                </span>
                                             </div>
-                                            <div className={`flex flex-row my-4`}>
+                                            <div
+                                                className={`flex flex-row my-4`}>
                                                 <div>Signature</div>
-                                                <div className={`min-w-max border-b border-black w-full`}></div>
+                                                <div
+                                                    className={`min-w-max border-b border-black w-full`}></div>
                                             </div>
-                                            <div className={`flex flex-row my-4`}>
-                                                <div className={`min-w-fit`}>Section Head</div>
-                                                <div className={`border-b border-black w-full`}></div>
+                                            <div
+                                                className={`flex flex-row my-4`}>
+                                                <div className={`min-w-fit`}>
+                                                    Section Head
+                                                </div>
+                                                <div
+                                                    className={`border-b border-black w-full`}></div>
                                             </div>
                                             <div className={`mt-4`}>
-                                                <input type="checkbox" className={'mx-4'} />
+                                                <input
+                                                    type="checkbox"
+                                                    className={'mx-4'}
+                                                />
                                                 <label>Urgent Nature</label>
                                             </div>
                                         </div>
                                     </td>
                                     <td className={`border text-xs px-2`}>
                                         <div className={`flex flex-col`}>
-                                            <div className={`flex flex-row justify-between`}>
+                                            <div
+                                                className={`flex flex-row justify-between`}>
                                                 <div>
-                                                    <input type="checkbox" checked={true} className={`form-checkbox mr-2`} />
-                                                    <label htmlFor="">Cash</label>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={true}
+                                                        className={`form-checkbox mr-2`}
+                                                    />
+                                                    <label htmlFor="">
+                                                        Cash
+                                                    </label>
                                                 </div>
                                                 <div>
-                                                    <input type="checkbox" className={`form-checkbox mr-2`} />
-                                                    <label htmlFor="">Cheque</label>
+                                                    <input
+                                                        type="checkbox"
+                                                        className={`form-checkbox mr-2`}
+                                                    />
+                                                    <label htmlFor="">
+                                                        Cheque
+                                                    </label>
                                                 </div>
                                                 <div>
-                                                    <input type="checkbox" className={`form-checkbox mr-2`} />
-                                                    <label htmlFor="">LPO</label>
+                                                    <input
+                                                        type="checkbox"
+                                                        className={`form-checkbox mr-2`}
+                                                    />
+                                                    <label htmlFor="">
+                                                        LPO
+                                                    </label>
                                                 </div>
                                             </div>
-                                            <div className={`flex flex-row my-4`}>
-                                                <div className={`w-5/12 mr-0 pr-0`}>
-                                                    <input type="checkbox" className={`form-checkbox mr-2`} />
-                                                    <label htmlFor="">Fund available</label>
+                                            <div
+                                                className={`flex flex-row my-4`}>
+                                                <div
+                                                    className={`w-5/12 mr-0 pr-0`}>
+                                                    <input
+                                                        type="checkbox"
+                                                        className={`form-checkbox mr-2`}
+                                                    />
+                                                    <label htmlFor="">
+                                                        Fund available
+                                                    </label>
                                                 </div>
-                                                <div className={`flex flex-row ml-0 pl-0`}>
+                                                <div
+                                                    className={`w-5/12 mr-0 pr-0`}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked
+                                                        className={`form-checkbox mr-2`}
+                                                    />
+                                                    <label htmlFor="">
+                                                        None Store Item
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div
+                                                className={`flex flex-row my-4`}>
+                                                <div
+                                                    className={`flex flex-row ml-0 pl-0`}>
                                                     <div className={``}>
-                                                        <input type="checkbox" className={`form-checkbox mr-2`} />
+                                                        <input
+                                                            type="checkbox"
+                                                            className={`form-checkbox mr-2`}
+                                                        />
                                                     </div>
-                                                    <div className={``}>Maybe arranged on</div>
-                                                    <div className={`border-b border-black ml-0 pl-0 w-20`}></div>
+                                                    <div className={``}>
+                                                        Maybe arranged on
+                                                    </div>
+                                                    <div
+                                                        className={`border-b border-black ml-0 pl-0 w-20`}></div>
                                                 </div>
                                             </div>
                                             <div className={`flex flex-col`}>
-                                                <div className={`flex flex-row my-4`}>
-                                                    <div>
-                                                        Accounts Officer
-                                                    </div>
-                                                    <div className={`w-1/2 border-b border-black`}></div>
+                                                <div
+                                                    className={`flex flex-row my-4`}>
+                                                    <div>Accounts Officer</div>
+                                                    <div
+                                                        className={`w-1/2 border-b border-black`}></div>
                                                 </div>
-                                                <div className={`text-center`}>[Requisitor to initiate follow-up action]</div>
+                                                <div className={`text-center`}>
+                                                    [Requisitor to initiate
+                                                    follow-up action]
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td className={`border px-2`}>
-                                        <div className={`flex flex-col justify-items-between items-baseline justify-between min-h-full h-36`}>
-                                            <div className={`text-center w-full`}>Approved for payment</div>
-                                            <div className={`text-center border-t border-black w-full`}>Chief Executive Officer</div>
+                                        <div
+                                            className={`flex flex-col justify-items-between items-baseline justify-between min-h-full h-36`}>
+                                            <div
+                                                className={`text-center w-full`}>
+                                                Approved for payment
+                                            </div>
+                                            <div
+                                                className={`text-center border-t border-black w-full`}>
+                                                Chief Executive Officer
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -192,68 +341,136 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                 </div>
             </div>
             {/*  End Header  */}
-            <hr ref={hrRef} className={`my-16 h-px bg-gray-400 border-2 border-dashed`}/>
+            <hr
+                ref={hrRef}
+                className={`my-16 h-px bg-gray-400 border-2 border-dashed`}
+            />
             <div className={`flex flex-col shadow-none`} ref={requisitorCopy}>
-                <div className={`flex justify-center items-center justify-items-center text-center`}>
-                    <h2 className={`py-1 px-4 underline bg-gray-300 w-fit`}>Purchase Requisition Form</h2>
+                <div
+                    className={`flex flex-col justify-center items-center justify-items-center text-center`}>
+                    <h2 className={`py-1 px-4 underline bg-gray-300 w-fit`}>
+                        Purchase Requisition Form
+                    </h2>
                 </div>
-                <div className={`flex justify-center items-center justify-items-center text-center`}>
-                    <i className={`py-1 px-4 w-fit font-extralight font-serif`}>(Requisitor's Copy)</i>
+                <div
+                    className={`flex justify-center items-center justify-items-center text-center`}>
+                    <i className={`py-1 px-4 w-fit font-extralight font-serif`}>
+                        (Requisitor's Copy)
+                    </i>
                 </div>
-                <div className={`flex flex-row items-stretch justify-between mt-2 w-full`}>
+                <div
+                    className={`flex flex-row items-stretch justify-between mt-2 w-full`}>
                     <div className={`flex flex-row w-full justify-start`}>
                         <i className={`pr-2`}>Date: </i>
-                        <p className={`underline`}>{moment(mainData?.created_at).format('DD-MMM-Y')}</p>
+                        <p className={`underline`}>
+                            {moment(mainData?.created_at).format('DD-MMM-Y')}
+                        </p>
                     </div>
                     <div className={`flex flex-row w-full`}>
                         <i className={`pr-0`}>Recieved Tk. </i>
                         <p className={`border-b border-black w-20`}></p>
                     </div>
-                    <div className={`flex flex-row w-full justify-center`}>
-                        <i className={`pr-2`}>I.R.F. no. </i>
-                        <p className={`underline`}>{mainData?.irf_no}</p>
-                    </div>
                     <div className={`flex flex-row w-full justify-end`}>
-                        <i className={`pr-2`}>P.O. No. </i>
-                        <p className={`border-b border-black w-24`}></p>
-                        <p>/{moment().format('YY')}</p>
+                        <i className={`pr-2`}>P.R.F. NO. </i>
+                        <p className={`underline`}>{mainData?.prf_no}</p>
                     </div>
                 </div>
                 <div className={`flex flex-col text-sm shadow-none`}>
                     <div className="relative overflow-x-auto">
-                        <table className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
-                            <thead className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
-                            <tr>
-                                <th scope="col" className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>Sl.#</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-2 normal-case`}>Name of the Item</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-2 normal-case`}>Last Purchase Date</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-0 normal-case`}>Unit</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-2 normal-case`}>Required Quantity</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-2 normal-case`}>Unit Price</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-2 normal-case`}>Total</th>
-                                <th scope="col" className={`border bg-white leading-3 py-0 px-2 normal-case`}>Purpose</th>
-                            </tr>
+                        <table
+                            className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
+                            <thead
+                                className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
+                                <tr>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                                        Sl.#
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Name of the Item
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Last Purchase Date
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-0 normal-case`}>
+                                        Unit
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Required Quantity
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Unit Price
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Total
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Purpose
+                                    </th>
+                                </tr>
                             </thead>
                             <tbody className={`shadow-none text-gray-800`}>
-                            {
-                                requisition_products?.map((rp, index) => (
-                                    <tr className={`border text-center bg-white`} key={index}>
-                                        <td className={`border p-0`}>{index + 1}</td>
-                                        <td className={`border p-0 text-left`}>{rp.item}</td>
-                                        <td className={`border p-0`}>{rp.last_purchase_date ? moment(rp.last_purchase_date).format('DD MMM Y') : null}</td>
-                                        <td className={`border p-0`}>{rp?.unit}</td>
-                                        <td className={`border p-0`}>{rp.required_unit}</td>
-                                        <td className={`border p-0`}>{rp.unit_price}</td>
-                                        <td className={`border p-0`}>{parseFloat(rp.unit_price) * parseFloat(rp.required_unit)}</td>
-                                        <td className={`border p-0`}>{rp.purpose}</td>
-
+                                {requisition_products?.map((rp, index) => (
+                                    <tr
+                                        className={`border text-center bg-white`}
+                                        key={index}>
+                                        <td className={`border p-0`}>
+                                            {index + 1}
+                                        </td>
+                                        <td className={`border p-0 text-left`}>
+                                            {rp.item}
+                                        </td>
+                                        <td className={`border p-0`}>
+                                            {rp.last_purchase_date
+                                                ? moment(
+                                                      rp.last_purchase_date,
+                                                  ).format('DD MMM Y')
+                                                : null}
+                                        </td>
+                                        <td className={`border p-0`}>
+                                            {rp?.unit}
+                                        </td>
+                                        <td className={`border p-0`}>
+                                            {rp.required_unit}
+                                        </td>
+                                        <td className={`border p-0`}>
+                                            {rp.unit_price}
+                                        </td>
+                                        <td className={`border p-0`}>
+                                            {parseFloat(rp.unit_price) *
+                                                parseFloat(rp.required_unit)}
+                                        </td>
+                                        <td className={`border p-0`}>
+                                            {rp.purpose}
+                                        </td>
                                     </tr>
-                                ))
-                            }
-                            <tr>
-                                <th colSpan={7} className={`border py-0 px-2 text-right bg-white`}>Total: </th>
-                                <td className={`border py-0 px-2 text-center`}>{mainData?.total_cost.toLocaleString()}</td>
-                            </tr>
+                                ))}
+                                <tr>
+                                    <th
+                                        colSpan={7}
+                                        className={`border py-0 px-2 text-right bg-white`}>
+                                        Total:{' '}
+                                    </th>
+                                    <td
+                                        className={`border py-0 px-2 text-center`}>
+                                        {mainData?.total_cost.toLocaleString()}
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

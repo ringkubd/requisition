@@ -45,6 +45,7 @@ import { NavigationAPIService } from "@/store/service/navigation";
 import { CashRequisitionAPIService } from "@/store/service/cash/Index";
 import DashboardSlice from "@/store/slice/dashboardSlice";
 import ActivitySlice from "@/store/slice/activitySlice";
+import { ReportAPI } from "@/store/service/report";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -69,6 +70,7 @@ const middlewares = [
     PermissionsApiService.middleware,
     NavigationAPIService.middleware,
     CashRequisitionAPIService.middleware,
+    ReportAPI.middleware,
 ];
 
 const persistConfig = {
@@ -112,6 +114,7 @@ const combineReducer = combineReducers({
     [PermissionsApiService.reducerPath]: PermissionsApiService.reducer,
     [NavigationAPIService.reducerPath]: NavigationAPIService.reducer,
     [CashRequisitionAPIService.reducerPath]: CashRequisitionAPIService.reducer,
+    [ReportAPI.reducerPath]: ReportAPI.reducer,
 });
 
 const _persistedReducer = persistReducer(persistConfig, combineReducer);
