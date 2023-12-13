@@ -138,6 +138,8 @@ class ProductIssueAPIController extends AppBaseController
         foreach ($purchase_history as $purchase){
             if ($qty > 0){
                 $purchase_log[] = [
+                    'product_id' => $purchase->product_id,
+                    'product_option_id' => $purchase->product_option_id,
                     'purchase_id' => $purchase->id,
                     'qty' => min($request_quantity, $purchase->available_qty),
                     'unit_price' => $purchase->unit_price,
