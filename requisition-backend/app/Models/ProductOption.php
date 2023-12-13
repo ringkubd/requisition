@@ -97,7 +97,13 @@ use Illuminate\Database\Eloquent\Model;
         return $this->belongsTo(\App\Models\Product::class, 'product_id');
     }
 
-    public function purchaseHistory(){
+    public function purchaseHistory(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
         return $this->hasMany(Purchase::class);
+    }
+
+    public function issuePurchaseLog()
+    {
+        return $this->hasMany(IssuePurchaseLog::class);
     }
 }
