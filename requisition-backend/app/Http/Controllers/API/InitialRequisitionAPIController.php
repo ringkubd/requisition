@@ -370,7 +370,7 @@ class InitialRequisitionAPIController extends AppBaseController
             })
             ->with('category')
             ->skip($start)
-            ->limit(10)
+            ->limit(20)
             ->get());
 
         return $this->sendResponse(

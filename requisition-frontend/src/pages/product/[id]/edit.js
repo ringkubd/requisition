@@ -5,9 +5,6 @@ import NavLink from '@/components/navLink'
 import { useRouter } from 'next/router'
 import VariantForm from "@/components/product/VariantForm";
 import MetaForm from "@/components/product/MetaForm";
-import { FaFontAwesome } from "react-icons/fa";
-import { SiMetafilter } from "react-icons/si";
-import { TbHttpOptions } from "react-icons/tb";
 import BasicForm from "@/components/product/BasicForm";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveForm } from "@/store/service/product/product_active_form";

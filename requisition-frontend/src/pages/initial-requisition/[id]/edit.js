@@ -1,6 +1,6 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, Select, TextInput } from "flowbite-react";
+import { Button, Card, Label, TextInput } from "flowbite-react";
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
@@ -13,9 +13,11 @@ import {
 } from "@/store/service/requisitions/initial";
 import Actions from "@/components/actions";
 import DataTable from "react-data-table-component";
-import Select2ComponentAjax from "@/components/select2/Select2ComponentAjax";
 import moment from "moment/moment";
 import UpdateVariantForm from "@/components/initial-requisition/updateVariantForm";
+import axios from "@/lib/axios";
+import { AsyncPaginate } from "react-select-async-paginate";
+import Select from "react-select";
 
 const Edit = (props) => {
     const router = useRouter();
@@ -25,13 +27,11 @@ const Edit = (props) => {
     })
     const [products, setProducts] = useState([]);
     const selectRef = useRef();
+    const [productOptions, setProductOptions] = useState([]);
+    const [productUnit, setProductUnit] = useState("");
 
     const [requisitionData, setRequisitionData] = useState([]);
     const [submitRemoveProcessing, setSubmitRemoveProcessing] = useState(false);
-
-    useEffect(() => {
-        console.log(requisitionData)
-    })
 
     useEffect(() => {
         if (!isLoading && !isError && data){
@@ -41,7 +41,6 @@ const Edit = (props) => {
                 return rp;
             });
             setRequisitionData(abcObj);
-            selectRef.current.resetSelect()
         }
     }, [isLoading, data]);
 
@@ -60,7 +59,7 @@ const Edit = (props) => {
     useEffect(() => {
         if (updateResult.isError){
             // formikForm.current.setErrors(updateResult.error.data.errors)
-            console.log(updateResult)
+            // console.log(updateResult)
         }
         if (updateResult.isError || updateResult.isSuccess){
             formikForm.current.setSubmitting(false)
@@ -83,7 +82,8 @@ const Edit = (props) => {
         setRequisitionData([...requisitionData, values])
         pageProps.setSubmitting(false);
         pageProps.resetForm();
-        selectRef.current.resetSelect();
+        selectRef.current.clearValue();
+        selectRef.current.removeValue()
     }
 
     const updateItems = (values) => {
@@ -104,7 +104,6 @@ const Edit = (props) => {
             }
             return rd;
         })
-        // setRequisitionData(updated);
     }
     const updateOtherItems = (label, value, row) => {
         const newRequisitionData = requisitionData.map((rd) => {
@@ -115,6 +114,8 @@ const Edit = (props) => {
             return rd;
         })
         setRequisitionData(newRequisitionData);
+        selectRef.current.clearValue();
+        selectRef.current.removeValue()
     }
 
     const validationSchema = Yup.object().shape({
@@ -129,9 +130,9 @@ const Edit = (props) => {
         setSubmitRemoveProcessing(true)
         setRequisitionData(requisitionData.filter(r => item.product_id !== r.product_id && item.product_option_id !== r.product_option_id));
         setSubmitRemoveProcessing(false);
-        selectRef.current.resetSelect();
+        selectRef.current.clearValue();
+        selectRef.current.removeValue()
     }
-//products.filter(p => p.id == row.product_id)[0]?.product_options?.filter(o => o.id == row.product_option_id).map(o => (o.option.name + `(${o.option_value})`))[0] ?? `${row?.product_option?.option_name}(${ row?.product_option?.option_value})`,
     const tableColumns = [
         {
             name: 'Product',
@@ -201,6 +202,36 @@ const Edit = (props) => {
         }
     ];
 
+    async function loadOptions(search, loadedOptions, { page }) {
+        const response = await axios.get(`/api/product-select`, {
+            params: {
+                search: search,
+                page: page
+            }
+        });
+        const responseJSON = response.data;
+
+        if (page === 1){
+            setProducts(responseJSON.data);
+        }else{
+            setProducts([...products, ...responseJSON.data])
+        }
+        return {
+            options: responseJSON.data.map((r,) => {
+                return {
+                    label: r.category?.code + " => " + r.title,
+                    value: r.id,
+                    product_options: r.product_options,
+                    unit: r.unit,
+                    last_purchase: r.last_purchase,
+                }
+            }),
+            hasMore: responseJSON.data.length >= 1,
+            additional: {
+                page: search ? 1 : page + 1,
+            },
+        };
+    }
 
     return (
         <>
@@ -251,37 +282,25 @@ const Edit = (props) => {
                                                                         value="Product"
                                                                     />
                                                                 </div>
-                                                                <Select2ComponentAjax
+                                                                <AsyncPaginate
+                                                                    defaultOptions
                                                                     name='product_id'
                                                                     id='product_id'
-                                                                    ref={selectRef}
-                                                                    onChange={(e) => {
-                                                                        handleChange(e)
+                                                                    selectRef={selectRef}
+                                                                    className={`select`}
+                                                                    classNames={{
+                                                                        control: state => 'select'
                                                                     }}
-                                                                    className={`w-full border-1 border-gray-300`}
-                                                                    ajax={ {
-                                                                        url: process.env.NEXT_PUBLIC_BACKEND_API_URL+ `product-select`,
-                                                                        data: function (params) {
-                                                                            var query = {
-                                                                                search: params.term,
-                                                                                page: params.page || 1
-                                                                            }
-                                                                            // Query parameters will be ?search=[term]&type=public
-                                                                            return query;
-                                                                        },
-                                                                        processResults: function (data, params) {
-                                                                            params.page = params.page || 1;
-                                                                            setProducts(data.data);
-                                                                            return {
-                                                                                results: data.data.map((d)=> {
-                                                                                    return {text: d.title, id: d.id, unit: d.unit}
-                                                                                }),
-                                                                                pagination: {
-                                                                                    more: (params.page * 10) < data.count_filtered
-                                                                                }
-                                                                            };
-                                                                        }
+                                                                    onChange={(newValue) => {
+                                                                        setProductOptions(newValue?.product_options)
+                                                                        setProductUnit(newValue?.unit)
+                                                                        setFieldValue('product_id',newValue?.value)
+                                                                        setFieldValue('last_purchase_date', newValue?.last_purchase?.created_at ? moment(newValue?.last_purchase?.created_at)?.format('Y-M-DD') : null);
                                                                     }}
+                                                                    additional={{
+                                                                        page: 1,
+                                                                    }}
+                                                                    loadOptions={loadOptions}
                                                                     data-placeholder="Select options..."
                                                                 />
                                                                 <ErrorMessage
@@ -298,7 +317,7 @@ const Edit = (props) => {
                                                                     />
                                                                 </div>
                                                                 <TextInput
-                                                                    value={products.filter(p => p.id == values.product_id)[0]?.unit}
+                                                                    value={productUnit}
                                                                     id='unit'
                                                                     name='unit'
                                                                     onChange={handleChange}
@@ -317,22 +336,19 @@ const Edit = (props) => {
                                                                     />
                                                                 </div>
                                                                 <Select
-                                                                    value={values.product_option_id}
-                                                                    onChange={(e) => {
-                                                                        handleChange(e)
-                                                                        setFieldValue('available_quantity', products.filter(p => p.id == values.product_id)[0]?.product_options?.filter((o) => o.id == e.target.value)[0]?.stock ?? 0);
-                                                                        setFieldValue('last_purchase_date', moment(products.filter(p => p.id == values.product_id)[0]?.last_purchase?.created_at)?.format('Y-M-DD') ?? null);
-                                                                        console.log(products.filter(p => p.id == values.product_id)[0])
+                                                                    value={productOptions?.filter((po) => po.id == values.product_option_id)?.map(po => ({label: po.option.name, value: po.id}))}
+                                                                    onChange={(newValue) => {
+                                                                        setFieldValue('product_option_id',newValue.value)
+                                                                        setFieldValue('available_quantity', newValue.stock ?? 0);
                                                                     }}
-                                                                    onBlur={handleChange}
                                                                     id='product_option_id'
                                                                     name="product_option_id"
-                                                                >
-                                                                    <option value=""></option>
-                                                                    {
-                                                                        products.length ? products.filter(p => p.id == values.product_id)[0]?.product_options?.map((o) => <option key={o.id} value={o.id}>{o?.option?.name} ({o?.option_value})</option>) : ''
-                                                                    }
-                                                                </Select>
+                                                                    options={ productOptions?.map((o) => ({label: o.option.name, value: o.id, stock: o.stock, }))}
+                                                                    className={`select`}
+                                                                    classNames={{
+                                                                        control: state => `select`
+                                                                    }}
+                                                                />
                                                                 <ErrorMessage
                                                                     name='product_option_id'
                                                                     render={(msg) => <span className='text-red-500'>{msg}</span>} />
@@ -350,6 +366,8 @@ const Edit = (props) => {
                                                                     value={values.required_quantity}
                                                                     id='required_quantity'
                                                                     name='required_quantity'
+                                                                    type={`number`}
+                                                                    step={0.1}
                                                                     onChange={(e) => {
                                                                         handleChange(e);
                                                                         setFieldValue('quantity_to_be_purchase', (e.target.value - values.available_quantity) < 0 ? 0 : (e.target.value - values.available_quantity))
@@ -372,6 +390,8 @@ const Edit = (props) => {
                                                                     value={values.available_quantity}
                                                                     id='available_quantity'
                                                                     name='available_quantity'
+                                                                    type={`number`}
+                                                                    step={0.1}
                                                                     onChange={handleChange}
                                                                     onBlur={handleChange}
                                                                 />
@@ -392,6 +412,8 @@ const Edit = (props) => {
                                                                     value={values.quantity_to_be_purchase }
                                                                     id='quantity_to_be_purchase'
                                                                     name='quantity_to_be_purchase'
+                                                                    type={`number`}
+                                                                    step={0.1}
                                                                     onChange={handleChange}
                                                                 />
                                                                 <ErrorMessage

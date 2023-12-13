@@ -167,16 +167,15 @@ const InitialRequisitionCreate = (props) => {
         });
         const responseJSON = response.data;
 
-
         if (page === 1){
             setProducts(responseJSON.data);
         }else{
             setProducts([...products, ...responseJSON.data])
         }
         return {
-            options: responseJSON.data.map((r) => {
+            options: responseJSON.data.map((r,) => {
                 return {
-                    label: r.title + " => " + r.category?.code,
+                    label: r.category?.code + " => " + r.title,
                     value: r.id,
                     product_options: r.product_options,
                     unit: r.unit,

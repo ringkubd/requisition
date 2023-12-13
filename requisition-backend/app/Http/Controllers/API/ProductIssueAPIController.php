@@ -132,11 +132,13 @@ class ProductIssueAPIController extends AppBaseController
             ->oldest()
             ->get();
 
-        $qty = $quantity;
+        $request_quantity = $quantity;
+        $qty = $request_quantity;
         foreach ($purchase_history as $purchase){
             if ($qty > 0){
-                $purchase->available_qty = $quantity > $purchase->available_qty ? $quantity - $purchase->available_qty : $purchase->available_qty - $quantity;
-                $qty = $purchase->available_qty;
+                $qty = $qty <= $purchase->available_qty ? 0 : $qty - $purchase->available_qty;
+                $purchase->available_qty = $request_quantity < $purchase->available_qty ? $purchase->available_qty - $request_quantity : 0;
+                $request_quantity = $qty;
                 $purchase->save();
                 continue;
             }else{

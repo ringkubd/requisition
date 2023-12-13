@@ -14,6 +14,9 @@ import Select2Component from "@/components/select2/Select2Component";
 import AddSupplierModal from "@/components/suppliers/AddSupplierModal";
 import AddBrandModal from "@/components/brands/addBrandModal";
 import { useGetCountriesQuery } from "@/store/service/country";
+import axios from "@/lib/axios";
+import { AsyncPaginate } from "react-select-async-paginate";
+import Select from "react-select";
 const create = (props) => {
     const router = useRouter();
     const [storePurchase, storeResult] = useStorePurchaseMutation();
@@ -38,7 +41,6 @@ const create = (props) => {
             formikForm.current.setFieldValue('qty',quantity?.toString())
             formikForm.current.setFieldValue('unit_price',unitPrice?.toString())
             formikForm.current.setFieldValue('total_price',(quantity * unitPrice)?.toString())
-            console.log(quantity * unitPrice)
         }
     }, [selectedProductOptionId])
 
@@ -60,13 +62,17 @@ const create = (props) => {
         }
         if (storeResult.isError || storeResult.isSuccess){
             formikForm.current.setSubmitting(false)
-            formikForm.current.setSubmitting(false);
         }
         if (!storeResult.isLoading && storeResult.isSuccess){
             toast.success('Purchase stored successfully.')
             formikForm.current.setSubmitting(false);
-            // router.push('/purchase')
             formikForm.current.resetForm();
+            selectRef.current.clearValue();
+            if (purchaseRequisitionSelectRef){
+                purchaseRequisitionSelectRef.current.focus();
+                purchaseRequisitionSelectRef.current.clearValue();
+            }
+
         }
     }, [storeResult]);
     const submit = async (values, pageProps) => {
@@ -87,6 +93,30 @@ const create = (props) => {
         unit_price: Yup.number().required().label('Per Unit Price'),
         total_price: Yup.number().required().label('Total Price'),
     })
+
+    async function loadOptions(search, loadedOptions, { page }) {
+        const response = await axios.get(`/api/purchase-requisition-select`, {
+            params: {
+                search: search,
+                page: page
+            }
+        });
+        const responseJSON = response.data;
+        return {
+            options: responseJSON.data.map((r) => {
+                return {
+                    label: r.prf_no + " (" + moment(r.created_at).format('DD-MMM-Y')+" by "+r?.user?.name+")",
+                    value: r.id,
+                    data: r,
+                    products: r.purchase_requisition_products
+                }
+            }),
+            hasMore: responseJSON.data.length >= 10,
+            additional: {
+                page: search ? 1 : page + 1,
+            },
+        };
+    }
 
     return (
       <>
@@ -128,36 +158,28 @@ const create = (props) => {
                                                       value="Requisition"
                                                     />
                                                 </div>
-                                                <Select2ComponentAjax
-                                                  name='purchase_requisition_id'
-                                                  id='purchase_requisition_id'
-                                                  ref={purchaseRequisitionSelectRef}
-                                                  onChange={(e, {data}) => {
-                                                      handleChange(e)
-                                                      setProducts(data)
-                                                  }}
-                                                  className={`w-full border-1 border-gray-300`}
-                                                  ajax={{
-                                                      url: process.env.NEXT_PUBLIC_BACKEND_API_URL+ `purchase-requisition-select`,
-                                                      data: function (params) {
-                                                          return {
-                                                              search: params.term,
-                                                              page: params.page || 1
-                                                          }
-                                                      },
-                                                      processResults: function (data, params) {
-                                                          params.page = params.page || 1;
-                                                          return {
-                                                              results: data.data.map((d)=> {
-                                                                  return {text: d.irf_no + " (" + moment(d.created_at).format('DD-MMM-Y')+" by "+d?.user?.name+")", id: d.id, data: d?.purchase_requisition_products}
-                                                              }),
-                                                              pagination: {
-                                                                  more: (params.page * 10) < data.count_filtered
-                                                              }
-                                                          };
-                                                      },
-                                                  }}
-                                                  data-placeholder="Select options..."
+                                                <AsyncPaginate
+                                                    defaultOptions
+                                                    loadOptions={loadOptions}
+                                                    name='purchase_requisition_id'
+                                                    id='purchase_requisition_id'
+                                                    selectRef={purchaseRequisitionSelectRef}
+                                                    className={`select`}
+                                                    classNames={{
+                                                        control: state => 'select'
+                                                    }}
+                                                    onChange={(newValue, actionMeta) => {
+                                                        setFieldValue('purchase_requisition_id',newValue?.value)
+                                                        setSelectedProductOptionId(newValue?.data?.product_options?.id);
+                                                        setProducts(newValue?.products);
+                                                        setFieldValue('product_option_id',"")
+                                                        selectRef.current.clearValue();
+                                                        selectRef.current.focus();
+
+                                                    }}
+                                                    additional={{
+                                                        page: 1,
+                                                    }}
                                                 />
                                                 <ErrorMessage
                                                   name='purchase_requisition_id'
@@ -172,16 +194,19 @@ const create = (props) => {
                                                       value="Product"
                                                     />
                                                 </div>
-                                                <Select2Component
+                                                <Select
                                                   name='product_option_id'
                                                   id='product_option_id'
                                                   ref={selectRef}
-                                                  onChange={(e, data) => {
-                                                      handleChange(e)
-                                                      setSelectedProductOptionId(e.target.value);
+                                                  className={`select`}
+                                                  classNames={{
+                                                      control: state => 'select'
+                                                  }}
+                                                  onChange={(newValue, data) => {
+                                                      setFieldValue('product_option_id',newValue?.value)
+                                                      setSelectedProductOptionId(newValue?.value);
                                                   }}
                                                   options={products?.map((p) => ({value: p.product_option_id, label: p.title + " - "+p.product_option.title}))}
-                                                  className={`w-full border-1 border-gray-300`}
                                                 />
 
                                                 <ErrorMessage

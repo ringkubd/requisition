@@ -14,7 +14,9 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
         if (totalHeight > 1000){
             accountsCopy.current.classList.add('break-after-page')
             requisitorCopy.current.classList.add('mt-4')
-            hrRef.current.hide()
+            if(hrRef.current){
+                hrRef.current.style.display = 'none';
+            }
         }else {
             accountsCopy.current.classList.remove('break-after-page')
         }
