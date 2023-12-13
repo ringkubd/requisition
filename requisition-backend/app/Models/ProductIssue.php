@@ -100,4 +100,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     {
         return $this->belongsTo(\App\Models\User::class, 'receiver_id');
     }
+
+    public function purchaseLog(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(IssuePurchaseLog::class);
+    }
 }

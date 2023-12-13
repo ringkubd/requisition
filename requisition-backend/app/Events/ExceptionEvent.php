@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Exception;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -10,16 +11,17 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ExceptionEvent
+class ExceptionEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public Exception $exception;
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct(Exception $exception)
     {
-        //
+        $this->exception = $exception;
     }
 
     /**
@@ -30,7 +32,7 @@ class ExceptionEvent
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new Channel('exception'),
         ];
     }
 }

@@ -9,7 +9,6 @@ use App\Support\CreateUpdateOrDelete;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Activitylog\Models\Activity;

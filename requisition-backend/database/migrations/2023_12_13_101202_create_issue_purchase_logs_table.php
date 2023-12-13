@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('issue_purchase_logs', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(\App\Models\ProductIssue::class)->index()->references('id')->on('product_issues');
+            $table->foreignIdFor(\App\Models\Purchase::class)->index()->references('id')->on('purchases');
+            $table->double('qty');
+            $table->double('unit_price');
+            $table->double('total_price');
+            $table->date('purchase_date');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -134,8 +134,16 @@ class ProductIssueAPIController extends AppBaseController
 
         $request_quantity = $quantity;
         $qty = $request_quantity;
+        $purchase_log = [];
         foreach ($purchase_history as $purchase){
             if ($qty > 0){
+                $purchase_log[] = [
+                    'purchase_id' => $purchase->id,
+                    'qty' => min($request_quantity, $purchase->available_qty),
+                    'unit_price' => $purchase->unit_price,
+                    'total_price' => min($request_quantity, $purchase->available_qty) * $purchase->unit_price,
+                    'purchase_date' => $purchase->purchase_date,
+                ];
                 $qty = $qty <= $purchase->available_qty ? 0 : $qty - $purchase->available_qty;
                 $purchase->available_qty = $request_quantity < $purchase->available_qty ? $purchase->available_qty - $request_quantity : 0;
                 $request_quantity = $qty;
@@ -145,6 +153,7 @@ class ProductIssueAPIController extends AppBaseController
                 break;
             }
         }
+        $productIssue->purchaseLog()->createMany($purchase_log);
 
         return $this->sendResponse(
             new ProductIssueResource($productIssue),

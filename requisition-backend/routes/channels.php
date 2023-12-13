@@ -26,3 +26,6 @@ Broadcast::channel('activity', function ($user){
 Broadcast::channel('query_monitoring', function ($user){
     return true;
 });
+Broadcast::channel('exception', function ($user){
+    return true;
+});
