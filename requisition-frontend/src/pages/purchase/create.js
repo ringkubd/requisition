@@ -8,15 +8,15 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import * as Yup from 'yup';
 import { useStorePurchaseMutation } from "@/store/service/purchase";
-import Select2ComponentAjax from "@/components/select2/Select2ComponentAjax";
 import moment from "moment/moment";
 import Select2Component from "@/components/select2/Select2Component";
-import AddSupplierModal from "@/components/suppliers/AddSupplierModal";
-import AddBrandModal from "@/components/brands/addBrandModal";
 import { useGetCountriesQuery } from "@/store/service/country";
 import axios from "@/lib/axios";
 import { AsyncPaginate } from "react-select-async-paginate";
 import Select from "react-select";
+import CreatableSelect from 'react-select/creatable';
+import { useGetBrandsQuery, useStoreBrandsMutation } from "@/store/service/brands";
+import { useGetSuppliersQuery, useStoreSuppliersMutation } from "@/store/service/suppliers";
 const create = (props) => {
     const router = useRouter();
     const [storePurchase, storeResult] = useStorePurchaseMutation();
@@ -27,10 +27,14 @@ const create = (props) => {
     const purchaseRequisitionSelectRef = useRef();
     const [products, setProducts] = useState([]);
     const [selectedProductOptionId, setSelectedProductOptionId] = useState([]);
-    const [openAddSupplierModal, setOpenAddSupplierModal] = useState(false);
-    const [openAddBrandModal, setOpenAddBrandModal] = useState(false);
+    // const [openAddSupplierModal, setOpenAddSupplierModal] = useState(false);
+    // const [openAddBrandModal, setOpenAddBrandModal] = useState(false);
     const {data: countries, isLoading: countryLoading, isSuccess: countryIsSuccess, isError: countryIsError} = useGetCountriesQuery();
+    const {data: brands, isError: brandsISError, isSuccess: brandsISSUccess, isLoading: brandsISLoading} = useGetBrandsQuery();
+    const [storeBrand, storeBrandResult] = useStoreBrandsMutation();
 
+    const {data: suppliers, isError: suppliersISError, isSuccess: suppliersISSUccess, isLoading: suppliersISLoading} = useGetSuppliersQuery();
+    const [storeSupplier, storeSupplierResult] = useStoreSuppliersMutation();
 
     useEffect(() => {
         if (selectedProductOptionId){
@@ -221,41 +225,28 @@ const create = (props) => {
                                                       htmlFor="brand_id"
                                                       value="Brand"
                                                     />
-                                                    <button onClick={() => setOpenAddBrandModal(true)}>+Add</button>
-                                                    <AddBrandModal openModal={openAddBrandModal} setOpenModal={setOpenAddBrandModal} />
+                                                    {/*<button onClick={() => setOpenAddBrandModal(true)}>+Add</button>*/}
+                                                    {/*<AddBrandModal openModal={openAddBrandModal} setOpenModal={setOpenAddBrandModal} />*/}
                                                 </div>
-                                                <Select2ComponentAjax
-                                                  name='brand_id'
-                                                  id='brand_id'
-                                                  ref={brandSelectRef}
-                                                  onChange={(e) => {
-                                                      handleChange(e)
-                                                  }}
-                                                  className={`w-full border-1 border-gray-300`}
-                                                  ajax={ {
-                                                      url: process.env.NEXT_PUBLIC_BACKEND_API_URL+ `brands`,
-                                                      data: function (params) {
-                                                          return{
-                                                              search: params.term,
-                                                              page: params.page || 1
-                                                          }
-                                                      },
-                                                      processResults: function (data, params) {
-                                                          params.page = params.page || 1;
-                                                          return {
-                                                              results: data.data.map((d)=> {
-                                                                  return {text: d.name, id: d.id}
-                                                              }),
-                                                              pagination: {
-                                                                  more: (params.page * 10) < data.count_filtered
-                                                              }
-                                                          };
-                                                      }
-                                                  }}
-                                                  data-placeholder="Select options..."
+                                                <CreatableSelect
+                                                    className={'select'}
+                                                    name={`brand_id`}
+                                                    id={`brand_id`}
+                                                    classNames={{
+                                                        control: state => 'select'
+                                                    }}
+                                                    isLoading={brandsISLoading}
+                                                    isDisabled={brandsISLoading || brandsISError}
+                                                    isClearable
+                                                    options={brands?.data?.map(b => ({value: b.id, label: b.name}))}
+                                                    defaultOptions
+                                                    onCreateOption={(value) => storeBrand({name: value})}
+                                                    onChange={(newValue) => {
+                                                        setFieldValue('brand_id', newValue?.value)
+                                                    }}
                                                 />
                                                 <ErrorMessage
-                                                  name='product_option_id'
+                                                  name='brand_id'
                                                   render={(msg) => <span className='text-red-500'>{msg}</span>} />
                                             </div>
                                             <div className="w-full">
@@ -264,38 +255,55 @@ const create = (props) => {
                                                       htmlFor="supplier"
                                                       value="Supplier"
                                                     />
-                                                    <button onClick={() => setOpenAddSupplierModal(true)}>+Add</button>
-                                                    <AddSupplierModal openModal={openAddSupplierModal} setOpenModal={setOpenAddSupplierModal} />
+                                                    {/*<button onClick={() => setOpenAddSupplierModal(true)}>+Add</button>*/}
+                                                    {/*<AddSupplierModal openModal={openAddSupplierModal} setOpenModal={setOpenAddSupplierModal} />*/}
                                                 </div>
-                                                <Select2ComponentAjax
-                                                  name='supplier_id'
-                                                  id='supplier_id'
-                                                  ref={supplierSelectRef}
-                                                  onChange={(e) => {
-                                                      handleChange(e)
-                                                  }}
-                                                  className={`w-full border-1 border-gray-300`}
-                                                  ajax={ {
-                                                      url: process.env.NEXT_PUBLIC_BACKEND_API_URL+ `suppliers-select`,
-                                                      data: function (params) {
-                                                          return{
-                                                              search: params.term,
-                                                              page: params.page || 1
-                                                          }
-                                                      },
-                                                      processResults: function (data, params) {
-                                                          params.page = params.page || 1;
-                                                          return {
-                                                              results: data.data.map((d)=> {
-                                                                  return {text: d.name, id: d.id}
-                                                              }),
-                                                              pagination: {
-                                                                  more: (params.page * 10) < data.count_filtered
-                                                              }
-                                                          };
-                                                      }
-                                                  }}
-                                                  data-placeholder="Select options..."
+                                                {/*<Select2ComponentAjax*/}
+                                                {/*  name='supplier_id'*/}
+                                                {/*  id='supplier_id'*/}
+                                                {/*  ref={supplierSelectRef}*/}
+                                                {/*  onChange={(e) => {*/}
+                                                {/*      handleChange(e)*/}
+                                                {/*  }}*/}
+                                                {/*  className={`w-full border-1 border-gray-300`}*/}
+                                                {/*  ajax={ {*/}
+                                                {/*      url: process.env.NEXT_PUBLIC_BACKEND_API_URL+ `suppliers-select`,*/}
+                                                {/*      data: function (params) {*/}
+                                                {/*          return{*/}
+                                                {/*              search: params.term,*/}
+                                                {/*              page: params.page || 1*/}
+                                                {/*          }*/}
+                                                {/*      },*/}
+                                                {/*      processResults: function (data, params) {*/}
+                                                {/*          params.page = params.page || 1;*/}
+                                                {/*          return {*/}
+                                                {/*              results: data.data.map((d)=> {*/}
+                                                {/*                  return {text: d.name, id: d.id}*/}
+                                                {/*              }),*/}
+                                                {/*              pagination: {*/}
+                                                {/*                  more: (params.page * 10) < data.count_filtered*/}
+                                                {/*              }*/}
+                                                {/*          };*/}
+                                                {/*      }*/}
+                                                {/*  }}*/}
+                                                {/*  data-placeholder="Select options..."*/}
+                                                {/*/>*/}
+                                                <CreatableSelect
+                                                    className={'select'}
+                                                    name={`supplier_id`}
+                                                    id={`supplier_id`}
+                                                    classNames={{
+                                                        control: state => 'select'
+                                                    }}
+                                                    isLoading={suppliersISLoading}
+                                                    isDisabled={suppliersISLoading || suppliersISError}
+                                                    isClearable
+                                                    options={suppliers?.data?.map(b => ({value: b.id, label: b.name}))}
+                                                    defaultOptions
+                                                    onCreateOption={(value) => storeSupplier({name: value})}
+                                                    onChange={(newValue) => {
+                                                        setFieldValue('supplier_id', newValue?.value)
+                                                    }}
                                                 />
                                                 <ErrorMessage
                                                   name='supplier_id'

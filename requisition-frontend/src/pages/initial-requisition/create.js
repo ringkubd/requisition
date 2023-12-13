@@ -289,14 +289,14 @@ const InitialRequisitionCreate = (props) => {
                                                             />
                                                         </div>
                                                         <Select
-                                                            value={productOptions?.filter((po) => po.id == values.product_option_id)?.map(po => ({label: po.option.name, value: po.id}))}
+                                                            value={productOptions?.filter((po) => po.id == values.product_option_id)?.map(po => ({label: po.option_value, value: po.id}))}
                                                             onChange={(newValue) => {
                                                                 setFieldValue('product_option_id',newValue.value)
                                                                 setFieldValue('available_quantity', newValue.stock ?? 0);
                                                             }}
                                                             id='product_option_id'
                                                             name="product_option_id"
-                                                            options={ productOptions?.map((o) => ({label: o.option.name, value: o.id, stock: o.stock, }))}
+                                                            options={ productOptions?.map((o) => ({label: o.option_value, value: o.id, stock: o.stock, }))}
                                                             className={`select`}
                                                             classNames={{
                                                                 control: state => `select`
