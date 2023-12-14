@@ -226,7 +226,7 @@ const InitialRequisitionCreate = (props) => {
                                 {
                                     ({handleSubmit, handleChange, handleBlur,setFieldValue, values, errors, isSubmitting, setErrors}) => (
                                         <>
-                                            <div className="flex flex-col lg:flex-row gap-4 w-full shadow-md py-6 px-4">
+                                            <div className="flex flex-col xl:flex-row gap-4 w-full shadow-md py-6 px-4">
                                                 <div className="flex flex-row w-full gap-4">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
