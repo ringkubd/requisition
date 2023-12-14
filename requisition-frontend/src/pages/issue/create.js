@@ -12,6 +12,7 @@ import { useGetUsersQuery } from "@/store/service/user/management";
 import { useStoreIssueMutation } from "@/store/service/issue";
 import { useEditProductQuery, useGetProductQuery } from "@/store/service/product/product";
 import moment from "moment";
+import Select from "react-select";
 const create = (props) => {
   const router = useRouter();
   const [storeProductIssue, storeResult] = useStoreIssueMutation();
@@ -118,18 +119,22 @@ const create = (props) => {
                               value="Product"
                             />
                           </div>
-                          <Select2Component
-                            name="product_id"
-                            id="product_id"
-                            options={products?.data?.map((p) => ({value: p.id, label: p.title, other: p}))}
-                            ref={selectRef}
-                            onChange={(e) => {
-                              handleChange(e);
-                              setSelectedProduct(e.target.value);
-                            }}
-                            className={`w-full border-1 border-gray-300`}
-                            data-placeholder="Select options..."
-                          />
+                            <Select
+                                name="product_id"
+                                id="product_id"
+                                isLoading={productIsLoading}
+                                isDisabled={productIsLoading}
+                                options={products?.data?.map((p) => ({value: p.id, label: p.category?.code +" => "+ p.title, other: p}))}
+                                ref={selectRef}
+                                onChange={(newValue) => {
+                                    setFieldValue('product_id', newValue?.value)
+                                    setSelectedProduct(newValue?.value);
+                                }}
+                                className={'select'}
+                                classNames={{
+                                    control: state => `select`
+                                }}
+                            />
 
                           <ErrorMessage
                             name='product_option_id'
@@ -143,16 +148,18 @@ const create = (props) => {
                               value="Variant"
                             />
                           </div>
-                          <Select2Component
+                          <Select
                             name="product_option_id"
                             id="product_option_id"
                             options={productOptions?.map((p) => ({value: p.id, label: p.title, other: p}))}
-                            onChange={(e, data, optionSelected = {}) => {
-                              handleChange(e);
-                              const {other} = optionSelected;
-                              setStock(other?.stock ?? 0);
+                            onChange={(newValue) => {
+                              setFieldValue('product_option_id', newValue?.value)
+                              setStock(newValue?.other?.stock ?? 0);
                             }}
-                            className={`w-full border-1 border-gray-300`}
+                            className={'select'}
+                            classNames={{
+                                control: state => `select`
+                            }}
                             data-placeholder="Select options..."
                           />
 
