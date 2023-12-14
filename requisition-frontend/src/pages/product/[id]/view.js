@@ -157,12 +157,13 @@ const View = (props) => {
                                                         className={`border border-gray-300`}>Chalan</Table.HeadCell>
                                                     <Table.HeadCell
                                                         className={`border border-gray-300`}>Qty</Table.HeadCell>
-                                                    <Table.HeadCell className={`border border-gray-300`}>Unit
-                                                        Price</Table.HeadCell>
-                                                    <Table.HeadCell className={`border border-gray-300`}>Available
-                                                        Qty.</Table.HeadCell>
+                                                    <Table.HeadCell className={`border border-gray-300`}>Unit Price
+                                                    </Table.HeadCell>
+                                                    <Table.HeadCell className={`border border-gray-300`}>Available Qty.</Table.HeadCell>
                                                     <Table.HeadCell
                                                         className={`border border-gray-300`}>Total</Table.HeadCell>
+                                                    <Table.HeadCell
+                                                        className={`border border-gray-300`}>Stock Value</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Purchase
                                                         Date</Table.HeadCell>
                                                     <Table.HeadCell className={`border border-gray-300`}>Expiry
@@ -204,6 +205,8 @@ const View = (props) => {
                                                                                 className={`border border-gray-300`}>{parseFloat(pur?.available_qty).toLocaleString()}</Table.Cell>
                                                                             <Table.Cell
                                                                                 className={`border border-gray-300`}>{parseFloat(pur?.total_price).toLocaleString()}</Table.Cell>
+                                                                            <Table.Cell
+                                                                                className={`border border-gray-300`}>{(parseFloat(pur?.unit_price) * parseFloat(pur?.available_qty)).toLocaleString()}</Table.Cell>
                                                                             <Table.Cell
                                                                                 className={`border border-gray-300`}>{moment(pur?.created_at).format("HH:m - DD MMM YYYY")}</Table.Cell>
                                                                             <Table.Cell
