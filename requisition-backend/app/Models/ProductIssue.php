@@ -96,12 +96,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     {
         return $this->belongsTo(\App\Models\ProductOption::class, 'product_option_id');
     }
+
     public function receiver(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'receiver_id');
     }
 
-    public function purchaseLog(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function receiverDepartment(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Department::class, 'receiver_department_id');
+    }
+    public function receiverBranch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Branch::class, 'receiver_branch_id');
+    }
+
+    public function rateLog(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(IssuePurchaseLog::class);
     }

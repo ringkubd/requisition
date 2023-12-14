@@ -31,6 +31,7 @@ class PurchaseResource extends JsonResource
             'brand_id' => $this->brand_id,
             'purchase_requisition_id' => $this->purchase_requisition_id,
             'purchaseRequisition' => $this->purchaseRequisition,
+            'rateLog' => $this->rateLog,
             'qty' => $this->qty,
             'unit_price' => $this->unit_price,
             'total_price' => $this->total_price,

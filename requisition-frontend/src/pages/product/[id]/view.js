@@ -33,7 +33,7 @@ const View = (props) => {
                             <Button>Back</Button>
                         </NavLink>
                     </div>
-                    <div className="flex flex-col gap-2 space-x-4 sm:flex-row">
+                    <div className="flex flex-col space-y-2 md:gap-2 md:space-x-4 md:flex-row">
                         <div className={`w-full gap-2 space-x-4 shadow p-2 overflow-scroll`}>
                             <h2
                                 className={`w-full border-b pb-2 font-bold`}>
@@ -222,6 +222,7 @@ const View = (props) => {
                             }
                         </div>
                     </div>
+
                     <div>
                         <div className={`w-full gap-2 space-x-4 shadow p-2 overflow-scroll`}>
                             <h2
@@ -235,17 +236,21 @@ const View = (props) => {
                                                 <Table.Head>
                                                     <Table.HeadCell
                                                         className={`border border-gray-300`}>Sl#</Table.HeadCell>
-                                                    <Table.HeadCell
-                                                        className={`border border-gray-300`}>Variant</Table.HeadCell>
+                                                    <Table.HeadCell className={`border border-gray-300`}>
+                                                        Variant
+                                                    </Table.HeadCell>
+                                                    <Table.HeadCell className={`border border-gray-300`}>
+                                                        Department
+                                                    </Table.HeadCell>
                                                     <Table.HeadCell
                                                         className={`border border-gray-300`}>Qty</Table.HeadCell>
-                                                    <Table.HeadCell className={`border border-gray-300`}>Unit
+                                                    <Table.HeadCell className={`border border-gray-300`}>Avg. Unit
                                                         Price</Table.HeadCell>
                                                     {/*<Table.HeadCell className={`border border-gray-300`}>Available*/}
                                                     {/*    Qty.</Table.HeadCell>*/}
                                                     <Table.HeadCell
                                                         className={`border border-gray-300`}>Total</Table.HeadCell>
-                                                    <Table.HeadCell className={`border border-gray-300`}>Purchase
+                                                    <Table.HeadCell className={`border border-gray-300`}>Issue
                                                         Date</Table.HeadCell>
                                                     {/*<Table.HeadCell className={`border border-gray-300`}>Expiry*/}
                                                     {/*    Date</Table.HeadCell>*/}
@@ -256,20 +261,20 @@ const View = (props) => {
                                                             <>
                                                                 <Table.Row className={`border border-gray-300`} key={index}>
                                                                     <Table.Cell className={`border border-gray-300`}
-                                                                                rowSpan={p?.option_purchase_history?.length + 1}>{index + 1}</Table.Cell>
+                                                                                rowSpan={p?.product_issue?.length + 1}>{index + 1}</Table.Cell>
                                                                     <Table.Cell className={`border border-gray-300`}
-                                                                                rowSpan={p?.option_purchase_history?.length + 1}>{p?.title}</Table.Cell>
+                                                                                rowSpan={p?.product_issue?.length + 1}>{p?.title}</Table.Cell>
                                                                 </Table.Row>
                                                                 {
-                                                                    p?.option_purchase_issue_log?.map((pur, i) => (
+                                                                    p?.product_issue?.map((pur, i) => (
                                                                         <Table.Row className={`border border-gray-300`}
                                                                                    key={i}>
-                                                                            {/*<Table.Cell*/}
-                                                                            {/*    className={`border border-gray-300`}>{pur?.purchaseRequisition?.prf_no}</Table.Cell>*/}
                                                                             <Table.Cell
-                                                                                className={`border border-gray-300`}>{parseFloat(pur?.qty).toLocaleString()}</Table.Cell>
+                                                                                className={`border border-gray-300`}>{pur?.receiver_department?.name}</Table.Cell>
                                                                             <Table.Cell
-                                                                                className={`border border-gray-300`}>{parseFloat(pur?.unit_price).toLocaleString()}</Table.Cell>
+                                                                                className={`border border-gray-300`}>{parseFloat(pur?.quantity).toLocaleString()}</Table.Cell>
+                                                                            <Table.Cell
+                                                                                className={`border border-gray-300`}>{parseFloat(pur?.average_rate).toLocaleString()}</Table.Cell>
                                                                             {/*<Table.Cell*/}
                                                                             {/*    className={`border border-gray-300`}>{parseFloat(pur?.available_qty).toLocaleString()}</Table.Cell>*/}
                                                                             <Table.Cell

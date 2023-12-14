@@ -102,6 +102,10 @@ use Illuminate\Database\Eloquent\Model;
         return $this->hasMany(Purchase::class);
     }
 
+    public function productIssue(){
+        return $this->hasMany(ProductIssue::class);
+    }
+
     public function issuePurchaseLog()
     {
         return $this->hasMany(IssuePurchaseLog::class);

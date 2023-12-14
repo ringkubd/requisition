@@ -128,4 +128,9 @@ class Purchase extends BaseModel
     {
         return $this->belongsTo(Brand::class);
     }
+
+    public function rateLog(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(IssuePurchaseLog::class);
+    }
 }

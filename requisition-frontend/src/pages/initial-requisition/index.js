@@ -49,11 +49,6 @@ const InitialRequisition = () => {
                     sortable: true,
                 },
                 {
-                    name: 'Estimated Cost',
-                    selector: row => row.estimated_cost,
-                    sortable: true,
-                },
-                {
                     name: 'Purchase Requisition',
                     selector: row => row.is_purchase_requisition_generated ? 'Generated' : 'No',
                     sortable: true,

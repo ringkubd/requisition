@@ -155,7 +155,7 @@ class ProductIssueAPIController extends AppBaseController
                 break;
             }
         }
-        $productIssue->purchaseLog()->createMany($purchase_log);
+        $productIssue->rateLog()->createMany($purchase_log);
 
         return $this->sendResponse(
             new ProductIssueResource($productIssue),
