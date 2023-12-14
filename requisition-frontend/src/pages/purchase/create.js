@@ -225,8 +225,6 @@ const create = (props) => {
                                                       htmlFor="brand_id"
                                                       value="Brand"
                                                     />
-                                                    {/*<button onClick={() => setOpenAddBrandModal(true)}>+Add</button>*/}
-                                                    {/*<AddBrandModal openModal={openAddBrandModal} setOpenModal={setOpenAddBrandModal} />*/}
                                                 </div>
                                                 <CreatableSelect
                                                     className={'select'}
@@ -255,39 +253,7 @@ const create = (props) => {
                                                       htmlFor="supplier"
                                                       value="Supplier"
                                                     />
-                                                    {/*<button onClick={() => setOpenAddSupplierModal(true)}>+Add</button>*/}
-                                                    {/*<AddSupplierModal openModal={openAddSupplierModal} setOpenModal={setOpenAddSupplierModal} />*/}
                                                 </div>
-                                                {/*<Select2ComponentAjax*/}
-                                                {/*  name='supplier_id'*/}
-                                                {/*  id='supplier_id'*/}
-                                                {/*  ref={supplierSelectRef}*/}
-                                                {/*  onChange={(e) => {*/}
-                                                {/*      handleChange(e)*/}
-                                                {/*  }}*/}
-                                                {/*  className={`w-full border-1 border-gray-300`}*/}
-                                                {/*  ajax={ {*/}
-                                                {/*      url: process.env.NEXT_PUBLIC_BACKEND_API_URL+ `suppliers-select`,*/}
-                                                {/*      data: function (params) {*/}
-                                                {/*          return{*/}
-                                                {/*              search: params.term,*/}
-                                                {/*              page: params.page || 1*/}
-                                                {/*          }*/}
-                                                {/*      },*/}
-                                                {/*      processResults: function (data, params) {*/}
-                                                {/*          params.page = params.page || 1;*/}
-                                                {/*          return {*/}
-                                                {/*              results: data.data.map((d)=> {*/}
-                                                {/*                  return {text: d.name, id: d.id}*/}
-                                                {/*              }),*/}
-                                                {/*              pagination: {*/}
-                                                {/*                  more: (params.page * 10) < data.count_filtered*/}
-                                                {/*              }*/}
-                                                {/*          };*/}
-                                                {/*      }*/}
-                                                {/*  }}*/}
-                                                {/*  data-placeholder="Select options..."*/}
-                                                {/*/>*/}
                                                 <CreatableSelect
                                                     className={'select'}
                                                     name={`supplier_id`}

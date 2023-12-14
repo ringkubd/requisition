@@ -76,7 +76,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                 requisition_products?.map((rp, index) => (
                                     <tr className={`border text-center bg-white`} key={index}>
                                         <td className={`border p-0`}>{index + 1}</td>
-                                        <td className={`border p-0 text-left`}>{rp.title} {!rp?.product_option?.option_name?.includes('N/A') ? `(${rp?.product_option?.option_name + " " +rp?.product_option?.option_value})` : null}</td>
+                                        <td className={`border p-0 text-left`}>{rp.title} {!rp?.product_option?.option_name?.includes('N/A') ? `- ${rp?.product_option?.option_value}` : null}</td>
                                         <td className={`border p-0`}>{rp.last_purchase_date ? moment(rp.last_purchase_date).format('DD MMM YYYY') : ''}</td>
                                         <td className={`border p-0`}>{rp?.product?.unit}</td>
                                         <td className={`border p-0`}>{rp.available_quantity}</td>
@@ -159,7 +159,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                 requisition_products?.map((rp, index) => (
                                     <tr className={`border text-center bg-white`} key={index}>
                                         <td className={`border p-0`}>{index + 1}</td>
-                                        <td className={`border p-0 text-left`}>{rp.title} {!rp?.product_option?.option_name?.includes('N/A') ? `(${rp?.product_option?.option_name + " " +rp?.product_option?.option_value})` : null}</td>
+                                        <td className={`border p-0 text-left`}>{rp.title} {!rp?.product_option?.option_name?.includes('N/A') ? `- ${rp?.product_option?.option_value}` : null}</td>
                                         <td className={`border p-0`}>{rp.last_purchase_date ? moment(rp.last_purchase_date).format('DD MMM YYYY') : ''}</td>
                                         <td className={`border p-0`}>{rp?.product?.unit}</td>
                                         <td className={`border p-0`}>{rp.available_quantity}</td>

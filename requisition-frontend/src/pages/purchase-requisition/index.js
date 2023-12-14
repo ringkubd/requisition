@@ -38,8 +38,8 @@ const PurchaseRequisition = () => {
                     sortable: true,
                 },
                 {
-                    name: 'P.O. No.',
-                    selector: row => <UpdatePno value={row.po_no} created={row.created_at} requisition_id={row.id} />,
+                    name: 'P.R.F. NO.',
+                    selector: row =>  row.prf_no,
                     sortable: true,
                 },
                 {
