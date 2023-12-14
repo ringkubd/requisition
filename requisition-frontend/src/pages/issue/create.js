@@ -20,7 +20,7 @@ const create = (props) => {
   const [selectedProduct, setSelectedProduct] = useState(false);
   const {data: users , isLoading: userIsLoading} = useGetUsersQuery();
   const {data: products, isLoading: productLoading, isSuccess: productSuccess, isError: productError} = useGetProductQuery(null,  {
-    refetchOnMountOrArgChange: true
+      refetchOnFocus: true
   });
   const {data: product, isLoading: productIsLoading, isSuccess: productIsSuccess, isError: productIsError, refetch: refetchQuery} = useEditProductQuery(selectedProduct,{
     skip: !selectedProduct
