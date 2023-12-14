@@ -345,8 +345,10 @@ class PurchaseAPIController extends AppBaseController
         $purchase_requisition = PurchaseRequisitionResource::collection(PurchaseRequisition::query()
             ->where('irf_no', 'like', "%$request->search%")
             ->orWhere('ir_no', 'like', "%$request->search%")
+            ->orWhere('prf_no', 'like', "%$request->search%")
             ->skip($start)
             ->limit($end)
+            ->latest()
             ->get());
 
         return $this->sendResponse(

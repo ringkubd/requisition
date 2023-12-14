@@ -17,7 +17,7 @@ class ProductOptionResource extends JsonResource
         return [
             'id' => $this->id,
             'product_id' => $this->product_id,
-            'title' => $this->option?->name . "(".$this->option_value . ")",
+            'title' => $this->option?->name . " (".$this->option_value . ")",
             'option_id' => $this->option_id,
             'option' => $this->option,
             'option_name' => $this->option?->name,
