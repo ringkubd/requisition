@@ -29,6 +29,7 @@ const InitialRequisitionCreate = (props) => {
     const [selectedProductOption, setSelectedProductOption] = useState(null);
     const [productOptions, setProductOptions] = useState([]);
     const [productUnit, setProductUnit] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("")
 
     const suggestionQuery = useGetPurposeSuggestionQuery({
         product_id: selectedProduct,
@@ -57,7 +58,9 @@ const InitialRequisitionCreate = (props) => {
 
     const initValues = {
         product_id: '',
+        product_title: '',
         product_option_id: '',
+        product_option_name: '',
         last_purchase_date: '',
         required_quantity: '',
         available_quantity: '',
@@ -79,7 +82,16 @@ const InitialRequisitionCreate = (props) => {
     }, [storeResult]);
     const submit = () => {
         if (requisitionData.length){
-            storeInitialRequisition(requisitionData)
+            storeInitialRequisition(requisitionData.map((i) => ({
+                product_id: i.product_id,
+                product_option_id: i.product_option_id,
+                last_purchase_date:  i.last_purchase_date,
+                required_quantity:  i.required_quantity,
+                available_quantity:  i.available_quantity,
+                quantity_to_be_purchase:  i.quantity_to_be_purchase,
+                purpose:  i.purpose,
+                estimated_cost:  i.estimated_cost,
+            })))
         }else {
             toast.warn("Perhaps you forgot to add the item.");
         }
@@ -87,7 +99,6 @@ const InitialRequisitionCreate = (props) => {
     const addItems = (values, pageProps) => {
         values.estimated_cost = parseFloat(products.filter(p => p.id == values.product_id)[0]?.product_options.filter(o => o.id == values.product_option_id)[0].unit_price) * parseFloat(values.quantity_to_be_purchase);
         setRequisitionData([...requisitionData, values])
-        console.log(products)
         pageProps.setSubmitting(false);
         pageProps.resetForm();
         selectRef.current.clearValue()
@@ -113,12 +124,12 @@ const InitialRequisitionCreate = (props) => {
     const tableColumns = [
         {
             name: 'Product',
-            selector: row => products.filter(p => p.id == row.product_id)[0]?.title,
+            selector: row => row.product_title,
             sortable: true,
         },
         {
             name: 'Variant',
-            selector: row =>  products.filter(p => p.id == row.product_id)[0]?.product_options?.filter(o => o.id == row.product_option_id).map(o => (o.option.name + `(${o.option_value})`))[0],
+            selector: row =>  row.product_option_name,
             sortable: true,
         },
         {
@@ -162,15 +173,12 @@ const InitialRequisitionCreate = (props) => {
         const response = await axios.get(`/api/product-select`, {
             params: {
                 search: search,
-                page: page
+                page: page,
+                category_id: selectedCategory
             }
         });
         const responseJSON = response.data;
-        if (page === 1){
-            setProducts(responseJSON.data?.products);
-        }else{
-            setProducts([...products, ...responseJSON.data?.products])
-        }
+
         return {
             options: responseJSON.data?.products?.map((r,) => {
                 return {
@@ -179,6 +187,27 @@ const InitialRequisitionCreate = (props) => {
                     product_options: r.product_options,
                     unit: r.unit,
                     last_purchase: r.last_purchase,
+                }
+            }),
+            hasMore: responseJSON.data.count > 20,
+            additional: {
+                page: search ? 1 : page + 1,
+            },
+        };
+    }
+    async function loadCategory(search, loadedOptions, { page }) {
+        const response = await axios.get(`/api/category-select`, {
+            params: {
+                search: search,
+                page: page
+            }
+        });
+        const responseJSON = response.data;
+        return {
+            options: responseJSON.data?.categories?.map((r,) => {
+                return {
+                    label: r.title,
+                    value: r.id
                 }
             }),
             hasMore: responseJSON.data.count > 20,
@@ -230,23 +259,59 @@ const InitialRequisitionCreate = (props) => {
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
                                                             <Label
+                                                                htmlFor="category_id"
+                                                                value="Category"
+                                                            />
+                                                        </div>
+                                                        <AsyncPaginate
+                                                            defaultOptions
+                                                            name='category_id'
+                                                            id='category_id'
+                                                            className={`select`}
+                                                            classNames={{
+                                                                control: state => 'select'
+                                                            }}
+                                                            onChange={(newValue) => {
+                                                                setSelectedCategory(newValue?.value)
+                                                                var event = new Event('change');
+                                                                selectRef.current.inputRef.dispatchEvent(event);
+                                                            }}
+                                                            additional={{
+                                                                page: 1,
+                                                            }}
+                                                            loadOptions={loadCategory}
+                                                            data-placeholder="Select options..."
+                                                        />
+                                                        <ErrorMessage
+                                                            name='category_id'
+                                                            render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col xl:flex-row gap-4 w-full shadow-md py-6 px-4">
+                                                <div className="flex flex-row w-full gap-4">
+                                                    <div className="w-full">
+                                                        <div className="mb-2 block">
+                                                            <Label
                                                                 htmlFor="product_id"
                                                                 value="Product"
                                                             />
                                                         </div>
                                                         <AsyncPaginate
-                                                            defaultOptions
+                                                            key={selectedCategory}
                                                             name='product_id'
                                                             id='product_id'
                                                             selectRef={selectRef}
                                                             className={`select`}
+                                                            loadOptionsOnMenuOpen
                                                             classNames={{
                                                                 control: state => 'select'
                                                             }}
                                                             onChange={(newValue) => {
                                                                 setProductOptions(newValue.product_options)
                                                                 setProductUnit(newValue.unit)
-                                                                setFieldValue('product_id',newValue.value)
+                                                                setFieldValue('product_id', newValue.value)
+                                                                setFieldValue('product_title', newValue.label)
                                                                 setFieldValue('last_purchase_date', newValue.last_purchase?.created_at ? moment(newValue?.last_purchase?.created_at)?.format('Y-M-DD') : null);
                                                             }}
                                                             additional={{
@@ -257,7 +322,8 @@ const InitialRequisitionCreate = (props) => {
                                                         />
                                                         <ErrorMessage
                                                             name='product_id'
-                                                            render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                            render={(msg) => <span
+                                                                className='text-red-500'>{msg}</span>} />
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row w-full lg:w-1/2 gap-4">
@@ -276,7 +342,8 @@ const InitialRequisitionCreate = (props) => {
                                                         />
                                                         <ErrorMessage
                                                             name='Unit'
-                                                            render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                            render={(msg) => <span
+                                                                className='text-red-500'>{msg}</span>} />
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row w-full lg:w-1/2 gap-4">
@@ -288,14 +355,22 @@ const InitialRequisitionCreate = (props) => {
                                                             />
                                                         </div>
                                                         <Select
-                                                            value={productOptions?.filter((po) => po.id == values.product_option_id)?.map(po => ({label: po.option_value, value: po.id}))}
+                                                            value={productOptions?.filter((po) => po.id == values.product_option_id)?.map(po => ({
+                                                                label: po.option_value,
+                                                                value: po.id
+                                                            }))}
                                                             onChange={(newValue) => {
-                                                                setFieldValue('product_option_id',newValue.value)
+                                                                setFieldValue('product_option_id', newValue.value)
+                                                                setFieldValue('product_option_name', newValue.label)
                                                                 setFieldValue('available_quantity', newValue.stock ?? 0);
                                                             }}
                                                             id='product_option_id'
                                                             name="product_option_id"
-                                                            options={ productOptions?.map((o) => ({label: o.option_value, value: o.id, stock: o.stock, }))}
+                                                            options={productOptions?.map((o) => ({
+                                                                label: o.option_value,
+                                                                value: o.id,
+                                                                stock: o.stock,
+                                                            }))}
                                                             className={`select`}
                                                             classNames={{
                                                                 control: state => `select`
@@ -303,7 +378,8 @@ const InitialRequisitionCreate = (props) => {
                                                         />
                                                         <ErrorMessage
                                                             name='product_option_id'
-                                                            render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                            render={(msg) => <span
+                                                                className='text-red-500'>{msg}</span>} />
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row w-full lg:w-1/2 gap-4">
@@ -327,7 +403,8 @@ const InitialRequisitionCreate = (props) => {
                                                         />
                                                         <ErrorMessage
                                                             name='required_quantity'
-                                                            render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                            render={(msg) => <span
+                                                                className='text-red-500'>{msg}</span>} />
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row w-full lg:w-1/2 gap-4">
@@ -349,7 +426,8 @@ const InitialRequisitionCreate = (props) => {
                                                         />
                                                         <ErrorMessage
                                                             name='available_quantity'
-                                                            render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                            render={(msg) => <span
+                                                                className='text-red-500'>{msg}</span>} />
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row  w-full lg:w-1/2 gap-4">
@@ -361,7 +439,7 @@ const InitialRequisitionCreate = (props) => {
                                                             />
                                                         </div>
                                                         <TextInput
-                                                            value={values.quantity_to_be_purchase }
+                                                            value={values.quantity_to_be_purchase}
                                                             id='quantity_to_be_purchase'
                                                             name='quantity_to_be_purchase'
                                                             type={`number`}
@@ -370,7 +448,8 @@ const InitialRequisitionCreate = (props) => {
                                                         />
                                                         <ErrorMessage
                                                             name='quantity_to_be_purchase'
-                                                            render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                            render={(msg) => <span
+                                                                className='text-red-500'>{msg}</span>} />
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row w-full gap-4 relative">
@@ -413,14 +492,16 @@ const InitialRequisitionCreate = (props) => {
                                                                     <div ref={nodeRef}>
                                                                         {
                                                                             suggestState ? (!suggestionQuery.isLoading && !suggestionQuery.isError && suggestionQuery.data ? (
-                                                                                    <ul className={`py-1 mt-1 space-y-2 bg-green-100 px-1 z-50 absolute w-full`} ref={suggestRef}>
+                                                                                    <ul className={`py-1 mt-1 space-y-2 bg-green-100 px-1 z-50 absolute w-full`}
+                                                                                        ref={suggestRef}>
                                                                                         {
                                                                                             suggestionQuery.data.data.map((s, i) => (
-                                                                                                <li key={i} className={`bg-gray-300 px-2 rounded hover:drop-shadow-md hover:cursor-pointer hover:bg-gray-400`}>{s.purpose}</li>
+                                                                                                <li key={i}
+                                                                                                    className={`bg-gray-300 px-2 rounded hover:drop-shadow-md hover:cursor-pointer hover:bg-gray-400`}>{s.purpose}</li>
                                                                                             ))
                                                                                         }
                                                                                     </ul>
-                                                                                ) : suggestionQuery.isLoading ? "Loading..." : '' )
+                                                                                ) : suggestionQuery.isLoading ? "Loading..." : '')
                                                                                 : <div></div>
                                                                         }
                                                                     </div>
@@ -429,7 +510,8 @@ const InitialRequisitionCreate = (props) => {
                                                         </div>
                                                         <ErrorMessage
                                                             name='purpose'
-                                                            render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                            render={(msg) => <span
+                                                                className='text-red-500'>{msg}</span>} />
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row gap-4 justify-end mt-8">
@@ -440,7 +522,8 @@ const InitialRequisitionCreate = (props) => {
                                                         color={`warning`}>Add</Button>
                                                 </div>
                                             </div>
-                                            <div className={`flex flex-row w-full justify-end justify-items-end items-end`}>
+                                            <div
+                                                className={`flex flex-row w-full justify-end justify-items-end items-end`}>
                                                 <Button
                                                     isProcessing={isSubmitting}
                                                     onClick={submit}

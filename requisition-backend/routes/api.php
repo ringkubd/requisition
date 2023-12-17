@@ -71,6 +71,7 @@ Route::resource('initial-requisitions', App\Http\Controllers\API\InitialRequisit
  * Extra URL
  */
 Route::get('product-select', [InitialRequisitionAPIController::class, 'products']);
+Route::get('category-select', [InitialRequisitionAPIController::class, 'category']);
 Route::get('suppliers-select', [PurchaseAPIController::class, 'suppliers']);
 Route::get('purchase-requisition-select', [PurchaseAPIController::class, 'purchaseRequisition']);
 

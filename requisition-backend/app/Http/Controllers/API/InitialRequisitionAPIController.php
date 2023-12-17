@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Events\InitialRequisitionEvent;
+use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
+use App\Models\Category;
 use App\Models\Department;
 use App\Models\InitialRequisition;
 use App\Models\InitialRequisitionProduct;
@@ -352,6 +354,30 @@ class InitialRequisitionAPIController extends AppBaseController
             __('messages.deleted', ['model' => __('models/initialRequisitions.singular')])
         );
     }
+
+    public function category(Request $request): JsonResponse
+    {
+        $start = ((int)$request->page - 1) * 10;
+        $categories = CategoryResource::collection(Category::query()
+            ->when($request->search, function ($q, $s){
+                $q->where('title', 'like', "%$s%")
+                    ->orWhere('code', 'like', "%$s%");
+            })
+            ->skip($start)
+            ->limit(20)
+            ->get()
+        );
+        $count = Category::query()
+                ->when($request->search, function ($q, $s){
+                    $q->where('title', 'like', "%$s%")
+                        ->orWhere('code', 'like', "%$s%");
+                })
+                ->count() - $start;
+        return $this->sendResponse(
+            [ "categories" => $categories, 'count' => $count],
+            __('messages.retrieved', ['model' => __('models/initialRequisitions.plural')]));
+    }
+
     /**
      * Extra Options
      */
@@ -368,15 +394,21 @@ class InitialRequisitionAPIController extends AppBaseController
             ->when($request->search, function ($q, $s){
                 $q->where('title', 'like', "%$s%");
             })
+            ->when($request->category_id, function ($q, $v){
+                $q->where('category_id', $v);
+            })
             ->with('category')
             ->skip($start)
             ->limit(20)
             ->get());
         $count = Product::query()
-            ->when($request->search, function ($q, $s){
-                $q->where('title', 'like', "%$s%");
-            })
-            ->count() - $start;
+                ->when($request->search, function ($q, $s){
+                    $q->where('title', 'like', "%$s%");
+                })
+                ->when($request->category_id, function ($q, $v){
+                    $q->where('category_id', $v);
+                })
+                ->count() - $start;
 
         return $this->sendResponse(
             [ "products" => $products, 'count' => $count],
