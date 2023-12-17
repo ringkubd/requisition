@@ -31,12 +31,7 @@ const Purchase = () => {
     const columns = [
         {
             name: 'Product',
-            selector: row => row.product?.title,
-            sortable: true,
-        },
-        {
-            name: 'Variant',
-            selector: row => row.productOption?.title,
+            selector: row => row.product?.title + " - " +  row.productOption?.title,
             sortable: true,
         },
         {
@@ -52,6 +47,11 @@ const Purchase = () => {
         {
             name: 'Requisition',
             selector: row => row.purchaseRequisition?.irf_no,
+            sortable: true,
+        },
+        {
+            name: 'P.R. No.',
+            selector: row => row.purchaseRequisition?.prf_no,
             sortable: true,
         },
         {

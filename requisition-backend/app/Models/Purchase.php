@@ -65,6 +65,7 @@ class Purchase extends BaseModel
     public $table = 'purchases';
 
     public $fillable = [
+        'uuid',
         'product_id',
         'product_option_id',
         'supplier_id',

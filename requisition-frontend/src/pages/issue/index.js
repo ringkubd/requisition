@@ -34,12 +34,7 @@ const ProductIssue = () => {
             setColumns([
                 {
                     name: 'Product',
-                    selector: row => row.product?.title,
-                    sortable: true,
-                },
-                {
-                    name: 'Variant',
-                    selector: row => row.variant?.title,
+                    selector: row => row.product?.title + ( !row.variant?.option_value.includes('N/A') ? " - "+row.variant?.option_value : ""),
                     sortable: true,
                 },
                 {

@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductIssueResource;
+use Ramsey\Uuid\Nonstandard\Uuid;
 
 /**
  * Class ProductIssueController
@@ -107,56 +108,61 @@ class ProductIssueAPIController extends AppBaseController
      *      )
      * )
      */
-    public function store(CreateProductIssueAPIRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
         $input = $request->all();
-        $input['issuer_id'] = $request->user()->id;
-        $input['issue_time'] = now()->toDateTimeString();
-        $productOptionId = $input['product_option_id'];
-        $quantity = $input['quantity'];
-        $receiver = User::find($request->receiver_id);
-        $input['receiver_branch_id'] = $receiver->branches()->first()->id;
-        $input['receiver_department_id'] = $receiver->departments()->first()->id;
+        $uuid = Uuid::uuid4();
 
-        $productIssue = $this->productIssueRepository->create($input);
-        if ($productIssue){
-            $productOption = ProductOption::find($productOptionId);
-            $productOption->stock = (double)$productOption->stock - (double)$quantity;
-            $productOption->save();
-        }
+        foreach ($input as $item){
+            $item['uuid'] = $uuid;
+            $item['issuer_id'] = $request->user()->id;
+            $item['issue_time'] = now()->toDateTimeString();
+            $productOptionId = $item['product_option_id'];
+            $quantity = $item['quantity'];
+            $receiver = User::find($item['receiver_id']);
+            $item['receiver_branch_id'] = $receiver->branches()->first()->id;
+            $item['receiver_department_id'] = $receiver->departments()->first()->id;
 
-        $purchase_history = Purchase::query()
-            ->where('product_id', $input['product_id'])
-            ->where('product_option_id', $productOptionId)
-            ->where('available_qty', '>', 0)
-            ->oldest()
-            ->get();
-
-        $request_quantity = $quantity;
-        $qty = $request_quantity;
-        $purchase_log = [];
-        foreach ($purchase_history as $purchase){
-            if ($qty > 0){
-                $purchase_log[] = [
-                    'product_id' => $purchase->product_id,
-                    'product_option_id' => $purchase->product_option_id,
-                    'purchase_id' => $purchase->id,
-                    'qty' => min($request_quantity, $purchase->available_qty),
-                    'unit_price' => $purchase->unit_price,
-                    'total_price' => min($request_quantity, $purchase->available_qty) * $purchase->unit_price,
-                    'purchase_date' => $purchase->purchase_date,
-                ];
-                $qty = $qty <= $purchase->available_qty ? 0 : $qty - $purchase->available_qty;
-                $purchase->available_qty = $request_quantity < $purchase->available_qty ? $purchase->available_qty - $request_quantity : 0;
-                $request_quantity = $qty;
-                $purchase->save();
-                continue;
-            }else{
-                break;
+            $productIssue = $this->productIssueRepository->create($item);
+            if ($productIssue){
+                $productOption = ProductOption::find($productOptionId);
+                $productOption->stock = (double)$productOption->stock - (double)$quantity;
+                $productOption->save();
             }
-        }
-        $productIssue->rateLog()->createMany($purchase_log);
 
+            $purchase_history = Purchase::query()
+                ->where('product_id', $item['product_id'])
+                ->where('product_option_id', $productOptionId)
+                ->where('available_qty', '>', 0)
+                ->oldest()
+                ->get();
+
+            $request_quantity = $quantity;
+            $qty = $request_quantity;
+            $purchase_log = [];
+            foreach ($purchase_history as $purchase){
+                if ($qty > 0){
+                    $purchase_log[] = [
+                        'product_id' => $purchase->product_id,
+                        'product_option_id' => $purchase->product_option_id,
+                        'purchase_id' => $purchase->id,
+                        'qty' => min($request_quantity, $purchase->available_qty),
+                        'unit_price' => $purchase->unit_price,
+                        'total_price' => min($request_quantity, $purchase->available_qty) * $purchase->unit_price,
+                        'purchase_date' => $purchase->purchase_date,
+                    ];
+                    $qty = $qty <= $purchase->available_qty ? 0 : $qty - $purchase->available_qty;
+                    $purchase->available_qty = $request_quantity < $purchase->available_qty ? $purchase->available_qty - $request_quantity : 0;
+                    $request_quantity = $qty;
+                    $purchase->save();
+                    continue;
+                }else{
+                    break;
+                }
+            }
+            $productIssue->rateLog()->createMany($purchase_log);
+
+        }
         return $this->sendResponse(
             new ProductIssueResource($productIssue),
             __('messages.saved', ['model' => __('models/productIssues.singular')])

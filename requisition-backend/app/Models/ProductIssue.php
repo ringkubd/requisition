@@ -57,6 +57,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     public $table = 'product_issues';
 
     public $fillable = [
+        'uuid',
         'product_id',
         'product_option_id',
         'quantity',

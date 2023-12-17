@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\PurchaseResource;
 use Illuminate\Support\Facades\DB;
+use Ramsey\Uuid\Nonstandard\Uuid;
 
 /**
  * Class PurchaseController
@@ -111,18 +112,20 @@ class PurchaseAPIController extends AppBaseController
      *      )
      * )
      */
-    public function store(CreatePurchaseAPIRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
         $input = $request->all();
-        $input['user_id'] = $request->user()->id;
-        $input['available_qty'] = $input['qty'];
-        DB::beginTransaction();
-        $product_option = ProductOption::query()
-            ->find($input['product_option_id']);
-        $purchase = $this->purchaseRepository->create($input);
-        $stock = (float)$input['qty'] + $product_option->stock;
-        $update = $product_option->update(['stock' => $stock]);
-        DB::commit();
+        $uuid = Uuid::uuid4();
+
+        foreach ($input as $item){
+            $item['user_id'] = $request->user()->id;
+            $item['uuid'] = $uuid;
+            $purchase = $this->purchaseRepository->create($item);
+            $product_option = ProductOption::query()->find($item['product_option_id']);
+            $stock = (float)$item['qty'] + $product_option->stock;
+            $update = $product_option->update(['stock' => $stock]);
+        }
+
         return $this->sendResponse(
             new PurchaseResource($purchase),
             __('messages.saved', ['model' => __('models/purchases.singular')])
