@@ -44,11 +44,12 @@ const create = (props) => {
         if (selectedProductOptionId){
             const unitPrice = products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.unit_price;
             const quantity = products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.quantity_to_be_purchase;
+            const actual_purchase = products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.actual_purchase;
 
             formikForm.current.setFieldValue('product_id',products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.product_id)
-            formikForm.current.setFieldValue('qty',quantity?.toString())
+            formikForm.current.setFieldValue('qty',(quantity - actual_purchase)?.toString() )
             formikForm.current.setFieldValue('unit_price',unitPrice?.toString())
-            formikForm.current.setFieldValue('total_price',(quantity * unitPrice)?.toString())
+            formikForm.current.setFieldValue('total_price',((quantity - actual_purchase) * unitPrice)?.toString())
         }
     }, [selectedProductOptionId])
 
@@ -88,6 +89,8 @@ const create = (props) => {
                 purchaseRequisitionSelectRef.current.focus();
                 purchaseRequisitionSelectRef.current.clearValue();
             }
+            setRequisitionDisabled(false);
+            router.push('/purchase')
 
         }
     }, [storeResult]);
@@ -340,7 +343,6 @@ const create = (props) => {
                                                             setFieldValue('product_title',newValue?.label)
                                                             setFieldValue('product_id',newValue?.product_options?.product_id)
                                                             setSelectedProductOptionId(newValue?.value);
-                                                            console.log(newValue)
                                                         }}
                                                         options={products?.map((p) => ({value: p.product_option_id, product_options: p, label: p.title + (!p.product_option?.option_value?.includes('N/A') ? " - "+p.product_option?.option_value : "")}))}
                                                     />

@@ -55,11 +55,11 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                         </p>
                     </div>
                     <div className={`flex flex-row w-full justify-center`}>
-                        <i className={`pr-2`}>I.R.F. NO. </i>
+                        <i className={`pr-2`}>I.R. NO. </i>
                         <p className={`underline`}>{mainData?.irf_no}</p>
                     </div>
                     <div className={`flex flex-row w-full justify-end`}>
-                        <i className={`pr-2`}>P.R.F. NO. </i>
+                        <i className={`pr-2`}>P.R. NO. </i>
                         <p className={`underline`}>{mainData?.prf_no}</p>
                     </div>
                 </div>
@@ -374,11 +374,11 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                         <p className={`border-b border-black w-20`}></p>
                     </div>
                     <div className={`flex flex-row w-full justify-center`}>
-                        <i className={`pr-2`}>I.R.F. NO. </i>
+                        <i className={`pr-2`}>I.R. NO. </i>
                         <p className={`underline`}>{mainData?.irf_no}</p>
                     </div>
                     <div className={`flex flex-row w-full justify-end`}>
-                        <i className={`pr-2`}>P.R.F. NO. </i>
+                        <i className={`pr-2`}>P.R. NO. </i>
                         <p className={`underline`}>{mainData?.prf_no}</p>
                     </div>
                 </div>

@@ -9,8 +9,10 @@ use App\Http\Resources\SupplierResource;
 use App\Models\ProductOption;
 use App\Models\Purchase;
 use App\Models\PurchaseRequisition;
+use App\Models\PurchaseRequisitionProduct;
 use App\Models\Supplier;
 use App\Repositories\PurchaseRepository;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -124,6 +126,12 @@ class PurchaseAPIController extends AppBaseController
             $product_option = ProductOption::query()->find($item['product_option_id']);
             $stock = (float)$item['qty'] + $product_option->stock;
             $update = $product_option->update(['stock' => $stock]);
+            $purchaseRequisitionProduct = PurchaseRequisitionProduct::query()
+                ->where('purchase_requisition_id', $item['purchase_requisition_id'])
+                ->where('product_id', $item['product_id'])
+                ->where('product_option_id', $item['product_option_id'])
+                ->first();
+            $purchaseRequisitionProduct->update(['actual_purchase' => $purchaseRequisitionProduct->actual_purchase + $item['qty']]);
         }
 
         return $this->sendResponse(
@@ -306,6 +314,13 @@ class PurchaseAPIController extends AppBaseController
                 ->find($purchase->product_option_id);
             $product_option->stock = $product_option->stock - $purchase->qty;
             $product_option->save();
+
+            $purchaseRequisitionProduct = PurchaseRequisitionProduct::query()
+                ->where('purchase_requisition_id', $purchase->purchase_requisition_id)
+                ->where('product_id', $purchase->product_id)
+                ->where('product_option_id', $purchase->product_option_id)
+                ->first();
+            $purchaseRequisitionProduct->update(['actual_purchase' => $purchaseRequisitionProduct->actual_purchase - $purchase->qty]);
         }
         return $this->sendResponse(
             $id,
@@ -345,13 +360,24 @@ class PurchaseAPIController extends AppBaseController
         $start = ((int)$request->page - 1) * 10;
         $end = ((int)$request->page) * 10;
 
+        $day_before_15_days = Carbon::now()->subDays(15)->toDateString();
         $purchase_requisition = PurchaseRequisitionResource::collection(PurchaseRequisition::query()
-            ->where('irf_no', 'like', "%$request->search%")
-            ->orWhere('ir_no', 'like', "%$request->search%")
-            ->orWhere('prf_no', 'like', "%$request->search%")
+            ->where(function ($q) use($request, $day_before_15_days){
+                $q->where('irf_no', 'like', "%$request->search%")
+                    ->orWhere('ir_no', 'like', "%$request->search%")
+                    ->orWhere('prf_no', 'like', "%$request->search%")
+                    ->whereRaw("date(created_at) <= '$day_before_15_days'");
+            })
+
+            ->with(['purchaseRequisitionProducts' => function ($q) {
+                $q->whereRaw('`actual_purchase` < `quantity_to_be_purchase`');
+            }])
+            ->whereHas('purchaseRequisitionProducts', function ($q) {
+                $q->whereRaw('actual_purchase < quantity_to_be_purchase');
+            })
             ->skip($start)
             ->limit($end)
-            ->latest()
+            ->latest('purchase_requisitions.created_at')
             ->get());
 
         return $this->sendResponse(

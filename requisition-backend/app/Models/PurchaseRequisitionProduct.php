@@ -23,4 +23,9 @@ class PurchaseRequisitionProduct extends BaseModel
     {
         return $this->belongsTo(ProductOption::class, 'product_option_id', 'id');
     }
+
+    public function purchase(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Purchase::class, 'product_option_id', 'product_option_id');
+    }
 }

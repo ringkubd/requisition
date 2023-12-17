@@ -166,14 +166,13 @@ const InitialRequisitionCreate = (props) => {
             }
         });
         const responseJSON = response.data;
-
         if (page === 1){
-            setProducts(responseJSON.data);
+            setProducts(responseJSON.data?.products);
         }else{
-            setProducts([...products, ...responseJSON.data])
+            setProducts([...products, ...responseJSON.data?.products])
         }
         return {
-            options: responseJSON.data.map((r,) => {
+            options: responseJSON.data?.products?.map((r,) => {
                 return {
                     label: r.category?.code + " => " + r.title,
                     value: r.id,
@@ -182,7 +181,7 @@ const InitialRequisitionCreate = (props) => {
                     last_purchase: r.last_purchase,
                 }
             }),
-            hasMore: responseJSON.data.length >= 1,
+            hasMore: responseJSON.data.count > 20,
             additional: {
                 page: search ? 1 : page + 1,
             },

@@ -145,10 +145,11 @@ const create = (props) => {
                 page: page
             }
         });
-        const responseJSON = response.data;
+        const responseJSON = response.data?.data;
+        console.log(responseJSON)
 
         return {
-            options: responseJSON.data.map((r,) => {
+            options: responseJSON?.products.map((r,) => {
                 return {
                     label: r.category?.code + " => " + r.title,
                     value: r.id,
@@ -156,7 +157,7 @@ const create = (props) => {
                     product_options: r.product_options,
                 }
             }),
-            hasMore: responseJSON.data.length >= 1,
+            hasMore: responseJSON.count > 20,
             additional: {
                 page: search ? 1 : page + 1,
             },

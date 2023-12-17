@@ -212,12 +212,12 @@ const Edit = (props) => {
         const responseJSON = response.data;
 
         if (page === 1){
-            setProducts(responseJSON.data);
+            setProducts(responseJSON.data?.products);
         }else{
-            setProducts([...products, ...responseJSON.data])
+            setProducts([...products, ...responseJSON.data?.products])
         }
         return {
-            options: responseJSON.data.map((r,) => {
+            options: responseJSON.data?.products?.map((r,) => {
                 return {
                     label: r.category?.code + " => " + r.title,
                     value: r.id,
@@ -226,7 +226,7 @@ const Edit = (props) => {
                     last_purchase: r.last_purchase,
                 }
             }),
-            hasMore: responseJSON.data.length >= 1,
+            hasMore: responseJSON.data.count > 20,
             additional: {
                 page: search ? 1 : page + 1,
             },
@@ -336,14 +336,14 @@ const Edit = (props) => {
                                                                     />
                                                                 </div>
                                                                 <Select
-                                                                    value={productOptions?.filter((po) => po.id == values.product_option_id)?.map(po => ({label: po.option.name, value: po.id}))}
+                                                                    value={productOptions?.filter((po) => po.id == values.product_option_id)?.map(po => ({label: po.option_value, value: po.id}))}
                                                                     onChange={(newValue) => {
                                                                         setFieldValue('product_option_id',newValue.value)
                                                                         setFieldValue('available_quantity', newValue.stock ?? 0);
                                                                     }}
                                                                     id='product_option_id'
                                                                     name="product_option_id"
-                                                                    options={ productOptions?.map((o) => ({label: o.option.name, value: o.id, stock: o.stock, }))}
+                                                                    options={ productOptions?.map((o) => ({label: o.option_value, value: o.id, stock: o.stock, }))}
                                                                     className={`select`}
                                                                     classNames={{
                                                                         control: state => `select`

@@ -372,9 +372,14 @@ class InitialRequisitionAPIController extends AppBaseController
             ->skip($start)
             ->limit(20)
             ->get());
+        $count = Product::query()
+            ->when($request->search, function ($q, $s){
+                $q->where('title', 'like', "%$s%");
+            })
+            ->count() - $start;
 
         return $this->sendResponse(
-            $products,
+            [ "products" => $products, 'count' => $count],
             __('messages.retrieved', ['model' => __('models/initialRequisitions.plural')])
         );
     }
