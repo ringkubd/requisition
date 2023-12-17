@@ -182,7 +182,7 @@ const InitialRequisitionCreate = (props) => {
         return {
             options: responseJSON.data?.products?.map((r,) => {
                 return {
-                    label: r.category?.code + " => " + r.title,
+                    label: r.title,
                     value: r.id,
                     product_options: r.product_options,
                     unit: r.unit,
@@ -273,8 +273,6 @@ const InitialRequisitionCreate = (props) => {
                                                             }}
                                                             onChange={(newValue) => {
                                                                 setSelectedCategory(newValue?.value)
-                                                                var event = new Event('change');
-                                                                selectRef.current.inputRef.dispatchEvent(event);
                                                             }}
                                                             additional={{
                                                                 page: 1,
