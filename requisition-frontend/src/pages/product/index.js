@@ -77,7 +77,7 @@ const Product = () => {
     }, [isLoading, isError, data]);
 
     const changeSearchParams = (key, value) => {
-        setSearchParams({...searchParams, [key]: value});
+        setSearchParams({...searchParams , [key]: value, page: 1});
     }
 
 
@@ -139,9 +139,12 @@ const Product = () => {
                             columns={columns}
                             data={data?.data}
                             pagination
+                            paginationServer
                             responsive
                             progressPending={isLoading}
                             persistTableHead
+                            onChangePage={(page, totalRows) => setSearchParams({'page': page})}
+                            paginationTotalRows={data?.number_of_rows}
                         />
                     </Card>
                 </div>

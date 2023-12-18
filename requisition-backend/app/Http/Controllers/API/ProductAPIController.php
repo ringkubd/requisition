@@ -78,11 +78,13 @@ class ProductAPIController extends AppBaseController
                 $q->whereIn('category_id', explode(',',$request->category));
             })
             ->latest()
-            ->get();
+            ->paginate();
 
-        return $this->sendResponse(
-            ProductResource::collection($products),
-            __('messages.retrieved', ['model' => __('models/products.plural')])
+        return response()->json([
+            'data' => ProductResource::collection($products),
+            "message" => __('messages.retrieved', ['model' => __('models/products.plural')]),
+                "number_of_rows" => $products->total()
+            ]
         );
     }
 

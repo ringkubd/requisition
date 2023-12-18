@@ -11,6 +11,7 @@ import {
     useGetNavigationOrganizationQuery
 } from "@/store/service/navigation";
 export default function OrganizationBranch({user, changingEffect}){
+    console.log(user)
     const { selected_organization, selected_branch, selected_department } = user ?? {};
     const [organization_id, setOrganizationId] = useState(selected_organization);
     const [branch_id, setBranchId] = useState(selected_branch);

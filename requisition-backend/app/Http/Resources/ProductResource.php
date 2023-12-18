@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
@@ -29,6 +30,13 @@ class ProductResource extends JsonResource
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
+        ];
+    }
+
+    public function with($request)
+    {
+        return [
+          'total_data' => $this->count()
         ];
     }
 }
