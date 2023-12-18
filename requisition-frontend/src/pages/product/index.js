@@ -143,7 +143,7 @@ const Product = () => {
                             responsive
                             progressPending={isLoading}
                             persistTableHead
-                            onChangePage={(page, totalRows) => setSearchParams({'page': page})}
+                            onChangePage={(page, totalRows) => setSearchParams({...searchParams, 'page': page})}
                             paginationTotalRows={data?.number_of_rows}
                         />
                     </Card>
