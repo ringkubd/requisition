@@ -1,5 +1,7 @@
 import React, { forwardRef, useEffect, useRef } from "react";
 import moment from "moment";
+import { useSelector } from "react-redux";
+import { useAuth } from "@/hooks/auth";
 
 const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
     const accountsCopy = useRef();
@@ -98,7 +100,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                             <h2 className={`border-t border-black px-4`}>Store</h2>
                         </div>
                         <div>
-                            <h2 className={`border-t border-black px-4`}>Projects Department</h2>
+                            <h2 className={`border-t border-black px-4`}>{mainData?.department?.name} Department</h2>
                         </div>
                         <div>
                             <h2 className={`border-t border-black px-4`}>Chief Executive Officer</h2>
@@ -180,7 +182,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                             <h2 className={`border-t border-black px-10`}>Store</h2>
                         </div>
                         <div>
-                            <h2 className={`border-t border-black px-10`}>Projects</h2>
+                            <h2 className={`border-t border-black px-10`}>{mainData?.department?.name} Department</h2>
                         </div>
                         <div>
                             <h2 className={`border-t border-black px-4`}>Chief Executive Officer</h2>

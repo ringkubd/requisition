@@ -25,6 +25,11 @@ const Edit = (props) => {
     })
     const [selectedOrganization, setSelectedOrganization] = useState(false);
     const [selectedBranch, setSelectedBranch] = useState(false);
+
+    const [defaultOrganizationOptions, setDefaultOrganizationOptions] = useState([]);
+    const [defaultBranchOptions, setDefaultBranchOptions] = useState([]);
+    const [defaultDepartmentOptions, setDefaultDepartmentOptions] = useState([]);
+
     const organizations = useGetOrganizationQuery();
     const branch = useGetBranchByOrganizationQuery(selectedOrganization, {skip: !selectedOrganization});
     const department = useGetDepartmentByOrganizationBranchQuery({
@@ -140,7 +145,8 @@ const Edit = (props) => {
                                                             />
                                                             <ErrorMessage
                                                                 name='name'
-                                                                render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                                render={(msg) => <span
+                                                                    className='text-red-500'>{msg}</span>} />
                                                         </div>
                                                         <div className="w-full">
                                                             <div className="mb-2 block">
@@ -160,7 +166,8 @@ const Edit = (props) => {
                                                             />
                                                             <ErrorMessage
                                                                 name='email'
-                                                                render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                                render={(msg) => <span
+                                                                    className='text-red-500'>{msg}</span>} />
                                                         </div>
                                                     </div>
                                                     <div className="flex flex-col md:flex-row gap-4">
@@ -181,7 +188,8 @@ const Edit = (props) => {
                                                             />
                                                             <ErrorMessage
                                                                 name='password'
-                                                                render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                                render={(msg) => <span
+                                                                    className='text-red-500'>{msg}</span>} />
                                                         </div>
                                                         <div className="w-full">
                                                             <div className="mb-2 block">
@@ -199,7 +207,8 @@ const Edit = (props) => {
                                                             />
                                                             <ErrorMessage
                                                                 name='confirm_password'
-                                                                render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                                render={(msg) => <span
+                                                                    className='text-red-500'>{msg}</span>} />
                                                         </div>
                                                     </div>
                                                     <div className="flex flex-col md:flex-row gap-4">
@@ -221,12 +230,20 @@ const Edit = (props) => {
                                                                 components={animatedComponents}
                                                                 value={organizations?.data?.filter((r) => {
                                                                     return values.organization_id.filter(v => v === r.id).length;
-                                                                }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                }).map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name?.toUpperCase()
+                                                                }))}
                                                                 isMulti
-                                                                options={organizations?.data?.map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                options={organizations?.data?.map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name?.toUpperCase()
+                                                                }))}
                                                                 onChange={(newValue, actionMeta) => {
-                                                                    setFieldValue('organization_id',newValue.map((v) => v.value));
+                                                                    setFieldValue('organization_id', newValue.map((v) => v.value));
                                                                     setSelectedOrganization(newValue.map((v) => v.value));
+                                                                    setDefaultOrganizationOptions(newValue);
+                                                                    console.log(newValue)
                                                                 }}
                                                                 menuPlacement={`bottom`}
                                                                 onBlur={handleBlur}
@@ -234,7 +251,8 @@ const Edit = (props) => {
                                                             />
                                                             <ErrorMessage
                                                                 name='organization_id'
-                                                                render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                                render={(msg) => <span
+                                                                    className='text-red-500'>{msg}</span>} />
                                                         </div>
                                                         <div className="w-full">
                                                             <div className="mb-2 block">
@@ -254,11 +272,18 @@ const Edit = (props) => {
                                                                 components={animatedComponents}
                                                                 value={branch?.data?.data?.filter((r) => {
                                                                     return values.branch_id.filter(v => v === r.id).length;
-                                                                }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                }).map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name?.toUpperCase()
+                                                                }))}
                                                                 isMulti
-                                                                options={branch?.data?.data.map((o) => ({value: o.id, label: o.name}))}
+                                                                options={branch?.data?.data.map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name
+                                                                }))}
                                                                 onChange={(newValue, actionMeta) => {
-                                                                    setFieldValue('branch_id',newValue.map((v) => v.value))
+                                                                    setFieldValue('branch_id', newValue.map((v) => v.value))
+                                                                    setDefaultBranchOptions(newValue);
                                                                 }}
                                                                 menuPlacement={`bottom`}
                                                                 onBlur={handleBlur}
@@ -266,7 +291,74 @@ const Edit = (props) => {
                                                             />
                                                             <ErrorMessage
                                                                 name='branch_id'
-                                                                render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                                render={(msg) => <span
+                                                                    className='text-red-500'>{msg}</span>} />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col md:flex-row gap-4">
+                                                        <div className="w-full">
+                                                            <div className="mb-2 block">
+                                                                <Label
+                                                                    htmlFor="default_organization_id"
+                                                                    value="Default Organization"
+                                                                />
+                                                            </div>
+                                                            <Select
+                                                                id="default_organization_id"
+                                                                name="default_organization_id"
+                                                                className={`select`}
+                                                                value={organizations?.data?.filter((r) => {
+                                                                    return values.default_organization_id === r.id
+                                                                }).map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name?.toUpperCase()
+                                                                }))}
+                                                                closeMenuOnSelect={false}
+                                                                components={animatedComponents}
+                                                                onChange={(newValue, actionMeta) => {
+                                                                    setFieldValue('default_organization_id', newValue?.value);
+                                                                }}
+                                                                options={defaultOrganizationOptions}
+                                                                menuPlacement={`bottom`}
+                                                                onBlur={handleBlur}
+                                                                menuShouldScrollIntoView={true}
+                                                            />
+                                                            <ErrorMessage
+                                                                name='default_organization_id'
+                                                                render={(msg) => <span
+                                                                    className='text-red-500'>{msg}</span>} />
+                                                        </div>
+                                                        <div className="w-full">
+                                                            <div className="mb-2 block">
+                                                                <Label
+                                                                    htmlFor="default_branch_id"
+                                                                    value="Default Branch"
+                                                                />
+                                                            </div>
+                                                            <Select
+                                                                id="default_branch_id"
+                                                                name="default_branch_id"
+                                                                className={`select`}
+                                                                closeMenuOnSelect={false}
+                                                                value={branch?.data?.data?.filter((r) => {
+                                                                    return values.default_branch_id === r.id
+                                                                }).map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name?.toUpperCase()
+                                                                }))}
+                                                                components={animatedComponents}
+                                                                options={defaultBranchOptions}
+                                                                onChange={(newValue, actionMeta) => {
+                                                                    setFieldValue('default_branch_id', newValue.value)
+                                                                }}
+                                                                menuPlacement={`bottom`}
+                                                                onBlur={handleBlur}
+                                                                menuShouldScrollIntoView={true}
+                                                            />
+                                                            <ErrorMessage
+                                                                name='default_branch_id'
+                                                                render={(msg) => <span
+                                                                    className='text-red-500'>{msg}</span>} />
                                                         </div>
                                                     </div>
                                                     <div className="flex flex-col md:flex-row gap-4">
@@ -288,11 +380,18 @@ const Edit = (props) => {
                                                                 components={animatedComponents}
                                                                 value={department?.data?.data?.filter((r) => {
                                                                     return values.department_id.filter(v => v === r.id).length;
-                                                                }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                }).map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name?.toUpperCase()
+                                                                }))}
                                                                 isMulti
-                                                                options={department?.data?.data.map((o) => ({value: o.id, label: o.name}))}
+                                                                options={department?.data?.data.map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name
+                                                                }))}
                                                                 onChange={(newValue, actionMeta) => {
-                                                                    setFieldValue('department_id',newValue.map((v) => v.value))
+                                                                    setFieldValue('department_id', newValue.map((v) => v.value))
+                                                                    setDefaultDepartmentOptions(newValue);
                                                                 }}
                                                                 menuPlacement={`bottom`}
                                                                 onBlur={handleBlur}
@@ -300,7 +399,8 @@ const Edit = (props) => {
                                                             />
                                                             <ErrorMessage
                                                                 name='department_id'
-                                                                render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                                render={(msg) => <span
+                                                                    className='text-red-500'>{msg}</span>} />
                                                         </div>
                                                         <div className="w-full">
                                                             <div className="mb-2 block">
@@ -319,23 +419,63 @@ const Edit = (props) => {
                                                                 closeMenuOnSelect={false}
                                                                 components={animatedComponents}
                                                                 isMulti
-                                                                options={designation?.data?.data.map((o) => ({value: o.id, label: o.name}))}
+                                                                options={designation?.data?.data.map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name
+                                                                }))}
                                                                 onChange={(newValue, actionMeta) => {
-                                                                    setFieldValue('designation_id',newValue.map((v) => v.value));
+                                                                    setFieldValue('designation_id', newValue.map((v) => v.value));
                                                                 }}
                                                                 value={designation?.data?.data?.filter((r) => {
                                                                     return values.designation_id.filter(v => v === r.id).length;
-                                                                }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                }).map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name?.toUpperCase()
+                                                                }))}
                                                                 menuPlacement={`bottom`}
                                                                 onBlur={handleBlur}
                                                                 menuShouldScrollIntoView={true}
                                                             />
                                                             <ErrorMessage
                                                                 name='designation_id'
-                                                                render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                                render={(msg) => <span
+                                                                    className='text-red-500'>{msg}</span>} />
                                                         </div>
                                                     </div>
                                                     <div className="flex flex-col md:flex-row gap-4">
+                                                        <div className="w-full">
+                                                            <div className="mb-2 block">
+                                                                <Label
+                                                                    htmlFor="default_department_id"
+                                                                    value="Default Department"
+                                                                />
+                                                            </div>
+                                                            <Select
+                                                                className={`select`}
+                                                                id="default_department_id"
+                                                                name="default_department_id"
+                                                                closeMenuOnSelect={false}
+                                                                value={department?.data?.data?.filter((r) => {
+                                                                    return values.default_department_id === r.id;
+                                                                }).map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name?.toUpperCase()
+                                                                }))}
+                                                                components={animatedComponents}
+                                                                options={defaultDepartmentOptions}
+                                                                onChange={(newValue, actionMeta) => {
+                                                                    setFieldValue('default_department_id', newValue?.value)
+                                                                }}
+                                                                menuPlacement={`bottom`}
+                                                                onBlur={handleBlur}
+                                                                menuShouldScrollIntoView={true}
+                                                            />
+
+                                                            <ErrorMessage
+                                                                name='default_department_id'
+                                                                render={(msg) => <span
+                                                                    className='text-red-500'>{msg}</span>} />
+                                                        </div>
                                                         <div className="w-full">
                                                             <div className="mb-2 block">
                                                                 <Label
@@ -354,11 +494,17 @@ const Edit = (props) => {
                                                                 components={animatedComponents}
                                                                 value={roles?.data?.filter((r) => {
                                                                     return values.roles.filter(v => v === r.id).length;
-                                                                }).map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                }).map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name?.toUpperCase()
+                                                                }))}
                                                                 isMulti
-                                                                options={roles?.data?.map((o) => ({value: o.id, label: o.name?.toUpperCase()}))}
+                                                                options={roles?.data?.map((o) => ({
+                                                                    value: o.id,
+                                                                    label: o.name?.toUpperCase()
+                                                                }))}
                                                                 onChange={(newValue, actionMeta) => {
-                                                                    setFieldValue('roles',newValue.map((v) => v.value));
+                                                                    setFieldValue('roles', newValue.map((v) => v.value));
                                                                 }}
                                                                 menuPlacement={`bottom`}
                                                                 onBlur={handleBlur}
@@ -366,7 +512,8 @@ const Edit = (props) => {
                                                             />
                                                             <ErrorMessage
                                                                 name='roles'
-                                                                render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                                render={(msg) => <span
+                                                                    className='text-red-500'>{msg}</span>} />
                                                         </div>
                                                     </div>
                                                     <div className="flex flex-col md:flex-row gap-4 justify-end">

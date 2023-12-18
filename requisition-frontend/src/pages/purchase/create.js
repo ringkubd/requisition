@@ -175,7 +175,7 @@ const create = (props) => {
                     sortable: true,
                 },
                 {
-                    name: 'Chalan',
+                    name: 'Chalan / Bill',
                     selector: row => row.chalan_no,
                     sortable: true,
                 },
@@ -551,7 +551,7 @@ const create = (props) => {
                                                     <div className="mb-2 block">
                                                         <Label
                                                             htmlFor="chalan_no"
-                                                            value="Chalan Number"
+                                                            value="Chalan/Bill Number"
                                                         />
                                                     </div>
                                                     <TextInput

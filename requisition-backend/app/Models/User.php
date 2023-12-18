@@ -91,7 +91,10 @@ use Spatie\Permission\Traits\HasRoles;
         'email',
         'email_verified_at',
         'password',
-        'remember_token'
+        'remember_token',
+        'default_organization_id',
+        'default_branch_id',
+        'default_department_id',
     ];
 
     protected $casts = [
@@ -141,5 +144,18 @@ use Spatie\Permission\Traits\HasRoles;
     {
         // TODO: Implement getActivitylogOptions() method.
         return LogOptions::defaults()->logFillable();
+    }
+
+    public function defaultBranch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'default_branch_id');
+    }
+    public function defaultDepartment(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'default_department_id');
+    }
+    public function defaultOrganization(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Organization::class, 'default_organization_id');
     }
 }

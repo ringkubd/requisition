@@ -111,6 +111,16 @@ class UserAPIController extends AppBaseController
     {
         $input = $request->all();
 
+        if ($request->default_department_id === "" or $request->default_department_id == null){
+            $input['default_department_id'] = $request->department_id[0];
+        }
+        if ($request->default_branch_id === "" or $request->default_branch_id == null){
+            $input['default_branch_id'] = $request->branch_id[0];
+        }
+        if ($request->default_organization_id === "" or $request->default_organization_id == null){
+            $input['default_organization_id'] = $request->organization_id[0];
+        }
+
         $user = $this->userRepository->create($input);
         $user->organizations()->sync($request->organization_id);
         $user->branches()->sync($request->branch_id);
@@ -237,6 +247,17 @@ class UserAPIController extends AppBaseController
         $user->branches()->sync($request->branch_id);
         $user->departments()->sync($request->department_id);
         $user->designations()->sync($request->designation_id);
+
+        if ($request->default_department_id === "" or $request->default_department_id == null){
+            $input['default_department_id'] = $request->department_id[0];
+        }
+        if ($request->default_branch_id === "" or $request->default_branch_id == null){
+            $input['default_branch_id'] = $request->branch_id[0];
+        }
+        if ($request->default_organization_id === "" or $request->default_organization_id == null){
+            $input['default_organization_id'] = $request->organization_id[0];
+        }
+
         if ($request->has('roles')){
             $user->roles()->sync($request->roles);
         }
