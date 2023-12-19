@@ -221,7 +221,7 @@ const CashRequisitionCreate = (props) => {
                               isDisabled={unitsISError}
                               isLoading={unitsISLoading}
                               onChange={(newValue) => {
-                                setFieldValue('unit', newValue.value)
+                                setFieldValue('unit', newValue?.value)
                               }}
                               onCreateOption={(inputValue) => {
                                 storeUnit({

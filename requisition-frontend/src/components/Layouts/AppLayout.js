@@ -7,14 +7,19 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Loading from "@/components/loading";
 import { EchoConfig } from "@/lib/echo";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSingleInitialRequisition } from "@/store/slice/dashboardSlice";
 import { setSingleActivity } from "@/store/slice/activitySlice";
+import { addNewOnline, removeOnline, setAllOnline } from "@/store/slice/userOnlineSlice";
+import { Badge, ListGroup, Tooltip } from "flowbite-react";
 
 const AppLayout = ({ header, children }) => {
     const router = useRouter();
     const dispatch = useDispatch();
     const { user } = useAuth({ middleware: 'auth' })
+    const online_users = useSelector(state => state.active_users);
+
+    useEffect(() => { console.log(online_users)}, [online_users])
     const changingEffect = (effect) => {
         if (effect){
             router.reload();
@@ -56,6 +61,16 @@ const AppLayout = ({ header, children }) => {
             .listen('QueryMonitorEvent', event => {
                 console.log(event)
             })
+        window.Echo.join('online')
+            .here((users) => {
+                dispatch(setAllOnline(users))
+            })
+            .joining((user) => {
+                dispatch(addNewOnline(user))
+            })
+            .leaving((user) => {
+                dispatch(removeOnline(user))
+            })
     }, [])
 
 
@@ -76,6 +91,19 @@ const AppLayout = ({ header, children }) => {
                     {load ? (
                         <Loading />
                     ) : children}
+                    <div className={`fixed bottom-2 right-5 h-fit w-fit`}>
+                        <Tooltip className={`flex w-full h-full justify-center items-center justify-items-center align-middle`} content={
+                            <ListGroup>
+                                {
+                                    online_users?.user_list ? online_users?.user_list?.map((user, index) => (
+                                        <ListGroup.Item key={index}>{user.name}</ListGroup.Item>
+                                    )) : <ListGroup.Item>No one is online currently.</ListGroup.Item>
+                                }
+                            </ListGroup>
+                        }>
+                            <Badge className={`h-fit w-fit text-2xl font-bold rounded-full`}>{online_users?.number_of_user ?? 0}</Badge>
+                        </Tooltip>
+                    </div>
                 </Suspense>
             </main>
             <ToastContainer

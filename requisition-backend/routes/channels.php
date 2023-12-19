@@ -21,11 +21,15 @@ Broadcast::channel('initial_requisition', function (){
     return true;
 });
 Broadcast::channel('activity', function ($user){
-    return true;
+    return $user;
 });
 Broadcast::channel('query_monitoring', function ($user){
     return true;
 });
 Broadcast::channel('exception', function ($user){
     return true;
+});
+
+Broadcast::channel('online', function ($user){
+    return $user;
 });

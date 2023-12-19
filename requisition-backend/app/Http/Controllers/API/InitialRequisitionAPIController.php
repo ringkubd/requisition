@@ -11,6 +11,8 @@ use App\Models\InitialRequisition;
 use App\Models\InitialRequisitionProduct;
 use App\Models\Product;
 use App\Models\PurchaseRequisitionProduct;
+use App\Models\User;
+use App\Notifications\RequisitionStatusNotification;
 use App\Repositories\InitialRequisitionRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -135,6 +137,10 @@ class InitialRequisitionAPIController extends AppBaseController
         ]);
         $initialRequisition->irfNos()->create([
             'irf_no' => $irf_no
+        ]);
+        $initialRequisition->approval_status()->create([
+            'department_id' => auth_department_id(),
+            'user_id' => $request->user()->id
         ]);
         $allProduct = array_map(function($p){
             unset($p['estimated_cost']);
@@ -449,5 +455,38 @@ class InitialRequisitionAPIController extends AppBaseController
             $initialProducts,
             __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])
         );
+    }
+
+    /**
+     * @param Request $request
+     * @param InitialRequisition $requisition
+     * @return JsonResponse|void
+     */
+
+    public function changeStatusDepartment(Request $request,InitialRequisition $requisition){
+        $head_of_department = $requisition->department?->head_of_department;
+        $head_of_department_user = User::find($head_of_department);
+        if ($head_of_department){
+            $data = [
+                'department_id' => $requisition->department_id,
+                'user_id' => \request()->user()->id,
+                'notes' => $request->notes
+            ];
+            match($request->stage){
+                'accounts' => $data['accounts_status'] = $request->status,
+                'ceo' => $data['ceo_status'] = $request->status,
+                default => $data['department_status'] = $request->status,
+            };
+            $status = $requisition->approval_status()->updateOrCreate($data);
+            if ($request->status == 1){
+                $head_of_department_user->notify(new RequisitionStatusNotification($status));
+            }else{
+                $request->user()->notify(new RequisitionStatusNotification($status));
+            }
+            return $this->sendResponse(
+                $status,
+                __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])
+            );
+        }
     }
 }

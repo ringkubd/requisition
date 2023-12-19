@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateCashRequisitionAPIRequest;
 use App\Http\Requests\API\UpdateCashRequisitionAPIRequest;
 use App\Models\CashRequisition;
+use App\Models\User;
+use App\Notifications\RequisitionStatusNotification;
 use App\Repositories\CashRequisitionRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -123,6 +125,10 @@ class CashRequisitionAPIController extends AppBaseController
         $cashRequisition->prfNOS()->create([
             'prf_no' => $prf_no,
             'total' => collect($input)->sum('cost')
+        ]);
+        $cashRequisition->approval_status()->create([
+            'department_id' => auth_department_id(),
+            'user_id' => $request->user()->id
         ]);
 
         return $this->sendResponse(
@@ -309,5 +315,38 @@ class CashRequisitionAPIController extends AppBaseController
             $id,
             __('messages.deleted', ['model' => __('models/cashRequisitions.singular')])
         );
+    }
+
+    /**
+     * @param Request $request
+     * @param CashRequisition $requisition
+     * @return JsonResponse|void
+     */
+
+    public function changeStatusDepartment(Request $request,CashRequisition $requisition){
+        $head_of_department = $requisition->department?->head_of_department;
+        $head_of_department_user = User::find($head_of_department);
+        if ($head_of_department){
+            $data = [
+                'department_id' => $requisition->department_id,
+                'user_id' => \request()->user()->id,
+                'notes' => $request->notes
+            ];
+            match($request->stage){
+                'accounts' => $data['accounts_status'] = $request->status,
+                'ceo' => $data['ceo_status'] = $request->status,
+                default => $data['department_status'] = $request->status,
+            };
+            $status = $requisition->approval_status()->updateOrCreate($data);
+            if ($request->status == 1){
+                $head_of_department_user->notify(new RequisitionStatusNotification($status));
+            }else{
+                $request->user()->notify(new RequisitionStatusNotification($status));
+            }
+            return $this->sendResponse(
+                $status,
+                __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])
+            );
+        }
     }
 }

@@ -46,6 +46,7 @@ import { CashRequisitionAPIService } from "@/store/service/cash/Index";
 import DashboardSlice from "@/store/slice/dashboardSlice";
 import ActivitySlice from "@/store/slice/activitySlice";
 import { ReportAPI } from "@/store/service/report";
+import { UserOnlineSlice } from "@/store/slice/userOnlineSlice";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -87,6 +88,7 @@ const combineReducer = combineReducers({
     errors: errorSlice.reducer,
     dashboard: DashboardSlice.reducer,
     activity: ActivitySlice.reducer,
+    active_users: UserOnlineSlice.reducer,
     purchase_requisition_inputs: PurchaseRequisitionInputChangeSlice.reducer,
     [OrganizationApiService.reducerPath]: OrganizationApiService.reducer,
     [BranchApiService.reducerPath]: BranchApiService.reducer,

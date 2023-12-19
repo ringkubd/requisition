@@ -116,4 +116,9 @@ use Illuminate\Database\Eloquent\Model;
     {
         return $this->morphOne(PRFNo::class, 'model');
     }
+
+    public function approval_status(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(RequisitionStatus::class, 'requisition');
+    }
 }

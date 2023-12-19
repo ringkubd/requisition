@@ -6,6 +6,7 @@ import axios from "@/lib/axios";
 import { setInitialRequisition } from "@/store/slice/dashboardSlice";
 import { Card } from "flowbite-react";
 import DataTable from "react-data-table-component";
+import Status from "@/components/requisition/status";
 
 const Dashboard = () => {
     const dispatch = useDispatch();
@@ -61,6 +62,10 @@ const Dashboard = () => {
                     selector: row => row.created_at,
                     sortable: true,
                 },
+                {
+                    name: 'Status',
+                    selector: row => <Status key={row.id} requisition={row} type={'initial'} />
+                }
             ])
         }
     }, [dashboardData]);

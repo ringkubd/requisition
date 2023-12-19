@@ -30,6 +30,8 @@ class PurchaseRequisitionResource extends JsonResource
             'payment_type' => $this->payment_type,
             'total_required_unit' => $this->purchaseRequisitionProducts?->sum('required_quantity'),
             'purchase_requisition_products' => PurchaseRequisitionProductResource::collection($this->purchaseRequisitionProducts),
+            'approval_status' => $this->approval_status,
+            'current_status' => $this->approval_status?->current_status,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

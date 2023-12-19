@@ -164,3 +164,7 @@ Route::prefix('report')->group(function (){
     Route::get('product', [\App\Http\Controllers\API\ProductAPIController::class, 'report']);
     Route::get('daily', [\App\Http\Controllers\API\ReportAPIController::class, 'dailyReport']);
 });
+
+Route::put('update_initial_status/{requisition}', [InitialRequisitionAPIController::class, 'changeStatusDepartment']);
+Route::put('update_purchase_status/{requisition}', [PurchaseRequisitionAPIController::class, 'changeStatusDepartment']);
+Route::put('update_cash_status/{requisition}', [\App\Http\Controllers\API\CashRequisitionAPIController::class, 'changeStatusDepartment']);
