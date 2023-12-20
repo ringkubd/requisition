@@ -9,7 +9,6 @@ import { toast } from "react-toastify";
 import * as Yup from 'yup';
 import { useStorePurchaseMutation } from "@/store/service/purchase";
 import moment from "moment/moment";
-import Select2Component from "@/components/select2/Select2Component";
 import { useGetCountriesQuery } from "@/store/service/country";
 import axios from "@/lib/axios";
 import { AsyncPaginate } from "react-select-async-paginate";
@@ -531,13 +530,16 @@ const create = (props) => {
                                                             value="Origin"
                                                         />
                                                     </div>
-                                                    <Select2Component
+                                                    <Select
                                                         options={countries?.data?.map((c) => ({label: c.country_name, value: c.country_name}))}
-                                                        onChange={handleChange}
+                                                        onChange={(newValue) => setFieldValue('origin', newValue?.value)}
                                                         name='origin'
                                                         id='origin'
-                                                        className={`w-full border-1 border-gray-300`}
-                                                        value={values.origin}
+                                                        value={countries?.data?.filter(c => c.id === values.origin)?.map((c) => ({label: c.country_name, value: c.country_name}))[0]}
+                                                        className={`select`}
+                                                        classNames={{
+                                                            control: state => 'select'
+                                                        }}
                                                     />
                                                     <ErrorMessage
                                                         name="description"

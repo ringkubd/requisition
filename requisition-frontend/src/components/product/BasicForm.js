@@ -5,11 +5,9 @@ import * as Yup from "yup";
 import { useGetCategoryQuery } from "@/store/service/category";
 import { useDispatch, useSelector } from "react-redux";
 import { setProductBasicInfo } from "@/store/service/product/product_basic_form";
-import MySelect2Component from "@/components/select2/Select2Component";
 import { setActiveForm } from "@/store/service/product/product_active_form";
-import { useGetCountriesQuery } from "@/store/service/country";
-import Select2Component from "@/components/select2/Select2Component";
 import { useGetUnitsQuery } from "@/store/service/units";
+import Select from "react-select";
 
 export default function BasicForm(props){
     const category = useGetCategoryQuery()
@@ -115,15 +113,18 @@ export default function BasicForm(props){
                                         value="Category"
                                     />
                                 </div>
-                                <MySelect2Component
+                                <Select
                                     name={`category_id`}
                                     id={`category_id`}
-                                    onChange={handleChange}
+                                    onChange={(newValue) => {
+                                        setFieldValue('category_id', newValue?.value)
+                                    }}
                                     onBlur={handleBlur}
                                     options={categoryOptions}
-                                    value={values.category_id}
+                                    value={categoryOptions.filter(c => c.value === values.category_id)[0]}
                                     data-placeholder="Select options..."
-                                    className={`w-full border-1 border-gray-300`}
+                                    className={`select`}
+                                    classNames={{control: state => `select`}}
                                 />
 
                                 <ErrorMessage
@@ -144,14 +145,17 @@ export default function BasicForm(props){
                                         value="Unit"
                                     />
                                 </div>
-                                <Select2Component
+                                <Select
                                     name={`unit`}
                                     id={`unit`}
                                     options={units?.data?.map((u) => ({label: u.unit_code + ` (${u.unit_name})`, value: u.unit_code}) )}
-                                    value={values.unit}
-                                    onChange={handleChange}
+                                    value={units?.data?.filter(u => u.unit_code === values.unit)?.map((u) => ({label: u.unit_code + ` (${u.unit_name})`, value: u.unit_code}))[0]}
+                                    onChange={(newValue) => {
+                                        setFieldValue('unit', newValue?.value)
+                                    }}
                                     data-placeholder="Select options..."
-                                    className={`w-full border-1 border-gray-300`}
+                                    className={`select`}
+                                    classNames={{control: state => `select`}}
                                 />
                                 <ErrorMessage
                                     name="unit"

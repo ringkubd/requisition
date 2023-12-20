@@ -1,6 +1,6 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, Select, Textarea, TextInput } from "flowbite-react";
+import { Button, Card, Label, Textarea, TextInput } from "flowbite-react";
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 import { useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { useEditCategoryQuery, useGetCategoryQuery, useUpdateCategoryMutation } from "@/store/service/category";
-import Select2Component from "@/components/select2/Select2Component";
+import Select from "react-select";
 
 const Edit = (props) => {
     const router = useRouter();
@@ -131,16 +131,17 @@ const Edit = (props) => {
                                                                     value="Parent Category"
                                                                 />
                                                             </div>
-                                                            <Select2Component
+                                                            <Select
                                                                 name="parent_id"
                                                                 id="parent_id"
                                                                 options={categories?.data?.filter((c) => parseInt(c.id) !== parseInt(router.query.id))?.map((p) => ({value: p.id, label: p.title}))}
                                                                 ref={selectRef}
-                                                                value={values.parent_id}
-                                                                onChange={(e, s) => {
-                                                                    setFieldValue('parent_id', e.target.value)
+                                                                value={categories?.data?.filter((c) => parseInt(c.id) !== parseInt(router.query.id) && c.id === values.parent_id)?.map((p) => ({value: p.id, label: p.title}))}
+                                                                onChange={(newValue) => {
+                                                                    setFieldValue('parent_id', newValue?.value)
                                                                 }}
-                                                                className={`w-full border-1 border-gray-300`}
+                                                                className={`select`}
+                                                                classNames={{control: state => `select`}}
                                                                 data-placeholder="Select parent category..."
                                                             />
                                                             <ErrorMessage

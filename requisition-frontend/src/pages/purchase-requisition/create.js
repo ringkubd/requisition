@@ -152,7 +152,7 @@ const InitialRequisitionCreate = (props) => {
                                           <option value=""></option>
                                           {
                                               initialRequisitionForPurchase.data?.data?.map(r => (
-                                                <option key={r.id} value={r.id}>{r.irf_no + " (" + moment(r.created_at).format('DD-MMM-Y@H:mm')+")"}</option>
+                                                <option key={r.id} value={r.id}>{r.irf_no + ` ${r.user?.name} ` + " (" + moment(r.created_at).format('DD-MMM-Y@H:mm')+")"}</option>
                                               ))
                                           }
                                       </Select>

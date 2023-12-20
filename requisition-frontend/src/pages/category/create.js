@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 import { useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { useGetCategoryQuery, useStoreCategoryMutation } from "@/store/service/category";
-import Select2Component from "@/components/select2/Select2Component";
+import Select from "react-select";
 
 const create = (props) => {
     const router = useRouter();
@@ -128,15 +128,18 @@ const create = (props) => {
                                                             value="Parent Category"
                                                         />
                                                     </div>
-                                                    <Select2Component
+                                                    <Select
                                                         name="parent_id"
                                                         id="parent_id"
                                                         options={categories?.data?.map((p) => ({value: p.id, label: p.title}))}
                                                         ref={selectRef}
-                                                        onChange={(e) => {
-                                                            setFieldValue('parent_id', e.target.value)
+                                                        onChange={(newValue) => {
+                                                            setFieldValue('parent_id', newValue?.value)
                                                         }}
-                                                        className={`w-full border-1 border-gray-300`}
+                                                        className={`select`}
+                                                        classNames={{
+                                                            control: state => `select`
+                                                        }}
                                                         data-placeholder="Select parent category..."
                                                     />
                                                     <ErrorMessage
