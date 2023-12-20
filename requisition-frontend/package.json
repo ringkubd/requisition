@@ -9,7 +9,8 @@
         "start_1080": "next start -p 1080",
         "lint": "next lint",
         "lint:fix": "next lint --fix",
-        "updateLink": "npm unlink unit2select && npm link unit2select"
+        "updateLink": "npm unlink unit2select && npm link unit2select",
+        "analyze": "ANALYZE=true next build"
     },
     "dependencies": {
         "@dotlottie/player-component": "^2.7.0",

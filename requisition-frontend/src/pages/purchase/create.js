@@ -18,7 +18,6 @@ import CreatableSelect from 'react-select/creatable';
 import { useGetBrandsQuery, useStoreBrandsMutation } from "@/store/service/brands";
 import { useGetSuppliersQuery, useStoreSuppliersMutation } from "@/store/service/suppliers";
 import DataTable from "react-data-table-component";
-import Image from "next/image";
 import Actions from "@/components/actions";
 const create = (props) => {
     const router = useRouter();
