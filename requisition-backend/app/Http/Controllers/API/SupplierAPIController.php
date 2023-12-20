@@ -26,10 +26,10 @@ class SupplierAPIController extends AppBaseController
         $this->supplierRepository = $supplierRepo;
 
         $this->middleware('auth:sanctum');
-        $this->middleware('role_or_permission:Super Admin|view_suppliers', ['only' => ['index']]);
-        $this->middleware('role_or_permission:Super Admin|update_suppliers', ['only' => ['show', 'update']]);
-        $this->middleware('role_or_permission:Super Admin|create_suppliers', ['only' => ['store']]);
-        $this->middleware('role_or_permission:Super Admin|delete_suppliers', ['only' => ['delete']]);
+//        $this->middleware('role_or_permission:Super Admin|view_suppliers', ['only' => ['index']]);
+//        $this->middleware('role_or_permission:Super Admin|update_suppliers', ['only' => ['show', 'update']]);
+//        $this->middleware('role_or_permission:Super Admin|create_suppliers', ['only' => ['store']]);
+//        $this->middleware('role_or_permission:Super Admin|delete_suppliers', ['only' => ['delete']]);
     }
 
     /**
