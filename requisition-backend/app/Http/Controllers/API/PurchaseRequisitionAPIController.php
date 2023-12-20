@@ -158,7 +158,6 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $purchaseRequisition->approval_status()->create([
             'department_id' => auth_department_id(),
             'department_status' => 1,
-            'department_approved_by' => null,
         ]);
         $purchaseRequisition->purchaseRequisitionProducts()->createMany($purchaseProducts);
         $purchaseRequisition->prfNOS()->create([

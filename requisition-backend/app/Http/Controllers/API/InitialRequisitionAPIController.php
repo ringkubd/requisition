@@ -140,7 +140,7 @@ class InitialRequisitionAPIController extends AppBaseController
         ]);
         $initialRequisition->approval_status()->create([
             'department_id' => auth_department_id(),
-            'user_id' => $request->user()->id
+            'department_status' => 1,
         ]);
         $allProduct = array_map(function($p){
             unset($p['estimated_cost']);

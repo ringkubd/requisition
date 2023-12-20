@@ -128,7 +128,7 @@ class CashRequisitionAPIController extends AppBaseController
         ]);
         $cashRequisition->approval_status()->create([
             'department_id' => auth_department_id(),
-            'user_id' => $request->user()->id
+            'department_status' => 1,
         ]);
 
         return $this->sendResponse(
