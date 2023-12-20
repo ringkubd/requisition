@@ -329,15 +329,25 @@ class CashRequisitionAPIController extends AppBaseController
         if ($head_of_department){
             $data = [
                 'department_id' => $requisition->department_id,
-                'user_id' => \request()->user()->id,
                 'notes' => $request->notes
             ];
-            match($request->stage){
-                'accounts' => $data['accounts_status'] = $request->status,
-                'ceo' => $data['ceo_status'] = $request->status,
-                default => $data['department_status'] = $request->status,
-            };
-            $status = $requisition->approval_status()->updateOrCreate($data);
+            switch ($request->stage){
+                case 'accounts':
+                    $data['accounts_status'] = $request->status;
+                    $data['accounts_approved_by'] = \request()->user()->id;
+                    break;
+                case 'ceo':
+                    $data['ceo_status'] = $request->status;
+                    break;
+                default:
+                    $data['department_status'] = $request->status;
+                    $data['department_approved_by'] = \request()->user()->id;
+            }
+            if ($requisition->approval_status){
+                $status = $requisition->approval_status()->update($data);
+            }else{
+                $status = $requisition->approval_status()->updateOrCreate($data);
+            }
             if ($request->status == 1){
                 $head_of_department_user->notify(new RequisitionStatusNotification($status));
             }else{

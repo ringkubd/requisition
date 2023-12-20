@@ -144,6 +144,7 @@ const Product = () => {
                             progressPending={isLoading}
                             persistTableHead
                             onChangePage={(page, totalRows) => setSearchParams({...searchParams, 'page': page})}
+                            onChangeRowsPerPage={(currentRowsPerPage, currentPage) => setSearchParams({...searchParams, 'page': currentPage, per_page: currentRowsPerPage })}
                             paginationTotalRows={data?.number_of_rows}
                         />
                     </Card>

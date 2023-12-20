@@ -16,6 +16,7 @@ import {
 } from "@/store/service/requisitions/purchase";
 import moment from "moment";
 import UpdatePno from "@/components/purchase-requisition/UpdatePno";
+import Status from "@/components/requisition/status";
 
 const PurchaseRequisition = () => {
     const router = useRouter();
@@ -66,6 +67,10 @@ const PurchaseRequisition = () => {
                     name: 'Created at',
                     selector: row => moment(row.created_at).format("YYYY-MM-DD hh:mm:ss"),
                     sortable: true,
+                },
+                {
+                    name: 'Status',
+                    selector: row => <Status key={row.id} requisition={row} type={'purchase'} />
                 },
                 {
                     name: 'Actions',

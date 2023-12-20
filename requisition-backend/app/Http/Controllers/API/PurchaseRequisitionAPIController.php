@@ -379,21 +379,35 @@ class PurchaseRequisitionAPIController extends AppBaseController
      * @return JsonResponse|void
      */
 
-    public function changeStatusDepartment(Request $request,PurchaseRequisition $requisition){
+    public function changeStatusDepartment(Request $request, PurchaseRequisition $requisition){
         $head_of_department = $requisition->department?->head_of_department;
         $head_of_department_user = User::find($head_of_department);
         if ($head_of_department){
             $data = [
                 'department_id' => $requisition->department_id,
-                'user_id' => \request()->user()->id,
                 'notes' => $request->notes
             ];
-            match($request->stage){
-                'accounts' => $data['accounts_status'] = $request->status,
-                'ceo' => $data['ceo_status'] = $request->status,
-                default => $data['department_status'] = $request->status,
-            };
-            $status = $requisition->approval_status()->updateOrCreate($data);
+            switch ($request->stage){
+                case 'accounts':
+                    $data['accounts_status'] = $request->status;
+                    $data['accounts_approved_by'] = \request()->user()->id;
+                    if ($request->status == 2){
+                        $data['ceo_status'] = 1;
+                    }
+                    break;
+                case 'ceo':
+                    $data['ceo_status'] = $request->status;
+                    break;
+                default:
+                    $data['department_status'] = $request->status;
+                    $data['department_approved_by'] = \request()->user()->id;
+            }
+            $requisition->initialRequisition->approval_status()->update($data);
+            if ($requisition->approval_status){
+                $status = $requisition->approval_status()->update($data);
+            }else{
+                $status = $requisition->approval_status()->updateOrCreate($data);
+            }
             if ($request->status == 1){
                 $head_of_department_user->notify(new RequisitionStatusNotification($status));
             }else{

@@ -1,35 +1,35 @@
 import AppLayout from '@/components/Layouts/AppLayout'
 import Head from 'next/head'
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import axios from "@/lib/axios";
-import { setInitialRequisition } from "@/store/slice/dashboardSlice";
 import { Card } from "flowbite-react";
 import DataTable from "react-data-table-component";
 import Status from "@/components/requisition/status";
+import { useGetDashboardDataQuery } from "@/store/service/dashboard";
+import { useAuth } from "@/hooks/auth";
 
 const Dashboard = () => {
-    const dispatch = useDispatch();
-    const dashboardData = useSelector(state => state.dashboard);
+    const { user } = useAuth()
     const [initialColumns, setInitialColumns] = useState([]);
-
-    function data(){
-        axios.get('/api/dashboard-data')
-            .then(({data}) => {
-                dispatch(setInitialRequisition(data?.initial))
-            })
-    }
+    const [searchParams, setSearchParams] = useState({});
+    const {data, isLoading, isError, isSuccess} = useGetDashboardDataQuery(searchParams);
+    const isDepartmentHead = user?.current_department_head === parseInt(user?.id);
 
     useEffect(() => {
-        data();
-    }, [])
-
-    useEffect(() => {
-        if (dashboardData && dashboardData?.initial){
+        if (isSuccess && data){
             setInitialColumns([
                 {
-                    name: 'IRF No',
+                    name: 'Sl',
+                    selector: (row, sl) => sl + 1,
+                    sortable: true,
+                },
+                {
+                    name: 'I.R. NO.',
                     selector: row => row.irf_no,
+                    sortable: true,
+                },
+                {
+                    name: 'P.R. NO.',
+                    selector: row => row.purchase_requisitions?.prf_no,
                     sortable: true,
                 },
                 {
@@ -44,12 +44,7 @@ const Dashboard = () => {
                 },
                 {
                     name: 'Estimated Cost',
-                    selector: row => row.estimated_cost,
-                    sortable: true,
-                },
-                {
-                    name: 'Purchase Requisition',
-                    selector: row => row.is_purchase_requisition_generated ? 'Generated' : 'No',
+                    selector: row => parseFloat(row.purchase_requisitions?.estimated_total_amount ?? 0).toLocaleString('bd'),
                     sortable: true,
                 },
                 {
@@ -63,12 +58,22 @@ const Dashboard = () => {
                     sortable: true,
                 },
                 {
-                    name: 'Status',
-                    selector: row => <Status key={row.id} requisition={row} type={'initial'} />
+                    name: 'Initial',
+                    selector: row => <Status key={row.id} requisition={row} type={'initial'} />,
+                    omit: false
+                },
+                {
+                    name: 'Purchase',
+                    selector: row => row.purchase_requisitions ? <Status key={row.id} requisition={row} type={'purchase'} /> : ''
                 }
             ])
         }
-    }, [dashboardData]);
+    }, [data, isSuccess])
+
+
+    const changeSearchParams = (key, value) => {
+        setSearchParams({...searchParams , [key]: value, page: 1});
+    }
 
     return (
         <AppLayout
@@ -82,17 +87,25 @@ const Dashboard = () => {
             </Head>
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 bg-white border-b border-gray-200">
-                            {
-                                dashboardData?.initial && (
-                                    <Card>
-                                        <h2>Latest Initial Requisition</h2>
-                                        <DataTable columns={initialColumns} data={dashboardData?.initial} />
-                                    </Card>
-                                )
-                            }
+                            <Card>
+                                <h2>Latest Requisition</h2>
+                                <DataTable
+                                    columns={initialColumns}
+                                    data={data?.initial}
+                                    progressPending={isLoading}
+                                    pagination
+                                    paginationServer
+                                    responsive
+                                    persistTableHead
+                                    onChangePage={(page, totalRows) => setSearchParams({...searchParams, 'page': page})}
+                                    onChangeRowsPerPage={(currentRowsPerPage, currentPage) => setSearchParams({...searchParams, 'page': currentPage, per_page: currentRowsPerPage })}
+                                    paginationTotalRows={data?.number_of_rows}
+                                />
+                            </Card>
+
                         </div>
                     </div>
                 </div>

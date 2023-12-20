@@ -88,27 +88,23 @@ const Actions = ({edit, destroy, view , itemId, progressing, print, other, permi
               {
                   checkPermission('view') ?
                     print ? (
-                      <Link href={print}>
                           <Button
                             gradientMonochrome="info"
+                            onClick={() => router.push(print)}
                           >
                               <AiFillPrinter />
                           </Button>
-
-                      </Link>
                     ) : <></> : <></>
               }
               {
                   checkPermission('view') ?
                     other ? (
-                      <Link href={other}>
                           <Button
                             gradientMonochrome="teal"
+                            onClick={() => router.push(other)}
                           >
                               <AiFillSetting />
                           </Button>
-
-                      </Link>
                     ) : <></> : <></>
               }
               {!edit && !view && !destroy && !print && !other ? <Button>No Action</Button> : <></>}

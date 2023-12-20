@@ -14,6 +14,7 @@ const Status = ({ requisition, type }) => {
                 setUrl(`api/update_initial_status/${requisition.id}`);
                 break;
             case 'purchase':
+                requisition = requisition.purchase_requisitions
                 setUrl(`api/update_purchase_status/${requisition.id}`);
                 break;
             case 'cash':
@@ -31,21 +32,18 @@ const Status = ({ requisition, type }) => {
                 'stage': requisition?.current_status?.stage
             })
     }
-
-
+    console.log( (requisition?.current_status?.stage ===  "accounts" && requisition?.current_status?.status !== "Approved" && isDepartmentHead && type !== "initial" && user.default_department_name === "Accounts"))
     return (
         <div>
             {
-                (requisition?.current_status?.stage ===  "ceo" && requisition?.current_status?.status !== "Approved") ||
+                (requisition?.current_status?.stage ===  "ceo" && requisition?.current_status?.status !== "Approved" && user.designation_name === "CEO") ||
                 (requisition?.current_status?.stage ===  "department" && requisition?.current_status?.status !== "Approved" && isDepartmentHead && (parseInt(requisition.department_id) === user.current_department_head)) ||
-                (requisition?.current_status?.stage ===  "accounts" && requisition?.current_status?.status !== "Approved" && isDepartmentHead) ||
-                (parseInt(requisition.department_id) === parseInt(user.selected_department) && isDepartmentHead)
+                (requisition?.current_status?.stage ===  "accounts" && requisition?.current_status?.status !== "Approved" && isDepartmentHead && type !== "initial" && user.default_department_name === "Accounts") ||
+                (parseInt(requisition.department_id) === parseInt(user.selected_department) && isDepartmentHead && (requisition?.current_status?.stage ===  "department" || !requisition?.current_status?.stage))
                     ? (
                     <Dropdown
                         label={selectedDropdown}
                         dismissOnClick={true}
-                        onSelect={(s) => console.log(s)}
-                        onClick={(a) => console.log(a)}
                     >
                         <Dropdown.Item
                             onClick={() => {
@@ -68,17 +66,6 @@ const Status = ({ requisition, type }) => {
                             }}
                         >
                             Reject
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                            onClick={() => {
-                                setSelectedDropdown('Need Change');
-                                updateStatus({
-                                    status: 4,
-                                    notes: ''
-                                });
-                            }}
-                        >
-                            Need Change
                         </Dropdown.Item>
                     </Dropdown>
                 )

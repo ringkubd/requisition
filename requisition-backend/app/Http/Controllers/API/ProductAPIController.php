@@ -27,8 +27,8 @@ class ProductAPIController extends AppBaseController
         $this->productRepository = $productRepo;
 
         $this->middleware('auth:sanctum');
-        $this->middleware('role_or_permission:Super Admin|view_products', ['only' => ['index']]);
-        $this->middleware('role_or_permission:Super Admin|update_products', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|view_products', ['only' => ['index', 'show']]);
+        $this->middleware('role_or_permission:Super Admin|update_products', ['only' => ['update']]);
         $this->middleware('role_or_permission:Super Admin|create_products', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_products', ['only' => ['delete']]);
     }
@@ -81,9 +81,9 @@ class ProductAPIController extends AppBaseController
             ->paginate();
 
         return response()->json([
-            'data' => ProductResource::collection($products),
-            "message" => __('messages.retrieved', ['model' => __('models/products.plural')]),
-                "number_of_rows" => $products->total()
+                'data' => ProductResource::collection($products),
+                "number_of_rows" => $products->total(),
+                "message" => __('messages.retrieved', ['model' => __('models/products.plural')]),
             ]
         );
     }
