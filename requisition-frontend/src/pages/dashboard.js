@@ -88,11 +88,6 @@ const Dashboard = () => {
                     sortable: true,
                 },
                 {
-                    name: 'Total Req. Unit',
-                    selector: row => row.total_required_unit,
-                    sortable: true,
-                },
-                {
                     name: 'Department',
                     selector: row => row.department?.name,
                     sortable: true,
