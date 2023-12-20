@@ -69,10 +69,6 @@ const PurchaseRequisition = () => {
                     sortable: true,
                 },
                 {
-                    name: 'Status',
-                    selector: row => <Status key={row.id} requisition={row} type={'purchase'} />
-                },
-                {
                     name: 'Actions',
                     cell: (row) => <Actions
                         itemId={row.id}

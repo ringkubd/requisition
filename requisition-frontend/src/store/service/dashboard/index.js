@@ -11,10 +11,17 @@ export const DashboardAPI = createApi({
                 url: 'dashboard-data',
                 params: arg
             })
+        }),
+        getDashboardCashData : builder.query({
+            query: arg => ({
+                url: 'dashboard-cash-data',
+                params: arg
+            })
         })
     })
 })
 
 export const {
-    useGetDashboardDataQuery
+    useGetDashboardDataQuery,
+    useGetDashboardCashDataQuery,
 } = DashboardAPI;

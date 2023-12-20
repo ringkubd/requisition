@@ -335,6 +335,9 @@ class CashRequisitionAPIController extends AppBaseController
                 case 'accounts':
                     $data['accounts_status'] = $request->status;
                     $data['accounts_approved_by'] = \request()->user()->id;
+                    if ($request->status == 2){
+                        $data['ceo_status'] = 1;
+                    }
                     break;
                 case 'ceo':
                     $data['ceo_status'] = $request->status;
