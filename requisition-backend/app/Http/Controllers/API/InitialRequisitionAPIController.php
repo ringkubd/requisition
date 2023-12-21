@@ -477,13 +477,19 @@ class InitialRequisitionAPIController extends AppBaseController
                 case 'accounts':
                     $data['accounts_status'] = $request->status;
                     $data['accounts_approved_by'] = \request()->user()->id;
+                    if ($request->status == 2){
+                        $data['ceo_status'] = 1;
+                    }
+                    $data['accounts_approved_at'] = now();
                     break;
                 case 'ceo':
                     $data['ceo_status'] = $request->status;
+                    $data['ceo_approved_at'] = now();
                     break;
                 default:
                     $data['department_status'] = $request->status;
                     $data['department_approved_by'] = \request()->user()->id;
+                    $data['department_approved_at'] = now();
             }
             if ($requisition->approval_status){
                 $status = $requisition->approval_status()->update($data);
@@ -495,7 +501,7 @@ class InitialRequisitionAPIController extends AppBaseController
             }else{
                 $request->user()->notify(new RequisitionStatusNotification($status));
             }
-            broadcast(new RequisitionStatusEvent($status, $requisition->user()));
+            broadcast(new RequisitionStatusEvent($requisition->approval_status, $requisition->user));
             return $this->sendResponse(
                 $status,
                 __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])

@@ -358,19 +358,19 @@ input:-webkit-autofill {
     /*-webkit-box-shadow: .01rem .1rem #78b3d3;*/
     -webkit-border-radius: 1rem;
     border-radius: 1rem;
-    @apply shadow-amber-100 shadow-2xl bg-amber-50
+    @apply shadow bg-transparent border-2 border-amber-600
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb
 {
-    /*background:#E0F2FE url('https://isdb-bisew.org/img/isdb-bisew.png') 5px!important;*/
-    background-size:5px 5px;
-    /*background-position:;*/
+    background:#E0F2FE url('https://isdb-bisew.org/img/isdb-bisew.png') 5px!important;
+    background-size: contain!important;
+    /*background-position: center;*/
     display: block;
     /*width: 30px;*/
     /*height: 100px;*/
-    @apply shadow-amber-100 shadow-2xl
+    @apply shadow shadow-red-600 border-2 border-amber-600 hover:opacity-10
 }
 /*::-webkit-scrollbar-thumb {*/
 /*  -webkit-border-radius: 1rem;*/

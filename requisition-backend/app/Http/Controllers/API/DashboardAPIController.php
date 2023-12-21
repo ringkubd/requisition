@@ -7,7 +7,6 @@ use App\Http\Resources\CashRequisitionResource;
 use App\Http\Resources\InitialRequisitionResource;
 use App\Models\CashRequisition;
 use App\Models\InitialRequisition;
-use Illuminate\Http\Request;
 
 class DashboardAPIController extends AppBaseController
 {

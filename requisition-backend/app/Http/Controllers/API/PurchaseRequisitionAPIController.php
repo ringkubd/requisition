@@ -394,13 +394,16 @@ class PurchaseRequisitionAPIController extends AppBaseController
                     if ($request->status == 2){
                         $data['ceo_status'] = 1;
                     }
+                    $data['accounts_approved_at'] = now();
                     break;
                 case 'ceo':
                     $data['ceo_status'] = $request->status;
+                    $data['ceo_approved_at'] = now();
                     break;
                 default:
                     $data['department_status'] = $request->status;
                     $data['department_approved_by'] = \request()->user()->id;
+                    $data['department_approved_at'] = now();
             }
             $requisition->initialRequisition->approval_status()->update($data);
             if ($requisition->approval_status){

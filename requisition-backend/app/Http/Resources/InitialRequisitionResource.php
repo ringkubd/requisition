@@ -31,9 +31,9 @@ class InitialRequisitionResource extends JsonResource
             'is_purchase_done' => $this->is_purchase_done,
             'total_required_unit' => $this->initialRequisitionProducts->sum('required_quantity'),
             'deleted_at' => $this->deleted_at,
-            'approval_status' => $this->approval_status,
+            'approval_status' => new RequisitionStatusResource($this->approval_status),
+            'purchase_approval_status' => new RequisitionStatusResource($this->purchaseRequisitions?->approval_status),
             'current_status' => $this->approval_status?->current_status,
-            'purchase_approval_status' => $this->purchaseRequisitions?->approval_status,
             'purchase_current_status' => $this->purchaseRequisitions?->approval_status?->current_status,
             'created_at' => Carbon::parse($this->created_at)->format('H:i d-M-Y'),
             'updated_at' => $this->updated_at
