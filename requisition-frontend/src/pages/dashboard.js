@@ -24,7 +24,7 @@ const Dashboard = () => {
             setInitialColumns([
                 {
                     name: 'Sl',
-                    selector: (row, sl) => sl + 1 + " " + row.id,
+                    selector: (row, sl) => sl + 1,
                     sortable: true,
                 },
                 {

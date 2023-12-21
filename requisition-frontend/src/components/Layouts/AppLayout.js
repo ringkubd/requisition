@@ -19,7 +19,6 @@ const AppLayout = ({ header, children }) => {
     const { user } = useAuth({ middleware: 'auth' })
     const online_users = useSelector(state => state.active_users);
 
-    useEffect(() => { console.log(online_users)}, [online_users])
     const changingEffect = (effect) => {
         if (effect){
             router.reload();
@@ -72,6 +71,16 @@ const AppLayout = ({ header, children }) => {
                 dispatch(removeOnline(user))
             })
     }, [])
+
+    useEffect(() => {
+        if (user){
+            window.Echo.private(`requisition-status.${user?.id}`)
+                .listen('RequisitionStatusEvent', event => {
+                    toast.success(`A new requisition is initialised by`)
+                    console.log(event)
+                })
+        }
+    }, [user]);
 
 
     return (

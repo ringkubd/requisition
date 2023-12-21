@@ -33,3 +33,6 @@ Broadcast::channel('exception', function ($user){
 Broadcast::channel('online', function ($user){
     return $user;
 });
+Broadcast::channel('requisition-status.{id}', function ($user, $id){
+    return (int) $user->id === (int) $id;
+});

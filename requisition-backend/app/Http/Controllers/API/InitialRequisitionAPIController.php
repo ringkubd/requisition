@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Events\InitialRequisitionEvent;
+use App\Events\RequisitionStatusEvent;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Category;
@@ -138,10 +139,11 @@ class InitialRequisitionAPIController extends AppBaseController
         $initialRequisition->irfNos()->create([
             'irf_no' => $irf_no
         ]);
-        $initialRequisition->approval_status()->create([
+        $approval_status = $initialRequisition->approval_status()->create([
             'department_id' => auth_department_id(),
             'department_status' => 1,
         ]);
+        broadcast(new RequisitionStatusEvent($approval_status, $request->user()));
         $allProduct = array_map(function($p){
             unset($p['estimated_cost']);
             if (array_key_exists('last_purchase_date', $p) && ($p['last_purchase_date'] == "" || $p['last_purchase_date'] == null)){
@@ -493,6 +495,7 @@ class InitialRequisitionAPIController extends AppBaseController
             }else{
                 $request->user()->notify(new RequisitionStatusNotification($status));
             }
+            broadcast(new RequisitionStatusEvent($status, $requisition->user()));
             return $this->sendResponse(
                 $status,
                 __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])

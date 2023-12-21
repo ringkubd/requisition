@@ -2,6 +2,9 @@
 
 namespace App\Events;
 
+use App\Models\Department;
+use App\Models\RequisitionStatus;
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -17,9 +20,8 @@ class RequisitionStatusEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct(public RequisitionStatus $requisition, public User $user)
     {
-        //
     }
 
     /**
@@ -30,7 +32,7 @@ class RequisitionStatusEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new PrivateChannel("requisition-status.".$this->user->id),
         ];
     }
 }

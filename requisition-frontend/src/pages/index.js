@@ -37,23 +37,12 @@ export default function Home() {
                     )}
                 </div>
 
-                <div className="max-w-6xl mx-auto sm:px-6 lg:px-8">
-                    <div className="flex justify-center pt-8 sm:justify-start sm:pt-0">
+                <div className="max-w-6xl mx-auto flex flex-col justify-center align-middle justify-items-center sm:px-6 lg:px-8">
+                    <div className="flex justify-center pt-8 sm:justify-start sm:pt-0 border">
                        <ApplicationLogo />
                     </div>
-
-                    <div className="mt-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
-                        <div className="grid grid-cols-1 md:grid-cols-2">
-
-                        </div>
-                    </div>
-
-                    <div className="flex justify-center mt-4 sm:items-center sm:justify-between">
-                        <div className="text-center text-sm text-gray-500 sm:text-left">
-
-                        </div>
-
-                        <div className="ml-4 text-center text-sm text-gray-500 sm:text-right sm:ml-0">
+                    <div className="flex justify-center items-center justify-items-center mt-4 sm:items-center sm:justify-between border text-center">
+                        <div className="text-center text-sm text-gray-500 sm:text-right sm:ml-0">
                             IsDB-BISEW
                         </div>
                     </div>
