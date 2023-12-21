@@ -24,7 +24,7 @@ const Dashboard = () => {
             setInitialColumns([
                 {
                     name: 'Sl',
-                    selector: (row, sl) => sl + 1,
+                    selector: (row, sl) => sl + 1 + " " + row.id,
                     sortable: true,
                 },
                 {
@@ -69,7 +69,7 @@ const Dashboard = () => {
                 },
                 {
                     name: 'Purchase',
-                    selector: row => row.purchase_requisitions ? <Status key={row.id} requisition={row} type={'purchase'} /> : ''
+                    selector: row => row.purchase_requisitions ? <Status key={row.purchase_requisitions.id} requisition={row} type={'purchase'} /> : ''
                 }
             ])
         }
