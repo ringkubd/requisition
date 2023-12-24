@@ -143,7 +143,6 @@ class InitialRequisitionAPIController extends AppBaseController
             'department_id' => auth_department_id(),
             'department_status' => 1,
         ]);
-        broadcast(new RequisitionStatusEvent($approval_status, $request->user()));
         $allProduct = array_map(function($p){
             unset($p['estimated_cost']);
             if (array_key_exists('last_purchase_date', $p) && ($p['last_purchase_date'] == "" || $p['last_purchase_date'] == null)){
@@ -496,12 +495,14 @@ class InitialRequisitionAPIController extends AppBaseController
             }else{
                 $status = $requisition->approval_status()->updateOrCreate($data);
             }
+
+            broadcast(new RequisitionStatusEvent(new InitialRequisitionResource($requisition), [$requisition->user, $request->user()]));
+
             if ($request->status == 1){
                 $head_of_department_user->notify(new RequisitionStatusNotification($status));
             }else{
                 $request->user()->notify(new RequisitionStatusNotification($status));
             }
-            broadcast(new RequisitionStatusEvent($requisition->approval_status, $requisition->user));
             return $this->sendResponse(
                 $status,
                 __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\RequisitionStatusEvent;
 use App\Http\Requests\API\UpdatePurchaseRequisitionAPIRequest;
 use App\Http\Resources\InitialRequisitionResource;
+use App\Models\Department;
+use App\Models\Designation;
 use App\Models\InitialRequisition;
 use App\Models\PurchaseRequisition;
 use App\Models\User;
@@ -387,6 +390,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                 'department_id' => $requisition->department_id,
                 'notes' => $request->notes
             ];
+            $notifiedUsers = [$request->user(), $requisition->user];
             switch ($request->stage){
                 case 'accounts':
                     $data['accounts_status'] = $request->status;
@@ -395,6 +399,14 @@ class PurchaseRequisitionAPIController extends AppBaseController
                         $data['ceo_status'] = 1;
                     }
                     $data['accounts_approved_at'] = now();
+                    $ceo = User::query()
+                        ->whereHas('organizations', function ($q){
+                            $q->where('id', auth_organization_id());
+                        })
+                        ->whereHas('designations', function ($q){
+                            $q->where('name', 'CEO');
+                        })->first();
+                    if ($ceo) $notifiedUsers[] = $ceo;
                     break;
                 case 'ceo':
                     $data['ceo_status'] = $request->status;
@@ -404,6 +416,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
                     $data['department_status'] = $request->status;
                     $data['department_approved_by'] = \request()->user()->id;
                     $data['department_approved_at'] = now();
+                    $department = Department::query()->where('branch_id', auth_branch_id())->where('name', 'Accounts')->first();
+                    $notifiedUsers[] = User::query()->find($department?->head_of_department);
             }
             $requisition->initialRequisition->approval_status()->update($data);
             if ($requisition->approval_status){
@@ -411,6 +425,9 @@ class PurchaseRequisitionAPIController extends AppBaseController
             }else{
                 $status = $requisition->approval_status()->updateOrCreate($data);
             }
+
+            broadcast(new RequisitionStatusEvent(new PurchaseRequisitionResource($requisition),$notifiedUsers));
+
             if ($request->status == 1){
                 $head_of_department_user->notify(new RequisitionStatusNotification($status));
             }else{

@@ -4,11 +4,19 @@ import { useEffect, useState } from "react";
 import { Card } from "flowbite-react";
 import DataTable from "react-data-table-component";
 import Status from "@/components/requisition/status";
-import { useGetDashboardCashDataQuery, useGetDashboardDataQuery } from "@/store/service/dashboard";
+import {
+    getDashboardCashData,
+    getDashboardData,
+    useGetDashboardCashDataQuery,
+    useGetDashboardDataQuery,
+    getRunningQueriesThunk
+} from "@/store/service/dashboard";
 import { useAuth } from "@/hooks/auth";
 import { Tabs } from 'flowbite-react';
 import { AiFillGolden, AiFillMoneyCollect } from "react-icons/ai";
 import moment from "moment";
+import { wrapper } from "@/store";
+import Link from "next/link";
 
 const Dashboard = () => {
     const { user } = useAuth()
@@ -29,12 +37,12 @@ const Dashboard = () => {
                 },
                 {
                     name: 'I.R. NO.',
-                    selector: row => row.irf_no,
+                    selector: row => <Link className={`underline text-blue-600`} href={`/initial-requisition/${row.id}/print_view`}>{row.irf_no}</Link>,
                     sortable: true,
                 },
                 {
                     name: 'P.R. NO.',
-                    selector: row => row.purchase_requisitions?.prf_no,
+                    selector: row =>  row.purchase_requisitions ? <Link className={`underline text-blue-600`} href={`/purchase-requisition/${row.purchase_requisitions.id}/print_view`}>{row.purchase_requisitions?.prf_no}</Link> : null,
                     sortable: true,
                 },
                 {
@@ -190,5 +198,14 @@ const Dashboard = () => {
         </AppLayout>
     )
 }
+export const getServerSideProps = wrapper.getServerSideProps((store) => async (context) => {
+    // const params = context.params
+    store.dispatch(getDashboardData.initiate())
+    store.dispatch(getDashboardCashData.initiate())
+    await Promise.all(store.dispatch(getRunningQueriesThunk()));
+    return {
+        props: {},
+    };
+})
 
 export default Dashboard

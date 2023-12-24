@@ -17,6 +17,14 @@ const DashboardSlice = createSlice({
         },
         setSingleInitialRequisition: (state, action) => {
             state.initial = [action.payload, ...state.initial]
+        },
+        updateSingleInitialRequisition: (state, action) => {
+            state.initial = state.initial.map(il => {
+                if (il.id === action.payload.id){
+                    return action.payload;
+                }
+                return il;
+            })
         }
     }
 })
@@ -25,5 +33,6 @@ export const {
     getInitialRequisition,
     setInitialRequisition,
     setSingleInitialRequisition,
+    updateSingleInitialRequisition,
 } = DashboardSlice.actions;
 export default DashboardSlice;

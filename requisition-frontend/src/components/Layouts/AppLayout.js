@@ -8,10 +8,11 @@ import { useRouter } from "next/router";
 import Loading from "@/components/loading";
 import { EchoConfig } from "@/lib/echo";
 import { useDispatch, useSelector } from "react-redux";
-import { setSingleInitialRequisition } from "@/store/slice/dashboardSlice";
+import { setSingleInitialRequisition, updateSingleInitialRequisition } from "@/store/slice/dashboardSlice";
 import { setSingleActivity } from "@/store/slice/activitySlice";
 import { addNewOnline, removeOnline, setAllOnline } from "@/store/slice/userOnlineSlice";
 import { Badge, ListGroup, Tooltip } from "flowbite-react";
+import { DashboardAPI } from "@/store/service/dashboard";
 
 const AppLayout = ({ header, children }) => {
     const router = useRouter();
@@ -51,6 +52,7 @@ const AppLayout = ({ header, children }) => {
             .listen('InitialRequisitionEvent', e => {
                 toast.success(`A new requisition is initialised by ${e.requisition?.user?.name}`)
                 dispatch(setSingleInitialRequisition(e.requisition))
+                dispatch(DashboardAPI.util.invalidateTags(['general_requisition']));
             })
         window.Echo.private('activity')
             .listen('ActivityEvent', event => {
@@ -76,8 +78,9 @@ const AppLayout = ({ header, children }) => {
         if (user){
             window.Echo.private(`requisition-status.${user?.id}`)
                 .listen('RequisitionStatusEvent', event => {
-                    toast.success(`A new requisition is initialised by`)
-                    console.log(event)
+                    dispatch(updateSingleInitialRequisition(event.requisition));
+                    dispatch(DashboardAPI.util.invalidateTags(['general_requisition']));
+                    toast.success(`Requisition Status Updated`)
                 })
         }
     }, [user]);

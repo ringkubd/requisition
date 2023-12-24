@@ -84,14 +84,6 @@ use Illuminate\Database\Eloquent\Model;
         'accounts_approved_by'
     ];
 
-    protected $casts = [
-        'requisition_type' => 'string',
-        'department_status' => 'boolean',
-        'accounts_status' => 'boolean',
-        'ceo_status' => 'boolean',
-        'notes' => 'string'
-    ];
-
     public static array $rules = [
         'requisition_type' => 'required|string|max:255',
         'requisition_id' => 'required',
@@ -120,5 +112,40 @@ use Illuminate\Database\Eloquent\Model;
     public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\Department::class, 'department_id');
+    }
+
+    public function requisition(): \Illuminate\Database\Eloquent\Relations\MorphTo
+    {
+        return $this->morphTo('requisition');
+    }
+
+    public function getCurrentStatusAttribute(): array
+    {
+        $department_status = match ($this->department_status) {
+            2 => 'Approved',
+            3 => 'Rejected',
+            4 => 'Change',
+            default => 'Pending',
+        };
+        if ($department_status != 'Approved'){
+            return ['stage' => 'department', 'status' => $department_status];
+        }
+        $accounts_status = match ($this->accounts_status) {
+            0 => $this->department_status == 2 ? 'Pending' : 'Not arrived',
+            2 => 'Approved',
+            3 => 'Rejected',
+            4 => 'Change',
+            default => 'Pending',
+        };
+        if ($accounts_status != 'Approved'){
+            return ['stage' => 'accounts', 'status' => $accounts_status];
+        }
+        $ceo_status = match ($this->ceo_status) {
+            2 => 'Approved',
+            3 => 'Rejected',
+            4 => 'Change',
+            default => 'Pending',
+        };
+        return ['stage' => 'ceo', 'status' => $ceo_status];
     }
 }

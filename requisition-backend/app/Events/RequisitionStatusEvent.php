@@ -12,6 +12,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class RequisitionStatusEvent implements ShouldBroadcast
 {
@@ -20,19 +21,21 @@ class RequisitionStatusEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public RequisitionStatus $requisition, public User $user)
+    public function __construct(public  $requisition, public $users)
     {
     }
 
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
+     * @return array<int, Channel>
      */
     public function broadcastOn(): array
     {
-        return [
-            new PrivateChannel("requisition-status.".$this->user->id),
-        ];
+        $channels = [];
+        foreach ($this->users as $user){
+            $channels[] =  new PrivateChannel("requisition-status.".$user->id);
+        }
+        return $channels;
     }
 }

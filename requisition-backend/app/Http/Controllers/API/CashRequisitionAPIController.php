@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Requests\API\CreateCashRequisitionAPIRequest;
-use App\Http\Requests\API\UpdateCashRequisitionAPIRequest;
+use App\Events\RequisitionStatusEvent;
 use App\Models\CashRequisition;
 use App\Models\User;
 use App\Notifications\RequisitionStatusNotification;
@@ -354,6 +353,7 @@ class CashRequisitionAPIController extends AppBaseController
             }else{
                 $status = $requisition->approval_status()->updateOrCreate($data);
             }
+            broadcast(new RequisitionStatusEvent(new CashRequisitionResource($requisition), [$requisition->user, $request->user()]));
             if ($request->status == 1){
                 $head_of_department_user->notify(new RequisitionStatusNotification($status));
             }else{
