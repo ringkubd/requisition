@@ -1,7 +1,5 @@
 import React, { forwardRef, useEffect, useRef } from "react";
 import moment from "moment";
-import { useSelector } from "react-redux";
-import { useAuth } from "@/hooks/auth";
 
 const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
     const accountsCopy = useRef();
@@ -28,7 +26,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
 
     return (
         <div
-            className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none`}
+            className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none print:m-5`}
             ref={ref}>
             {/*Header*/}
             <div

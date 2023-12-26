@@ -8,8 +8,9 @@ export const IssueApiService = createApi({
     tagTypes: ['issue', 'editIssue'],
     endpoints: builder => ({
         getIssue: builder.query({
-            query: () => ({
+            query: (arg) => ({
                 url: 'product-issues',
+                params: arg
             }),
             providesTags: ['issue'],
             onQueryStarted: onQueryStartedErrorToast,

@@ -92,7 +92,7 @@ const Dashboard = () => {
                 },
                 {
                     name: 'P.R. NO.',
-                    selector: row => row.prf_no,
+                    selector: row => <Link className={`underline text-blue-600`} href={`/cash-requisition/${row.id}/print_view`}>{row.prf_no}</Link>,
                     sortable: true,
                 },
                 {

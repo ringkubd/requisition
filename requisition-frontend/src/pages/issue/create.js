@@ -9,19 +9,23 @@ import { toast } from "react-toastify";
 import * as Yup from 'yup';
 import { useGetUsersQuery } from "@/store/service/user/management";
 import { useStoreIssueMutation } from "@/store/service/issue";
-import { useEditProductQuery, useGetProductQuery } from "@/store/service/product/product";
 import moment from "moment";
 import Select from "react-select";
 import DataTable from "react-data-table-component";
 import Actions from "@/components/actions";
 import axios from "@/lib/axios";
 import { AsyncPaginate } from "react-select-async-paginate";
+import { useAuth } from "@/hooks/auth";
 const create = (props) => {
     const router = useRouter();
+    const { user } = useAuth()
     const [storeProductIssue, storeResult] = useStoreIssueMutation();
     let formikForm = useRef();
     const selectRef = useRef();
-    const {data: users , isLoading: userIsLoading} = useGetUsersQuery();
+    const {data: users , isLoading: userIsLoading} = useGetUsersQuery({
+        branch_id: user?.selected_branch,
+        department_id: user?.selected_department
+    });
     const [productOptions, setProductOptions] = useState([]);
     const [stock, setStock] = useState(0);
     const [items, setItems] = useState([]);
@@ -146,7 +150,6 @@ const create = (props) => {
             }
         });
         const responseJSON = response.data?.data;
-        console.log(responseJSON)
 
         return {
             options: responseJSON?.products.map((r,) => {

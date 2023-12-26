@@ -15,10 +15,12 @@ import {
     getRunningQueriesThunk, getIssue
 } from "@/store/service/issue";
 import moment from "moment";
+import IssueStatus from "@/components/issue/Status";
 
 const ProductIssue = () => {
     const router = useRouter();
-    const {data, isLoading, isError} = useGetIssueQuery();
+    const [searchParams, setSearchParams] = useState({});
+    const {data, isLoading, isError} = useGetIssueQuery(searchParams);
     const [destroy, destroyResponse] = useDestroyIssueMutation();
     const [columns, setColumns] = useState([]);
 
@@ -73,6 +75,10 @@ const ProductIssue = () => {
                     sortable: true,
                 },
                 {
+                    name: 'Status',
+                    selector: row => <IssueStatus key={row.id} row={row} />
+                },
+                {
                     name: 'Actions',
                     cell: (row) => <Actions
                         itemId={row.id}
@@ -88,6 +94,9 @@ const ProductIssue = () => {
         }
     }, [isLoading, data])
 
+    const changeSearchParams = (key, value) => {
+        setSearchParams({...searchParams , [key]: value, page: 1});
+    }
 
     return (
         <>
@@ -117,11 +126,22 @@ const ProductIssue = () => {
 
                         <DataTable
                             columns={columns}
-                            data={data?.data}
+                            data={data?.product_issue}
                             pagination
                             responsive
                             progressPending={isLoading}
                             persistTableHead={true}
+                            paginationServer
+                            onChangePage={(page, totalRows) => setSearchParams({
+                                ...searchParams,
+                                'page': page
+                            })}
+                            onChangeRowsPerPage={(currentRowsPerPage, currentPage) => setSearchParams({
+                                ...searchParams,
+                                'page': currentPage,
+                                per_page: currentRowsPerPage
+                            })}
+                            paginationTotalRows={data?.number_of_rows}
                         />
                     </Card>
                 </div>
