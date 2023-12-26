@@ -56,6 +56,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     use HasFactory;
     public $table = 'product_issues';
 
+    protected $casts = [
+        'quantity' => 'float',
+        'issue_time' => 'datetime'
+    ];
+
     public $fillable = [
         'uuid',
         'product_id',
@@ -65,15 +70,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         'receiver_branch_id',
         'receiver_department_id',
         'issuer_id',
+        'issuer_branch_id',
+        'issuer_department_id',
         'issue_time',
         'purpose',
         'uses_area',
         'note',
-    ];
-
-    protected $casts = [
-        'quantity' => 'float',
-        'issue_time' => 'datetime'
+        'department_status',
+        'department_approved_by',
+        'store_approved_by',
+        'store_status',
     ];
 
     public static array $rules = [
@@ -86,6 +92,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     public function issuer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'issuer_id');
+    }
+
+    public function issuerBranch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Branch::class, 'issuer_branch_id');
+    }
+    public function issuerDepartment(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Department::class, 'issuer_department_id');
     }
 
     public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo

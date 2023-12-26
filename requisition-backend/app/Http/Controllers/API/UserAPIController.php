@@ -63,13 +63,22 @@ class UserAPIController extends AppBaseController
     {
         $user = \request()->user();
         $user->can('Super Admin');
-        $users = User::whereHas('branches', function($branch) use ($request, $user){
-            $branch->when($request->branch_id, function ($q) use ($request){
-                $q->where('id', $request->branch_id);
-            }, function ($q){
-                $q->where('id', auth_branch_id());
-            });
-        })->get();
+        $users = User::query()
+            ->whereHas('branches', function($branch) use ($request, $user){
+                $branch->when($request->branch_id, function ($q) use ($request){
+                    $q->where('id', $request->branch_id);
+                }, function ($q){
+                    $q->where('id', auth_branch_id());
+                });
+            })
+            ->whereHas('departments', function ($department)use ($request, $user){
+                $department->when($request->department_id, function ($q, $d){
+                    $q->where('id', $d);
+                }, function ($q){
+                    $q->where('id', auth_department_id());
+                });
+            })
+            ->get();
         return $this->sendResponse(
             UserResource::collection($users),
             __('messages.retrieved', ['model' => __('models/users.plural')])

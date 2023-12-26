@@ -13,6 +13,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductIssueResource;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Nonstandard\Uuid;
 
 /**
@@ -65,16 +67,39 @@ class ProductIssueAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $productIssues = $this->productIssueRepository->all(
+        $department_head = $request->user()->departments->where('id', auth_department_id())->first()?->head_of_department;
+        $storeManager = $request->user()->hasRole('Store Manager') ? 'TRUE' : 'FALSE';
+        $productIssues = $this->productIssueRepository->allQuery(
             $request->except(['skip', 'limit']),
             $request->get('skip'),
             $request->get('limit')
-        );
+        )
+            ->where(function ($q) use($request){
+                $q->whereHas('receiverBranch', function($branch) use ($request){
+                    $branch->when($request->branch_id, function ($q) use ($request){
+                        $q->where('id', $request->branch_id);
+                    }, function ($q){
+                        $q->where('id', auth_branch_id());
+                    });
+                })->whereHas('receiverDepartment', function ($department)use ($request){
+                    $department->when($request->department_id, function ($q, $d){
+                        $q->where('id', $d);
+                    }, function ($q){
+                        $q->where('id', auth_department_id());
+                    });
+                });
+            })
+            ->orWhere(function ($q) use ($storeManager){
+                $q->whereRaw("true = $storeManager")->where('department_status', 1);
+            })
 
-        return $this->sendResponse(
-            ProductIssueResource::collection($productIssues),
-            __('messages.retrieved', ['model' => __('models/productIssues.plural')])
-        );
+            ->latest()
+            ->paginate(\request()->per_page ?? 10);
+
+        return response()->json([
+            'product_issue' =>  ProductIssueResource::collection($productIssues),
+            'number_of_rows' => $productIssues->total()
+        ]);
     }
 
     /**
@@ -116,52 +141,14 @@ class ProductIssueAPIController extends AppBaseController
         foreach ($input as $item){
             $item['uuid'] = $uuid;
             $item['issuer_id'] = $request->user()->id;
+            $item['issuer_branch_id'] = auth_branch_id();
+            $item['issuer_department_id'] = auth_department_id();
             $item['issue_time'] = now()->toDateTimeString();
-            $productOptionId = $item['product_option_id'];
-            $quantity = $item['quantity'];
             $receiver = User::find($item['receiver_id']);
             $item['receiver_branch_id'] = $receiver->branches()->first()->id;
             $item['receiver_department_id'] = $receiver->departments()->first()->id;
 
             $productIssue = $this->productIssueRepository->create($item);
-            if ($productIssue){
-                $productOption = ProductOption::find($productOptionId);
-                $productOption->stock = (double)$productOption->stock - (double)$quantity;
-                $productOption->save();
-            }
-
-            $purchase_history = Purchase::query()
-                ->where('product_id', $item['product_id'])
-                ->where('product_option_id', $productOptionId)
-                ->where('available_qty', '>', 0)
-                ->oldest()
-                ->get();
-
-            $request_quantity = $quantity;
-            $qty = $request_quantity;
-            $purchase_log = [];
-            foreach ($purchase_history as $purchase){
-                if ($qty > 0){
-                    $purchase_log[] = [
-                        'product_id' => $purchase->product_id,
-                        'product_option_id' => $purchase->product_option_id,
-                        'purchase_id' => $purchase->id,
-                        'qty' => min($request_quantity, $purchase->available_qty),
-                        'unit_price' => $purchase->unit_price,
-                        'total_price' => min($request_quantity, $purchase->available_qty) * $purchase->unit_price,
-                        'purchase_date' => $purchase->purchase_date,
-                    ];
-                    $qty = $qty <= $purchase->available_qty ? 0 : $qty - $purchase->available_qty;
-                    $purchase->available_qty = $request_quantity < $purchase->available_qty ? $purchase->available_qty - $request_quantity : 0;
-                    $request_quantity = $qty;
-                    $purchase->save();
-                    continue;
-                }else{
-                    break;
-                }
-            }
-            $productIssue->rateLog()->createMany($purchase_log);
-
         }
         return $this->sendResponse(
             new ProductIssueResource($productIssue),
@@ -262,7 +249,7 @@ class ProductIssueAPIController extends AppBaseController
      *      )
      * )
      */
-    public function update($id, UpdateProductIssueAPIRequest $request): JsonResponse
+    public function update($id, Request $request): JsonResponse
     {
         $input = $request->all();
 
@@ -274,9 +261,72 @@ class ProductIssueAPIController extends AppBaseController
                 __('messages.not_found', ['model' => __('models/productIssues.singular')])
             );
         }
+        if ($request->has('department')){
+            switch ($request->department){
+                case 'both':
+                    $input['department_status'] = 1;
+                    $input['department_approved_by'] = $request->user()->id;
+                    $input['store_status'] = 1;
+                    $input['store_approved_by'] = $request->user()->id;
+                    break;
+                case 'department':
+                    $input['department_status'] = 1;
+                    $input['department_approved_by'] = $request->user()->id;
+                    break;
+                case 'store':
+                    $input['store_status'] = 1;
+                    $input['store_approved_by'] = $request->user()->id;
+                    break;
+            };
+        }
+        unset($input['department']);
+        unset($input['status']);
 
-        $productIssue = $this->productIssueRepository->update($input, $id);
+        DB::transaction(function () use($productIssue, $input, $id, $request){
+            try {
+                $productIssue = $this->productIssueRepository->update($input, $id);
+                // TODO check is it store person or not if yes then reduce the stock;
+                if (!$request->user()->hasRole('Store Manager')) return;
 
+                $productOption = ProductOption::find($productIssue->product_option_id);
+                $productOption->stock = (double)$productOption->stock - (double)$productIssue->quantity;
+                $productOption->save();
+
+                $purchase_history = Purchase::query()
+                    ->where('product_id', $productIssue->product_id)
+                    ->where('product_option_id', $productIssue->product_option_id)
+                    ->where('available_qty', '>', 0)
+                    ->oldest()
+                    ->get();
+
+                $request_quantity = (double)$productIssue->quantity;
+                $qty = $request_quantity;
+                $purchase_log = [];
+                foreach ($purchase_history as $purchase){
+                    if ($qty > 0){
+                        $purchase_log[] = [
+                            'product_id' => $purchase->product_id,
+                            'product_option_id' => $purchase->product_option_id,
+                            'purchase_id' => $purchase->id,
+                            'qty' => min($request_quantity, $purchase->available_qty),
+                            'unit_price' => $purchase->unit_price,
+                            'total_price' => min($request_quantity, $purchase->available_qty) * $purchase->unit_price,
+                            'purchase_date' => $purchase->purchase_date,
+                        ];
+                        $qty = $qty <= $purchase->available_qty ? 0 : $qty - $purchase->available_qty;
+                        $purchase->available_qty = $request_quantity < $purchase->available_qty ? $purchase->available_qty - $request_quantity : 0;
+                        $request_quantity = $qty;
+                        $purchase->save();
+                        continue;
+                    }else{
+                        break;
+                    }
+                }
+                $productIssue->rateLog()->createMany($purchase_log);
+            }catch (\PDOException $exception){
+                Log::error('product issue update error', $exception->getMessage());
+            }
+        }, 2);
         return $this->sendResponse(
             new ProductIssueResource($productIssue),
             __('messages.updated', ['model' => __('models/productIssues.singular')])
