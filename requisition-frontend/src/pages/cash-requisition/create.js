@@ -230,9 +230,10 @@ const CashRequisitionCreate = (props) => {
                                 })
                               }}
                               options={units?.data.map((cp) => ({label: cp.unit_name, value: cp.unit_name}))}
+                              value={{label: values.unit, value: values.unit}}
                             />
                             <ErrorMessage
-                              name='Unit'
+                              name='unit'
                               render={(msg) => <span className='text-red-500'>{msg}</span>} />
                           </div>
                         </div>
