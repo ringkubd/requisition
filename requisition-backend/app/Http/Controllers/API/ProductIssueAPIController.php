@@ -67,7 +67,6 @@ class ProductIssueAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $department_head = $request->user()->departments->where('id', auth_department_id())->first()?->head_of_department;
         $storeManager = $request->user()->hasRole('Store Manager') ? 'TRUE' : 'FALSE';
         $productIssues = $this->productIssueRepository->allQuery(
             $request->except(['skip', 'limit']),
@@ -192,10 +191,10 @@ class ProductIssueAPIController extends AppBaseController
      *      )
      * )
      */
-    public function show($id): JsonResponse
+    public function show($uuid): JsonResponse
     {
         /** @var ProductIssue $productIssue */
-        $productIssue = $this->productIssueRepository->find($id);
+        $productIssue = $this->productIssueRepository->allQuery()->where('uuid', $uuid)->get();
 
         if (empty($productIssue)) {
             return $this->sendError(
@@ -204,7 +203,7 @@ class ProductIssueAPIController extends AppBaseController
         }
 
         return $this->sendResponse(
-            new ProductIssueResource($productIssue),
+            ProductIssueResource::collection($productIssue),
             __('messages.retrieved', ['model' => __('models/productIssues.singular')])
         );
     }

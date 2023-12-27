@@ -65,6 +65,8 @@ class CashRequisitionAPIController extends AppBaseController
             ->when($request->date, function ($q, $date){
                 $q->whereRaw("date(created_at) = '$date'");
             })
+            ->where('department_id', auth_department_id())
+            ->where('branch_id', auth_branch_id())
             ->latest()
             ->get();
 

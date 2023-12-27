@@ -74,15 +74,18 @@ class PurchaseRequisitionAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
+            ->when($request->date, function ($q, $date){
+                $q->whereRaw("date(created_at) = '$date'");
+            })
             ->where('department_id', auth_department_id())
             ->where('branch_id', auth_branch_id())
             ->latest()
-            ->get();
+            ->paginate(\request()->per_page ?? 10);
 
-        return $this->sendResponse(
-            PurchaseRequisitionResource::collection($purchaseRequisitions),
-            __('messages.retrieved', ['model' => __('models/purchaseRequisitions.plural')])
-        );
+        return response()->json([
+            'purchase' =>  PurchaseRequisitionResource::collection($purchaseRequisitions),
+            'number_of_rows' => $purchaseRequisitions->total()
+        ]);
     }
 
     /**

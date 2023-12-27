@@ -18,11 +18,11 @@ import moment from "moment";
 
 const InitialRequisition = () => {
     const router = useRouter();
+    const [searchParams, setSearchParams] = useState({});
     const [destroy, destroyResponse] = useDestroyInitialRequisitionMutation();
     const [columns, setColumns] = useState([]);
 
-    const [search, setSearch] = useState({});
-    const {data, isLoading, isError, refetch} = useGetInitialRequisitionQuery(search);
+    const {data, isLoading, isError, refetch} = useGetInitialRequisitionQuery(searchParams);
 
 
     useEffect(() => {
@@ -87,18 +87,9 @@ const InitialRequisition = () => {
         }
     }, [isLoading, isError, data]);
 
-    const changeSearchInput = (e) => {
-        setSearch({search: e.target.value})
-        if (e.target.value){
-            refetch();
-        }
+    const changeSearchParams = (key, value) => {
+        setSearchParams({...searchParams , [key]: value, page: 1});
     }
-
-    useEffect(() => {
-        if (search.length){
-            refetch();
-        }
-    }, [search]);
 
     return (
         <>
@@ -126,23 +117,39 @@ const InitialRequisition = () => {
                             </NavLink>
                             <div>
                                 <Datepicker
-                                    onSelectedDateChanged={(date) => setSearch({...search, date: moment(date).format('Y-MM-DD')})}
+                                    onSelectedDateChanged={(date) => setSearchParams({search: searchParams.search, date: moment(date).format('Y-MM-DD')})}
                                 />
                             </div>
                             <div>
                                 <TextInput
                                     icon={AiOutlineSearch}
-                                    onBlur={changeSearchInput}
+                                    onBlur={(e) => {
+                                        setSearchParams({
+                                            search: e.target.value,
+                                            date: searchParams.date
+                                        })
+                                    }}
                                 />
                             </div>
                         </div>
                         <DataTable
                             columns={columns}
-                            data={data?.data}
+                            data={data?.initial}
                             pagination
                             responsive
                             progressPending={isLoading}
                             persistTableHead
+                            paginationServer
+                            onChangePage={(page, totalRows) => setSearchParams({
+                                ...searchParams,
+                                'page': page
+                            })}
+                            onChangeRowsPerPage={(currentRowsPerPage, currentPage) => setSearchParams({
+                                ...searchParams,
+                                'page': currentPage,
+                                per_page: currentRowsPerPage
+                            })}
+                            paginationTotalRows={data?.number_of_rows}
                         />
                     </Card>
                 </div>

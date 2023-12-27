@@ -16,6 +16,7 @@ class ProductIssueResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'uuid' => $this->uuid,
             'purchase_requisition_id' => $this->purchase_requisition_id,
             'purchase_requisition' => $this->purchaseRequisition,
             'product_id' => $this->product_id,

@@ -8,8 +8,9 @@ export const PurchaseRequisitionApi = createApi({
     tagTypes: ['purchase-requisition', 'edit-purchase-requisition', 'get-initial-requisition-for-purchase'],
     endpoints: build => ({
         getPurchaseRequisition: build.query({
-            query: () => ({
-                url: 'purchase-requisitions'
+            query: (arg) => ({
+                url: 'purchase-requisitions',
+                params: arg
             }),
             providesTags: ['purchase-requisition'],
             onQueryStarted: onQueryStartedErrorToast,

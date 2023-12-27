@@ -1,7 +1,7 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { wrapper } from "@/store";
-import { Button, Card } from "flowbite-react";
+import { Button, Card, Datepicker, TextInput } from "flowbite-react";
 import DataTable from 'react-data-table-component';
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
@@ -17,10 +17,12 @@ import {
 import moment from "moment";
 import UpdatePno from "@/components/purchase-requisition/UpdatePno";
 import Status from "@/components/requisition/status";
+import { AiOutlineSearch } from "react-icons/ai";
 
 const PurchaseRequisition = () => {
     const router = useRouter();
-    const {data, isLoading, isError} = useGetPurchaseRequisitionQuery();
+    const [searchParams, setSearchParams] = useState({});
+    const {data, isLoading, isError} = useGetPurchaseRequisitionQuery(searchParams);
     const [destroy, destroyResponse] = useDestroyPurchaseRequisitionMutation();
     const [columns, setColumns] = useState([]);
 
@@ -111,14 +113,44 @@ const PurchaseRequisition = () => {
                             >
                                 <Button>Create</Button>
                             </NavLink>
+                            <div>
+                                <Datepicker
+                                    onSelectedDateChanged={(date) => setSearchParams({
+                                        search: searchParams.search,
+                                        date: moment(date).format('Y-MM-DD')
+                                    })}
+                                />
+                            </div>
+                            <div>
+                                <TextInput
+                                    icon={AiOutlineSearch}
+                                    onBlur={(e) => {
+                                        setSearchParams({
+                                            search: e.target.value,
+                                            date: searchParams.date
+                                        })
+                                    }}
+                                />
+                            </div>
                         </div>
                         <DataTable
                             columns={columns}
-                            data={data?.data}
+                            data={data?.purchase}
                             pagination
                             responsive
                             progressPending={isLoading}
                             persistTableHead
+                            paginationServer
+                            onChangePage={(page, totalRows) => setSearchParams({
+                                ...searchParams,
+                                'page': page
+                            })}
+                            onChangeRowsPerPage={(currentRowsPerPage, currentPage) => setSearchParams({
+                                ...searchParams,
+                                'page': currentPage,
+                                per_page: currentRowsPerPage
+                            })}
+                            paginationTotalRows={data?.number_of_rows}
                         />
                     </Card>
                 </div>

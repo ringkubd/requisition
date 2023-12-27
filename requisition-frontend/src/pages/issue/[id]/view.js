@@ -4,14 +4,64 @@ import { Button, Card, Table } from "flowbite-react";
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import { useEditIssueQuery } from "@/store/service/issue";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import moment from "moment";
+import IssueStatus from "@/components/issue/Status";
+import Actions from "@/components/actions";
+import DataTable from "react-data-table-component";
 
 const IssueView = () => {
     const router = useRouter();
-    const {data: issue, isLoading: issueISLoading, isSuccess: issueISSuccess} = useEditIssueQuery(router.query?.id, {
+    const {data: issue, isLoading: issueISLoading, isSuccess: issueISSuccess, isError: issueISError} = useEditIssueQuery(router.query?.id, {
         skip: !router.query?.id
     })
+    const [columns, setColumns] = useState([]);
+    useEffect(() => {
+        if (!issueISLoading && !issueISError && issue) {
+            setColumns([
+                {
+                    name: 'Product',
+                    selector: row => row.product?.title + ( !row.variant?.option_value.includes('N/A') ? " - "+row.variant?.option_value : ""),
+                    sortable: true,
+                },
+                {
+                    name: 'Qty',
+                    selector: row => row.quantity,
+                    sortable: true,
+                },
+                {
+                    name: 'Receiver',
+                    selector: row => row.receiver?.name,
+                    sortable: true,
+                },
+                {
+                    name: 'Issuer',
+                    selector: row => row.issuer?.name,
+                    sortable: true,
+                },
+                {
+                    name: 'Purpose',
+                    selector: row => row.purpose,
+                    sortable: false,
+                },
+                {
+                    name: 'Uses Area',
+                    selector: row => row.uses_area,
+                    sortable: false,
+                },
+                {
+                    name: 'Note',
+                    selector: row => row.note,
+                    sortable: false,
+                },
+                {
+                    name: 'Issue Time',
+                    selector: row => moment(row.issue_time).format('D MMM Y @ H:mm '),
+                    sortable: true,
+                },
+            ])
+        }
+    }, [issueISLoading, issue])
 
     useEffect(() => {
         if (issueISSuccess){
@@ -41,83 +91,18 @@ const IssueView = () => {
                         </NavLink>
                     </div>
                     <div className={`overflow-auto hidden sm:flex w-full flex-col`}>
-                        <Table>
-                            <Table.Head>
-                                <Table.HeadCell>Item</Table.HeadCell>
-                                <Table.HeadCell>Variant</Table.HeadCell>
-                                <Table.HeadCell>Receiver</Table.HeadCell>
-                                <Table.HeadCell>Department</Table.HeadCell>
-                                <Table.HeadCell>Quantity</Table.HeadCell>
-                                <Table.HeadCell>Total Price</Table.HeadCell>
-                                <Table.HeadCell>Avg. Rate</Table.HeadCell>
-                                <Table.HeadCell>Issue Time</Table.HeadCell>
-                                <Table.HeadCell>Usage Area</Table.HeadCell>
-                                <Table.HeadCell>Purpose</Table.HeadCell>
-                                <Table.HeadCell>Note</Table.HeadCell>
-                            </Table.Head>
-                            <Table.Body>
-                                <Table.Row>
-                                    <Table.Cell>{issue?.data?.product?.title}</Table.Cell>
-                                    <Table.Cell>{issue?.data?.variant?.option_name}</Table.Cell>
-                                    <Table.Cell>{issue?.data?.receiver?.name}</Table.Cell>
-                                    <Table.Cell>{issue?.data?.receiver_department?.name}</Table.Cell>
-                                    <Table.Cell>{issue?.data?.quantity}</Table.Cell>
-                                    <Table.Cell>{issue?.data?.total_price}</Table.Cell>
-                                    <Table.Cell>{issue?.data?.average_rate}</Table.Cell>
-                                    <Table.Cell>{issue?.data?.issue_time ? moment(issue?.data?.issue_time).format("hh:mm DD-MMM-Y") : null}</Table.Cell>
-                                    <Table.Cell>{issue?.data?.uses_area}</Table.Cell>
-                                    <Table.Cell>{issue?.data?.purpose}</Table.Cell>
-                                    <Table.Cell>{issue?.data?.note}</Table.Cell>
-                                </Table.Row>
-                            </Table.Body>
-                        </Table>
-                    </div>
-                    <div className={`overflow-auto sm:hidden flex w-full flex-col`}>
-                        <Table>
-                            <Table.Body>
-                                <Table.Row>
-                                    <Table.HeadCell>Item</Table.HeadCell>
-                                    <Table.Cell>{issue?.data?.product?.title}</Table.Cell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.HeadCell>Variant</Table.HeadCell>
-                                    <Table.Cell>{issue?.data?.variant?.option_name}</Table.Cell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.HeadCell>Receiver</Table.HeadCell>
-                                    <Table.Cell>{issue?.data?.receiver?.name}</Table.Cell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.HeadCell>Department</Table.HeadCell>
-                                    <Table.Cell>{issue?.data?.receiver_department?.name}</Table.Cell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.HeadCell>Quantity</Table.HeadCell>
-                                    <Table.Cell>{issue?.data?.quantity}</Table.Cell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.HeadCell>Issue Time</Table.HeadCell>
-                                    <Table.Cell>{issue?.data?.issue_time ? moment(issue?.data?.issue_time).format("hh:mm DD-MMM-Y") : null}</Table.Cell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.HeadCell>Usage Area</Table.HeadCell>
-                                    <Table.Cell>{issue?.data?.uses_area}</Table.Cell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.HeadCell>Purpose</Table.HeadCell>
-                                    <Table.Cell>{issue?.data?.purpose}</Table.Cell>
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.HeadCell>Note</Table.HeadCell>
-                                    <Table.Cell>{issue?.data?.note}</Table.Cell>
-                                </Table.Row>
-                            </Table.Body>
-                        </Table>
+                        <DataTable
+                            columns={columns}
+                            data={issue?.data}
+                            expandableRowDisabled={false}
+                            title={`Issued product list`}
+                        />
                     </div>
                     <div className={`overflow-auto my-8`}>
                         <h2 className={`border-b-2 mb-2`}>Product Rate Log</h2>
                         <Table className={`border-b-2`}>
                             <Table.Head className={`border-b-2`}>
+                                <Table.HeadCell>Product</Table.HeadCell>
                                 <Table.HeadCell>Purchase Date</Table.HeadCell>
                                 <Table.HeadCell>Quantity</Table.HeadCell>
                                 <Table.HeadCell>Unit Price</Table.HeadCell>
@@ -125,14 +110,17 @@ const IssueView = () => {
                             </Table.Head>
                             <Table.Body>
                                 {
-                                    issue?.data?.rateLog && (
-                                        issue?.data?.rateLog?.map((r) => (
-                                            <Table.Row className={`border-2`} key={r.id}>
-                                                <Table.Cell className={`border-2`}>{moment(r.purchase_date).format("DD MMM Y")}</Table.Cell>
-                                                <Table.Cell className={`border-2`}>{r.qty}</Table.Cell>
-                                                <Table.Cell className={`border-2`}>{r.unit_price}</Table.Cell>
-                                                <Table.Cell className={`border-2`}>{parseFloat(r.total_price).toLocaleString('bd')}</Table.Cell>
-                                            </Table.Row>
+                                    issue?.data && (
+                                        issue?.data?.map((p) => (
+                                            p?.rateLog.map((r, i) => (
+                                                <Table.Row className={`border-2`} key={r.id}>
+                                                    <Table.HeadCell  className={`border-2`}>{p?.product?.title}</Table.HeadCell>
+                                                    <Table.Cell className={`border-2`}>{moment(r.purchase_date).format("DD MMM Y")}</Table.Cell>
+                                                    <Table.Cell className={`border-2`}>{r.qty}</Table.Cell>
+                                                    <Table.Cell className={`border-2`}>{r.unit_price}</Table.Cell>
+                                                    <Table.Cell className={`border-2`}>{parseFloat(r.total_price).toLocaleString('bd')}</Table.Cell>
+                                                </Table.Row>
+                                            ))
                                         ))
                                     )
                                 }

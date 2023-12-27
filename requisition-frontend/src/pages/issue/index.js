@@ -82,8 +82,9 @@ const ProductIssue = () => {
                     name: 'Actions',
                     cell: (row) => <Actions
                         itemId={row.id}
-                        // edit={`/purchase/${row.id}/edit`}
-                        view={`/issue/${row.id}/view`}
+                        edit={`/issue/${row.uuid}/edit`}
+                        view={`/issue/${row.uuid}/view`}
+                        print={`/issue/${row.uuid}/print_view`}
                         destroy={destroy}
                         progressing={destroyResponse.isLoading}
                         permissionModule={`product-issues`}

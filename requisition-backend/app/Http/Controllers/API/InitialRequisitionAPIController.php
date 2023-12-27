@@ -83,12 +83,12 @@ class InitialRequisitionAPIController extends AppBaseController
             ->where('department_id', auth_department_id())
             ->where('branch_id', auth_branch_id())
             ->latest()
-            ->get();
-        $branch_id = auth_department_id();
-        return $this->sendResponse(
-            InitialRequisitionResource::collection($initialRequisitions),
-            __("messages.retrieved $branch_id", ['model' => __('models/initialRequisitions.plural')])
-        );
+            ->paginate(\request()->per_page ?? 10);;
+
+        return response()->json([
+            'initial' =>  InitialRequisitionResource::collection($initialRequisitions),
+            'number_of_rows' => $initialRequisitions->total()
+        ]);
     }
 
     /**

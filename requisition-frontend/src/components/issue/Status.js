@@ -26,14 +26,17 @@ const IssueStatus = ({row}) => {
             setSelectedDropdown('Pending');
         }
     }, [user, row])
-    const updateStatus = (arg) => {
+    const updateStatus = (arg, selected) => {
+        const c = confirm("Are your sure?");
+        console.log(c)
+        if (!c) return;
         const both = isStoreManager && row?.department_status && isReceiverDepartment && isDepartmentHead;
         const storeManager = isStoreManager && row?.department_status;
         const department = isReceiverDepartment && isDepartmentHead;
         updateIssue({ ...arg, department: both ? 'both' : storeManager ? 'store' : department ? 'department' : "" })
+        setSelectedDropdown(selected);
     }
 
-    console.log(row)
     return (
         <>
             {
@@ -47,8 +50,7 @@ const IssueStatus = ({row}) => {
                                 updateStatus({
                                     status: 1,
                                     id: row.id
-                                });
-                                setSelectedDropdown('Approved');
+                                }, 'Approved');
                             }}
                         >
                             Approve
@@ -58,8 +60,7 @@ const IssueStatus = ({row}) => {
                                 updateStatus({
                                     status: 2,
                                     id: row.id
-                                });
-                                setSelectedDropdown('Rejected');
+                                }, 'Rejected');
                             }}
                         >
                             Reject
