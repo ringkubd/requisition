@@ -143,11 +143,12 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         </td>
                                         <td className={`border p-0`}>
                                             {rp.title}{' '}
-                                            {!rp?.product_option?.option_name?.includes(
+                                            {rp?.product_option?.option_name?.includes(
                                                 'N/A',
+                                            ) || rp?.product_option?.option_value?.includes(
+                                                'NA',
                                             )
-                                                ? `- ${rp?.product_option?.option_value}`
-                                                : null}
+                                                ? null :  `- ${rp?.product_option?.option_value}`}
                                         </td>
                                         <td className={`border p-0`}>
                                             {rp.last_purchase_date
@@ -522,11 +523,12 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         </td>
                                         <td className={`border p-0`}>
                                             {rp.title}{' '}
-                                            {!rp?.product_option?.option_name?.includes(
+                                            {rp?.product_option?.option_name?.includes(
                                                 'N/A',
+                                            ) || rp?.product_option?.option_value?.includes(
+                                                'NA',
                                             )
-                                                ? `- ${rp?.product_option?.option_value}`
-                                                : null}
+                                                ? null :  `- ${rp?.product_option?.option_value}`}
                                         </td>
                                         <td className={`border p-0`}>
                                             {rp.last_purchase_date
