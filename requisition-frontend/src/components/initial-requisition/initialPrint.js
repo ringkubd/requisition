@@ -158,7 +158,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         <td className={`border p-0`}>
                                             {rp.quantity_to_be_purchase}
                                         </td>
-                                        <td className={`border p-0`}>
+                                        <td className={`border p-0 text-justify`}>
                                             {rp.purpose}
                                         </td>
                                     </tr>
@@ -386,7 +386,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         <td className={`border p-0`}>
                                             {rp.quantity_to_be_purchase}
                                         </td>
-                                        <td className={`border p-0`}>
+                                        <td className={`border p-0 text-justify`}>
                                             {rp.purpose}
                                         </td>
                                     </tr>

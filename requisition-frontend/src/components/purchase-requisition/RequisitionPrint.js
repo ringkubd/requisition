@@ -123,7 +123,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 p-1 normal-case`}>
+                                        className={`border bg-white leading-3 p-1 normal-case text-justify`}>
                                         Purpose
                                     </th>
                                     <th
@@ -549,7 +549,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         <td className={`border p-0`}>
                                             {rp.unit_price.toLocaleString()}
                                         </td>
-                                        <td className={`border p-0`}>
+                                        <td className={`border p-0 text-justify`}>
                                             {rp.purpose}
                                         </td>
                                         <td className={`border p-0`}>
