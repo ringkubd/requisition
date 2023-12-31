@@ -229,10 +229,10 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                         </div>
                         <div
                             className={`flex flex-col min-h-[20px] justify-end`}>
+                            <span>Neaz Khan</span>
                             <small>
                                 <i>
-                                    {mainData.approval_status
-                                        ?.ceo_approved_at
+                                    {mainData.approval_status?.ceo_approved_at
                                         ? moment(
                                               mainData.approval_status
                                                   ?.ceo_approved_at,
@@ -419,9 +419,9 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                     {mainData.approval_status
                                         ?.department_approved_at
                                         ? moment(
-                                            mainData.approval_status
-                                                ?.department_approved_at,
-                                        ).format('hh:mm DD-MMM-Y')
+                                              mainData.approval_status
+                                                  ?.department_approved_at,
+                                          ).format('hh:mm DD-MMM-Y')
                                         : ''}
                                 </i>
                             </small>
@@ -442,9 +442,9 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                     {mainData.approval_status
                                         ?.accounts_approved_at
                                         ? moment(
-                                            mainData.approval_status
-                                                ?.accounts_approved_at,
-                                        ).format('hh:mm DD-MMM-Y')
+                                              mainData.approval_status
+                                                  ?.accounts_approved_at,
+                                          ).format('hh:mm DD-MMM-Y')
                                         : ''}
                                 </i>
                             </small>
@@ -454,14 +454,14 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                         </div>
                         <div
                             className={`flex flex-col min-h-[20px] justify-end`}>
+                            <span>Neaz Khan</span>
                             <small>
                                 <i>
-                                    {mainData.approval_status
-                                        ?.ceo_approved_at
+                                    {mainData.approval_status?.ceo_approved_at
                                         ? moment(
-                                            mainData.approval_status
-                                                ?.ceo_approved_at,
-                                        ).format('hh:mm DD-MMM-Y')
+                                              mainData.approval_status
+                                                  ?.ceo_approved_at,
+                                          ).format('hh:mm DD-MMM-Y')
                                         : 'ddd'}
                                 </i>
                             </small>

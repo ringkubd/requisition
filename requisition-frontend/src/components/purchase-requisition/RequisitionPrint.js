@@ -143,7 +143,11 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         </td>
                                         <td className={`border p-0`}>
                                             {rp.title}{' '}
-                                            {!rp?.product_option?.option_name?.includes('N/A',) ? `- ${rp?.product_option?.option_value}` : null}
+                                            {!rp?.product_option?.option_name?.includes(
+                                                'N/A',
+                                            )
+                                                ? `- ${rp?.product_option?.option_value}`
+                                                : null}
                                         </td>
                                         <td className={`border p-0`}>
                                             {rp.last_purchase_date
@@ -204,19 +208,43 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                     {mainData?.user?.name}
                                                 </span>
                                             </div>
+                                            {/*<div*/}
+                                            {/*    className={`flex flex-row my-4`}>*/}
+                                            {/*    <div>Signature</div>*/}
+                                            {/*    <div*/}
+                                            {/*        className={`min-w-max border-b border-black w-full`}></div>*/}
+                                            {/*</div>*/}
                                             <div
-                                                className={`flex flex-row my-4`}>
-                                                <div>Signature</div>
-                                                <div
-                                                    className={`min-w-max border-b border-black w-full`}></div>
-                                            </div>
-                                            <div
-                                                className={`flex flex-row my-4`}>
+                                                className={`flex flex-row my-4  items-center`}>
                                                 <div className={`min-w-fit`}>
                                                     Section Head
                                                 </div>
                                                 <div
-                                                    className={`border-b border-black w-full`}></div>
+                                                    className={`border-b border-black w-full flex flex-col`}>
+                                                    <span className={`ml-2`}>
+                                                        {mainData
+                                                            ?.approval_status
+                                                            ?.department_approved_at
+                                                            ? mainData
+                                                                  ?.approval_status
+                                                                  ?.departmentApprovedBy
+                                                                  ?.name
+                                                            : ''}
+                                                    </span>
+                                                    <span className={`ml-2`}>
+                                                        {mainData
+                                                            ?.approval_status
+                                                            ?.department_approved_at
+                                                            ? moment(
+                                                                  mainData
+                                                                      ?.approval_status
+                                                                      ?.department_approved_at,
+                                                              ).format(
+                                                                  'hh:mm DD MMM Y',
+                                                              )
+                                                            : ''}
+                                                    </span>
+                                                </div>
                                             </div>
                                             <div className={`mt-4`}>
                                                 <input
@@ -288,10 +316,37 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             </div>
                                             <div className={`flex flex-col`}>
                                                 <div
-                                                    className={`flex flex-row my-4`}>
+                                                    className={`flex flex-row my-4 items-center`}>
                                                     <div>Accounts Officer</div>
+
                                                     <div
-                                                        className={`w-1/2 border-b border-black`}></div>
+                                                        className={`w-1/2 border-b border-black flex flex-col`}>
+                                                        <span
+                                                            className={`ml-2`}>
+                                                            {mainData
+                                                                ?.approval_status
+                                                                ?.accounts_approved_at
+                                                                ? mainData
+                                                                      ?.approval_status
+                                                                      ?.accountsApprovedBy
+                                                                      ?.name
+                                                                : ''}
+                                                        </span>
+                                                        <span
+                                                            className={`ml-2`}>
+                                                            {mainData
+                                                                ?.approval_status
+                                                                ?.accounts_approved_at
+                                                                ? moment(
+                                                                      mainData
+                                                                          ?.approval_status
+                                                                          ?.accounts_approved_at,
+                                                                  ).format(
+                                                                      'hh:mm DD MMM Y',
+                                                                  )
+                                                                : ''}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                                 <div className={`text-center`}>
                                                     [Requisitor to initiate
@@ -306,6 +361,27 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             <div
                                                 className={`text-center w-full`}>
                                                 Approved for payment
+                                            </div>
+                                            <div
+                                                className={`w-full flex flex-col`}>
+                                                <span className={`ml-2`}>
+                                                    {mainData?.approval_status
+                                                        ?.ceo_approved_at
+                                                        ? 'Neaz Khan'
+                                                        : ''}
+                                                </span>
+                                                <span className={`ml-2`}>
+                                                    {mainData?.approval_status
+                                                        ?.ceo_approved_at
+                                                        ? moment(
+                                                              mainData
+                                                                  ?.approval_status
+                                                                  ?.ceo_approved_at,
+                                                          ).format(
+                                                              'hh:mm DD MMM Y',
+                                                          )
+                                                        : ''}
+                                                </span>
                                             </div>
                                             <div
                                                 className={`text-center border-t border-black w-full`}>
@@ -446,7 +522,11 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         </td>
                                         <td className={`border p-0`}>
                                             {rp.title}{' '}
-                                            {!rp?.product_option?.option_name?.includes('N/A',) ? `- ${rp?.product_option?.option_value}` : null}
+                                            {!rp?.product_option?.option_name?.includes(
+                                                'N/A',
+                                            )
+                                                ? `- ${rp?.product_option?.option_value}`
+                                                : null}
                                         </td>
                                         <td className={`border p-0`}>
                                             {rp.last_purchase_date
