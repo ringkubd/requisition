@@ -37,7 +37,7 @@ const IssueStatus = ({row}) => {
     }
 
     return (
-        <>
+        <div>
             {
                 ((isStoreManager && row?.department_status) || (isReceiverDepartment && isDepartmentHead)) && selectedDropdown !== "Approved"  ? (
                     <Dropdown
@@ -72,7 +72,7 @@ const IssueStatus = ({row}) => {
                     </div>
                 )
             }
-        </>
+        </div>
     )
 }
 
