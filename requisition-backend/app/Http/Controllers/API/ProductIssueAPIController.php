@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Requests\API\CreateProductIssueAPIRequest;
-use App\Http\Requests\API\UpdateProductIssueAPIRequest;
 use App\Models\ProductIssue;
 use App\Models\ProductOption;
 use App\Models\Purchase;
@@ -35,6 +33,7 @@ class ProductIssueAPIController extends AppBaseController
         $this->middleware('role_or_permission:Super Admin|update_product-issues', ['only' => ['show', 'update']]);
         $this->middleware('role_or_permission:Super Admin|create_product-issues', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_product-issues', ['only' => ['delete']]);
+        $this->middleware('role_or_permission:Super Admin|Store Manager|update_product-issues', ['only' => ['updateQuantity']]);
     }
 
     /**
@@ -391,5 +390,32 @@ class ProductIssueAPIController extends AppBaseController
             $id,
             __('messages.deleted', ['model' => __('models/productIssues.singular')])
         );
+    }
+
+    /**
+     * @param $id
+     * @param Request $request
+     * @return JsonResponse
+     *
+     */
+
+    public function updateQuantity($id, Request $request): JsonResponse
+    {
+        $issue =  ProductIssue::find($id);
+        if (empty($issue)) {
+            return $this->sendError(
+                __('messages.not_found', ['model' => __('models/productIssues.singular')])
+            );
+        }
+        if ($request->has('quantity')){
+            $issue->update([
+                'quantity' => $request->quantity
+            ]);
+        }
+        return $this->sendResponse(
+            new ProductIssueResource($issue),
+            __('messages.updated', ['model' => __('models/productIssues.singular')])
+        );
+
     }
 }

@@ -127,6 +127,7 @@ Route::resource('purchases', App\Http\Controllers\API\PurchaseAPIController::cla
 
 Route::resource('product-issues', App\Http\Controllers\API\ProductIssueAPIController::class)
     ->except(['create', 'edit']);
+Route::put('product-issues-quantity-update/{id}', [\App\Http\Controllers\API\ProductIssueAPIController::class, 'updateQuantity']);
 
 
 Route::resource('brands', App\Http\Controllers\API\BrandAPIController::class)

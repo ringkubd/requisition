@@ -28,7 +28,6 @@ const IssueStatus = ({row}) => {
     }, [user, row])
     const updateStatus = (arg, selected) => {
         const c = confirm("Are your sure?");
-        console.log(c)
         if (!c) return;
         const both = isStoreManager && row?.department_status && isReceiverDepartment && isDepartmentHead;
         const storeManager = isStoreManager && row?.department_status;

@@ -50,6 +50,15 @@ export const IssueApiService = createApi({
             }),
             invalidatesTags: ['issue'],
             onQueryStarted: onQueryStartedErrorToast,
+        }),
+        updateIssueQuantity: builder.mutation({
+            query: ({id, ...patch}) => ({
+                url: `product-issues-quantity-update/${id}`,
+                method: 'PUT',
+                body: patch
+            }),
+            invalidatesTags: ['issue'],
+            onQueryStarted: onQueryStartedErrorToast,
         })
     }),
 })
@@ -61,6 +70,7 @@ export const {
     useUpdateIssueMutation,
     useStoreIssueMutation,
     useDestroyIssueMutation,
+    useUpdateIssueQuantityMutation,
     util: { getRunningQueriesThunk },
 } = IssueApiService;
 

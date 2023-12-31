@@ -16,13 +16,22 @@ import {
 } from "@/store/service/issue";
 import moment from "moment";
 import IssueStatus from "@/components/issue/Status";
+import { useAuth } from "@/hooks/auth";
 
 const ProductIssue = () => {
+    const { user } = useAuth();
     const router = useRouter();
     const [searchParams, setSearchParams] = useState({});
     const {data, isLoading, isError} = useGetIssueQuery(searchParams);
     const [destroy, destroyResponse] = useDestroyIssueMutation();
     const [columns, setColumns] = useState([]);
+    const [isStoreManager, setISStoreManager] = useState(user?.role_object?.filter(r => r.name === "Store Manager").length);
+
+    useEffect(() => {
+        if (user){
+            setISStoreManager(user?.role_object?.filter(r => r.name === "Store Manager").length);
+        }
+    }, [user]);
 
 
     useEffect(() => {
@@ -82,7 +91,7 @@ const ProductIssue = () => {
                     name: 'Actions',
                     cell: (row) => <Actions
                         itemId={row.id}
-                        edit={`/issue/${row.uuid}/edit`}
+                        edit={isStoreManager && !row.store_status ? `/issue/${row.uuid}/edit` : false}
                         view={`/issue/${row.uuid}/view`}
                         print={`/issue/${row.uuid}/print_view`}
                         destroy={destroy}
