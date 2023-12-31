@@ -229,7 +229,8 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                         </div>
                         <div
                             className={`flex flex-col min-h-[20px] justify-end`}>
-                            <span>Neaz Khan</span>
+                            {mainData.approval_status?.ceo_approved_at
+                                ? <span>Neaz Khan</span> : null }
                             <small>
                                 <i>
                                     {mainData.approval_status?.ceo_approved_at
@@ -454,7 +455,8 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                         </div>
                         <div
                             className={`flex flex-col min-h-[20px] justify-end`}>
-                            <span>Neaz Khan</span>
+                            {mainData.approval_status?.ceo_approved_at
+                                ? <span>Neaz Khan</span> : null }
                             <small>
                                 <i>
                                     {mainData.approval_status?.ceo_approved_at
@@ -462,7 +464,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                               mainData.approval_status
                                                   ?.ceo_approved_at,
                                           ).format('hh:mm DD-MMM-Y')
-                                        : 'ddd'}
+                                        : ''}
                                 </i>
                             </small>
                             <h2 className={`border-t border-black px-4`}>
