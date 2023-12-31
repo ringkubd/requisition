@@ -23,6 +23,7 @@ class RequisitionStatusResource extends JsonResource
             'department_status' => $this->department_status,
             'accounts_status' => $this->accounts_status,
             'ceo_status' => $this->ceo_status,
+            'ceo_approved_at' => $this->ceo_approved_at,
             'notes' => $this->notes,
             'department_approved_by' => $this->department_approved_by,
             'department_approved_at' => $this->department_approved_at,

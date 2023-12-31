@@ -393,7 +393,12 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                     </div>
                     <div
                         className={`flex flex-row justify-between text-center mt-20`}>
-                        <div>
+                        <div
+                            className={`flex flex-col min-h-[20px] justify-end`}>
+                            <span>{mainData.user?.name}</span>
+                            <small>
+                                <i>{mainData.created_at}</i>
+                            </small>
                             <h2 className={`border-t border-black px-4`}>
                                 Requisitor
                             </h2>
@@ -401,12 +406,65 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                         {/*<div>*/}
                         {/*    <h2 className={`border-t border-black px-10`}>Store</h2>*/}
                         {/*</div>*/}
-                        <div>
-                            <h2 className={`border-t border-black px-10`}>
+                        <div
+                            className={`flex flex-col min-h-[20px] justify-end`}>
+                            <span>
+                                {
+                                    mainData.approval_status
+                                        ?.departmentApprovedBy?.name
+                                }
+                            </span>
+                            <small>
+                                <i>
+                                    {mainData.approval_status
+                                        ?.department_approved_at
+                                        ? moment(
+                                            mainData.approval_status
+                                                ?.department_approved_at,
+                                        ).format('hh:mm DD-MMM-Y')
+                                        : ''}
+                                </i>
+                            </small>
+                            <h2 className={`border-t border-black px-4`}>
                                 {mainData?.department?.name} Department
                             </h2>
                         </div>
-                        <div>
+                        <div
+                            className={`flex flex-col min-h-[20px] justify-end`}>
+                            <span>
+                                {
+                                    mainData.approval_status?.accountsApprovedBy
+                                        ?.name
+                                }
+                            </span>
+                            <small>
+                                <i>
+                                    {mainData.approval_status
+                                        ?.accounts_approved_at
+                                        ? moment(
+                                            mainData.approval_status
+                                                ?.accounts_approved_at,
+                                        ).format('hh:mm DD-MMM-Y')
+                                        : ''}
+                                </i>
+                            </small>
+                            <h2 className={`border-t border-black px-4`}>
+                                Accounts
+                            </h2>
+                        </div>
+                        <div
+                            className={`flex flex-col min-h-[20px] justify-end`}>
+                            <small>
+                                <i>
+                                    {mainData.approval_status
+                                        ?.ceo_approved_at
+                                        ? moment(
+                                            mainData.approval_status
+                                                ?.ceo_approved_at,
+                                        ).format('hh:mm DD-MMM-Y')
+                                        : 'ddd'}
+                                </i>
+                            </small>
                             <h2 className={`border-t border-black px-4`}>
                                 Chief Executive Officer
                             </h2>

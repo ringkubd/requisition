@@ -42,9 +42,9 @@ const Status = ({ requisition, type }) => {
     return (
         <div>
             {
-                (currentStatus?.stage ===  "ceo" && currentStatus?.status !== "Approved" && user?.designation_name === "CEO") ||
+                (currentStatus?.stage ===  "ceo" && currentStatus?.status !== "Approved" && user?.designation_name === "CEO" && type !== "initial") ||
                 (currentStatus?.stage ===  "department" && currentStatus?.status !== "Approved" && isDepartmentHead && (parseInt(requisition.department_id) === user?.current_department_head)) ||
-                (currentStatus?.stage ===  "accounts" && currentStatus?.status !== "Approved" && isDepartmentHead && type !== "initial" && user?.default_department_name === "Accounts") ||
+                (currentStatus?.stage ===  "accounts" && currentStatus?.status !== "Approved" && isDepartmentHead && type !== "initial" && user?.default_department_name === "Accounts"  && type !== "initial") ||
                 (parseInt(requisition.department_id) === parseInt(user?.selected_department) && isDepartmentHead && (currentStatus?.stage ===  "department" || !currentStatus?.stage))
                     ? (
                     <Dropdown
