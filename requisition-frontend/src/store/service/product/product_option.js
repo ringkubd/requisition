@@ -7,18 +7,28 @@ export const ProductOptionApiService = createApi({
     baseQuery: CustomBaseQuery,
     tagTypes: ['getProductOptions', 'getOptions'],
     endpoints: builder => ({
-        getProductOptions : builder.query({
-            query : () => ({
+        getProductOptions: builder.query({
+            query: () => ({
                 url: 'product-options',
             }),
-            providesTags: ['getProductOptions']
+            providesTags: ['getProductOptions'],
+            onQueryStarted: onQueryStartedErrorToast,
         }),
-        onQueryStarted: onQueryStartedErrorToast,
+        updateProductOptions: builder.mutation({
+            query: ({ id, ...arg }) => ({
+                url: `product-options/${id}`,
+                method: 'PUT',
+                body: arg,
+            }),
+            invalidatesTags: ['getProductOptions'],
+            onQueryStarted: onQueryStartedErrorToast,
+        }),
     }),
 })
 
 export const {
     useGetProductOptionsQuery,
+    useUpdateProductOptionsMutation,
     util: { getRunningQueriesThunk },
 } = ProductOptionApiService;
 

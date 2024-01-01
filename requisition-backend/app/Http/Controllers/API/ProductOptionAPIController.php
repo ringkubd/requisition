@@ -196,7 +196,7 @@ class ProductOptionAPIController extends AppBaseController
      *      )
      * )
      */
-    public function update($id, UpdateProductOptionAPIRequest $request): JsonResponse
+    public function update($id, Request $request): JsonResponse
     {
         $input = $request->all();
 

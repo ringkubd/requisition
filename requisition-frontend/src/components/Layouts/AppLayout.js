@@ -79,7 +79,7 @@ const AppLayout = ({ header, children }) => {
             window.Echo.private(`requisition-status.${user?.id}`)
                 .listen('RequisitionStatusEvent', event => {
                     dispatch(updateSingleInitialRequisition(event.requisition));
-                    dispatch(DashboardAPI.util.resetApiState());
+                    dispatch(DashboardAPI.util.invalidateTags(['general_requisition', 'cash_requisition']));
                     toast.success(`Requisition Status Updated`)
                 })
         }

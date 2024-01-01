@@ -8,6 +8,7 @@ import { useEffect, useRef } from "react";
 import { useGetOptionsQuery, useStoreOptionsMutation } from "@/store/service/options";
 import { setActiveForm } from "@/store/service/product/product_active_form";
 import Creatable from 'react-select/creatable';
+import EditStock from "@/components/product/EditStock";
 
 export default function VariantForm(props) {
     const options = useGetOptionsQuery();
@@ -60,12 +61,12 @@ export default function VariantForm(props) {
         },
         {
             name: 'SKU',
-            selector: row => row?.sku,
+            selector: row =>  row?.sku,
             sortable: true,
         },
         {
             name: 'Stock',
-            selector: row => row?.stock,
+            selector: row => row.id ? <EditStock key={row.id} rowId={row.id} name={`stock`} rowValue={row.stock} /> : row.stock,
             sortable: true,
         },
         {
