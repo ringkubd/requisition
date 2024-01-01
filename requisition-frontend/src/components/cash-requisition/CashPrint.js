@@ -114,12 +114,12 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                     <th
                                         scope="col"
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
-                                        Total
+                                        Purpose
                                     </th>
                                     <th
                                         scope="col"
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
-                                        Purpose
+                                        Total
                                     </th>
                                 </tr>
                             </thead>
@@ -151,11 +151,11 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             {rp.unit_price}
                                         </td>
                                         <td className={`border p-0`}>
-                                            {parseFloat(rp.unit_price) *
-                                                parseFloat(rp.required_unit)}
+                                            {rp.purpose}
                                         </td>
                                         <td className={`border p-0`}>
-                                            {rp.purpose}
+                                            {parseFloat(rp.unit_price) *
+                                                parseFloat(rp.required_unit)}
                                         </td>
                                     </tr>
                                 ))}
@@ -417,12 +417,12 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                     <th
                                         scope="col"
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
-                                        Total
+                                        Purpose
                                     </th>
                                     <th
                                         scope="col"
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
-                                        Purpose
+                                        Total
                                     </th>
                                 </tr>
                             </thead>
@@ -454,11 +454,11 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             {rp.unit_price}
                                         </td>
                                         <td className={`border p-0`}>
-                                            {parseFloat(rp.unit_price) *
-                                                parseFloat(rp.required_unit)}
+                                            {rp.purpose}
                                         </td>
                                         <td className={`border p-0`}>
-                                            {rp.purpose}
+                                            {parseFloat(rp.unit_price) *
+                                                parseFloat(rp.required_unit)}
                                         </td>
                                     </tr>
                                 ))}
