@@ -52,7 +52,7 @@ const AppLayout = ({ header, children }) => {
             .listen('InitialRequisitionEvent', e => {
                 toast.success(`A new requisition is initialised by ${e.requisition?.user?.name}`)
                 dispatch(setSingleInitialRequisition(e.requisition))
-                dispatch(DashboardAPI.util.invalidateTags(['general_requisition']));
+                dispatch(DashboardAPI.util.invalidateTags(['general_requisition', 'cash_requisition']));
             })
         window.Echo.private('activity')
             .listen('ActivityEvent', event => {
@@ -79,7 +79,7 @@ const AppLayout = ({ header, children }) => {
             window.Echo.private(`requisition-status.${user?.id}`)
                 .listen('RequisitionStatusEvent', event => {
                     dispatch(updateSingleInitialRequisition(event.requisition));
-                    dispatch(DashboardAPI.util.invalidateTags(['general_requisition']));
+                    dispatch(DashboardAPI.util.invalidateTags(['general_requisition', 'cash_requisition']));
                     toast.success(`Requisition Status Updated`)
                 })
         }

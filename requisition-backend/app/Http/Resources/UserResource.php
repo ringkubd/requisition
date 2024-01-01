@@ -40,7 +40,7 @@ class UserResource extends JsonResource
             'department_name' => ucwords(implode(',',$this->departments->pluck('name')->toArray())),
             'department_id' => $this->departments->pluck('id')->toArray(),
             'selected_department' => auth_department_id(),
-            'current_department_head' =>  $this->departments->where('id', auth_department_id())->first()?->head_of_department,
+            'current_department_head' =>  $this->defaultDepartment?->head_of_department,
             'designations' => $this->designations,
             'designation_name' => implode(',',$this->designations->pluck('name')->toArray()),
             'designation_id' => $this->designations->pluck('id')->toArray(),

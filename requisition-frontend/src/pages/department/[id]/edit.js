@@ -49,6 +49,7 @@ const Edit = (props) => {
     }
   }, [updateResult]);
   const submit = (values, pageProps) => {
+      // console.log(values);
     updateDepartment(values)
   }
   const validationSchema = Yup.object().shape({
