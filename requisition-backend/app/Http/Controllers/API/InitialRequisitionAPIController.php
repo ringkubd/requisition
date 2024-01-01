@@ -37,7 +37,7 @@ class InitialRequisitionAPIController extends AppBaseController
 
         $this->middleware('auth:sanctum');
 //        $this->middleware('role_or_permission:Super Admin|view_initial-requisitions', ['only' => ['index']]);
-        $this->middleware('role_or_permission:Super Admin|update_initial-requisitions', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|update_initial-requisitions', ['only' => ['update']]);
         $this->middleware('role_or_permission:Super Admin|create_initial-requisitions', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_initial-requisitions', ['only' => ['delete']]);
     }
