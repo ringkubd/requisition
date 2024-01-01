@@ -154,8 +154,8 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             {rp.purpose}
                                         </td>
                                         <td className={`border p-0`}>
-                                            {parseFloat(rp.unit_price) *
-                                                parseFloat(rp.required_unit)}
+                                            {(parseFloat(rp.unit_price) *
+                                                parseFloat(rp.required_unit)).toLocaleString()}
                                         </td>
                                     </tr>
                                 ))}
@@ -457,8 +457,8 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             {rp.purpose}
                                         </td>
                                         <td className={`border p-0`}>
-                                            {parseFloat(rp.unit_price) *
-                                                parseFloat(rp.required_unit)}
+                                            {(parseFloat(rp.unit_price) *
+                                                parseFloat(rp.required_unit)).toLocaleString()}
                                         </td>
                                     </tr>
                                 ))}
