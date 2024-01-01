@@ -25,7 +25,7 @@ class CashRequisitionResource extends JsonResource
             'items' => CashRequisitionItemResource::collection($this->cashRequisitionItems),
             'prf_no' => $this->prf_no,
             'ir_no' => $this->ir_no,
-            'approval_status' => $this->approval_status,
+            'approval_status' => new RequisitionStatusResource($this->approval_status),
             'current_status' => $this->approval_status?->current_status,
             'total_cost' => $this->total_cost,
             'deleted_at' => $this->deleted_at,

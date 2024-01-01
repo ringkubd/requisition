@@ -197,7 +197,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         ? moment(
                                               mainData.approval_status
                                                   ?.department_approved_at,
-                                          ).format('hh:mm DD-MMM-Y')
+                                          ).format('hh:mm A - DD MMM Y')
                                         : ''}
                                 </i>
                             </small>
@@ -220,7 +220,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         ? moment(
                                               mainData.approval_status
                                                   ?.accounts_approved_at,
-                                          ).format('hh:mm DD-MMM-Y')
+                                          ).format('hh:mm A - DD MMM Y')
                                         : ''}
                                 </i>
                             </small>
@@ -238,7 +238,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         ? moment(
                                               mainData.approval_status
                                                   ?.ceo_approved_at,
-                                          ).format('hh:mm DD-MMM-Y')
+                                          ).format('hh:mm A - DD MMM Y')
                                         : ''}
                                 </i>
                             </small>
@@ -371,7 +371,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             {rp.last_purchase_date
                                                 ? moment(
                                                       rp.last_purchase_date,
-                                                  ).format('DD MMM YYYY')
+                                                  ).format('hh:mm A - DD MMM Y')
                                                 : ''}
                                         </td>
                                         <td className={`border p-0`}>
@@ -424,7 +424,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         ? moment(
                                               mainData.approval_status
                                                   ?.department_approved_at,
-                                          ).format('hh:mm DD-MMM-Y')
+                                          ).format('hh:mm A - DD MMM Y')
                                         : ''}
                                 </i>
                             </small>
@@ -447,7 +447,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         ? moment(
                                               mainData.approval_status
                                                   ?.accounts_approved_at,
-                                          ).format('hh:mm DD-MMM-Y')
+                                          ).format('hh:mm A - DD MMM Y')
                                         : ''}
                                 </i>
                             </small>
@@ -465,7 +465,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         ? moment(
                                               mainData.approval_status
                                                   ?.ceo_approved_at,
-                                          ).format('hh:mm DD-MMM-Y')
+                                          ).format('hh:mm A - DD MMM Y')
                                         : ''}
                                 </i>
                             </small>

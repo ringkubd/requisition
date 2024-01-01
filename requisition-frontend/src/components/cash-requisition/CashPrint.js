@@ -154,8 +154,10 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             {rp.purpose}
                                         </td>
                                         <td className={`border p-0`}>
-                                            {(parseFloat(rp.unit_price) *
-                                                parseFloat(rp.required_unit)).toLocaleString()}
+                                            {(
+                                                parseFloat(rp.unit_price) *
+                                                parseFloat(rp.required_unit)
+                                            ).toLocaleString()}
                                         </td>
                                     </tr>
                                 ))}
@@ -188,19 +190,43 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                     {mainData?.user?.name}
                                                 </span>
                                             </div>
+                                            {/*<div*/}
+                                            {/*    className={`flex flex-row my-4`}>*/}
+                                            {/*    <div>Signature</div>*/}
+                                            {/*    <div*/}
+                                            {/*        className={`min-w-max border-b border-black w-full`}></div>*/}
+                                            {/*</div>*/}
                                             <div
-                                                className={`flex flex-row my-4`}>
-                                                <div>Signature</div>
-                                                <div
-                                                    className={`min-w-max border-b border-black w-full`}></div>
-                                            </div>
-                                            <div
-                                                className={`flex flex-row my-4`}>
+                                                className={`flex flex-row my-4 items-center`}>
                                                 <div className={`min-w-fit`}>
                                                     Section Head
                                                 </div>
                                                 <div
-                                                    className={`border-b border-black w-full`}></div>
+                                                    className={`border-b border-black w-full flex flex-col`}>
+                                                    <span className={`ml-2`}>
+                                                        {mainData
+                                                            ?.approval_status
+                                                            ?.department_approved_at
+                                                            ? mainData
+                                                                  ?.approval_status
+                                                                  ?.departmentApprovedBy
+                                                                  ?.name
+                                                            : ''}
+                                                    </span>
+                                                    <span className={`ml-2`}>
+                                                        {mainData
+                                                            ?.approval_status
+                                                            ?.department_approved_at
+                                                            ? moment(
+                                                                  mainData
+                                                                      ?.approval_status
+                                                                      ?.department_approved_at,
+                                                              ).format(
+                                                                  'hh:mm A - DD MMM Y',
+                                                              )
+                                                            : ''}
+                                                    </span>
+                                                </div>
                                             </div>
                                             <div className={`mt-4`}>
                                                 <input
@@ -287,10 +313,37 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             </div>
                                             <div className={`flex flex-col`}>
                                                 <div
-                                                    className={`flex flex-row my-4`}>
+                                                    className={`flex flex-row my-4 items-center`}>
                                                     <div>Accounts Officer</div>
+
                                                     <div
-                                                        className={`w-1/2 border-b border-black`}></div>
+                                                        className={`w-1/2 border-b border-black flex flex-col`}>
+                                                        <span
+                                                            className={`ml-2`}>
+                                                            {mainData
+                                                                ?.approval_status
+                                                                ?.accounts_approved_at
+                                                                ? mainData
+                                                                      ?.approval_status
+                                                                      ?.accountsApprovedBy
+                                                                      ?.name
+                                                                : ''}
+                                                        </span>
+                                                        <span
+                                                            className={`ml-2`}>
+                                                            {mainData
+                                                                ?.approval_status
+                                                                ?.accounts_approved_at
+                                                                ? moment(
+                                                                      mainData
+                                                                          ?.approval_status
+                                                                          ?.accounts_approved_at,
+                                                                  ).format(
+                                                                      'hh:mm A - DD MMM Y',
+                                                                  )
+                                                                : ''}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                                 <div className={`text-center`}>
                                                     [Requisitor to initiate
@@ -305,6 +358,27 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             <div
                                                 className={`text-center w-full`}>
                                                 Approved for payment
+                                            </div>
+                                            <div
+                                                className={`w-full flex flex-col`}>
+                                                <span className={`ml-2`}>
+                                                    {mainData?.approval_status
+                                                        ?.ceo_approved_at
+                                                        ? 'Neaz Khan'
+                                                        : ''}
+                                                </span>
+                                                <span className={`ml-2`}>
+                                                    {mainData?.approval_status
+                                                        ?.ceo_approved_at
+                                                        ? moment(
+                                                              mainData
+                                                                  ?.approval_status
+                                                                  ?.ceo_approved_at,
+                                                          ).format(
+                                                              'hh:mm A - DD MMM Y',
+                                                          )
+                                                        : ''}
+                                                </span>
                                             </div>
                                             <div
                                                 className={`text-center border-t border-black w-full`}>
@@ -457,8 +531,10 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             {rp.purpose}
                                         </td>
                                         <td className={`border p-0`}>
-                                            {(parseFloat(rp.unit_price) *
-                                                parseFloat(rp.required_unit)).toLocaleString()}
+                                            {(
+                                                parseFloat(rp.unit_price) *
+                                                parseFloat(rp.required_unit)
+                                            ).toLocaleString()}
                                         </td>
                                     </tr>
                                 ))}

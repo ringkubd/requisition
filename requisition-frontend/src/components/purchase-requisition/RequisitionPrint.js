@@ -241,7 +241,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                                       ?.approval_status
                                                                       ?.department_approved_at,
                                                               ).format(
-                                                                  'hh:mm DD MMM Y',
+                                                                  'hh:mm A - DD MMM Y',
                                                               )
                                                             : ''}
                                                     </span>
@@ -343,7 +343,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                                           ?.approval_status
                                                                           ?.accounts_approved_at,
                                                                   ).format(
-                                                                      'hh:mm DD MMM Y',
+                                                                      'hh:mm A - DD MMM Y',
                                                                   )
                                                                 : ''}
                                                         </span>
@@ -379,7 +379,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                                   ?.approval_status
                                                                   ?.ceo_approved_at,
                                                           ).format(
-                                                              'hh:mm DD MMM Y',
+                                                              'hh:mm A - DD MMM Y',
                                                           )
                                                         : ''}
                                                 </span>
