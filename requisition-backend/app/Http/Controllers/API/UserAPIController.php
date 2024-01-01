@@ -25,7 +25,7 @@ class UserAPIController extends AppBaseController
         $this->userRepository = $userRepo;
 
         $this->middleware('auth:sanctum');
-        $this->middleware('role_or_permission:Super Admin|view_users', ['only' => ['index']]);
+//        $this->middleware('role_or_permission:Super Admin|view_users', ['only' => ['index']]);
         $this->middleware('role_or_permission:Super Admin|update_users', ['only' => ['show', 'update']]);
         $this->middleware('role_or_permission:Super Admin|create_users', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_users', ['only' => ['delete']]);

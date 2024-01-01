@@ -36,7 +36,7 @@ const Login = () => {
     const submitForm = async event => {
         event.preventDefault()
 
-        login({
+        await login({
             email,
             password,
             remember: shouldRemember,
@@ -71,7 +71,7 @@ const Login = () => {
                             autoFocus
                         />
 
-                        <InputError messages={errors.email} className="mt-2" />
+                        <InputError messages={errors?.email} className="mt-2" />
                     </div>
 
                     {/* Password */}
@@ -89,7 +89,7 @@ const Login = () => {
                         />
 
                         <InputError
-                            messages={errors.password}
+                            messages={errors?.password}
                             className="mt-2"
                         />
                     </div>

@@ -8,6 +8,7 @@ const Status = ({ requisition, type }) => {
     const [selectedDropdown, setSelectedDropdown] = useState('Status')
     const isDepartmentHead = user?.current_department_head === parseInt(user?.id);
     const [currentStatus, setCurrentStatus] = useState(requisition.current_status);
+    const [manualPermission, setManualPermission] = useState(false);
 
 
     useEffect(() => {
@@ -19,9 +20,11 @@ const Status = ({ requisition, type }) => {
                 setCurrentStatus(requisition.purchase_current_status)
                 requisition = requisition.purchase_requisitions
                 setUrl(`api/update_purchase_status/${requisition.id}`);
+                setManualPermission(user?.purchase_approval_permission);
                 break;
             case 'cash':
                 setUrl(`api/update_cash_status/${requisition.id}`);
+                setManualPermission(user?.cash_approval_permission);
                 break;
         }
         setSelectedDropdown(currentStatus?.status ?? 'Status')
@@ -44,7 +47,7 @@ const Status = ({ requisition, type }) => {
             {
                 (currentStatus?.stage ===  "ceo" && currentStatus?.status !== "Approved" && user?.designation_name === "CEO" && type !== "initial") ||
                 (currentStatus?.stage ===  "department" && currentStatus?.status !== "Approved" && isDepartmentHead && (parseInt(requisition.department_id) === user?.current_department_head)) ||
-                (currentStatus?.stage ===  "accounts" && currentStatus?.status !== "Approved" && isDepartmentHead && user?.default_department_name === "Accounts"  && type !== "initial") ||
+                (currentStatus?.stage ===  "accounts" && currentStatus?.status !== "Approved" && (isDepartmentHead || manualPermission) && user?.default_department_name === "Accounts"  && type !== "initial") ||
                 (parseInt(requisition.department_id) === parseInt(user?.default_department_id) && isDepartmentHead && (currentStatus?.stage ===  "department" || !currentStatus?.stage))
                     ? (
                     <Dropdown

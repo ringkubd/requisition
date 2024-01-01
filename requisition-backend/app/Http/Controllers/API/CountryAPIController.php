@@ -25,7 +25,7 @@ class CountryAPIController extends AppBaseController
         $this->countryRepository = $countryRepo;
 
         $this->middleware('auth:sanctum');
-        $this->middleware('role_or_permission:Super Admin|view_countries', ['only' => ['index']]);
+//        $this->middleware('role_or_permission:Super Admin|view_countries', ['only' => ['index']]);
         $this->middleware('role_or_permission:Super Admin|update_countries', ['only' => ['show', 'update']]);
         $this->middleware('role_or_permission:Super Admin|create_countries', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_countries', ['only' => ['delete']]);

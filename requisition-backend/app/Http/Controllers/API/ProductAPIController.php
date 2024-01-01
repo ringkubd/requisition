@@ -27,7 +27,7 @@ class ProductAPIController extends AppBaseController
         $this->productRepository = $productRepo;
 
         $this->middleware('auth:sanctum');
-        $this->middleware('role_or_permission:Super Admin|view_products', ['only' => ['index', 'show']]);
+//        $this->middleware('role_or_permission:Super Admin|view_products', ['only' => ['index', 'show']]);
         $this->middleware('role_or_permission:Super Admin|update_products', ['only' => ['update']]);
         $this->middleware('role_or_permission:Super Admin|create_products', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_products', ['only' => ['delete']]);

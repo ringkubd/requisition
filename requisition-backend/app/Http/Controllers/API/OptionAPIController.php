@@ -22,7 +22,7 @@ class OptionAPIController extends AppBaseController
         $this->optionRepository = $optionRepo;
 
         $this->middleware('auth:sanctum');
-        $this->middleware('role_or_permission:Super Admin|view_options', ['only' => ['index']]);
+//        $this->middleware('role_or_permission:Super Admin|view_options', ['only' => ['index']]);
         $this->middleware('role_or_permission:Super Admin|update_options', ['only' => ['show', 'update']]);
         $this->middleware('role_or_permission:Super Admin|create_options', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_options', ['only' => ['delete']]);

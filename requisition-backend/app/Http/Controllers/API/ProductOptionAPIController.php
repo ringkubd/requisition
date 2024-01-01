@@ -23,7 +23,7 @@ class ProductOptionAPIController extends AppBaseController
         $this->productOptionRepository = $productOptionRepo;
 
         $this->middleware('auth:sanctum');
-        $this->middleware('role_or_permission:Super Admin|view_product-options', ['only' => ['index']]);
+//        $this->middleware('role_or_permission:Super Admin|view_product-options', ['only' => ['index']]);
         $this->middleware('role_or_permission:Super Admin|update_product-options', ['only' => ['show', 'update']]);
         $this->middleware('role_or_permission:Super Admin|create_product-options', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_product-options', ['only' => ['delete']]);

@@ -25,7 +25,7 @@ class MeasurementUnitAPIController extends AppBaseController
         $this->measurementUnitRepository = $measurementUnitRepo;
 
         $this->middleware('auth:sanctum');
-        $this->middleware('role_or_permission:Super Admin|view_measurement-units', ['only' => ['index']]);
+//        $this->middleware('role_or_permission:Super Admin|view_measurement-units', ['only' => ['index']]);
         $this->middleware('role_or_permission:Super Admin|update_measurement-units', ['only' => ['show', 'update']]);
         $this->middleware('role_or_permission:Super Admin|create_measurement-units', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_measurement-units', ['only' => ['delete']]);

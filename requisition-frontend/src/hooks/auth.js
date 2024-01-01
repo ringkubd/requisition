@@ -48,9 +48,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             .then(() => mutate())
             .catch(error => {
                 // if (error.response.status !== 422) throw error
-                console.log(error)
-
-                // setErrors(error.response.data.errors)
+                setErrors(error?.response?.data?.errors)
             })
     }
 

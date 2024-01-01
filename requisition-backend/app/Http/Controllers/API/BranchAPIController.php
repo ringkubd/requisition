@@ -24,7 +24,7 @@ class BranchAPIController extends AppBaseController
     {
         $this->branchRepository = $branchRepo;
         $this->middleware('auth:sanctum');
-        $this->middleware('role_or_permission:Super Admin|view_branches', ['only' => ['index']]);
+//        $this->middleware('role_or_permission:Super Admin|view_branches', ['only' => ['index']]);
         $this->middleware('role_or_permission:Super Admin|update_branches', ['only' => ['show', 'update']]);
         $this->middleware('role_or_permission:Super Admin|create_branches', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_branches', ['only' => ['delete']]);

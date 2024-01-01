@@ -41,6 +41,8 @@ class UserResource extends JsonResource
             'department_id' => $this->departments->pluck('id')->toArray(),
             'selected_department' => auth_department_id(),
             'current_department_head' =>  $this->defaultDepartment?->head_of_department,
+            'cash_approval_permission' => $this->hasPermissionTo('accounts-approval-cash'),
+            'purchase_approval_permission' => $this->hasPermissionTo('accounts-approval-purchase'),
             'designations' => $this->designations,
             'designation_name' => implode(',',$this->designations->pluck('name')->toArray()),
             'designation_id' => $this->designations->pluck('id')->toArray(),

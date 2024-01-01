@@ -25,7 +25,7 @@ const Dashboard = () => {
     const [searchParams, setSearchParams] = useState({});
     const [searchCashParams, setSearchCashParams] = useState({});
     const {data, isLoading, isError, isSuccess} = useGetDashboardDataQuery(searchParams);
-    const {data: cash, isLoading:cashISLoading, isError: cashISError, isSuccess: cashISSuccess} = useGetDashboardCashDataQuery(searchCashParams);
+    const {data: cash, isLoading: cashISLoading, isError: cashISError, isSuccess: cashISSuccess} = useGetDashboardCashDataQuery(searchCashParams);
 
     useEffect(() => {
         if (isSuccess && data){
