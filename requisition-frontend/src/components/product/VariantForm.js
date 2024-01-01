@@ -56,7 +56,7 @@ export default function VariantForm(props) {
         },
         {
             name: 'Value',
-            selector: row => row?.option_value,
+            selector: row =>  row.id ? <EditStock key={row.id} rowId={row.id} name={`option_value`} rowValue={row?.option_value} /> : row?.option_value,
             sortable: true,
         },
         {
