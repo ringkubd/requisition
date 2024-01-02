@@ -24,3 +24,8 @@
 .drop-shadow-md{
     @apply shadow-none;
 }
+
+@page {
+    margin-top: 50cm;
+    margin-bottom: 50cm;
+}

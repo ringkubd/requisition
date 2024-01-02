@@ -27,65 +27,66 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
         <div
             className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none`}
             ref={ref}>
-            {/*Header*/}
-            <div className={`flex flex-col shadow-none`} ref={accountsCopy}>
-                <div className={`text-center font-bold`}>
-                    <h2>
-                        IsDB-Bangladesh Islamic Solidarity Educational Wakf
-                        (IsDB-BISEW)
-                    </h2>
-                </div>
-                <div
-                    className={`flex justify-center items-center justify-items-center text-center`}>
-                    <p className={`py-1 px-4 underline bg-gray-300 w-fit`}>
-                        Purchase Requisition Form
-                    </p>
-                </div>
-                <div
-                    className={`flex justify-center items-center justify-items-center text-center`}>
-                    <i className={`px-4 w-fit font-extralight font-serif`}>
-                        (Account's Copy)
-                    </i>
-                </div>
-                <div
-                    className={`flex flex-row items-stretch justify-between my-2 w-full`}>
-                    <div className={`flex flex-row w-full justify-start`}>
-                        <i className={`pr-4`}>Date: </i>
-                        <p className={`underline`}>
-                            {moment(mainData?.created_at).format('DD-MMM-Y')}
+            <div className={`flex flex-col w-full justify-center justify-items-center shadow-none printBody`}>
+                {/*Header*/}
+                <div className={`flex flex-col shadow-none`} ref={accountsCopy}>
+                    <div className={`text-center font-bold`}>
+                        <h2>
+                            IsDB-Bangladesh Islamic Solidarity Educational Wakf
+                            (IsDB-BISEW)
+                        </h2>
+                    </div>
+                    <div
+                        className={`flex justify-center items-center justify-items-center text-center`}>
+                        <p className={`py-1 px-4 underline bg-gray-300 w-fit`}>
+                            Purchase Requisition Form
                         </p>
                     </div>
-                    <div className={`flex flex-row w-full justify-center`}>
-                        <i className={`pr-2`}>I.R. NO. </i>
-                        <p className={`underline`}>{mainData?.irf_no}</p>
+                    <div
+                        className={`flex justify-center items-center justify-items-center text-center`}>
+                        <i className={`px-4 w-fit font-extralight font-serif`}>
+                            (Account's Copy)
+                        </i>
                     </div>
-                    <div className={`flex flex-row w-full justify-end`}>
-                        <i className={`pr-2`}>P.R. NO. </i>
-                        <p className={`underline`}>{mainData?.prf_no}</p>
+                    <div
+                        className={`flex flex-row items-stretch justify-between my-2 w-full`}>
+                        <div className={`flex flex-row w-full justify-start`}>
+                            <i className={`pr-4`}>Date: </i>
+                            <p className={`underline`}>
+                                {moment(mainData?.created_at).format('DD-MMM-Y')}
+                            </p>
+                        </div>
+                        <div className={`flex flex-row w-full justify-center`}>
+                            <i className={`pr-2`}>I.R. NO. </i>
+                            <p className={`underline`}>{mainData?.irf_no}</p>
+                        </div>
+                        <div className={`flex flex-row w-full justify-end`}>
+                            <i className={`pr-2`}>P.R. NO. </i>
+                            <p className={`underline`}>{mainData?.prf_no}</p>
+                        </div>
                     </div>
-                </div>
-                <div className={`flex flex-col text-sm shadow-none`}>
-                    <div>
-                        Please arrange estimated Tk.{' '}
-                        <strong className={`underline font-bold italic`}>
-                            {mainData?.estimated_total_amount.toLocaleString()}
-                            /-
-                        </strong>{' '}
-                        (In Word){' '}
-                        <strong className={`underline font-bold italic`}>
-                            {mainData?.estimated_total_amount === 0
-                                ? 'Zero'
-                                : number2wordEnglish(
-                                      mainData?.estimated_total_amount ?? 0,
-                                  )}
-                        </strong>{' '}
-                        for purchase of the following:
-                    </div>
-                    <div className="relative overflow-x-auto">
-                        <table
-                            className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
-                            <thead
-                                className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
+                    <div className={`flex flex-col text-sm shadow-none`}>
+                        <div>
+                            Please arrange estimated Tk.{' '}
+                            <strong className={`underline font-bold italic`}>
+                                {mainData?.estimated_total_amount.toLocaleString()}
+                                /-
+                            </strong>{' '}
+                            (In Word){' '}
+                            <strong className={`underline font-bold italic`}>
+                                {mainData?.estimated_total_amount === 0
+                                    ? 'Zero'
+                                    : number2wordEnglish(
+                                        mainData?.estimated_total_amount ?? 0,
+                                    )}
+                            </strong>{' '}
+                            for purchase of the following:
+                        </div>
+                        <div className="relative overflow-x-auto">
+                            <table
+                                className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
+                                <thead
+                                    className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
                                 <tr>
                                     <th
                                         scope="col"
@@ -133,8 +134,8 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         Estimated Cost
                                     </th>
                                 </tr>
-                            </thead>
-                            <tbody className={`shadow-none text-gray-800`}>
+                                </thead>
+                                <tbody className={`shadow-none text-gray-800`}>
                                 {requisition_products?.map((rp, index) => (
                                     <tr
                                         className={`border text-center bg-white`}
@@ -142,7 +143,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         <td className={`border p-0`}>
                                             {index + 1}
                                         </td>
-                                        <td className={`border p-0`}>
+                                        <td className={`border p-0 text-left`}>
                                             {rp.title}{' '}
                                             {rp?.product_option?.option_name?.includes(
                                                 'N/A',
@@ -154,8 +155,8 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         <td className={`border p-0`}>
                                             {rp.last_purchase_date
                                                 ? moment(
-                                                      rp.last_purchase_date,
-                                                  ).format('DD-MMM-YY')
+                                                    rp.last_purchase_date,
+                                                ).format('DD-MMM-YY')
                                                 : ''}
                                         </td>
                                         <td className={`border p-0`}>
@@ -173,10 +174,10 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         <td className={`border p-0`}>
                                             {rp.purpose}
                                         </td>
-                                        <td className={`border p-0`}>
+                                        <td className={`border p-0 text-right`}>
                                             {parseFloat(
                                                 rp.unit_price *
-                                                    rp.quantity_to_be_purchase,
+                                                rp.quantity_to_be_purchase,
                                             ).toLocaleString()}
                                         </td>
                                     </tr>
@@ -188,27 +189,39 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         Total:{' '}
                                     </th>
                                     <td
-                                        className={`border py-0 px-2 text-center`}>
+                                        className={`border py-0 text-right font-bold`}>
                                         {mainData?.estimated_total_amount.toLocaleString()}
                                     </td>
                                 </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className={`my-1`}></div>
-                    {/*Table Two*/}
-                    <div className="relative overflow-x-auto">
-                        <table
-                            className={`w-full text-left text-gray-800 dark:text-gray-400 text-xs shadow-none`}>
-                            <tbody className={`shadow-none`}>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className={`my-1`}></div>
+                        {/*Table Two*/}
+                        <div className="relative overflow-x-auto">
+                            <table
+                                className={`w-full text-left text-gray-800 dark:text-gray-400 text-xs shadow-none`}>
+                                <tbody className={`shadow-none`}>
                                 <tr>
                                     <td className={`border px-2 py-2`}>
-                                        <div className={`flex flex-col`}>
-                                            <div>
+                                        <div className={`flex flex-col w-full`}>
+                                            <div className={`flex flex-row items-center w-full`}>
                                                 Requisitioned by{' '}
-                                                <span className={`underline`}>
-                                                    {mainData?.user?.name}
-                                                </span>
+                                                <div className={'ml-1'}>
+                                                    <div>
+                                                        {mainData?.user?.name}
+                                                    </div>
+                                                    <div className={`underline w-full`}>
+                                                        {mainData?.created_at
+                                                            ? moment(
+                                                                mainData
+                                                                    ?.created_at
+                                                            ).format(
+                                                                'hh:mm A - DD MMM Y',
+                                                            )
+                                                            : ''}
+                                                    </div>
+                                                </div>
                                             </div>
                                             {/*<div*/}
                                             {/*    className={`flex flex-row my-4`}>*/}
@@ -228,9 +241,9 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                             ?.approval_status
                                                             ?.department_approved_at
                                                             ? mainData
-                                                                  ?.approval_status
-                                                                  ?.departmentApprovedBy
-                                                                  ?.name
+                                                                ?.approval_status
+                                                                ?.departmentApprovedBy
+                                                                ?.name
                                                             : ''}
                                                     </span>
                                                     <span className={`ml-2`}>
@@ -238,12 +251,12 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                             ?.approval_status
                                                             ?.department_approved_at
                                                             ? moment(
-                                                                  mainData
-                                                                      ?.approval_status
-                                                                      ?.department_approved_at,
-                                                              ).format(
-                                                                  'hh:mm A - DD MMM Y',
-                                                              )
+                                                                mainData
+                                                                    ?.approval_status
+                                                                    ?.department_approved_at,
+                                                            ).format(
+                                                                'hh:mm A - DD MMM Y',
+                                                            )
                                                             : ''}
                                                     </span>
                                                 </div>
@@ -329,9 +342,9 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                                 ?.approval_status
                                                                 ?.accounts_approved_at
                                                                 ? mainData
-                                                                      ?.approval_status
-                                                                      ?.accountsApprovedBy
-                                                                      ?.name
+                                                                    ?.approval_status
+                                                                    ?.accountsApprovedBy
+                                                                    ?.name
                                                                 : ''}
                                                         </span>
                                                         <span
@@ -340,12 +353,12 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                                 ?.approval_status
                                                                 ?.accounts_approved_at
                                                                 ? moment(
-                                                                      mainData
-                                                                          ?.approval_status
-                                                                          ?.accounts_approved_at,
-                                                                  ).format(
-                                                                      'hh:mm A - DD MMM Y',
-                                                                  )
+                                                                    mainData
+                                                                        ?.approval_status
+                                                                        ?.accounts_approved_at,
+                                                                ).format(
+                                                                    'hh:mm A - DD MMM Y',
+                                                                )
                                                                 : ''}
                                                         </span>
                                                     </div>
@@ -376,12 +389,12 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                     {mainData?.approval_status
                                                         ?.ceo_approved_at
                                                         ? moment(
-                                                              mainData
-                                                                  ?.approval_status
-                                                                  ?.ceo_approved_at,
-                                                          ).format(
-                                                              'hh:mm A - DD MMM Y',
-                                                          )
+                                                            mainData
+                                                                ?.approval_status
+                                                                ?.ceo_approved_at,
+                                                        ).format(
+                                                            'hh:mm A - DD MMM Y',
+                                                        )
                                                         : ''}
                                                 </span>
                                             </div>
@@ -392,80 +405,80 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         </div>
                                     </td>
                                 </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className={`flex flex-row my-6`}>
-                        <div className={`flex flex-row w-1/4 text-sm`}>
-                            <div>Received Tk.</div>
-                            <div className={`border-b border-black w-24`}></div>
+                                </tbody>
+                            </table>
                         </div>
-                        <div className={`flex flex-row w-2/4 text-sm`}>
-                            <div>Name</div>
-                            <div className={`border-b border-black w-80`}></div>
+                        <div className={`flex flex-row my-6`}>
+                            <div className={`flex flex-row w-1/4 text-sm`}>
+                                <div>Received Tk.</div>
+                                <div className={`border-b border-black w-24`}></div>
+                            </div>
+                            <div className={`flex flex-row w-2/4 text-sm`}>
+                                <div>Name</div>
+                                <div className={`border-b border-black w-80`}></div>
+                            </div>
+                            <div className={`flex flex-row w-1/4 text-sm`}>
+                                <div>Signature</div>
+                                <div className={`border-b border-black w-32`}></div>
+                            </div>
                         </div>
-                        <div className={`flex flex-row w-1/4 text-sm`}>
-                            <div>Signature</div>
-                            <div className={`border-b border-black w-32`}></div>
-                        </div>
-                    </div>
-                    <div className={`flex flex-row`}>
-                        <div className={`flex flex-row w-3/4 text-sm`}>
-                            <div>Authorized Signature (Accounts Dept.)</div>
-                            <div className={`border-b border-black w-80`}></div>
-                        </div>
-                        <div className={`flex flex-row w-1/4 text-sm`}>
-                            <div>Date</div>
-                            <div className={`border-b border-black w-40`}></div>
+                        <div className={`flex flex-row`}>
+                            <div className={`flex flex-row w-3/4 text-sm`}>
+                                <div>Authorized Signature (Accounts Dept.)</div>
+                                <div className={`border-b border-black w-80`}></div>
+                            </div>
+                            <div className={`flex flex-row w-1/4 text-sm`}>
+                                <div>Date</div>
+                                <div className={`border-b border-black w-40`}></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            {/*  End Header  */}
-            <hr
-                ref={hrRef}
-                className={`my-16 h-px bg-gray-400 border-2 border-dashed`}
-            />
-            <div className={`flex flex-col shadow-none`} ref={requisitorCopy}>
-                <div
-                    className={`flex justify-center items-center justify-items-center text-center`}>
-                    <h2 className={`py-1 px-4 underline bg-gray-300 w-fit`}>
-                        Purchase Requisition Form
-                    </h2>
-                </div>
-                <div
-                    className={`flex justify-center items-center justify-items-center text-center`}>
-                    <i className={`py-1 px-4 w-fit font-extralight font-serif`}>
-                        (Requisitor's Copy)
-                    </i>
-                </div>
-                <div
-                    className={`flex flex-row items-stretch justify-between mt-2 w-full`}>
-                    <div className={`flex flex-row w-full justify-start`}>
-                        <i className={`pr-2`}>Date: </i>
-                        <p className={`underline`}>
-                            {moment(mainData?.created_at).format('DD-MMM-Y')}
-                        </p>
+                {/*  End Header  */}
+                <hr
+                    ref={hrRef}
+                    className={`my-16 h-px bg-gray-400 border-2 border-dashed`}
+                />
+                <div className={`flex flex-col shadow-none`} ref={requisitorCopy}>
+                    <div
+                        className={`flex justify-center items-center justify-items-center text-center`}>
+                        <h2 className={`py-1 px-4 underline bg-gray-300 w-fit`}>
+                            Purchase Requisition Form
+                        </h2>
                     </div>
-                    <div className={`flex flex-row w-full`}>
-                        <i className={`pr-0`}>Recieved Tk. </i>
-                        <p className={`border-b border-black w-20`}></p>
+                    <div
+                        className={`flex justify-center items-center justify-items-center text-center`}>
+                        <i className={`py-1 px-4 w-fit font-extralight font-serif`}>
+                            (Requisitor's Copy)
+                        </i>
                     </div>
-                    <div className={`flex flex-row w-full justify-center`}>
-                        <i className={`pr-2`}>I.R. NO. </i>
-                        <p className={`underline`}>{mainData?.irf_no}</p>
+                    <div
+                        className={`flex flex-row items-stretch justify-between mt-2 w-full`}>
+                        <div className={`flex flex-row w-full justify-start`}>
+                            <i className={`pr-2`}>Date: </i>
+                            <p className={`underline`}>
+                                {moment(mainData?.created_at).format('DD-MMM-Y')}
+                            </p>
+                        </div>
+                        <div className={`flex flex-row w-full`}>
+                            <i className={`pr-0`}>Recieved Tk. </i>
+                            <p className={`border-b border-black w-20`}></p>
+                        </div>
+                        <div className={`flex flex-row w-full justify-center`}>
+                            <i className={`pr-2`}>I.R. NO. </i>
+                            <p className={`underline`}>{mainData?.irf_no}</p>
+                        </div>
+                        <div className={`flex flex-row w-full justify-end`}>
+                            <i className={`pr-2`}>P.R. NO. </i>
+                            <p className={`underline`}>{mainData?.prf_no}</p>
+                        </div>
                     </div>
-                    <div className={`flex flex-row w-full justify-end`}>
-                        <i className={`pr-2`}>P.R. NO. </i>
-                        <p className={`underline`}>{mainData?.prf_no}</p>
-                    </div>
-                </div>
-                <div className={`flex flex-col text-sm shadow-none`}>
-                    <div className="relative overflow-x-auto">
-                        <table
-                            className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
-                            <thead
-                                className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
+                    <div className={`flex flex-col text-sm shadow-none`}>
+                        <div className="relative overflow-x-auto">
+                            <table
+                                className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
+                                <thead
+                                    className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
                                 <tr>
                                     <th
                                         scope="col"
@@ -513,8 +526,8 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         Estimated Cost
                                     </th>
                                 </tr>
-                            </thead>
-                            <tbody className={`shadow-none text-gray-800`}>
+                                </thead>
+                                <tbody className={`shadow-none text-gray-800`}>
                                 {requisition_products?.map((rp, index) => (
                                     <tr
                                         className={`border text-center bg-white`}
@@ -522,7 +535,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         <td className={`border p-0`}>
                                             {index + 1}
                                         </td>
-                                        <td className={`border p-0`}>
+                                        <td className={`border p-0 text-left`}>
                                             {rp.title}{' '}
                                             {rp?.product_option?.option_name?.includes(
                                                 'N/A',
@@ -534,8 +547,8 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         <td className={`border p-0`}>
                                             {rp.last_purchase_date
                                                 ? moment(
-                                                      rp.last_purchase_date,
-                                                  ).format('DD-MMM-YY')
+                                                    rp.last_purchase_date,
+                                                ).format('DD-MMM-YY')
                                                 : ''}
                                         </td>
                                         <td className={`border p-0`}>
@@ -553,10 +566,10 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         <td className={`border p-0 text-justify`}>
                                             {rp.purpose}
                                         </td>
-                                        <td className={`border p-0`}>
+                                        <td className={`border p-0 text-right`}>
                                             {parseFloat(
                                                 rp.unit_price *
-                                                    rp.quantity_to_be_purchase,
+                                                rp.quantity_to_be_purchase,
                                             ).toLocaleString()}
                                         </td>
                                     </tr>
@@ -568,12 +581,13 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         Total:{' '}
                                     </th>
                                     <td
-                                        className={`border py-0 px-2 text-center`}>
+                                        className={`border py-0 text-right font-bold`}>
                                         {mainData?.estimated_total_amount.toLocaleString()}
                                     </td>
                                 </tr>
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

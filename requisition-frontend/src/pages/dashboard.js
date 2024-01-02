@@ -72,12 +72,12 @@ const Dashboard = () => {
                 },
                 {
                     name: 'Initial',
-                    selector: row => <Status key={row.id} requisition={row} type={'initial'} />,
+                    selector: row => <Status key={`${row.current_status?.stage}_${row.id}`} requisition={row} type={'initial'} />,
                     omit: false
                 },
                 {
                     name: 'Purchase',
-                    selector: row => row.purchase_requisitions ? <Status key={row.purchase_requisitions.id} requisition={row} type={'purchase'} /> : ''
+                    selector: row => row.purchase_requisitions ? <Status key={`${row.current_status?.stage}_${row.purchase_requisitions.id}`} requisition={row} type={'purchase'} /> : ''
                 }
             ])
         }
@@ -117,7 +117,7 @@ const Dashboard = () => {
                 },
                 {
                     name: 'Status',
-                    selector: row => <Status key={row.id} requisition={row} type={'cash'} />
+                    selector: row => <Status key={`${row.current_status?.stage}_${row.id}`} requisition={row} type={'cash'} />
                 }
             ])
         }

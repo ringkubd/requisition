@@ -1,9 +1,7 @@
 import { useAuth } from "@/hooks/auth";
-import { Button, Dropdown, Tooltip } from "flowbite-react";
+import { Button, Tooltip } from "flowbite-react";
 import { useEffect, useState } from "react";
-import axios from "@/lib/axios";
 import { AiFillCheckSquare, AiFillDelete } from "react-icons/ai";
-import { dispatch } from "@/store";
 import {
     DashboardAPI, useUpdateCashStatusMutation,
     useUpdateInitialStatusMutation,
@@ -11,7 +9,6 @@ import {
 } from "@/store/service/dashboard";
 const Status = ({ requisition, type }) => {
     const { user } = useAuth()
-    const [url, setUrl] = useState(`api/update_initial_status/${requisition.id}`);
     const [selectedDropdown, setSelectedDropdown] = useState('Status')
     const isDepartmentHead = user?.current_department_head === parseInt(user?.id);
     const [currentStatus, setCurrentStatus] = useState(requisition.current_status);
@@ -23,17 +20,12 @@ const Status = ({ requisition, type }) => {
 
     useEffect(() => {
         switch (type){
-            case 'initial':
-                // setUrl(`api/update_initial_status/${requisition.id}`);
-                break;
             case 'purchase':
                 setCurrentStatus(requisition.purchase_current_status)
                 requisition = requisition.purchase_requisitions
-                // setUrl(`api/update_purchase_status/${requisition.id}`);
                 setManualPermission(user?.purchase_approval_permission);
                 break;
             case 'cash':
-                // setUrl(`api/update_cash_status/${requisition.id}`);
                 setManualPermission(user?.cash_approval_permission);
                 break;
         }
