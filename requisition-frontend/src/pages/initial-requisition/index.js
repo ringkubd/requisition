@@ -15,8 +15,10 @@ import {
 } from "@/store/service/requisitions/initial";
 import {AiFillShopping, AiOutlineSearch} from 'react-icons/ai';
 import moment from "moment";
+import { useAuth } from "@/hooks/auth";
 
 const InitialRequisition = () => {
+    const user = useAuth();
     const router = useRouter();
     const [searchParams, setSearchParams] = useState({});
     const [destroy, destroyResponse] = useDestroyInitialRequisitionMutation();
@@ -73,7 +75,7 @@ const InitialRequisition = () => {
                         progressing={destroyResponse.isLoading}
                         permissionModule={`initial-requisitions`}
                         item={row}
-                        view={!row.is_purchase_requisition_generated ? (
+                        view={!row.is_purchase_requisition_generated && parseInt(row.department_id) === parseInt(user?.default_department_id) ? (
                             <Button
                                 gradientMonochrome={`cyan`}
                                 onClick={() => router.push(`/initial-requisition/${row.id}/create_purchase`)}>

@@ -1,7 +1,8 @@
 import { useAuth } from "@/hooks/auth";
-import { Dropdown } from 'flowbite-react';
+import { Button, Dropdown, Tooltip } from "flowbite-react";
 import { useEffect, useState } from "react";
 import axios from "@/lib/axios";
+import { AiFillCheckSquare, AiFillDelete } from "react-icons/ai";
 const Status = ({ requisition, type }) => {
     const { user } = useAuth()
     const [url, setUrl] = useState(`api/update_initial_status/${requisition.id}`);
@@ -50,32 +51,36 @@ const Status = ({ requisition, type }) => {
                 (currentStatus?.stage ===  "accounts" && currentStatus?.status !== "Approved" && (isDepartmentHead || manualPermission) && user?.default_department_name === "Accounts"  && type !== "initial") ||
                 (parseInt(requisition.department_id) === parseInt(user?.default_department_id) && isDepartmentHead && (currentStatus?.stage ===  "department" || !currentStatus?.stage))
                     ? (
-                    <Dropdown
-                        label={selectedDropdown}
-                        dismissOnClick={true}
-                    >
-                        <Dropdown.Item
-                            onClick={() => {
-                                updateStatus({
-                                    status: 2,
-                                    notes: ''
-                                });
-                            }}
-                        >
-                            Approved
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                            onClick={() => {
-                                updateStatus({
-                                    status: 3,
-                                    notes: ''
-                                });
-                            }}
-                        >
-                            Reject
-                        </Dropdown.Item>
-                    </Dropdown>
-                )
+                        <div className="flex flex-wrap">
+                            <Tooltip content={`Approved`} placement={`left-start`}>
+                                <Button
+                                    gradientDuoTone="greenToBlue"
+                                    onClick={() => {
+                                        updateStatus({
+                                            status: 2,
+                                            notes: ''
+                                        });
+                                    }}
+                                >
+                                    <AiFillCheckSquare />
+                                </Button>
+                            </Tooltip>
+                            <Tooltip content={`Reject`} placement={`right-start`}>
+                                <Button
+                                    gradientDuoTone="redToYellow"
+                                    onClick={() => {
+                                        updateStatus({
+                                            status: 3,
+                                            notes: ''
+                                        });
+                                    }}
+                                >
+                                    <AiFillDelete />
+                                </Button>
+                            </Tooltip>
+
+                        </div>
+                    )
                     : currentStatus?.stage ? (currentStatus?.status === "Pending" ? 'Pending at ' : currentStatus?.status + ' by ') +  currentStatus?.stage : null
             }
         </div>

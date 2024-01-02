@@ -81,7 +81,7 @@ const InitialRequisitionCreate = (props) => {
         },
         {
             name: 'Variant',
-            selector: row =>  row.product_option?.option_name,
+            selector: row =>  row.product_option?.option_value,
             sortable: true,
         },
         {

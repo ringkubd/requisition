@@ -419,6 +419,9 @@ class PurchaseRequisitionAPIController extends AppBaseController
                     $data['department_status'] = $request->status;
                     $data['department_approved_by'] = \request()->user()->id;
                     $data['department_approved_at'] = now();
+                    if ($request->status == 2){
+                        $data['accounts_status'] = 1;
+                    }
                     $department = Department::query()->where('branch_id', auth_branch_id())->where('name', 'Accounts')->first();
                     $notifiedUsers[] = User::query()->find($department?->head_of_department);
             }

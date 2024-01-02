@@ -488,6 +488,9 @@ class InitialRequisitionAPIController extends AppBaseController
                 default:
                     $data['department_status'] = $request->status;
                     $data['department_approved_by'] = \request()->user()->id;
+                    if ($request->status == 2){
+                        $data['accounts_status'] = 1;
+                    }
                     $data['department_approved_at'] = now();
             }
             if ($requisition->approval_status){
