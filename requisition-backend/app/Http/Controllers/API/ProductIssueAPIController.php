@@ -143,8 +143,8 @@ class ProductIssueAPIController extends AppBaseController
             $item['issuer_department_id'] = auth_department_id();
             $item['issue_time'] = now()->toDateTimeString();
             $receiver = User::find($item['receiver_id']);
-            $item['receiver_branch_id'] = $receiver->branches()->first()->id;
-            $item['receiver_department_id'] = $receiver->departments()->first()->id;
+            $item['receiver_branch_id'] = auth_branch_id();
+            $item['receiver_department_id'] = auth_department_id();
 
             $productIssue = $this->productIssueRepository->create($item);
         }
