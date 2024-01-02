@@ -19,6 +19,30 @@ export const DashboardAPI = createApi({
                 params: arg
             }),
             providesTags: ['cash_requisition']
+        }),
+        updateInitialStatus: builder.mutation({
+            query: ({id, ...arg}) => ({
+                url: `update_initial_status/${id}`,
+                method: 'PUT',
+                body: arg
+            }),
+            invalidatesTags: ['general_requisition']
+        }),
+        updatePurchaseStatus: builder.mutation({
+            query: ({id, ...arg}) => ({
+                url: `update_purchase_status/${id}`,
+                method: 'PUT',
+                body: arg
+            }),
+            invalidatesTags: ['general_requisition']
+        }),
+        updateCashStatus: builder.mutation({
+            query: ({id, ...arg}) => ({
+                url: `update_cash_status/${id}`,
+                method: 'PUT',
+                body: arg
+            }),
+            invalidatesTags: ['cash_requisition']
         })
     })
 })
@@ -26,6 +50,9 @@ export const DashboardAPI = createApi({
 export const {
     useGetDashboardDataQuery,
     useGetDashboardCashDataQuery,
+    useUpdateInitialStatusMutation,
+    useUpdatePurchaseStatusMutation,
+    useUpdateCashStatusMutation,
     util: { getRunningQueriesThunk },
 } = DashboardAPI;
 

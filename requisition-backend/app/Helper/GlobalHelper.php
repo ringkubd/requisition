@@ -18,8 +18,8 @@ if (!function_exists('auth_organizations')) {
 if (!function_exists('auth_organization_id')) {
     function auth_organization_id()
     {
-        if (Cache::has('select_organization')) {
-            return Cache::get('select_organization');
+        if (Cache::has('select_organization_'.\request()->user()->id)) {
+            return Cache::get('select_organization_'.\request()->user()->id);
         }
         return auth()->user()->defaultOrganization?->id; // login branch organization id
     }
@@ -28,8 +28,8 @@ if (!function_exists('auth_organization_id')) {
 if (!function_exists('auth_organization_name')) {
     function auth_organization_name()
     {
-        if (Cache::has('select_organization')) {
-            $organizationId = Cache::get('select_organization');
+        if (Cache::has('select_organization_'.\request()->user()->id)) {
+            $organizationId = Cache::get('select_organization_'.\request()->user()->id);
             return Organization::where('id', $organizationId)->first()->name ?? 'Not Found';
         }
 
@@ -49,8 +49,8 @@ if (!function_exists('auth_branches')){
 
 if (!function_exists('auth_branch_id')){
     function auth_branch_id(){
-        if (Cache::has('select_branch')) {
-            return Cache::get('select_branch');
+        if (Cache::has('select_branch_'.\request()->user()->id)) {
+            return Cache::get('select_branch_'.\request()->user()->id);
         }
         return auth()->user()->defaultBranch?->id; // login branch organization id
     }
@@ -58,33 +58,37 @@ if (!function_exists('auth_branch_id')){
 
 if (!function_exists('auth_department_id')){
     function auth_department_id(){
-        if (Cache::has('select_department')) {
-            return Cache::get('select_department');
+        $key = 'select_department_'.\request()->user()->id;
+        if (Cache::has($key)) {
+            return Cache::get($key);
         }
-        return auth()->user()->defaultDepartment?->id; // login department id
+        return \request()->user()->defaultDepartment?->id; // login department id
     }
 }
 if (!function_exists('auth_department_name')){
     function auth_department_name(){
-        return \App\Models\Department::find(auth_department_id())->name;
+        $department_name = \App\Models\Department::find(auth_department_id())->name;
+        return $department_name;
+
     }
 }
 
 if (!function_exists('auth_designation_id')){
     function auth_designation_id(){
-        if (Cache::has('select_designation')) {
-            return Cache::get('select_designation');
+        $key = 'select_designation_'.\request()->user()->id;
+        if (Cache::has($key)) {
+            return Cache::get($key);
         }
         return auth()->user()->designations->first()?->id; // login branch organization id
     }
 }
 if (!function_exists('auth_designation_name')){
     function auth_designation_name(){
-        if (Cache::has('select_designation_name')) {
-            return Cache::get('select_designation_name');
+        if (Cache::has('select_designation_name_'.\request()->user()->id)) {
+            return Cache::get('select_designation_name_'.\request()->user()->id);
         }else{
             $designation = \App\Models\Designation::find(auth_designation_id())->name;
-            Cache::set('select_designation_name', $designation);
+            Cache::set('select_designation_name_'.\request()->user()->id, $designation);
             return $designation;
         }
     }

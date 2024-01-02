@@ -78,22 +78,22 @@ Route::get('purchase-requisition-select', [PurchaseAPIController::class, 'purcha
 Route::get('last-purchase-information', [InitialRequisitionAPIController::class, 'lastPurchase']);
 
 Route::post('change-organization', function (Request $request){
-    cache()->forget('select_organization');
-    cache()->put('select_organization',$request->organization_id);
-    cache()->forget('select_branch');
-    cache()->forget('select_department');
-    return cache()->get('select_organization');
+    cache()->forget('select_organization_'.$request->user()->id);
+    cache()->put('select_organization_'.$request->user()->id,$request->organization_id);
+    cache()->forget('select_branch_'.$request->user()->id);
+    cache()->forget('select_department_'.$request->user()->id);
+    return cache()->get('select_organization_'.$request->user()->id);
 });
 Route::post('change-branch', function (Request $request){
-    cache()->forget('select_branch');
-    cache()->forget('select_department');
-    cache()->put('select_branch',$request->branch_id);
-    return cache()->get('select_branch');
+    cache()->forget('select_branch_'.$request->user()->id);
+    cache()->forget('select_department_'.$request->user()->id);
+    cache()->put('select_branch_'.$request->user()->id,$request->branch_id);
+    return cache()->get('select_branch_'.$request->user()->id);
 });
 Route::post('change-departments', function (Request $request){
-    cache()->forget('select_department');
-    cache()->put('select_department',$request->department_id);
-    return cache()->get('select_department');
+    cache()->forget('select_department_'.$request->user()->id);
+    cache()->put('select_department_'.$request->user()->id,$request->department_id);
+    return cache()->get('select_department_'.$request->user()->id);
 });
 
 Route::get('navigation-organization', [NavigationAPIController::class, 'organization']);

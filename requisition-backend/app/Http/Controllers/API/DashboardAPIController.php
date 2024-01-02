@@ -58,15 +58,7 @@ class DashboardAPIController extends AppBaseController
     {
         $cashRequisition = CashRequisition::query()
             ->where('branch_id', auth_branch_id())
-            ->when(!$request->user()->hasRole('CEO') && !$request->user()->hasRole('Accounts'), function ($query) use($request){
-                $query->whereHas('department', function ($department)use ($request){
-                    $department->when($request->department_id, function ($q, $d){
-                        $q->where('id', $d);
-                    }, function ($q){
-                        $q->where('id', auth_department_id());
-                    });
-                });
-            }, function ($query) use($request){
+            ->when($request->user()->hasRole('CEO') || $request->user()->hasRole('Accounts'), function ($query) use($request){
                 if ($request->user()->hasRole('CEO')){
                     $query->whereHas('approval_status', function ($q){
                         $q->where('ceo_status', '!=', 0);
@@ -77,6 +69,14 @@ class DashboardAPIController extends AppBaseController
                         $q->where('accounts_status', '!=', 0);
                     });
                 }
+            }, function ($query) use($request){
+                $query->whereHas('department', function ($department)use ($request){
+                    $department->when($request->department_id, function ($q, $d){
+                        $q->where('id', $d);
+                    }, function ($q){
+                        $q->where('id', auth_department_id());
+                    });
+                });
 
             })
             ->latest()

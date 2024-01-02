@@ -86,6 +86,11 @@ export default function create_purchase(props){
             sortable: true,
         },
         {
+            name: 'Unit',
+            selector: row =>  row.product?.unit,
+            sortable: true,
+        },
+        {
             name: 'Last Purchase',
             selector: row => row.last_purchase_date ?? 'New',
             sortable: true,

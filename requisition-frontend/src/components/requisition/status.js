@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import axios from "@/lib/axios";
 import { AiFillCheckSquare, AiFillDelete } from "react-icons/ai";
 import { dispatch } from "@/store";
-import { DashboardAPI } from "@/store/service/dashboard";
+import {
+    DashboardAPI, useUpdateCashStatusMutation,
+    useUpdateInitialStatusMutation,
+    useUpdatePurchaseStatusMutation
+} from "@/store/service/dashboard";
 const Status = ({ requisition, type }) => {
     const { user } = useAuth()
     const [url, setUrl] = useState(`api/update_initial_status/${requisition.id}`);
@@ -12,21 +16,24 @@ const Status = ({ requisition, type }) => {
     const isDepartmentHead = user?.current_department_head === parseInt(user?.id);
     const [currentStatus, setCurrentStatus] = useState(requisition.current_status);
     const [manualPermission, setManualPermission] = useState(false);
+    const [updateInitial, {data: initialResponse, isSuccess: isSuccessInitialUpdate}] = useUpdateInitialStatusMutation();
+    const [updatePurchase, {data: purchaseResponse, isSuccess: isSuccessPurchaseUpdate}] = useUpdatePurchaseStatusMutation();
+    const [updateCash, {data: cashResponse, isSuccess: isSuccessCashUpdate}] = useUpdateCashStatusMutation();
 
 
     useEffect(() => {
         switch (type){
             case 'initial':
-                setUrl(`api/update_initial_status/${requisition.id}`);
+                // setUrl(`api/update_initial_status/${requisition.id}`);
                 break;
             case 'purchase':
                 setCurrentStatus(requisition.purchase_current_status)
                 requisition = requisition.purchase_requisitions
-                setUrl(`api/update_purchase_status/${requisition.id}`);
+                // setUrl(`api/update_purchase_status/${requisition.id}`);
                 setManualPermission(user?.purchase_approval_permission);
                 break;
             case 'cash':
-                setUrl(`api/update_cash_status/${requisition.id}`);
+                // setUrl(`api/update_cash_status/${requisition.id}`);
                 setManualPermission(user?.cash_approval_permission);
                 break;
         }
@@ -38,13 +45,32 @@ const Status = ({ requisition, type }) => {
         if (status && confirmation) {
             const statusText = status === 2 ? 'Approved' : 'Rejected';
             setSelectedDropdown(statusText);
-            await axios.put(url, {
-                'notes': notes,
-                'status': status,
-                'stage': currentStatus?.stage
-            }).then(() => {
-                dispatch(DashboardAPI.util.invalidateTags(['general_requisition', 'cash_requisition']))
-            })
+            switch (type) {
+                case 'initial':
+                    updateInitial({
+                        id: requisition.id,
+                        'notes': notes,
+                        'status': status,
+                        'stage': currentStatus?.stage
+                    })
+                    break;
+                case 'purchase':
+                    updatePurchase({
+                        id: requisition.id,
+                        'notes': notes,
+                        'status': status,
+                        'stage': currentStatus?.stage
+                    })
+                    break;
+                case 'cash':
+                    updateCash({
+                        id: requisition.id,
+                        'notes': notes,
+                        'status': status,
+                        'stage': currentStatus?.stage
+                    })
+                    break;
+            }
         }
     }
     return (
@@ -85,7 +111,7 @@ const Status = ({ requisition, type }) => {
 
                         </div>
                     )
-                    : currentStatus?.stage ? (currentStatus?.status === "Pending" ? 'Pending at ' : currentStatus?.status + ' by ') +  currentStatus?.stage : null
+                    : (currentStatus?.stage ? (currentStatus?.status === "Pending" ? 'Pending at ' : currentStatus?.status + ' by ') +  currentStatus?.stage : null).replace('ceo', 'CEO')
             }
         </div>
     )
