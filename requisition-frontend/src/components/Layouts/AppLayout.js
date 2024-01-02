@@ -22,7 +22,7 @@ const AppLayout = ({ header, children }) => {
 
     const changingEffect = (effect) => {
         if (effect){
-            // router.reload();
+            router.reload();
         }
     }
     const [load, setLoad] = useState(false);
