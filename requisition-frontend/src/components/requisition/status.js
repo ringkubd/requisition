@@ -56,7 +56,7 @@ const Status = ({ requisition, type }) => {
                     break;
                 case 'purchase':
                     updatePurchase({
-                        id: requisition.id,
+                        id: requisition.purchase_requisitions?.id,
                         'notes': notes,
                         'status': status,
                         'stage': currentStatus?.stage
