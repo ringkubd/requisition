@@ -15,11 +15,17 @@ class DashboardAPIController extends AppBaseController
     {
         $initialRequisition =InitialRequisition::query()
             ->where('branch_id', auth_branch_id())
-            ->whereHas('department', function ($department)use ($request){
-                $department->when($request->department_id, function ($q, $d){
-                    $q->where('id', $d);
-                }, function ($q){
-                    $q->where('id', auth_department_id());
+            ->when(!$request->user()->hasRole('CEO'), function ($query) use($request){
+                $query->whereHas('department', function ($department)use ($request){
+                    $department->when($request->department_id, function ($q, $d){
+                        $q->where('id', $d);
+                    }, function ($q){
+                        $q->where('id', auth_department_id());
+                    });
+                });
+            }, function ($query) use($request){
+                $query->whereHas('approval_status', function ($q){
+                    $q->where('ceo_status', '!=', 0);
                 });
             })
             ->latest()
