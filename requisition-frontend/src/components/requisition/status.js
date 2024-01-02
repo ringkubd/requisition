@@ -3,6 +3,8 @@ import { Button, Dropdown, Tooltip } from "flowbite-react";
 import { useEffect, useState } from "react";
 import axios from "@/lib/axios";
 import { AiFillCheckSquare, AiFillDelete } from "react-icons/ai";
+import { dispatch } from "@/store";
+import { DashboardAPI } from "@/store/service/dashboard";
 const Status = ({ requisition, type }) => {
     const { user } = useAuth()
     const [url, setUrl] = useState(`api/update_initial_status/${requisition.id}`);
@@ -40,6 +42,8 @@ const Status = ({ requisition, type }) => {
                 'notes': notes,
                 'status': status,
                 'stage': currentStatus?.stage
+            }).then(() => {
+                dispatch(DashboardAPI.util.invalidateTags(['general_requisition', 'cash_requisition']))
             })
         }
     }
@@ -65,7 +69,7 @@ const Status = ({ requisition, type }) => {
                                     <AiFillCheckSquare />
                                 </Button>
                             </Tooltip>
-                            <Tooltip content={`Reject`} placement={`right-start`}>
+                            <Tooltip content={`Reject`} placement={`top`}>
                                 <Button
                                     gradientDuoTone="redToYellow"
                                     onClick={() => {

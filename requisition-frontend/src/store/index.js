@@ -126,7 +126,7 @@ const _persistedReducer = persistReducer(persistConfig, combineReducer);
 
 const makeStore = () => configureStore({
     reducer: _persistedReducer,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware({ immutableCheck: false,
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({ immutableCheck: true,
         serializableCheck: {
             /* ignore persistance actions */
             ignoredActions: [

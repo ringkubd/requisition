@@ -18,7 +18,7 @@ import moment from "moment";
 import { useAuth } from "@/hooks/auth";
 
 const InitialRequisition = () => {
-    const user = useAuth();
+    const { user } = useAuth()
     const router = useRouter();
     const [searchParams, setSearchParams] = useState({});
     const [destroy, destroyResponse] = useDestroyInitialRequisitionMutation();
@@ -26,14 +26,13 @@ const InitialRequisition = () => {
 
     const {data, isLoading, isError, refetch} = useGetInitialRequisitionQuery(searchParams);
 
-
     useEffect(() => {
         if (!destroyResponse.isLoading && destroyResponse.isSuccess){
             toast.success('Requisition deleted.')
         }
     }, [destroyResponse])
     useEffect(() => {
-        if (!isLoading && !isError && data){
+        if (!isLoading && !isError && data && user){
             setColumns([
                 {
                     name: 'I.R.F. No.',
@@ -75,9 +74,9 @@ const InitialRequisition = () => {
                         progressing={destroyResponse.isLoading}
                         permissionModule={`initial-requisitions`}
                         item={row}
-                        view={!row.is_purchase_requisition_generated && parseInt(row.department_id) === parseInt(user?.default_department_id) ? (
+                        view={!row.is_purchase_requisition_generated && (parseInt(row.department_id) === parseInt(user?.default_department_id) || user.role_names.includes('Store Manager')) ? (
                             <Button
-                                gradientMonochrome={`cyan`}
+                                gradientDuoTone="greenToBlue"
                                 onClick={() => router.push(`/initial-requisition/${row.id}/create_purchase`)}>
                                 <AiFillShopping />
                             </Button>
@@ -87,7 +86,7 @@ const InitialRequisition = () => {
                 }
             ]);
         }
-    }, [isLoading, isError, data]);
+    }, [isLoading, isError, data, user]);
 
     const changeSearchParams = (key, value) => {
         setSearchParams({...searchParams , [key]: value, page: 1});

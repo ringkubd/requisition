@@ -28,7 +28,7 @@ const Dashboard = () => {
     const {data: cash, isLoading: cashISLoading, isError: cashISError, isSuccess: cashISSuccess} = useGetDashboardCashDataQuery(searchCashParams);
 
     useEffect(() => {
-        if (isSuccess && data){
+        if (isSuccess && data && user){
             setInitialColumns([
                 {
                     name: 'Sl',
@@ -81,9 +81,9 @@ const Dashboard = () => {
                 }
             ])
         }
-    }, [data, isSuccess])
+    }, [data, isSuccess, user])
     useEffect(() => {
-        if (cashISSuccess && cash){
+        if (cashISSuccess && cash && user){
             setCashColumns([
                 {
                     name: 'Sl',
@@ -121,7 +121,7 @@ const Dashboard = () => {
                 }
             ])
         }
-    }, [cash, cashISSuccess])
+    }, [cash, cashISSuccess, user])
 
     const changeSearchParams = (key, value) => {
         setSearchParams({...searchParams , [key]: value, page: 1});
