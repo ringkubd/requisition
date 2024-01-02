@@ -77,8 +77,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
             ->when($request->date, function ($q, $date){
                 $q->whereRaw("date(created_at) = '$date'");
             })
-//            ->where('department_id', auth_department_id())
-//            ->where('branch_id', auth_branch_id())
+            ->where('department_id', auth_department_id())
+            ->where('branch_id', auth_branch_id())
             ->latest()
             ->paginate(\request()->per_page ?? 10);
 
