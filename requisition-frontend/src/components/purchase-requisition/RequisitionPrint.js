@@ -14,11 +14,12 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
         const totalHeight = accountsCopyHeight + requisitorCopyHeight;
 
         if (totalHeight > 1000){
-            accountsCopy.current.classList.add('break-after-page')
-            requisitorCopy.current.classList.add('mt-4')
-            hrRef.current?.hide()
+            accountsCopy.current.classList.add('break-after-page');
+            requisitorCopy.current.classList.add('mt-4');
+            hrRef.current?.classList?.add('hidden');
         }else {
-            accountsCopy.current.classList.remove('break-after-page')
+            accountsCopy.current.classList.remove('break-after-page');
+            hrRef.current?.classList?.remove('hidden');
         }
     })
 
