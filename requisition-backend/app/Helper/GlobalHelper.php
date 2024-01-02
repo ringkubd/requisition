@@ -66,13 +66,7 @@ if (!function_exists('auth_department_id')){
 }
 if (!function_exists('auth_department_name')){
     function auth_department_name(){
-        if (Cache::has('select_department_name')) {
-            return Cache::get('select_department_name');
-        }else{
-            $department_name = \App\Models\Department::find(auth_department_id())->name;
-            Cache::set('select_department_name', $department_name);
-            return $department_name;
-        }
+        return \App\Models\Department::find(auth_department_id())->name;
     }
 }
 
