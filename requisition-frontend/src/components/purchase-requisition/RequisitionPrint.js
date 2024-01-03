@@ -205,7 +205,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         </th>
                                         <td
                                             className={`border py-0 text-right font-bold`}>
-                                            {mainData?.estimated_total_amount.toLocaleString()}
+                                            {Math.round(mainData?.estimated_total_amount).toLocaleString()}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -634,7 +634,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         </th>
                                         <td
                                             className={`border py-0 text-right font-bold`}>
-                                            {mainData?.estimated_total_amount.toLocaleString()}
+                                            {Math.round(mainData?.estimated_total_amount).toLocaleString()}
                                         </td>
                                     </tr>
                                 </tbody>
