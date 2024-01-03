@@ -171,7 +171,7 @@ const Dashboard = () => {
                         <div className="p-2 bg-white border-b border-gray-200">
                             <Card className={`overflow-x-auto`}>
                                 <Tabs.Group aria-label={"Requisition Status and Approval Management"} style={`fullWidth`}>
-                                    <Tabs.Item title={<div className={`flex flex-row`}>General Requisition <sup><Badge className={`animate-bounce`} color={`pink`}>{initialPending}</Badge></sup></div>} icon={AiFillGolden}>
+                                    <Tabs.Item title={<div className={`flex flex-row`}>General Requisition {initialPending ? <sup><Badge className={`animate-bounce`} color={`pink`}>{initialPending}</Badge></sup> : ""}</div>} icon={AiFillGolden}>
                                         <DataTable
                                             columns={initialColumns}
                                             data={data?.initial}
@@ -193,7 +193,7 @@ const Dashboard = () => {
                                             paginationPerPage={15}
                                         />
                                     </Tabs.Item>
-                                    <Tabs.Item title={<div className={`flex flex-row`}>Cash Requisition <sup><Badge className={`animate-bounce`} color={`pink`}>{cashPending}</Badge></sup></div>} icon={AiFillMoneyCollect}>
+                                    <Tabs.Item title={<div className={`flex flex-row`}>Cash Requisition { cashPending ? <sup><Badge className={`animate-bounce`} color={`pink`}>{cashPending}</Badge></sup> : ""}</div>} icon={AiFillMoneyCollect}>
                                         <DataTable
                                             columns={cashColumns}
                                             data={cash?.cash}
