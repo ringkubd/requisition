@@ -72,7 +72,7 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                         <div>
                             Please arrange estimated Tk.{' '}
                             <strong className={`underline font-bold italic`}>
-                                {mainData?.estimated_total_amount.toLocaleString()}
+                                {Math.round(mainData?.estimated_total_amount).toLocaleString()}
                                 /-
                             </strong>{' '}
                             (In Word){' '}
