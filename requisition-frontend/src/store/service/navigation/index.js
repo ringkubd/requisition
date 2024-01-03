@@ -25,6 +25,13 @@ export const NavigationAPIService = createApi({
                 params: arg
             }),
             onQueryStarted: onQueryStartedErrorToast,
+        }),
+        subscribePushNotification: builder.mutation({
+            query: arg => ({
+                url: 'subscribe-push',
+                method: 'POST',
+                body: arg
+            })
         })
     })
 });
@@ -33,4 +40,5 @@ export  const {
     useGetNavigationOrganizationQuery,
     useGetNavigationBranchQuery,
     useGetNavigationDepartmentQuery,
+    useSubscribePushNotificationMutation,
 } = NavigationAPIService;

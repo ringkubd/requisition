@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Branch;
 use App\Models\Department;
+use Illuminate\Http\Request;
 
 class NavigationAPIController extends AppBaseController
 {
@@ -47,5 +48,10 @@ class NavigationAPIController extends AppBaseController
             $departments,
             __("messages.retrieved".\request()->branch_id, ['model' => __('models/department.plural')])
         );
+    }
+
+    public function subscribeWebPush(Request $request){
+
+        return $request->user()->updatePushSubscription($request->endpoint, $request->keys['p256dh']?? "", $request->keys['auth'] ?? "");
     }
 }

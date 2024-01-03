@@ -15,12 +15,14 @@ import { Badge, ListGroup, Tooltip } from "flowbite-react";
 import { DashboardAPI } from "@/store/service/dashboard";
 import { dispatch } from "@/store";
 import { PurchaseRequisitionApi } from "@/store/service/requisitions/purchase";
+import { useSubscribePushNotificationMutation } from "@/store/service/navigation";
 
 const AppLayout = ({ header, children }) => {
     const router = useRouter();
     const dispatch = useDispatch();
     const { user } = useAuth({ middleware: 'auth' })
     const online_users = useSelector(state => state.active_users);
+    const [subscribePush, {data, isLoading}] = useSubscribePushNotificationMutation();
 
     const changingEffect = (effect) => {
         if (effect){
@@ -87,6 +89,41 @@ const AppLayout = ({ header, children }) => {
                 })
         }
     }, [user]);
+
+    useEffect(() => {
+        if ('PushManager' in window) {
+            navigator.serviceWorker.ready.then((serviceWorkerRegistration) => {
+                serviceWorkerRegistration.pushManager
+                    .getSubscription()
+                    .then((subscription) => {
+                        if (!subscription) {
+                            console.log(subscription, 456)
+                            return;
+                        }
+                        console.log(subscription, 4567)
+                    })
+                    .catch((err) => {
+                        console.error(`Error during getSubscription(): ${err}`);
+                    });
+            });
+        }
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('/serviceworker.js', { scope: '/' })
+                .then((registration) => {
+                    return registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: 'BLj_KK7o4C_emrLmBmVgIQmntpfWeC8TvR2MbP5pX2GIWeBclc8JQf091nn3jAfx2Xikx3HJ6bUP6OfUkPavWyI'
+                    });
+                })
+                .then(function(subscription){
+                    subscribePush(subscription)
+                })
+                .catch((error) => {
+                    console.error('Service worker registration failed:', error);
+                });
+        }
+    }, [window]);
 
 
     return (

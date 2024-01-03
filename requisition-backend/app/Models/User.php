@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Sanctum\HasApiTokens;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasPermissions;
@@ -81,7 +82,7 @@ use Spatie\Permission\Traits\HasRoles;
  * )
  */class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens, HasRoles, SoftDeletes, HasPermissions, LogsActivity;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles, SoftDeletes, HasPermissions, LogsActivity, HasPushSubscriptions;
     public $table = 'users';
 
     public $hidden = ['password'];

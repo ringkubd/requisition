@@ -44,10 +44,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Activity::observe(ActivityObserver::class);
-        if (env('APP_DEBUG')){
-            DB::listen(function ($query){
-                broadcast(new QueryMonitorEvent($query->sql));
-            });
-        }
+//        if (env('APP_DEBUG')){
+//            DB::listen(function ($query){
+//                broadcast(new QueryMonitorEvent($query->sql));
+//            });
+//        }
     }
 }

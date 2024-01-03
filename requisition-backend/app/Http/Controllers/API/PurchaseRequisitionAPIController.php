@@ -10,6 +10,7 @@ use App\Models\Designation;
 use App\Models\InitialRequisition;
 use App\Models\PurchaseRequisition;
 use App\Models\User;
+use App\Notifications\PushNotification;
 use App\Notifications\RequisitionStatusNotification;
 use App\Repositories\PurchaseRequisitionRepository;
 use Carbon\Carbon;
@@ -170,6 +171,14 @@ class PurchaseRequisitionAPIController extends AppBaseController
             'prf_no' => $prfNo,
             'total' => $inputCollection->sum('price')
         ]);
+
+        $requisitor_name = $request->user()->name;
+        User::find(Department::find(auth_department_id())->head_of_department)->notify(new PushNotification(
+            "A purchase requisition is initiated.",
+            "$requisitor_name generated a purchase requisition P.R. No. $prfNo against I.R.F. No. $initial_requisition->irf_no. Please approve or reject it.",
+            $purchaseRequisition
+        ));
+
         return $this->sendResponse(
             new PurchaseRequisitionResource($purchaseRequisition),
             __('messages.saved', ['model' => __('models/purchaseRequisitions.singular')])
@@ -433,6 +442,15 @@ class PurchaseRequisitionAPIController extends AppBaseController
             }
 
             broadcast(new RequisitionStatusEvent(new PurchaseRequisitionResource($requisition),$notifiedUsers));
+
+            foreach ($notifiedUsers as $notifiedUser){
+                $requisitor = $requisition->user->name;
+                $notifiedUser->notify(new PushNotification(
+                    "A requisition is waiting for your approval.",
+                    "$requisitor is generated an requisition P.R. NO. $requisition->prf_no against I.R.F. NO. $requisition->irf_no. Please approve or reject it.",
+                    $requisition
+                ));
+            }
 
             if ($request->status == 1){
                 $head_of_department_user->notify(new RequisitionStatusNotification($status));

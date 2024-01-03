@@ -13,6 +13,7 @@ use App\Models\InitialRequisitionProduct;
 use App\Models\Product;
 use App\Models\PurchaseRequisitionProduct;
 use App\Models\User;
+use App\Notifications\PushNotification;
 use App\Notifications\RequisitionStatusNotification;
 use App\Repositories\InitialRequisitionRepository;
 use Carbon\Carbon;
@@ -156,6 +157,13 @@ class InitialRequisitionAPIController extends AppBaseController
         $initialRequisition->initialRequisitionProducts()->createMany($allProduct);
         broadcast(new InitialRequisitionEvent(new InitialRequisitionResource($initialRequisition)));
 
+        $user = $request->user();
+        $head_of_department = User::find($initialRequisition->department->head_of_department);
+        $head_of_department->notify(new PushNotification(
+            "An purchase requisition is initiated..",
+            "$user->name is generated an initial requisition I.R.F. No. $irf_no. Please approve or reject it.",
+            $initialRequisition
+        ));
         return $this->sendResponse(
             new InitialRequisitionResource($initialRequisition),
             __('messages.saved', ['model' => __('models/initialRequisitions.singular')])
@@ -499,13 +507,15 @@ class InitialRequisitionAPIController extends AppBaseController
                 $status = $requisition->approval_status()->updateOrCreate($data);
             }
 
-            broadcast(new RequisitionStatusEvent(new InitialRequisitionResource($requisition), [$requisition->user, $request->user()]));
+//            broadcast(new RequisitionStatusEvent(new InitialRequisitionResource($requisition), [$requisition->user, $request->user()]));
 
-            if ($request->status == 1){
-                $head_of_department_user->notify(new RequisitionStatusNotification($status));
-            }else{
-                $request->user()->notify(new RequisitionStatusNotification($status));
-            }
+            $statusText = $request->status == 2 ? 'approved' : 'rejected';
+            $user = $request->user();
+            $user->notify(new PushNotification(
+                "An initial requisition $statusText.",
+                "$user->name is generated an initial requisition I.R.F. No. $requisition->irf_no. Please approve or reject it.",
+                $requisition
+            ));
             return $this->sendResponse(
                 new InitialRequisitionResource($requisition),
                 __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])
