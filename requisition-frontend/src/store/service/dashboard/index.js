@@ -4,6 +4,7 @@ import CustomBaseQuery from "@/store/service/branch";
 export const DashboardAPI = createApi({
     reducerPath: 'dashboard_api_service',
     baseQuery: CustomBaseQuery,
+    refetchOnMountOrArgChange: true,
     tagTypes: ['general_requisition', 'cash_requisition'],
     endpoints: builder => ({
         getDashboardData : builder.query({

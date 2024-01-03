@@ -8,6 +8,7 @@ import React, { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useGetSingleCashRequisitionQuery } from "@/store/service/cash/Index";
 import CashPrint from "@/components/cash-requisition/CashPrint";
+import Status from "@/components/requisition/status";
 
 const PrintView = (props) => {
     const router = useRouter();
@@ -39,27 +40,40 @@ const PrintView = (props) => {
             <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
                 <Card className="min-h-screen">
                     <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
-                        <Button onClick={() => router.back()} gradientDuoTone="purpleToBlue">Back</Button>
+                        <Button
+                            onClick={() => router.back()}
+                            gradientDuoTone="purpleToBlue">
+                            Back
+                        </Button>
                         <div className={`pt-1`}>
                             <Button
                                 onClick={handlePrint}
                                 gradientDuoTone="purpleToBlue"
-                                outline
-                            >Print</Button>
+                                outline>
+                                Print
+                            </Button>
+                        </div>
+                        <div className={`flex flex-row items-center`}>
+                            {mainData ? (
+                                <Status
+                                    type={`cash`}
+                                    requisition={mainData}
+                                    from={`print_view`}
+                                />
+                            ) : null}
                         </div>
                     </div>
 
                     <div className={`mx-auto shadow-none`}>
-                        {
-                            !isLoading && !isError && data ? (
-                                    <CashPrint
-                                        mainData={mainData}
-                                        requisition_products={requisition_products}
-                                        ref={printPageRef}
-                                    />
-                                )
-                                : <h2>Data loading or error.</h2>
-                        }
+                        {!isLoading && !isError && data ? (
+                            <CashPrint
+                                mainData={mainData}
+                                requisition_products={requisition_products}
+                                ref={printPageRef}
+                            />
+                        ) : (
+                            <h2>Data loading or error.</h2>
+                        )}
                     </div>
                 </Card>
             </div>
