@@ -365,7 +365,7 @@ class CashRequisitionAPIController extends AppBaseController
                 $request->user()->notify(new RequisitionStatusNotification($status));
             }
             return $this->sendResponse(
-                $status,
+                new CashRequisitionResource($requisition),
                 __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])
             );
         }

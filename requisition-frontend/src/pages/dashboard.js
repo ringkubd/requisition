@@ -46,8 +46,8 @@ const Dashboard = () => {
                     sortable: true,
                 },
                 {
-                    name: 'Total Req. Unit',
-                    selector: row => row.total_required_unit,
+                    name: 'Total Req. Item',
+                    selector: row => row.requisition_products?.length,
                     sortable: true,
                 },
                 {

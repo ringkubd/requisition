@@ -440,7 +440,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                 $request->user()->notify(new RequisitionStatusNotification($status));
             }
             return $this->sendResponse(
-                $status,
+                new PurchaseRequisitionResource($requisition),
                 __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])
             );
         }

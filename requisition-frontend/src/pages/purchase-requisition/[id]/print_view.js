@@ -3,14 +3,18 @@ import AppLayout from "@/components/Layouts/AppLayout";
 import { useRouter } from "next/router";
 import { useEditPurchaseRequisitionQuery } from "@/store/service/requisitions/purchase";
 import Head from "next/head";
-import NavLink from "@/components/navLink";
 import { Button, Card } from "flowbite-react";
 import RequisitionPrint from "@/components/purchase-requisition/RequisitionPrint";
 import { useReactToPrint } from "react-to-print";
+import Status from "@/components/requisition/status";
+import { DashboardAPI } from "@/store/service/dashboard";
+import { useSelector } from "react-redux";
 
 export default function PrintView(props) {
     const printPageRef = useRef();
     const router = useRouter();
+    const selectIsResourceLoading = (state) => DashboardAPI.endpoints.getDashboardData.select()(state).isLoading;
+    const isResourceLoading = useSelector(selectIsResourceLoading);
     const {data, isLoading, isError} = useEditPurchaseRequisitionQuery(router.query.id, {
         skip: !router.query.id
     });
@@ -24,8 +28,8 @@ export default function PrintView(props) {
     });
 
     useEffect(() => {
-        console.log(printPageRef)
-    })
+       console.log( isResourceLoading)
+    }, [isResourceLoading]);
 
     return (
         <AppLayout
@@ -48,6 +52,13 @@ export default function PrintView(props) {
                                 outline
                             >Print</Button>
                         </div>
+                        <div className={`flex flex-row items-center`}>
+                            {
+                                mainData ? <Status type={`purchase`} requisition={mainData} from={`print_view`} /> : null
+                            }
+                        </div>
+
+
                     </div>
                     <div className={`mx-auto shadow-none`}>
                         <RequisitionPrint

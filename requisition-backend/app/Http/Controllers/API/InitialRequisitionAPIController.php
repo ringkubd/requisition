@@ -507,7 +507,7 @@ class InitialRequisitionAPIController extends AppBaseController
                 $request->user()->notify(new RequisitionStatusNotification($status));
             }
             return $this->sendResponse(
-                $status,
+                new InitialRequisitionResource($requisition),
                 __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])
             );
         }

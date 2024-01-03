@@ -3,11 +3,14 @@ import { Button, Tooltip } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { AiFillCheckSquare, AiFillDelete } from "react-icons/ai";
 import {
-    DashboardAPI, useUpdateCashStatusMutation,
+    DashboardAPI,
+    useUpdateCashStatusMutation,
     useUpdateInitialStatusMutation,
     useUpdatePurchaseStatusMutation
 } from "@/store/service/dashboard";
-const Status = ({ requisition, type }) => {
+import { dispatch } from "@/store";
+import { PurchaseRequisitionApi } from "@/store/service/requisitions/purchase";
+const Status = ({ requisition, type, from='dashboard' }) => {
     const { user } = useAuth()
     const [selectedDropdown, setSelectedDropdown] = useState('Status')
     const isDepartmentHead = user?.current_department_head === parseInt(user?.id);
@@ -16,14 +19,19 @@ const Status = ({ requisition, type }) => {
     const [updateInitial, {data: initialResponse, isSuccess: isSuccessInitialUpdate}] = useUpdateInitialStatusMutation();
     const [updatePurchase, {data: purchaseResponse, isSuccess: isSuccessPurchaseUpdate}] = useUpdatePurchaseStatusMutation();
     const [updateCash, {data: cashResponse, isSuccess: isSuccessCashUpdate}] = useUpdateCashStatusMutation();
-
+    const [rowID, setRowID] = useState(requisition.id);
 
     useEffect(() => {
         switch (type){
             case 'purchase':
-                setCurrentStatus(requisition.purchase_current_status)
-                requisition = requisition.purchase_requisitions
-                setManualPermission(user?.purchase_approval_permission);
+                if (from === "print_view"){
+                    setManualPermission(user?.purchase_approval_permission);
+                }else {
+                    setCurrentStatus(requisition.purchase_current_status)
+                    requisition = requisition.purchase_requisitions
+                    setManualPermission(user?.purchase_approval_permission);
+                    setRowID(requisition.id)
+                }
                 break;
             case 'cash':
                 setManualPermission(user?.cash_approval_permission);
@@ -31,6 +39,20 @@ const Status = ({ requisition, type }) => {
         }
         setSelectedDropdown(currentStatus?.status ?? 'Status')
     }, [])
+
+    useEffect(() => {
+        if (isSuccessPurchaseUpdate){
+            dispatch(PurchaseRequisitionApi.util.invalidateTags(['edit-purchase-requisition']));
+            dispatch(DashboardAPI.util.invalidateTags(['general_requisition', 'cash_requisition']));
+        }
+        if (isSuccessCashUpdate || isSuccessInitialUpdate){
+            dispatch(DashboardAPI.util.invalidateTags(['general_requisition', 'cash_requisition']));
+            console.log(cashResponse?.data?.current_status)
+            setCurrentStatus(cashResponse?.data?.current_status)
+
+        }
+    }, [isSuccessInitialUpdate, isSuccessCashUpdate, isSuccessPurchaseUpdate]);
+
 
     const updateStatus = async ({status, notes} = {}) => {
         const confirmation = confirm("Are you sure?");
@@ -48,7 +70,7 @@ const Status = ({ requisition, type }) => {
                     break;
                 case 'purchase':
                     updatePurchase({
-                        id: requisition.purchase_requisitions?.id,
+                        id: rowID,
                         'notes': notes,
                         'status': status,
                         'stage': currentStatus?.stage
@@ -103,7 +125,7 @@ const Status = ({ requisition, type }) => {
 
                         </div>
                     )
-                    : (currentStatus?.stage ? (currentStatus?.status === "Pending" ? 'Pending at ' : currentStatus?.status + ' by ') +  currentStatus?.stage : null).replace('ceo', 'CEO')
+                    : (currentStatus?.stage ? (currentStatus?.status === "Pending" ? 'Pending at ' : currentStatus?.status + ' by ') +  currentStatus?.stage : "").replace('ceo', 'CEO')
             }
         </div>
     )

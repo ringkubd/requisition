@@ -41,31 +41,6 @@ const IssueStatus = ({row}) => {
         <div>
             {
                 ((isStoreManager && row?.department_status) || (isReceiverDepartment && isDepartmentHead)) && selectedDropdown !== "Approved"  ? (
-                    // <Dropdown
-                    //     label={selectedDropdown}
-                    //     dismissOnClick={true}
-                    // >
-                    //     <Dropdown.Item
-                    //         onClick={() => {
-                    //             updateStatus({
-                    //                 status: 1,
-                    //                 id: row.id
-                    //             }, "Approved");
-                    //         }}
-                    //     >
-                    //         Approve
-                    //     </Dropdown.Item>
-                    //     <Dropdown.Item
-                    //         onClick={() => {
-                    //             updateStatus({
-                    //                 status: 2,
-                    //                 id: row.id
-                    //             }, "Rejected");
-                    //         }}
-                    //     >
-                    //         Reject
-                    //     </Dropdown.Item>
-                    // </Dropdown>
                     <div className="flex flex-wrap">
                         <Tooltip content={`Approved`} placement={`left-start`}>
                             <Button
