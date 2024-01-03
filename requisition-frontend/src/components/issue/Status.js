@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Dropdown } from "flowbite-react";
+import { Button, Dropdown, Tooltip } from "flowbite-react";
 import { useAuth } from "@/hooks/auth";
 import { useUpdateIssueMutation } from "@/store/service/issue";
+import { AiFillCheckSquare, AiFillDelete } from "react-icons/ai";
 
 const IssueStatus = ({row}) => {
     const { user } = useAuth()
@@ -40,31 +41,60 @@ const IssueStatus = ({row}) => {
         <div>
             {
                 ((isStoreManager && row?.department_status) || (isReceiverDepartment && isDepartmentHead)) && selectedDropdown !== "Approved"  ? (
-                    <Dropdown
-                        label={selectedDropdown}
-                        dismissOnClick={true}
-                    >
-                        <Dropdown.Item
-                            onClick={() => {
-                                updateStatus({
-                                    status: 1,
-                                    id: row.id
-                                }, 'Approved');
-                            }}
-                        >
-                            Approve
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                            onClick={() => {
-                                updateStatus({
-                                    status: 2,
-                                    id: row.id
-                                }, 'Rejected');
-                            }}
-                        >
-                            Reject
-                        </Dropdown.Item>
-                    </Dropdown>
+                    // <Dropdown
+                    //     label={selectedDropdown}
+                    //     dismissOnClick={true}
+                    // >
+                    //     <Dropdown.Item
+                    //         onClick={() => {
+                    //             updateStatus({
+                    //                 status: 1,
+                    //                 id: row.id
+                    //             }, "Approved");
+                    //         }}
+                    //     >
+                    //         Approve
+                    //     </Dropdown.Item>
+                    //     <Dropdown.Item
+                    //         onClick={() => {
+                    //             updateStatus({
+                    //                 status: 2,
+                    //                 id: row.id
+                    //             }, "Rejected");
+                    //         }}
+                    //     >
+                    //         Reject
+                    //     </Dropdown.Item>
+                    // </Dropdown>
+                    <div className="flex flex-wrap">
+                        <Tooltip content={`Approved`} placement={`left-start`}>
+                            <Button
+                                gradientDuoTone="greenToBlue"
+                                onClick={() => {
+                                    updateStatus({
+                                        status: 1,
+                                        id: row.id
+                                    }, "Approved");
+                                }}
+                            >
+                                <AiFillCheckSquare />
+                            </Button>
+                        </Tooltip>
+                        <Tooltip content={`Reject`} placement={`top`}>
+                            <Button
+                                gradientDuoTone="redToYellow"
+                                onClick={() => {
+                                    updateStatus({
+                                        status: 2,
+                                        id: row.id
+                                    }, "Rejected");
+                                }}
+                            >
+                                <AiFillDelete />
+                            </Button>
+                        </Tooltip>
+
+                    </div>
                 ) : (
                     <div className={`flex flex-col`}>
                         <div>{ !row?.department_status ? 'Pending in department.' : null}</div>
