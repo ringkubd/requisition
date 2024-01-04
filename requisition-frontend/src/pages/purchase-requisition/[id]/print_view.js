@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { useRouter } from "next/router";
 import { useEditPurchaseRequisitionQuery } from "@/store/service/requisitions/purchase";
@@ -7,17 +7,14 @@ import { Button, Card } from "flowbite-react";
 import RequisitionPrint from "@/components/purchase-requisition/RequisitionPrint";
 import { useReactToPrint } from "react-to-print";
 import Status from "@/components/requisition/status";
-import { DashboardAPI } from "@/store/service/dashboard";
-import { useSelector } from "react-redux";
 
 export default function PrintView(props) {
     const printPageRef = useRef();
     const router = useRouter();
-    const selectIsResourceLoading = (state) => DashboardAPI.endpoints.getDashboardData.select()(state).isLoading;
-    const isResourceLoading = useSelector(selectIsResourceLoading);
-    const {data, isLoading, isError} = useEditPurchaseRequisitionQuery(router.query.id, {
+    const {data, isLoading, isError, refetch} = useEditPurchaseRequisitionQuery(router.query.id, {
         skip: !router.query.id
     });
+    const [statusKey, setStatusKey] = useState(Math.round(Math.random() * 100000))
 
     const requisition_products = data?.data?.purchase_requisition_products;
     const mainData = data?.data;
@@ -26,10 +23,6 @@ export default function PrintView(props) {
         content: () => printPageRef.current,
         onBeforePrint: (a) => console.log(a)
     });
-
-    useEffect(() => {
-       console.log( isResourceLoading)
-    }, [isResourceLoading]);
 
     return (
         <AppLayout
@@ -54,7 +47,11 @@ export default function PrintView(props) {
                         </div>
                         <div className={`flex flex-row items-center`}>
                             {
-                                mainData ? <Status type={`purchase`} requisition={mainData} from={`print_view`} /> : null
+                                mainData ? <Status key={statusKey} type={`purchase`} changeStatus={(a) => {
+                                    refetch();
+                                    setStatusKey(Math.round(Math.random() * 100000))
+                                    router.reload()
+                                }} requisition={mainData} from={`print_view`} /> : null
                             }
                         </div>
 

@@ -406,19 +406,19 @@ class PurchaseRequisitionAPIController extends AppBaseController
             switch ($request->stage){
                 case 'accounts':
                     $data['accounts_status'] = $request->status;
-                    $data['accounts_approved_by'] = \request()->user()->id;
                     if ($request->status == 2){
                         $data['ceo_status'] = 1;
+                        $data['accounts_approved_by'] = \request()->user()->id;
+                        $data['accounts_approved_at'] = now();
+                        $ceo = User::query()
+                            ->whereHas('organizations', function ($q){
+                                $q->where('id', auth_organization_id());
+                            })
+                            ->whereHas('designations', function ($q){
+                                $q->where('name', 'CEO');
+                            })->first();
+                        if ($ceo) $notifiedUsers[] = $ceo;
                     }
-                    $data['accounts_approved_at'] = now();
-                    $ceo = User::query()
-                        ->whereHas('organizations', function ($q){
-                            $q->where('id', auth_organization_id());
-                        })
-                        ->whereHas('designations', function ($q){
-                            $q->where('name', 'CEO');
-                        })->first();
-                    if ($ceo) $notifiedUsers[] = $ceo;
                     break;
                 case 'ceo':
                     $data['ceo_status'] = $request->status;
@@ -426,13 +426,13 @@ class PurchaseRequisitionAPIController extends AppBaseController
                     break;
                 default:
                     $data['department_status'] = $request->status;
-                    $data['department_approved_by'] = \request()->user()->id;
-                    $data['department_approved_at'] = now();
                     if ($request->status == 2){
                         $data['accounts_status'] = 1;
+                        $data['department_approved_by'] = \request()->user()->id;
+                        $data['department_approved_at'] = now();
+                        $department = Department::query()->where('branch_id', auth_branch_id())->where('name', 'Accounts')->first();
+                        $notifiedUsers[] = User::query()->find($department?->head_of_department);
                     }
-                    $department = Department::query()->where('branch_id', auth_branch_id())->where('name', 'Accounts')->first();
-                    $notifiedUsers[] = User::query()->find($department?->head_of_department);
             }
             $requisition->initialRequisition->approval_status()->update($data);
             if ($requisition->approval_status){

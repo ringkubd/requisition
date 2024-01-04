@@ -44,7 +44,7 @@ class DashboardAPIController extends AppBaseController
 
             })
             ->latest()
-            ->paginate(\request()->per_page ?? 30);
+            ->paginate(\request()->per_page ?? 15);
         $collections = InitialRequisitionResource::collection($initialRequisition);
         return response()->json([
             'initial' =>  $collections,

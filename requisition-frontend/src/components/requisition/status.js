@@ -10,7 +10,7 @@ import {
 } from "@/store/service/dashboard";
 import { dispatch } from "@/store";
 import { PurchaseRequisitionApi } from "@/store/service/requisitions/purchase";
-const Status = ({ requisition, type, from='dashboard' }) => {
+const Status = ({ requisition, type, from='dashboard', changeStatus = false }) => {
     const { user } = useAuth()
     const [selectedDropdown, setSelectedDropdown] = useState('Status')
     const isDepartmentHead = user?.current_department_head === parseInt(user?.id);
@@ -44,11 +44,19 @@ const Status = ({ requisition, type, from='dashboard' }) => {
         if (isSuccessPurchaseUpdate){
             dispatch(PurchaseRequisitionApi.util.invalidateTags(['edit-purchase-requisition']));
             dispatch(DashboardAPI.util.invalidateTags(['general_requisition', 'cash_requisition']));
+            setCurrentStatus(purchaseResponse?.data?.current_status)
+            if (changeStatus){
+                changeStatus(purchaseResponse?.data);
+            }
         }
         if (isSuccessCashUpdate || isSuccessInitialUpdate){
             dispatch(DashboardAPI.util.invalidateTags(['general_requisition', 'cash_requisition']));
-            console.log(cashResponse?.data?.current_status)
-            setCurrentStatus(cashResponse?.data?.current_status)
+            if (isSuccessCashUpdate){
+                setCurrentStatus(cashResponse?.data?.current_status)
+                if (changeStatus){
+                    changeStatus(cashResponse?.data);
+                }
+            }
 
         }
     }, [isSuccessInitialUpdate, isSuccessCashUpdate, isSuccessPurchaseUpdate]);
@@ -96,7 +104,7 @@ const Status = ({ requisition, type, from='dashboard' }) => {
                 (parseInt(requisition.department_id) === parseInt(user?.default_department_id) && isDepartmentHead && (currentStatus?.stage ===  "department" || !currentStatus?.stage))
                     ? (
                         <div className="flex flex-wrap">
-                            <Tooltip content={`Approved`} placement={`left-start`}>
+                            <Tooltip content={`Approve`} placement={`left-start`}>
                                 <Button
                                     gradientDuoTone="greenToBlue"
                                     onClick={() => {
@@ -107,6 +115,7 @@ const Status = ({ requisition, type, from='dashboard' }) => {
                                     }}
                                 >
                                     <AiFillCheckSquare />
+                                    {from === "print_view" ? "Approve" : ''}
                                 </Button>
                             </Tooltip>
                             <Tooltip content={`Reject`} placement={`top`}>
@@ -120,6 +129,7 @@ const Status = ({ requisition, type, from='dashboard' }) => {
                                     }}
                                 >
                                     <AiFillDelete />
+                                    {from === "print_view" ? "Reject" : ''}
                                 </Button>
                             </Tooltip>
 

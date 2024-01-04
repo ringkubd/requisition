@@ -88,7 +88,7 @@ const Dashboard = () => {
                 },
                 {
                     name: 'Purchase',
-                    selector: row => row.purchase_requisitions ? <Status key={`${initialPending + row.purchase_requisitions.id}_${row.purchase_requisitions.id}`} requisition={row} type={'purchase'} /> : ''
+                    selector: row => row.purchase_requisitions ? <Status key={initialPending + row.purchase_requisitions.id} requisition={row} type={'purchase'} /> : ''
                 }
             ])
 
