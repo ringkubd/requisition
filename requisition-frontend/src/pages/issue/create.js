@@ -22,6 +22,7 @@ const create = (props) => {
     const [storeProductIssue, storeResult] = useStoreIssueMutation();
     let formikForm = useRef();
     const selectRef = useRef();
+    const [selectedCategory, setSelectedCategory] = useState("")
     const {data: users , isLoading: userIsLoading} = useGetUsersQuery({
         branch_id: user?.selected_branch,
         department_id: user?.selected_department
@@ -146,7 +147,8 @@ const create = (props) => {
         const response = await axios.get(`/api/product-select`, {
             params: {
                 search: search,
-                page: page
+                page: page,
+                category_id: selectedCategory
             }
         });
         const responseJSON = response.data?.data;
@@ -167,6 +169,27 @@ const create = (props) => {
         };
     }
 
+    async function loadCategory(search, loadedOptions, { page }) {
+        const response = await axios.get(`/api/category-select`, {
+            params: {
+                search: search,
+                page: page
+            }
+        });
+        const responseJSON = response.data;
+        return {
+            options: responseJSON.data?.categories?.map((r,) => {
+                return {
+                    label: r.title,
+                    value: r.id
+                }
+            }),
+            hasMore: responseJSON.data.count > 20,
+            additional: {
+                page: search ? 1 : page + 1,
+            },
+        };
+    }
     return (
         <>
             <AppLayout
@@ -174,8 +197,7 @@ const create = (props) => {
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                         Issue a product.
                     </h2>
-                }
-            >
+                }>
                 <Head>
                     <title> Issue a product.</title>
                 </Head>
@@ -184,248 +206,417 @@ const create = (props) => {
                         <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
                             <NavLink
                                 active={router.pathname === 'issue'}
-                                href={`/issue`}
-                            >
+                                href={`/issue`}>
                                 <Button>Back</Button>
                             </NavLink>
                         </div>
-                        <div className={`flex flex-col justify-center justify-items-center items-center basis-2/4 w-full`}>
-                            <DataTable
-                                columns={columns}
-                                data={items}
-                            />
-                            {
-                                items.length ? (
-                                    <Button onClick={finalSubmit} isProcessing={storeResult.isLoading} className={`my-4`}>Submit</Button>
-                                ) : null
-                            }
+                        <div
+                            className={`flex flex-col justify-center justify-items-center items-center basis-2/4 w-full`}>
+                            <DataTable columns={columns} data={items} />
+                            {items.length ? (
+                                <Button
+                                    onClick={finalSubmit}
+                                    isProcessing={storeResult.isLoading}
+                                    className={`my-4`}>
+                                    Submit
+                                </Button>
+                            ) : null}
 
-                            <hr className={`border-b-2 w-full my-4`}/>
+                            <hr className={`border-b-2 w-full my-4`} />
                             <Formik
                                 initialValues={initValues}
                                 onSubmit={submit}
                                 validationSchema={validationSchema}
-                                innerRef={formikForm}
-                            >
-                                {
-                                    ({handleSubmit, handleChange, setFieldValue, handleBlur, values, errors, isSubmitting, setErrors}) => (
-                                        <div className="flex flex-col gap-4 md:w-1/2 w-full">
-                                            <div className="flex flex-col sm:flex-row gap-4">
+                                innerRef={formikForm}>
+                                {({
+                                    handleSubmit,
+                                    handleChange,
+                                    setFieldValue,
+                                    handleBlur,
+                                    values,
+                                    errors,
+                                    isSubmitting,
+                                    setErrors,
+                                }) => (
+                                    <div className="flex flex-col gap-4 md:w-1/2 w-full">
+                                        <div className="w-full">
+                                            <div className="flex flex-row w-full gap-4">
                                                 <div className="w-full">
                                                     <div className="mb-2 block">
                                                         <Label
-                                                            htmlFor="product_id"
-                                                            value="Product"
+                                                            htmlFor="category_id"
+                                                            value="Category"
                                                         />
                                                     </div>
-
                                                     <AsyncPaginate
                                                         defaultOptions
-                                                        name='product_id'
-                                                        id='product_id'
-                                                        selectRef={selectRef}
+                                                        name="category_id"
+                                                        id="category_id"
                                                         className={`select`}
                                                         classNames={{
-                                                            control: state => 'select'
+                                                            control: state =>
+                                                                'select',
                                                         }}
-                                                        onChange={(newValue) => {
-                                                            setProductOptions(newValue.product_options)
-                                                            setFieldValue('product_id',newValue.value)
-                                                            setFieldValue('product_title', newValue?.product?.title)
-                                                            setFieldValue('quantity', "")
-                                                            setFieldValue('product_option_id', "")
+                                                        onChange={newValue => {
+                                                            setSelectedCategory(
+                                                                newValue?.value,
+                                                            )
                                                         }}
                                                         additional={{
                                                             page: 1,
                                                         }}
-                                                        loadOptions={loadOptions}
+                                                        loadOptions={
+                                                            loadCategory
+                                                        }
                                                         data-placeholder="Select options..."
                                                     />
-
                                                     <ErrorMessage
-                                                        name='product_id'
-                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
+                                                        name="category_id"
+                                                        render={msg => (
+                                                            <span className="text-red-500">
+                                                                    {msg}
+                                                                </span>
+                                                        )}
+                                                    />
                                                 </div>
-
-                                                <div className="w-full">
-                                                    <div className="mb-2 block">
-                                                        <Label
-                                                            htmlFor="product_option_id"
-                                                            value="Variant"
-                                                        />
-                                                    </div>
-                                                    <Select
-                                                        name="product_option_id"
-                                                        id="product_option_id"
-                                                        options={productOptions?.map((p) => ({value: p.id, label: p.option_value, other: p}))}
-                                                        onChange={(newValue) => {
-                                                            setFieldValue('product_option_id', newValue?.value)
-                                                            setFieldValue('product_option_name', newValue?.label)
-                                                            setStock(newValue?.other?.stock ?? 0);
-                                                        }}
-                                                        className={'select'}
-                                                        classNames={{
-                                                            control: state => `select`
-                                                        }}
-                                                        data-placeholder="Select options..."
-                                                    />
-
-                                                    <ErrorMessage
-                                                        name='product_option_id'
-                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col sm:flex-row gap-4">
-                                                <div className="w-full">
-                                                    <div className="mb-2 block">
-                                                        <Label
-                                                            htmlFor="quantity"
-                                                            value="Quantity"
-                                                        />
-                                                    </div>
-                                                    <TextInput
-                                                        id="quantity"
-                                                        name="quantity"
-                                                        placeholder="5"
-                                                        type="number"
-                                                        step={0.1}
-                                                        required
-                                                        onChange={(e) => {
-                                                            handleChange(e);
-                                                        }}
-                                                        onBlur={handleBlur}
-                                                        value={values.quantity}
-                                                    />
-                                                    <ErrorMessage
-                                                        name='quantity'
-                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
-                                                </div>  {/*Quantity*/}
-                                                <div className="w-full">
-                                                    <div className="mb-2 block">
-                                                        <Label
-                                                            htmlFor="receiver_id"
-                                                            value="Receiver"
-                                                        />
-                                                    </div>
-                                                    <Select
-                                                        value={{label: values.receiver_name, value: values.receiver_id}}
-                                                        onChange={(newValue) => {
-                                                            setFieldValue('receiver_id', newValue?.value);
-                                                            setFieldValue('receiver_name', newValue?.label);
-                                                        }}
-                                                        id='receiver_id'
-                                                        name="receiver_id"
-                                                        className={`select`}
-                                                        classNames={{control: state => `select`}}
-                                                        data-placeholder="Select options..."
-                                                        options={!userIsLoading && users.data ? users.data.map(u => ({value: u.id, label: u.name})) : []}
-                                                    />
-                                                    <ErrorMessage
-                                                        name='receiver_id'
-                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
-                                                </div>  {/*Variant*/}
-                                            </div>  {/*Product, variant*/}
-                                            <div className="flex flex-col sm:flex-row gap-4">
-                                                <div className="w-full">
-                                                    <div className="mb-2 block">
-                                                        <Label
-                                                            htmlFor="uses_area"
-                                                            value="Uses Area"
-                                                        />
-                                                    </div>
-                                                    <TextInput
-                                                        id="uses_area"
-                                                        name="uses_area"
-                                                        type="text"
-                                                        onChange={(e) => {
-                                                            handleChange(e);
-                                                        }}
-                                                        onBlur={handleBlur}
-                                                        value={values.uses_area}
-                                                    />
-                                                    <ErrorMessage
-                                                        name='uses_area'
-                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
-                                                </div>  {/*uses_area*/}
-                                            </div>  {/*Quantity, receiver*/}
-                                            <div className="flex flex-col sm:flex-row gap-4">  {/*Uses Area*/}
-                                                <div className="w-full">
-                                                    <div className="mb-2 block">
-                                                        <Label
-                                                            htmlFor="purpose"
-                                                            value="Purpose"
-                                                        />
-                                                    </div>
-                                                    <TextInput
-                                                        id="purpose"
-                                                        name="purpose"
-                                                        type="text"
-                                                        onChange={(e) => {
-                                                            handleChange(e);
-                                                        }}
-                                                        onBlur={handleBlur}
-                                                        value={values.purpose}
-                                                    />
-                                                    <ErrorMessage
-                                                        name='purpose'
-                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
-                                                </div>  {/*Purpose*/}
-                                                <div className="w-full">
-                                                    <div className="mb-2 block">
-                                                        <Label
-                                                            htmlFor="issue_time"
-                                                            value="Date"
-                                                        />
-                                                    </div>
-                                                    <TextInput
-                                                        id="issue_time"
-                                                        name="issue_time"
-                                                        type="datetime-local"
-                                                        onChange={(e) => {
-                                                            handleChange(e);
-                                                        }}
-                                                        onBlur={handleBlur}
-                                                        value={values.issue_time}
-                                                    />
-                                                    <ErrorMessage
-                                                        name='date'
-                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
-                                                </div>  {/*Date Time*/}
-                                            </div>
-                                            <div className="flex flex-col sm:flex-row gap-4">
-                                                <div className="w-full">
-                                                    <div className="mb-2 block">
-                                                        <Label
-                                                            htmlFor="note"
-                                                            value="Note"
-                                                        />
-                                                    </div>
-                                                    <Textarea
-                                                        id="note"
-                                                        name="note"
-                                                        type="text"
-                                                        onChange={(e) => {
-                                                            handleChange(e);
-                                                        }}
-                                                        onBlur={handleBlur}
-                                                        value={values.note}
-                                                    />
-                                                    <ErrorMessage
-                                                        name='note'
-                                                        render={(msg) => <span className='text-red-500'>{msg}</span>} />
-                                                </div>  {/*note*/}
-                                            </div>  {/*Note*/}
-                                            <div className="flex flex-row gap-4 justify-end">
-                                                <Button
-                                                    isProcessing={isSubmitting}
-                                                    onClick={handleSubmit}
-                                                    type='submit'
-                                                    color={`success`}>Add</Button>
                                             </div>
                                         </div>
-                                    )
-                                }
+                                        <div className="flex flex-col sm:flex-row gap-4">
+                                            <div className="w-full">
+                                                <div className="mb-2 block">
+                                                    <Label
+                                                        htmlFor="product_id"
+                                                        value="Product"
+                                                    />
+                                                </div>
 
+                                                <AsyncPaginate
+                                                    defaultOptions
+                                                    key={selectedCategory}
+                                                    name="product_id"
+                                                    id="product_id"
+                                                    selectRef={selectRef}
+                                                    className={`select`}
+                                                    classNames={{
+                                                        control: state =>
+                                                            'select',
+                                                    }}
+                                                    onChange={newValue => {
+                                                        setProductOptions(
+                                                            newValue.product_options,
+                                                        )
+                                                        setFieldValue(
+                                                            'product_id',
+                                                            newValue.value,
+                                                        )
+                                                        setFieldValue(
+                                                            'product_title',
+                                                            newValue?.product
+                                                                ?.title,
+                                                        )
+                                                        setFieldValue(
+                                                            'quantity',
+                                                            '',
+                                                        )
+                                                        setFieldValue(
+                                                            'product_option_id',
+                                                            '',
+                                                        )
+                                                    }}
+                                                    additional={{
+                                                        page: 1,
+                                                    }}
+                                                    loadOptions={loadOptions}
+                                                    data-placeholder="Select options..."
+                                                />
+
+                                                <ErrorMessage
+                                                    name="product_id"
+                                                    render={msg => (
+                                                        <span className="text-red-500">
+                                                            {msg}
+                                                        </span>
+                                                    )}
+                                                />
+                                            </div>
+
+                                            <div className="w-full">
+                                                <div className="mb-2 block">
+                                                    <Label
+                                                        htmlFor="product_option_id"
+                                                        value="Variant"
+                                                    />
+                                                </div>
+                                                <Select
+                                                    name="product_option_id"
+                                                    id="product_option_id"
+                                                    options={productOptions?.map(
+                                                        p => ({
+                                                            value: p.id,
+                                                            label:
+                                                            p.option_value,
+                                                            other: p,
+                                                        }),
+                                                    )}
+                                                    onChange={newValue => {
+                                                        setFieldValue(
+                                                            'product_option_id',
+                                                            newValue?.value,
+                                                        )
+                                                        setFieldValue(
+                                                            'product_option_name',
+                                                            newValue?.label,
+                                                        )
+                                                        setStock(
+                                                            newValue?.other
+                                                                ?.stock ?? 0,
+                                                        )
+                                                    }}
+                                                    className={'select'}
+                                                    classNames={{
+                                                        control: state =>
+                                                            `select`,
+                                                    }}
+                                                    data-placeholder="Select options..."
+                                                />
+
+                                                <ErrorMessage
+                                                    name="product_option_id"
+                                                    render={msg => (
+                                                        <span className="text-red-500">
+                                                            {msg}
+                                                        </span>
+                                                    )}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row gap-4">
+                                            <div className="w-full">
+                                                <div className="mb-2 block">
+                                                    <Label
+                                                        htmlFor="quantity"
+                                                        value="Quantity"
+                                                    />
+                                                </div>
+                                                <TextInput
+                                                    id="quantity"
+                                                    name="quantity"
+                                                    placeholder="5"
+                                                    type="number"
+                                                    step={0.1}
+                                                    required
+                                                    onChange={e => {
+                                                        handleChange(e)
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                    value={values.quantity}
+                                                />
+                                                <ErrorMessage
+                                                    name="quantity"
+                                                    render={msg => (
+                                                        <span className="text-red-500">
+                                                            {msg}
+                                                        </span>
+                                                    )}
+                                                />
+                                            </div>
+                                            {' '}
+                                            {/*Quantity*/}
+                                            <div className="w-full">
+                                                <div className="mb-2 block">
+                                                    <Label
+                                                        htmlFor="receiver_id"
+                                                        value="Receiver"
+                                                    />
+                                                </div>
+                                                <Select
+                                                    value={{
+                                                        label:
+                                                        values.receiver_name,
+                                                        value:
+                                                        values.receiver_id,
+                                                    }}
+                                                    onChange={newValue => {
+                                                        setFieldValue(
+                                                            'receiver_id',
+                                                            newValue?.value,
+                                                        )
+                                                        setFieldValue(
+                                                            'receiver_name',
+                                                            newValue?.label,
+                                                        )
+                                                    }}
+                                                    id="receiver_id"
+                                                    name="receiver_id"
+                                                    className={`select`}
+                                                    classNames={{
+                                                        control: state =>
+                                                            `select`,
+                                                    }}
+                                                    data-placeholder="Select options..."
+                                                    options={
+                                                        !userIsLoading &&
+                                                        users.data
+                                                            ? users.data.map(
+                                                                u => ({
+                                                                    value:
+                                                                    u.id,
+                                                                    label:
+                                                                    u.name,
+                                                                }),
+                                                            )
+                                                            : []
+                                                    }
+                                                />
+                                                <ErrorMessage
+                                                    name="receiver_id"
+                                                    render={msg => (
+                                                        <span className="text-red-500">
+                                                            {msg}
+                                                        </span>
+                                                    )}
+                                                />
+                                            </div>
+                                            {' '}
+                                            {/*Variant*/}
+                                        </div>
+                                        {' '}
+                                        {/*Product, variant*/}
+                                        <div className="flex flex-col sm:flex-row gap-4">
+                                            <div className="w-full">
+                                                <div className="mb-2 block">
+                                                    <Label
+                                                        htmlFor="uses_area"
+                                                        value="Uses Area"
+                                                    />
+                                                </div>
+                                                <TextInput
+                                                    id="uses_area"
+                                                    name="uses_area"
+                                                    type="text"
+                                                    onChange={e => {
+                                                        handleChange(e)
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                    value={values.uses_area}
+                                                />
+                                                <ErrorMessage
+                                                    name="uses_area"
+                                                    render={msg => (
+                                                        <span className="text-red-500">
+                                                            {msg}
+                                                        </span>
+                                                    )}
+                                                />
+                                            </div>
+                                            {' '}
+                                            {/*uses_area*/}
+                                        </div>
+                                        {' '}
+                                        {/*Quantity, receiver*/}
+                                        <div className="flex flex-col sm:flex-row gap-4">
+                                            {' '}
+                                            {/*Uses Area*/}
+                                            <div className="w-full">
+                                                <div className="mb-2 block">
+                                                    <Label
+                                                        htmlFor="purpose"
+                                                        value="Purpose"
+                                                    />
+                                                </div>
+                                                <TextInput
+                                                    id="purpose"
+                                                    name="purpose"
+                                                    type="text"
+                                                    onChange={e => {
+                                                        handleChange(e)
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                    value={values.purpose}
+                                                />
+                                                <ErrorMessage
+                                                    name="purpose"
+                                                    render={msg => (
+                                                        <span className="text-red-500">
+                                                            {msg}
+                                                        </span>
+                                                    )}
+                                                />
+                                            </div>
+                                            {' '}
+                                            {/*Purpose*/}
+                                            <div className="w-full">
+                                                <div className="mb-2 block">
+                                                    <Label
+                                                        htmlFor="issue_time"
+                                                        value="Date"
+                                                    />
+                                                </div>
+                                                <TextInput
+                                                    id="issue_time"
+                                                    name="issue_time"
+                                                    type="datetime-local"
+                                                    onChange={e => {
+                                                        handleChange(e)
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                    value={values.issue_time}
+                                                />
+                                                <ErrorMessage
+                                                    name="date"
+                                                    render={msg => (
+                                                        <span className="text-red-500">
+                                                            {msg}
+                                                        </span>
+                                                    )}
+                                                />
+                                            </div>
+                                            {' '}
+                                            {/*Date Time*/}
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row gap-4">
+                                            <div className="w-full">
+                                                <div className="mb-2 block">
+                                                    <Label
+                                                        htmlFor="note"
+                                                        value="Note"
+                                                    />
+                                                </div>
+                                                <Textarea
+                                                    id="note"
+                                                    name="note"
+                                                    type="text"
+                                                    onChange={e => {
+                                                        handleChange(e)
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                    value={values.note}
+                                                />
+                                                <ErrorMessage
+                                                    name="note"
+                                                    render={msg => (
+                                                        <span className="text-red-500">
+                                                            {msg}
+                                                        </span>
+                                                    )}
+                                                />
+                                            </div>
+                                            {' '}
+                                            {/*note*/}
+                                        </div>
+                                        {' '}
+                                        {/*Note*/}
+                                        <div className="flex flex-row gap-4 justify-end">
+                                            <Button
+                                                isProcessing={isSubmitting}
+                                                onClick={handleSubmit}
+                                                type="submit"
+                                                color={`success`}>
+                                                Add
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
                             </Formik>
                         </div>
                     </Card>
