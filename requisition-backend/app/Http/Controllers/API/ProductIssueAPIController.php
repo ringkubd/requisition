@@ -7,6 +7,7 @@ use App\Models\ProductOption;
 use App\Models\Purchase;
 use App\Models\User;
 use App\Repositories\ProductIssueRepository;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -140,8 +141,7 @@ class ProductIssueAPIController extends AppBaseController
             $item['issuer_id'] = $request->user()->id;
             $item['issuer_branch_id'] = auth_branch_id();
             $item['issuer_department_id'] = auth_department_id();
-            $item['issue_time'] = now()->toDateTimeString();
-            $receiver = User::find($item['receiver_id']);
+            $item['issue_time'] = Carbon::parse($item['issue_time'])->toDateTimeString();
             $item['receiver_branch_id'] = auth_branch_id();
             $item['receiver_department_id'] = auth_department_id();
 

@@ -1,11 +1,8 @@
-import React, { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef, useRef } from "react";
 import moment from "moment/moment";
-import number2wordEnglish from "number2english_word";
 
 const IssuePrint = forwardRef(({products}, ref) => {
     const accountsCopy = useRef();
-    const requisitorCopy = useRef();
-    const hrRef = useRef();
 
     return (
         <div

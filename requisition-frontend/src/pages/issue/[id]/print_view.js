@@ -1,11 +1,8 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { useRouter } from "next/router";
-import { useEditPurchaseRequisitionQuery } from "@/store/service/requisitions/purchase";
 import Head from "next/head";
-import NavLink from "@/components/navLink";
 import { Button, Card } from "flowbite-react";
-import RequisitionPrint from "@/components/purchase-requisition/RequisitionPrint";
 import { useReactToPrint } from "react-to-print";
 import { useEditIssueQuery } from "@/store/service/issue";
 import IssuePrint from "@/components/issue/IssuePrint";

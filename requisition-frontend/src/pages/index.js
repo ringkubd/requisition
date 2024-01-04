@@ -2,9 +2,20 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/auth'
 import ApplicationLogo from "@/components/applicationLogo";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 export default function Home() {
     const { user } = useAuth({ middleware: 'guest' })
+    const router = useRouter();
+
+    useEffect(() => {
+        if (user){
+            router.push('/dashboard')
+        }else {
+            router.push('/login')
+        }
+    }, [user])
 
     return (
         <>

@@ -31,6 +31,10 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (isSuccess && data && user){
+            const pending = data.initial.filter(d => {
+                return (d.current_status.status === "Pending" || d.purchase_current_status.status === "Pending")
+            }).length;
+            setInitialPending(pending);
             setInitialColumns([
                 {
                     name: 'Sl',
@@ -91,15 +95,14 @@ const Dashboard = () => {
                     selector: row => row.purchase_requisitions ? <Status key={initialPending + row.purchase_requisitions.id} requisition={row} type={'purchase'} /> : ''
                 }
             ])
-
-            const pending = data.initial.filter(d => {
-                return (d.current_status.status === "Pending" || d.purchase_current_status.status === "Pending")
-            }).length;
-            setInitialPending(pending);
         }
     }, [data, isSuccess, user])
     useEffect(() => {
         if (cashISSuccess && cash && user){
+            const pending = cash.cash.filter(d => {
+                return d.current_status.status === "Pending"
+            }).length;
+            setCashPending(pending);
             setCashColumns([
                 {
                     name: 'Sl',
@@ -143,10 +146,6 @@ const Dashboard = () => {
                     selector: row => <Status key={cashPending+row.id} requisition={row} type={'cash'} />
                 }
             ])
-            const pending = cash.cash.filter(d => {
-                return d.current_status.status === "Pending"
-            }).length;
-            setCashPending(pending);
         }
     }, [cash, cashISSuccess, user])
 
