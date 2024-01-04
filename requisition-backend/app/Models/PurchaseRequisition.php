@@ -81,7 +81,6 @@ use Illuminate\Database\Eloquent\Model;
     protected $casts = [
         'estimated_total_amount' => 'float',
         'received_amount' => 'float',
-        'payment_type' => 'boolean'
     ];
 
     public static array $rules = [

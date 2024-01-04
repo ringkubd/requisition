@@ -123,7 +123,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
     public function store(Request $request): JsonResponse
     {
         $prfNo = $this->newPRFNO();
-        $input = $request->all();
+        $input = $request->products;
+
         $input = array_map(function ($item){
             $item['unit_price'] = (float)$item['price'];
             $item['price'] = (array_key_exists('price', $item) ? (float)$item['price'] : 0) * (float)$item['quantity_to_be_purchase'];
@@ -142,7 +143,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
             'ir_no' => $initial_requisition->ir_no,
             'estimated_total_amount' => $inputCollection->sum('price'),
             'received_amount' => 0,
-            'payment_type' => 0,
+            'payment_type' => $request->payment_type,
             'status' => 0,
         ];
         $purchaseProducts = array_map(function ($item){

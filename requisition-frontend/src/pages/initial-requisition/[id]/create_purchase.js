@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { useStorePurchaseRequisitionMutation } from "@/store/service/requisitions/purchase";
 import Head from "next/head";
 import NavLink from "@/components/navLink";
-import { Button, Card } from "flowbite-react";
+import { Button, Card, Label, Radio } from "flowbite-react";
 import DataTable from "react-data-table-component";
 
 export default function create_purchase(props){
@@ -22,6 +22,7 @@ export default function create_purchase(props){
     const [totalPrice, setTotalPrice] = useState(0);
     const {products} = useSelector(state => state.purchase_requisition_inputs);
     const [storePurchaseRequisition, storeResult] = useStorePurchaseRequisitionMutation();
+    const [paymentType, setPaymentType] = useState(0);
 
     const { data, isLoading, isError, isSuccess, isFetching } = useEditInitialRequisitionQuery(router.query.id, {
         skip: !initialRequisitionId
@@ -62,11 +63,11 @@ export default function create_purchase(props){
                 const check = confirm("Are you sure you want to submit an estimated amount of 0?");
                 if (check){
                     toast.error("You are going to submit an estimated amount of 0?");
-                    storePurchaseRequisition(products);
+                    storePurchaseRequisition({products, payment_type: paymentType});
                 }
 
             }else{
-                storePurchaseRequisition(products);
+                storePurchaseRequisition({products, payment_type: paymentType});
             }
         }else {
             toast.warn("Perhaps you forgot to add the item.");
@@ -159,7 +160,76 @@ export default function create_purchase(props){
                                 <h2 className={`font-bold`}>Total Estimate Cost</h2>
                                 <h2 className={`font-bold`}>{totalPrice.toLocaleString()}</h2>
                             </div>
-                            <div className={`flex mx-4 my-3 border-t-2 justify-items-end text-right items-end flex-row justify-end`}>
+                            <div className={`mx-4 my-3 border-t-2 w-full`}>
+                                <fieldset className="flex flex-row gap-4">
+                                    <legend className="mb-4">
+                                        Choose payment type.
+                                    </legend>
+                                    <div className="flex items-center gap-2">
+                                        <Radio
+                                            id="cash"
+                                            name="payment_type"
+                                            value="1"
+                                            onChange={(e) => {
+                                                if (e.target.checked) setPaymentType(1);
+                                            }}
+                                        />
+                                        <Label htmlFor="cash">Cash</Label>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Radio
+                                            id="cheque"
+                                            name="payment_type"
+                                            value="2"
+                                            onChange={(e) => {
+                                                if (e.target.checked) setPaymentType(2);
+                                            }}
+                                        />
+                                        <Label htmlFor="cheque">
+                                            Cheque
+                                        </Label>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Radio
+                                            id="lpo"
+                                            name="payment_type"
+                                            value="3"
+                                            onChange={(e) => {
+                                                if (e.target.checked) setPaymentType(3);
+                                            }}
+                                        />
+                                        <Label htmlFor="lpo">LPO</Label>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Radio
+                                            id="fund"
+                                            name="payment_type"
+                                            value="4"
+                                            onChange={(e) => {
+                                                if (e.target.checked) setPaymentType(4);
+                                            }}
+                                        />
+                                        <Label htmlFor="fund">
+                                            Fund available
+                                        </Label>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Radio
+                                            id="maybe"
+                                            name="payment_type"
+                                            value="5"
+                                            onChange={(e) => {
+                                                if (e.target.checked) setPaymentType(5);
+                                            }}
+                                        />
+                                        <Label htmlFor="maybe">
+                                            Maybe Arranged on
+                                        </Label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div
+                                className={`flex mx-4 my-3 border-t-2 justify-items-end text-right items-end flex-row justify-end`}>
                                 <Button onClick={submit} gradientMonochrome="teal">Submit</Button>
                             </div>
                         </div>

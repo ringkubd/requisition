@@ -301,6 +301,8 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                         <input
                                                             type="checkbox"
                                                             className={`form-checkbox mr-2`}
+                                                            checked={mainData?.payment_type === 1}
+                                                            disabled
                                                         />
                                                         <label htmlFor="">
                                                             Cash
@@ -310,6 +312,8 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                         <input
                                                             type="checkbox"
                                                             className={`form-checkbox mr-2`}
+                                                            checked={mainData?.payment_type === 2}
+                                                            disabled
                                                         />
                                                         <label htmlFor="">
                                                             Cheque
@@ -319,6 +323,8 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                         <input
                                                             type="checkbox"
                                                             className={`form-checkbox mr-2`}
+                                                            checked={mainData?.payment_type === 3}
+                                                            disabled
                                                         />
                                                         <label htmlFor="">
                                                             LPO
@@ -332,6 +338,8 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                         <input
                                                             type="checkbox"
                                                             className={`form-checkbox mr-2`}
+                                                            checked={mainData?.payment_type === 4}
+                                                            disabled
                                                         />
                                                         <label htmlFor="">
                                                             Fund available
@@ -343,6 +351,8 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                             <input
                                                                 type="checkbox"
                                                                 className={`form-checkbox mr-2`}
+                                                                checked={mainData?.payment_type === 5}
+                                                                disabled
                                                             />
                                                         </div>
                                                         <div className={``}>

@@ -1,6 +1,6 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Select } from "flowbite-react";
+import { Button, Card, Label, Radio, Select } from "flowbite-react";
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -27,6 +27,7 @@ const InitialRequisitionCreate = (props) => {
     const dispatch = useDispatch();
     const {products} = useSelector(state => state.purchase_requisition_inputs);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [paymentType, setPaymentType] = useState(0);
 
 
     useEffect(() => {
@@ -55,11 +56,11 @@ const InitialRequisitionCreate = (props) => {
                 const check = confirm("Are you sure you want to submit an estimated amount of 0?");
                 if (check){
                     toast.error("You are going to submit an estimated amount of 0?");
-                    storePurchaseRequisition(products);
+                    storePurchaseRequisition({products, payment_type: paymentType});
                 }
 
             }else{
-                storePurchaseRequisition(products);
+                storePurchaseRequisition({products, payment_type: paymentType});
             }
         }else {
             toast.warn("Perhaps you forgot to add the item.");
@@ -129,63 +130,157 @@ const InitialRequisitionCreate = (props) => {
     ];
 
     return (
-      <>
-          <AppLayout
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Purchase Requisition.
-                </h2>
-            }
-          >
-              <Head>
-                  <title>Purchase Requisition</title>
-              </Head>
-              <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
-                  <Card className="min-h-screen">
-                      <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
-                          <NavLink
-                            active={router.pathname === 'purchase-requisition'}
-                            href={`/purchase-requisition`}
-                          >
-                              <Button>Back</Button>
-                          </NavLink>
-                      </div>
-                      <div className={`flex flex-col justify-center justify-items-center items-center basis-2/4 w-full space-y-4`}>
-                          <div className={`shadow-md w-full`}>
-                              {
-                                  initialRequisitionForPurchase.isLoading ? "Loading...." : (
-                                    !initialRequisitionForPurchase.isError && initialRequisitionForPurchase.isSuccess && (
-                                      <Select onChange={(c) => setSelectedRequisition(c.target.value)}>
-                                          <option value=""></option>
-                                          {
-                                              initialRequisitionForPurchase.data?.data?.map(r => (
-                                                <option key={r.id} value={r.id}>{r.irf_no + ` ${r.user?.name} ` + " (" + moment(r.created_at).format('DD-MMM-Y@H:mm')+")"}</option>
-                                              ))
-                                          }
-                                      </Select>
-                                    )
-                                  )
-                              }
-
-                          </div>
-                          <div className={`shadow-md w-full`}>
-                              <DataTable
-                                columns={tableColumns}
-                                data={products}
-                              />
-                              <div className={`mx-4 my-3 border-t-2 justify-items-end text-right`}>
-                                  <h2 className={`font-bold`}>Total Estimate Cost</h2>
-                                  <h2 className={`font-bold`}>{totalPrice.toLocaleString()}</h2>
-                              </div>
-                              <div className={`flex mx-4 my-3 border-t-2 justify-items-end text-right items-end flex-row justify-end`}>
-                                  <Button onClick={submit} gradientMonochrome="teal">Submit</Button>
-                              </div>
-                          </div>
-                      </div>
-                  </Card>
-              </div>
-          </AppLayout>
-      </>
+        <>
+            <AppLayout
+                header={
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        Purchase Requisition.
+                    </h2>
+                }>
+                <Head>
+                    <title>Purchase Requisition</title>
+                </Head>
+                <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
+                    <Card className="min-h-screen">
+                        <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
+                            <NavLink
+                                active={
+                                    router.pathname === 'purchase-requisition'
+                                }
+                                href={`/purchase-requisition`}>
+                                <Button>Back</Button>
+                            </NavLink>
+                        </div>
+                        <div
+                            className={`flex flex-col justify-center justify-items-center items-center basis-2/4 w-full space-y-4`}>
+                            <div className={`shadow-md w-full`}>
+                                {initialRequisitionForPurchase.isLoading
+                                    ? 'Loading....'
+                                    : !initialRequisitionForPurchase.isError &&
+                                      initialRequisitionForPurchase.isSuccess && (
+                                          <Select
+                                              onChange={c =>
+                                                  setSelectedRequisition(
+                                                      c.target.value,
+                                                  )
+                                              }>
+                                              <option value=""></option>
+                                              {initialRequisitionForPurchase.data?.data?.map(
+                                                  r => (
+                                                      <option
+                                                          key={r.id}
+                                                          value={r.id}>
+                                                          {r.irf_no +
+                                                              ` ${r.user?.name} ` +
+                                                              ' (' +
+                                                              moment(
+                                                                  r.created_at,
+                                                              ).format(
+                                                                  'DD-MMM-Y@H:mm',
+                                                              ) +
+                                                              ')'}
+                                                      </option>
+                                                  ),
+                                              )}
+                                          </Select>
+                                      )}
+                            </div>
+                            <div className={`shadow-md w-full`}>
+                                <DataTable
+                                    columns={tableColumns}
+                                    data={products}
+                                />
+                                <div
+                                    className={`mx-4 my-3 border-t-2 justify-items-end text-right`}>
+                                    <h2 className={`font-bold`}>
+                                        Total Estimate Cost
+                                    </h2>
+                                    <h2 className={`font-bold`}>
+                                        {totalPrice.toLocaleString()}
+                                    </h2>
+                                </div>
+                                <div className={`mx-4 my-3 border-t-2 w-full`}>
+                                    <fieldset className="flex flex-row gap-4">
+                                        <legend className="mb-4">
+                                            Choose payment type.
+                                        </legend>
+                                        <div className="flex items-center gap-2">
+                                            <Radio
+                                                id="cash"
+                                                name="payment_type"
+                                                value="1"
+                                                onChange={(e) => {
+                                                    if(e.target.checked) setPaymentType(1);
+                                                }}
+                                            />
+                                            <Label htmlFor="cash">Cash</Label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Radio
+                                                id="cheque"
+                                                name="payment_type"
+                                                value="2"
+                                                onChange={(e) => {
+                                                    if(e.target.checked) setPaymentType(2);
+                                                }}
+                                            />
+                                            <Label htmlFor="cheque">
+                                                Cheque
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Radio
+                                                id="lpo"
+                                                name="payment_type"
+                                                value="3"
+                                                onChange={(e) => {
+                                                    if(e.target.checked) setPaymentType(3);
+                                                }}
+                                            />
+                                            <Label htmlFor="lpo">LPO</Label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Radio
+                                                id="fund"
+                                                name="payment_type"
+                                                value="4"
+                                                onChange={(e) => {
+                                                    if(e.target.checked) setPaymentType(4);
+                                                }}
+                                            />
+                                            <Label htmlFor="fund">
+                                                Fund available
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Radio
+                                                id="maybe"
+                                                name="payment_type"
+                                                value="5"
+                                                onChange={(e) => {
+                                                    if(e.target.checked) setPaymentType(5);
+                                                }}
+                                            />
+                                            <Label htmlFor="maybe">
+                                                Maybe Arranged on
+                                            </Label>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <div
+                                    className={`flex mx-4 my-3 border-t-2 justify-items-end text-right items-end flex-row justify-end`}>
+                                    <Button
+                                        onClick={submit}
+                                        gradientMonochrome="teal">
+                                        Submit
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            </AppLayout>
+        </>
     )
 }
 export default InitialRequisitionCreate;
