@@ -100,7 +100,6 @@ const AppLayout = ({ header, children }) => {
                             console.log(subscription, 456)
                             return;
                         }
-                        console.log(subscription, 4567)
                     })
                     .catch((err) => {
                         console.error(`Error during getSubscription(): ${err}`);

@@ -36,7 +36,6 @@ const IssueStatus = ({row}) => {
         updateIssue({ ...arg, department: both ? 'both' : storeManager ? 'store' : department ? 'department' : "" })
         setSelectedDropdown(selected);
     }
-
     return (
         <div>
             {
@@ -48,7 +47,7 @@ const IssueStatus = ({row}) => {
                                 onClick={() => {
                                     updateStatus({
                                         status: 1,
-                                        id: row.id
+                                        uuid: row.uuid
                                     }, "Approved");
                                 }}
                             >
@@ -61,7 +60,7 @@ const IssueStatus = ({row}) => {
                                 onClick={() => {
                                     updateStatus({
                                         status: 2,
-                                        id: row.id
+                                        uuid: row.uuid
                                     }, "Rejected");
                                 }}
                             >

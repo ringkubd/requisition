@@ -23,8 +23,8 @@ export const IssueApiService = createApi({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateIssue: builder.mutation({
-            query: ({id, ...patch}) => ({
-                url: `product-issues/${id}`,
+            query: ({uuid, ...patch}) => ({
+                url: `product-issues/${uuid}`,
                 method: 'PATCH',
                 body: patch,
                 formData: true,

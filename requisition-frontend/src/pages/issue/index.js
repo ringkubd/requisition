@@ -26,6 +26,7 @@ const ProductIssue = () => {
     const [destroy, destroyResponse] = useDestroyIssueMutation();
     const [columns, setColumns] = useState([]);
     const [isStoreManager, setISStoreManager] = useState(user?.role_object?.filter(r => r.name === "Store Manager").length);
+    const [dataTableData, setDataTableData] = useState([]);
 
     useEffect(() => {
         if (user){
@@ -41,43 +42,74 @@ const ProductIssue = () => {
     }, [destroyResponse])
 
     useEffect(() => {
-        if (!isLoading && !isError && data) {
+        if (!isLoading && !isError && data ) {
+            const issueData = data?.product_issue;
+            const tableData = Object.keys(issueData).map((pi) => {
+                return {
+                    uuid : pi,
+                    number_of_item : issueData[pi].length,
+                    receiver : issueData[pi].reduce((prev, curr) => {
+                        if (!prev.includes(curr.receiver?.name)){
+                            return prev ? prev + "," + curr.receiver?.name : curr.receiver?.name
+                        }
+                        return curr.receiver.name
+                    }, ""),
+                    issuer : issueData[pi].reduce((prev, curr) => {
+                        if (!prev.includes(curr.issuer.name)){
+                            return prev ? prev + "," + curr.issuer?.name : curr.issuer?.name
+                        }
+                        return curr.issuer?.name
+                    }, ""),
+                    issue_time: issueData[pi][0].issue_time,
+                    receiver_department_id: issueData[pi][0].receiver_department_id,
+                    department_status: issueData[pi][0].department_status,
+                    store_status: issueData[pi][0].store_status,
+                    receiver_department: issueData[pi][0].receiver_department,
+                };
+            })
+
+            setDataTableData(tableData);
             setColumns([
                 {
-                    name: 'Product',
-                    selector: row => row.product?.title + ( !row.variant?.option_value.includes('N/A') ? " - "+row.variant?.option_value : ""),
+                    name: 'SL.',
+                    selector: (row, index) => index + 1,
                     sortable: true,
                 },
                 {
-                    name: 'Qty',
-                    selector: row => row.quantity,
+                    name: 'No. of Item',
+                    selector: row => row.number_of_item,
                     sortable: true,
                 },
                 {
                     name: 'Receiver',
-                    selector: row => row.receiver?.name,
+                    selector: row => row.receiver,
+                    sortable: true,
+                },
+                {
+                    name: 'Department',
+                    selector: row => row.receiver_department?.name,
                     sortable: true,
                 },
                 {
                     name: 'Issuer',
-                    selector: row => row.issuer?.name,
+                    selector: row => row.issuer,
                     sortable: true,
                 },
-                {
-                    name: 'Purpose',
-                    selector: row => row.purpose,
-                    sortable: false,
-                },
-                {
-                    name: 'Uses Area',
-                    selector: row => row.uses_area,
-                    sortable: false,
-                },
-                {
-                    name: 'Note',
-                    selector: row => row.note,
-                    sortable: false,
-                },
+                // {
+                //     name: 'Purpose',
+                //     selector: row => row.purpose,
+                //     sortable: false,
+                // },
+                // {
+                //     name: 'Uses Area',
+                //     selector: row => row.uses_area,
+                //     sortable: false,
+                // },
+                // {
+                //     name: 'Note',
+                //     selector: row => row.note,
+                //     sortable: false,
+                // },
                 {
                     name: 'Issue Time',
                     selector: row => moment(row.issue_time).format('D MMM Y @ H:mm '),
@@ -85,12 +117,12 @@ const ProductIssue = () => {
                 },
                 {
                     name: 'Status',
-                    selector: row => <IssueStatus key={row.id} row={row} />
+                    selector: row => <IssueStatus key={row.uuid} row={row} />
                 },
                 {
                     name: 'Actions',
                     cell: (row) => <Actions
-                        itemId={row.id}
+                        itemId={row.uuid}
                         edit={isStoreManager && !row.store_status ? `/issue/${row.uuid}/edit` : false}
                         view={`/issue/${row.uuid}/view`}
                         print={`/issue/${row.uuid}/print_view`}
@@ -102,7 +134,7 @@ const ProductIssue = () => {
                 }
             ])
         }
-    }, [isLoading, data])
+    }, [isLoading, data, isStoreManager])
 
     const changeSearchParams = (key, value) => {
         setSearchParams({...searchParams , [key]: value, page: 1});
@@ -136,7 +168,7 @@ const ProductIssue = () => {
 
                         <DataTable
                             columns={columns}
-                            data={data?.product_issue}
+                            data={dataTableData}
                             pagination
                             responsive
                             progressPending={isLoading}
