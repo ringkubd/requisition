@@ -19,7 +19,7 @@ if (!function_exists('auth_organization_id')) {
     function auth_organization_id()
     {
         if (Cache::has('select_organization_'.\request()->user()->id)) {
-            return Cache::get('select_organization_'.\request()->user()->id);
+            return (int)Cache::get('select_organization_'.\request()->user()->id);
         }
         return auth()->user()->defaultOrganization?->id; // login branch organization id
     }
