@@ -159,11 +159,14 @@ class InitialRequisitionAPIController extends AppBaseController
 
         $user = $request->user();
         $head_of_department = User::find($initialRequisition->department->head_of_department);
-        $head_of_department->notify(new PushNotification(
-            "An purchase requisition is initiated..",
-            "$user->name is generated an initial requisition I.R.F. No. $irf_no. Please approve or reject it.",
-            $initialRequisition
-        ));
+        if (!empty($head_of_department)){
+            $head_of_department->notify(new PushNotification(
+                "An purchase requisition is initiated..",
+                "$user->name is generated an initial requisition I.R.F. No. $irf_no. Please approve or reject it.",
+                $initialRequisition
+            ));
+        }
+
         return $this->sendResponse(
             new InitialRequisitionResource($initialRequisition),
             __('messages.saved', ['model' => __('models/initialRequisitions.singular')])

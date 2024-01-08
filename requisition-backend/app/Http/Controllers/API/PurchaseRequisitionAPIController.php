@@ -174,12 +174,14 @@ class PurchaseRequisitionAPIController extends AppBaseController
         ]);
 
         $requisitor_name = $request->user()->name;
-        User::find(Department::find(auth_department_id())->head_of_department)->notify(new PushNotification(
-            "A purchase requisition is initiated.",
-            "$requisitor_name generated a purchase requisition P.R. No. $prfNo against I.R.F. No. $initial_requisition->irf_no. Please approve or reject it.",
-            $purchaseRequisition
-        ));
-
+        $head_of_department =User::find(Department::find(auth_department_id())->head_of_department);
+        if (!empty($head_of_department)){
+            $head_of_department->notify(new PushNotification(
+                "A purchase requisition is initiated.",
+                "$requisitor_name generated a purchase requisition P.R. No. $prfNo against I.R.F. No. $initial_requisition->irf_no. Please approve or reject it.",
+                $purchaseRequisition
+            ));
+        }
         return $this->sendResponse(
             new PurchaseRequisitionResource($purchaseRequisition),
             __('messages.saved', ['model' => __('models/purchaseRequisitions.singular')])

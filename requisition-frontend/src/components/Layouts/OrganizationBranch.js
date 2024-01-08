@@ -46,6 +46,9 @@ export default function OrganizationBranch({user, changingEffect}){
     useEffect(() => {
         changingEffect(updateDepartmentResult.isSuccess)
     }, [updateDepartmentResult.isSuccess]);
+    useEffect(() => {
+        changingEffect(updateOrganizationResult.isSuccess)
+    }, [updateOrganizationResult.isSuccess]);
 
     return (
         <div className="max-w-7xl flex flex-row mx-auto py-6 px-4 my-1 sm:px-6 lg:px-8 gap-2">
