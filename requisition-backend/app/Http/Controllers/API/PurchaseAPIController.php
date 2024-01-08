@@ -35,7 +35,7 @@ class PurchaseAPIController extends AppBaseController
 
         $this->middleware('auth:sanctum');
 //        $this->middleware('role_or_permission:Super Admin|view_purchases', ['only' => ['index']]);
-        $this->middleware('role_or_permission:Super Admin|update_purchases', ['only' => ['show', 'update']]);
+        $this->middleware('role_or_permission:Super Admin|update_purchases', ['only' => ['update']]);
         $this->middleware('role_or_permission:Super Admin|create_purchases', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_purchases', ['only' => ['delete']]);
         $this->middleware('role_or_permission:Super Admin|view_purchases|update_purchases|create_purchases|delete_purchases', ['only' => ['suppliers', 'purchaseRequisition']]);
@@ -375,6 +375,8 @@ class PurchaseAPIController extends AppBaseController
             ->whereHas('purchaseRequisitionProducts', function ($q) {
                 $q->whereRaw('actual_purchase < quantity_to_be_purchase');
             })
+            ->where('organization_id', auth_organization_id())
+            ->where('branch_id', auth_branch_id())
             ->skip($start)
             ->limit($end)
             ->latest('purchase_requisitions.created_at')

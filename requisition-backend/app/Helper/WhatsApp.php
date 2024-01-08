@@ -50,11 +50,9 @@ class WhatsApp
         }
     }
 
-    public function sendMessageTemplate($document_link, $fileName, $groupName='it'){
+    public function sendMessageTemplate($notification_contacts, $message){
         $whatsapp_api =  '';
         $whatsapp_api_token =  '';
-        $last60day_new_problem = $document_link;
-        $notification_contacts = [];
         $log = [];
         foreach ($notification_contacts as $c){
             $curl = curl_init();
@@ -70,23 +68,31 @@ class WhatsApp
                 CURLOPT_POSTFIELDS =>'{
     "messaging_product": "whatsapp",
     "recipient_type": "individual",
-    "to": "'.$c->whatsapp.'",
+    "preview_url": true,
+    "to": "'.$c->mobile_no.'",
     "type": "template",
     "template": {
-        "name": "bcs_computer_city_utility_report",
+        "name": "inventory_approval_notice_2",
         "language": {
             "code": "en"
         },
         "components": [
             {
-                "type": "header",
+                "type": "body",
                 "parameters": [
                     {
-                        "type": "document",
-                        "document": {
-                            "link": "'.$last60day_new_problem.'",
-                            "filename": "'.$fileName.'"
-                        }
+                        "type": "text",
+                        "text: $message
+                    }
+                ]
+            }, {
+                "type": "button",
+                "index": 0,
+                "sub_type": "url",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text: $message
                     }
                 ]
             }
