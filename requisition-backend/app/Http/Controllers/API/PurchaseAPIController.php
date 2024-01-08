@@ -373,10 +373,9 @@ class PurchaseAPIController extends AppBaseController
                 $q->whereRaw('`actual_purchase` < `quantity_to_be_purchase`');
             }])
             ->whereHas('purchaseRequisitionProducts', function ($q) {
-                $q->whereRaw('actual_purchase < quantity_to_be_purchase');
+                $q->whereRaw('actual_purchase < quantity_to_be_purchase')->where('organization_id', auth_organization_id())
+                    ->where('branch_id', auth_branch_id());
             })
-            ->where('organization_id', auth_organization_id())
-            ->where('branch_id', auth_branch_id())
             ->skip($start)
             ->limit($end)
             ->latest('purchase_requisitions.created_at')
