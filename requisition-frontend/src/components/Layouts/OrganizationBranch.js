@@ -70,7 +70,7 @@ export default function OrganizationBranch({user, changingEffect}){
                 )
             }
             {
-                branches?.data?.length > 1 && (
+                branches?.data?.length && (
                     <label htmlFor={'user_branch_id'} className={`flex flex-row items-center`}>
                         Branch
                         <Select
