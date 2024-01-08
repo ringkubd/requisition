@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use OpenApi\Annotations as OA;
@@ -75,12 +76,19 @@ class Department extends BaseModel
         'updated_at' => 'nullable'
     ];
 
-    public function branch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    /**
+     * @return BelongsTo
+     */
+
+    public function branch(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Branch::class, 'branch_id');
     }
 
-    public function organization(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    /**
+     * @return BelongsTo
+     */
+    public function organization(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Organization::class, 'organization_id');
     }
@@ -88,8 +96,16 @@ class Department extends BaseModel
     /**
      * @return BelongsTo
      */
-    public function departmentHead(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function departmentHead(): BelongsTo
     {
         return $this->belongsTo(User::class, 'head_of_department');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_departments');
     }
 }

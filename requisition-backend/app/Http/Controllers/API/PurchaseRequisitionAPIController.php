@@ -405,7 +405,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                 'department_id' => $requisition->department_id,
                 'notes' => $request->notes
             ];
-            $notifiedUsers = [$request->user(), $requisition->user];
+            $notifiedUsers = [];
             switch ($request->stage){
                 case 'accounts':
                     $data['accounts_status'] = $request->status;
@@ -426,6 +426,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                 case 'ceo':
                     $data['ceo_status'] = $request->status;
                     $data['ceo_approved_at'] = now();
+                    $notifiedUsers[] = $requisition->user;
                     break;
                 default:
                     $data['department_status'] = $request->status;
@@ -433,8 +434,12 @@ class PurchaseRequisitionAPIController extends AppBaseController
                         $data['accounts_status'] = 1;
                         $data['department_approved_by'] = \request()->user()->id;
                         $data['department_approved_at'] = now();
-                        $department = Department::query()->where('branch_id', auth_branch_id())->where('name', 'Accounts')->first();
-                        $notifiedUsers[] = User::query()->find($department?->head_of_department);
+                        $department = Department::query()->where('branch_id', auth_branch_id())->where('name', 'Accounts')->with('users')->first();
+                        if (!empty($department)){
+                            foreach ($department->users as $user){
+                                $notifiedUsers[] = $user;
+                            }
+                        }
                     }
             }
             $requisition->initialRequisition->approval_status()->update($data);
@@ -449,8 +454,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
             foreach ($notifiedUsers as $notifiedUser){
                 $requisitor = $requisition->user->name;
                 $notifiedUser->notify(new PushNotification(
-                    "A requisition is waiting for your approval.",
-                    "$requisitor is generated an requisition P.R. NO. $requisition->prf_no against I.R.F. NO. $requisition->irf_no. Please approve or reject it.",
+                    "A purchase requisition has been generated and for your approval.",
+                    "$requisitor is generated an requisition P.R. NO. $requisition->prf_no against I.R.F. NO. $requisition->irf_no. Please review and approve.",
                     $requisition
                 ));
             }
