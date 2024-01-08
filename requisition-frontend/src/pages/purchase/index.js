@@ -30,9 +30,19 @@ const Purchase = () => {
 
     const columns = [
         {
+            name: 'SL',
+            selector: (row, index) => index + 1,
+            sortable: true,
+            width: "38px",
+            style: {
+                padding: 0
+            }
+        },
+        {
             name: 'Product',
             selector: row => row.product?.title + " - " +  row.productOption?.title,
             sortable: true,
+            minWidth: "200px"
         },
         {
             name: 'Supplier',
@@ -44,25 +54,28 @@ const Purchase = () => {
             selector: row => row.brand?.logo ? <Image width={50} height={50} alt={row.brand?.name} src={row.brand?.logo} /> : row.brand?.name,
             sortable: true,
         },
-        {
-            name: 'Requisition',
-            selector: row => row.purchaseRequisition?.irf_no,
-            sortable: true,
-        },
+        // {
+        //     name: 'Requisition',
+        //     selector: row => row.purchaseRequisition?.irf_no,
+        //     sortable: true,
+        // },
         {
             name: 'P.R. No.',
             selector: row => row.purchaseRequisition?.prf_no,
             sortable: true,
+            width: "96px",
         },
         {
             name: 'Qty',
             selector: row => row.qty,
             sortable: true,
+            width: "70px",
         },
         {
             name: 'Unit Price',
             selector: row => row.unit_price,
             sortable: true,
+            width: "96px",
         },
         {
             name: 'Purchase Date',

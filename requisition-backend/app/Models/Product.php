@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OpenApi\Annotations as OA;
+
 /**
  * @OA\Schema(
  *      schema="Product",
- *      required={"title","unit","category_id","status"},
+ *      required={"title","unit","category_id","status", "organization_id","branch_id"},
  *      @OA\Property(
  *          property="title",
  *          description="",
@@ -69,7 +72,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *          format="date-time"
  *      )
  * )
- */class Product extends BaseModel
+ */
+class Product extends BaseModel
 {
     use SoftDeletes, HasFactory;
 
@@ -103,6 +107,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         'updated_at' => 'nullable'
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+        self::creating(function ($model){
+            $model->organization_id = auth_organization_id();
+            $model->branch_id = auth_branch_id();
+        });
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope('branch_organization', function (Builder $builder){
+            $builder->where('organization_id', auth_organization_id())->where('branch_id', auth_branch_id());
+        });
+    }
+
     public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\Category::class, 'category_id');
@@ -135,6 +155,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
     public function purchaseRequisition(){
         return $this->hasManyThrough(PurchaseRequisition::class, PurchaseRequisitionProduct::class, 'product_id', 'id', 'id', 'purchase_requisition_id');
+    }
+
+    public function organization(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
+    }
+    public function branch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
 
