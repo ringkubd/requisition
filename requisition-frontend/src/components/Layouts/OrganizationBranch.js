@@ -26,6 +26,7 @@ export default function OrganizationBranch({user, changingEffect}){
         skip: !branch_id
     });
 
+
     useEffect(() => {
         if (selected_branch){
             setBranchId(selected_branch)
@@ -33,7 +34,10 @@ export default function OrganizationBranch({user, changingEffect}){
         if (selected_department){
             setDepartmentId(selected_department)
         }
-    }, [selected_branch])
+        if (selected_organization){
+            setOrganizationId(selected_organization)
+        }
+    }, [user])
 
     useEffect(() => {
         changingEffect(updateBranchResult.isSuccess)
