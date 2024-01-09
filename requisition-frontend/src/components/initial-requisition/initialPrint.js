@@ -225,7 +225,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                 </i>
                             </small>
                             <h2 className={`border-t border-black px-4`}>
-                                Accounts
+                                Accounts Department
                             </h2>
                         </div>
                         <div

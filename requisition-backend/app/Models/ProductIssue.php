@@ -80,6 +80,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         'department_approved_by',
         'store_approved_by',
         'store_status',
+        'department_approved_at',
+        'store_approved_at',
     ];
 
     public static array $rules = [
@@ -130,5 +132,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     public function rateLog(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(IssuePurchaseLog::class);
+    }
+
+    public function departmentApprovedBY(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'department_approved_by');
+    }
+    public function storeApprovedBY(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'store_approved_by');
     }
 }

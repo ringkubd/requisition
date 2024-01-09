@@ -31,6 +31,7 @@ const create = (props) => {
     const [stock, setStock] = useState(0);
     const [items, setItems] = useState([]);
     const [columns, setColumns] = useState([]);
+    const [unit, setUnit] = useState("");
 
     useEffect(() => {
         if (items.length){
@@ -322,6 +323,7 @@ const create = (props) => {
                                                             'product_option_id',
                                                             '',
                                                         )
+                                                        setUnit(newValue?.product?.unit)
                                                     }}
                                                     additional={{
                                                         page: 1,
@@ -388,6 +390,7 @@ const create = (props) => {
                                                         </span>
                                                     )}
                                                 />
+                                                <span>{stock} {unit} available</span>
                                             </div>
                                         </div>
                                         <div className="flex flex-col sm:flex-row gap-4">

@@ -108,9 +108,17 @@ const IssuePrint = forwardRef(({products}, ref) => {
                             className={`flex flex-row justify-between text-center mt-24`}>
                             <div
                                 className={`flex flex-col min-h-[20px] justify-end`}>
-                                <span></span>
+                                <span>
+                                    {products[0]?.issuer?.name}
+                                </span>
                                 <small>
-
+                                    {products[0]
+                                        ?.created_at
+                                        ? moment(
+                                            products[0]
+                                                ?.created_at,
+                                        ).format('hh:mm A - DD MMM Y')
+                                        : ''}
                                 </small>
                                 <h2 className={`border-t border-black px-16`}>
                                     Requisitor
@@ -118,11 +126,52 @@ const IssuePrint = forwardRef(({products}, ref) => {
                             </div>
                             <div
                                 className={`flex flex-col min-h-[20px] justify-end`}>
-                                <small>
-                                    <i>
+                                {
+                                    products[0]?.department_status === 1 ? (
+                                        <div className={`flex flex-col min-h-[20px] justify-end`}>
+                                            <span>
+                                    {products[0]?.departmentApprovedBY?.name}
+                                </span>
+                                            <small>
+                                                {products[0]
+                                                    ?.department_approved_at
+                                                    ? moment(
+                                                        products[0]
+                                                            ?.department_approved_at
+                                                    ).format("hh:mm A - DD MMM Y")
+                                                    : ""}
+                                            </small>
+                                        </div>
+                                    )
+                                        :  !products[0]?.department_status ? 'Pending' : "Rejected"
+                                }
 
-                                    </i>
-                                </small>
+                                <h2 className={`border-t border-black px-16`}>
+                                    {products[0]?.receiver_department?.name} Department
+                                </h2>
+                            </div>
+                            <div
+                                className={`flex flex-col min-h-[20px] justify-end`}>
+                                {
+                                    products[0]?.store_status === 1 ? (
+                                            <div className={`flex flex-col min-h-[20px] justify-end`}>
+                                            <span>
+                                    {products[0]?.storeApprovedBY?.name}
+                                </span>
+                                                <small>
+                                                    {products[0]
+                                                        ?.store_approved_at
+                                                        ? moment(
+                                                            products[0]
+                                                                ?.store_approved_at
+                                                        ).format("hh:mm A - DD MMM Y")
+                                                        : ""}
+                                                </small>
+                                            </div>
+                                        )
+                                        :  !products[0]?.store_status ? 'Pending' : "Rejected"
+                                }
+
                                 <h2 className={`border-t border-black px-16`}>
                                     Store
                                 </h2>

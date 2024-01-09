@@ -263,16 +263,20 @@ class ProductIssueAPIController extends AppBaseController
                 case 'both':
                     $input['department_status'] = 1;
                     $input['department_approved_by'] = $request->user()->id;
+                    $input['department_approved_at'] = now();
                     $input['store_status'] = 1;
                     $input['store_approved_by'] = $request->user()->id;
+                    $input['store_approved_at'] = now();
                     break;
                 case 'department':
                     $input['department_status'] = 1;
                     $input['department_approved_by'] = $request->user()->id;
+                    $input['department_approved_at'] = now();
                     break;
                 case 'store':
                     $input['store_status'] = 1;
                     $input['store_approved_by'] = $request->user()->id;
+                    $input['store_approved_at'] = now();
                     break;
             };
         }

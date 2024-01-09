@@ -355,6 +355,10 @@ class UserAPIController extends AppBaseController
                 $user = User::find($tokenExist->user_id);
                 Auth::login($user);
                 $token = $user->createToken($tokenExist->user_id);
+                $tokenExist->update([
+                    'used_at' => now(),
+                    'user_ip' => $request->ip()
+                ]);
                 return response()->json([
                     'token' => $token->plainTextToken,
                     'user' => new UserResource(auth()->user())
