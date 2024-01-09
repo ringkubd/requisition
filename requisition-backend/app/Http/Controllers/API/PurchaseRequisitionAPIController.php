@@ -438,6 +438,14 @@ class PurchaseRequisitionAPIController extends AppBaseController
                                 Component::urlButton(["/$requisition->id/whatsapp_view?auth_key=$key->auth_key"])
                             )
                         );
+                        $ceo->notify(new WhatsAppNotification(
+                                Component::text("Requisitor Name: $requisitor_name,  P.R. NO.: $requisition->prf_no, I.R.F. NO.: $requisition->irf_no."),
+                                '+8801725271724',
+                                Component::quickReplyButton([$requisition->id.'_'.$user->id.'_2']),
+                                Component::quickReplyButton([$requisition->id.'_'.$user->id.'_3']),
+                                Component::urlButton(["/$requisition->id/whatsapp_view?auth_key=$key->auth_key"])
+                            )
+                        );
                     }
                     break;
                 case 'ceo':
