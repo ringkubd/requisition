@@ -455,7 +455,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
             $one_time_key = new OneTimeLogin();
             $key = $one_time_key->generate($user->id);
             $request->user()->notify(new WhatsAppNotification(
-                    Component::text("Requisitor Name: $user->name,  P.R. NO.: $requisition->prf_no, I.R.F. NO.: $requisition->irf_no."),
+                    Component::text("Requisitor Name: $user->name,  P.R. NO.: $requisition->prf_no, I.R.F. NO.: $requisition->irf_no. https://inventory.isdb-bisew.org/purchase-requisition/48/view"),
                     '+8801737956549',
                     Component::quickReplyButton(["id" => $requisition->id.'_'.$user->id.'_2']),
                     Component::quickReplyButton(["id" => $requisition->id.'_'.$user->id.'_3']),
