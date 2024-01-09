@@ -356,8 +356,7 @@ const create = (props) => {
                                                     options={productOptions?.map(
                                                         p => ({
                                                             value: p.id,
-                                                            label:
-                                                            p.option_value,
+                                                            label: p.option_value,
                                                             other: p,
                                                         }),
                                                     )}
