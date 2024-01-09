@@ -8,16 +8,19 @@ use App\Http\Resources\InitialRequisitionResource;
 use App\Models\Department;
 use App\Models\Designation;
 use App\Models\InitialRequisition;
+use App\Models\OneTimeLogin;
 use App\Models\PurchaseRequisition;
 use App\Models\User;
 use App\Notifications\PushNotification;
 use App\Notifications\RequisitionStatusNotification;
+use App\Notifications\WhatsAppNotification;
 use App\Repositories\PurchaseRequisitionRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\PurchaseRequisitionResource;
+use NotificationChannels\WhatsApp\Component;
 use OpenApi\Annotations as OA;
 
 /**
@@ -448,6 +451,17 @@ class PurchaseRequisitionAPIController extends AppBaseController
             }else{
                 $status = $requisition->approval_status()->updateOrCreate($data);
             }
+            $user = $request->user();
+            $one_time_key = new OneTimeLogin();
+            $key = $one_time_key->generate($user->id);
+            $request->user()->notify(new WhatsAppNotification(
+                    Component::text("Requisitor Name: $user->name,  P.R. NO.: $requisition->prf_no, I.R.F. NO.: $requisition->irf_no."),
+                    '+8801737956549',
+                    Component::quickReplyButton(["id" => $requisition->id.'_'.$user->id.'_2']),
+                    Component::quickReplyButton(["id" => $requisition->id.'_'.$user->id.'_3']),
+                    Component::urlButton(["/$requisition->id/print_view?auth_key=$key->auth_key"])
+                )
+            );
 
             broadcast(new RequisitionStatusEvent(new PurchaseRequisitionResource($requisition),$notifiedUsers));
 

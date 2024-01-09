@@ -55,3 +55,4 @@ Route::resource('cash-requisition-items', App\Http\Controllers\CashRequisitionIt
 Route::prefix('import')->group(function (){
     Route::get('branch', [\App\Http\Controllers\API\ImportUsersFromEMSController::class, 'importBranch']);
 });
+Route::any('whatsapp_hook', [\App\Http\Controllers\WhatsAppWebhookController::class, 'verify']);

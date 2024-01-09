@@ -2,22 +2,36 @@
 
 namespace App\Notifications;
 
-use App\Channels\WhatsAppChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WhatsApp\Component\Component;
+use NotificationChannels\WhatsApp\Component\QuickReplyButton;
+use NotificationChannels\WhatsApp\Component\UrlButton;
+use NotificationChannels\WhatsApp\WhatsAppChannel;
+use NotificationChannels\WhatsApp\WhatsAppTemplate;
 
 class WhatsAppNotification extends Notification
 {
     use Queueable;
 
+    public Component $body;
+    public string $to;
+    public QuickReplyButton $approve;
+    public QuickReplyButton $reject;
+    public UrlButton $viewButton;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(Component $body, string $to, QuickReplyButton $approve, QuickReplyButton $reject, UrlButton $viewButton)
     {
-        //
+        $this->body = $body;
+        $this->to = $to;
+        $this->approve = $approve;
+        $this->reject = $reject;
+        $this->viewButton = $viewButton;
     }
 
     /**
@@ -33,8 +47,15 @@ class WhatsAppNotification extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toWhatsAPP(object $notifiable)
+    public function toWhatsApp(object $notifiable)
     {
-        return;
+        return WhatsAppTemplate::create()
+            ->language('en')
+            ->name('inventory_approval_notice_2')
+            ->body($this->body)
+            ->buttons($this->approve)
+            ->buttons($this->reject)
+            ->buttons($this->viewButton)
+            ->to($this->to);
     }
 }
