@@ -47,6 +47,13 @@ export const UserManagementApi = createApi({
             invalidatesTags: ['getAllUsers'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
+        oneTimeLogin: builder.mutation({
+            query: arg => ({
+                url: 'one_time_login',
+                method: 'POST',
+                body: arg
+            })
+        })
     }),
 })
 
@@ -56,6 +63,7 @@ export  const {
     useUpdateUserMutation,
     useDestroyUserMutation,
     useStoreUserMutation,
+    useOneTimeLoginMutation,
     util: { getRunningQueriesThunk },
 } = UserManagementApi;
 

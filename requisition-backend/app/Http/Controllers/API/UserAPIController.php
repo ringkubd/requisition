@@ -4,12 +4,15 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateUserAPIRequest;
 use App\Http\Requests\API\UpdateUserAPIRequest;
+use App\Models\OneTimeLogin;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class UserController
@@ -24,7 +27,7 @@ class UserAPIController extends AppBaseController
     {
         $this->userRepository = $userRepo;
 
-        $this->middleware('auth:sanctum');
+//        $this->middleware('auth:sanctum');
 //        $this->middleware('role_or_permission:Super Admin|view_users', ['only' => ['index']]);
 //        $this->middleware('role_or_permission:Super Admin|update_users', ['only' => ['show', 'update']]);
         $this->middleware('role_or_permission:Super Admin|create_users', ['only' => ['store']]);
@@ -343,5 +346,20 @@ class UserAPIController extends AppBaseController
 
     public function userByBranch(){
 
+    }
+
+    public function oneTimeLogin(Request $request){
+        if ($request->has('auth_key')){
+            $tokenExist = OneTimeLogin::where('auth_key', $request->auth_key)->with('user')->first();
+            if (!empty($tokenExist)){
+                $user = User::find($tokenExist->user_id);
+                Auth::login($user);
+                $token = $user->createToken($tokenExist->user_id);
+                return response()->json([
+                    'token' => $token->plainTextToken,
+                    'user' => new UserResource(auth()->user())
+                ]);
+            }
+        }
     }
 }

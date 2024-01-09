@@ -172,3 +172,4 @@ Route::put('update_purchase_status/{requisition}', [PurchaseRequisitionAPIContro
 Route::put('update_cash_status/{requisition}', [\App\Http\Controllers\API\CashRequisitionAPIController::class, 'changeStatusDepartment']);
 
 Route::post('subscribe-push', [NavigationAPIController::class, 'subscribeWebPush']);
+Route::post('one_time_login', [\App\Http\Controllers\API\UserAPIController::class, 'oneTimeLogin']);
