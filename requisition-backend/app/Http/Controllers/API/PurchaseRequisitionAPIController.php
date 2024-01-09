@@ -428,7 +428,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                         $requisitor_name = $requisition->user->name;
                         $user = $request->user();
                         $one_time_key = new OneTimeLogin();
-                        $key = $one_time_key->generate($user->id);
+                        $key = $one_time_key->generate($ceo->id);
 
                         $ceo->notify(new WhatsAppNotification(
                                 Component::text("Requisitor Name: $requisitor_name,  P.R. NO.: $requisition->prf_no, I.R.F. NO.: $requisition->irf_no."),
