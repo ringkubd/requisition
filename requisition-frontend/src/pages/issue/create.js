@@ -324,6 +324,7 @@ const create = (props) => {
                                                             '',
                                                         )
                                                         setUnit(newValue?.product?.unit)
+                                                        setStock(0)
                                                     }}
                                                     additional={{
                                                         page: 1,
