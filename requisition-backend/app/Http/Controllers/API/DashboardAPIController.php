@@ -20,8 +20,8 @@ class DashboardAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $initialRequisition =InitialRequisition::query()
-            ->where('branch_id', auth_branch_id())
+        $initialRequisition = InitialRequisition::query()
+//            ->where('branch_id', auth_branch_id())
             ->when($request->user()->hasRole('CEO') || $request->user()->hasRole('Accounts'), function ($query) use($request){
                 if ($request->user()->hasRole('CEO')){
                     $query->whereHas('approval_status', function ($q){
