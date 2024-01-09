@@ -11,7 +11,7 @@ class WhatsAppWebhookController extends Controller
         Log::error('whatsapp_response', ['response' => $request->all()]);
         Log::info( $request->hub_verify_token);
         Log::info( env('WHATSAPP_WEBHOOK_VERIFICATION_TOKEN'));
-        if ($request->has('hub_verify_token') && $request->hub_verify_token == env('WHATSAPP_WEBHOOK_VERIFICATION_TOKEN')){
+        if ($request->has('hub_verify_token') && $request->hub_verify_token == "verification_token"){
             Log::info($request->hub_challenge);
             return $request->hub_challenge;
         }
