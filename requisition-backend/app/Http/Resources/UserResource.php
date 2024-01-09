@@ -17,6 +17,7 @@ class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'mobile_no' => $this->mobile_no,
             'email' => $this->email,
             'organizations' => $this->organizations,
             'organization_name' => implode(',',$this->organizations->pluck('name')->toArray()),

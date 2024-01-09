@@ -96,6 +96,7 @@ use Spatie\Permission\Traits\HasRoles;
         'default_organization_id',
         'default_branch_id',
         'default_department_id',
+        'mobile_no'
     ];
 
     protected $casts = [

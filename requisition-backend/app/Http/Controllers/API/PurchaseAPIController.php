@@ -360,7 +360,7 @@ class PurchaseAPIController extends AppBaseController
         $start = ((int)$request->page - 1) * 10;
         $end = ((int)$request->page) * 10;
 
-        $day_before_15_days = Carbon::now()->subDays(15)->toDateString();
+        $day_before_15_days = Carbon::now()->subDays(30)->toDateString();
         $purchase_requisition = PurchaseRequisitionResource::collection(PurchaseRequisition::query()
             ->where(function ($q) use($request, $day_before_15_days){
                 $q->where('irf_no', 'like', "%$request->search%")

@@ -26,7 +26,7 @@ class UserAPIController extends AppBaseController
 
         $this->middleware('auth:sanctum');
 //        $this->middleware('role_or_permission:Super Admin|view_users', ['only' => ['index']]);
-        $this->middleware('role_or_permission:Super Admin|update_users', ['only' => ['show', 'update']]);
+//        $this->middleware('role_or_permission:Super Admin|update_users', ['only' => ['show', 'update']]);
         $this->middleware('role_or_permission:Super Admin|create_users', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_users', ['only' => ['delete']]);
     }
@@ -252,18 +252,26 @@ class UserAPIController extends AppBaseController
                 __('messages.not_found', ['model' => __('models/users.singular')])
             );
         }
-        $user->organizations()->sync($request->organization_id);
-        $user->branches()->sync($request->branch_id);
-        $user->departments()->sync($request->department_id);
-        $user->designations()->sync($request->designation_id);
+        if ($request->has('organization_id')){
+            $user->organizations()->sync($request->organization_id);
+        }
+        if ($request->has('branch_id')){
+            $user->branches()->sync($request->branch_id);
+        }
+        if ($request->has('department_id')){
+            $user->departments()->sync($request->department_id);
+        }
+        if ($request->has('designation_id')){
+            $user->designations()->sync($request->designation_id);
+        }
 
-        if ($request->default_department_id === "" or $request->default_department_id == null){
+        if ($request->has('default_department_id') && ($request->default_department_id === "" or $request->default_department_id == null)){
             $input['default_department_id'] = $request->department_id[0];
         }
-        if ($request->default_branch_id === "" or $request->default_branch_id == null){
+        if ($request->has('default_branch_id') && ($request->default_branch_id === "" or $request->default_branch_id == null)){
             $input['default_branch_id'] = $request->branch_id[0];
         }
-        if ($request->default_organization_id === "" or $request->default_organization_id == null){
+        if ($request->has('default_branch_id') && ($request->default_organization_id === "" or $request->default_organization_id == null)){
             $input['default_organization_id'] = $request->organization_id[0];
         }
 

@@ -12,7 +12,7 @@ class OrganizationHelperApiController extends AppBaseController
     public function __construct()
     {
         $this->middleware('auth:sanctum');
-        $this->middleware('role_or_permission:Super Admin|update_branches|create_branches', ['only' => ['getBranch']]);
+//        $this->middleware('role_or_permission:Super Admin|update_branches|create_branches', ['only' => ['getBranch']]);
     }
     public function getBranch(Request $request){
         if ($request->has('organization')){

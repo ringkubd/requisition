@@ -367,6 +367,9 @@ const Navigation = ({ user }) => {
                                 </button>
                             }>
                             {/* Authentication */}
+                            <DropdownButton onClick={() => router.push(`/employees/${user?.id}/profile`)}>
+                                Edit Profile
+                            </DropdownButton>
                             <DropdownButton onClick={logout}>
                                 Logout
                             </DropdownButton>
