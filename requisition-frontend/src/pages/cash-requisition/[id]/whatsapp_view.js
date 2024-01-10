@@ -1,21 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { useRouter } from "next/router";
-import { useEditPurchaseRequisitionQuery } from "@/store/service/requisitions/purchase";
 import Head from "next/head";
 import { Button, Card } from "flowbite-react";
 import { useReactToPrint } from "react-to-print";
 import Status from "@/components/requisition/status";
 import { useOneTimeLoginMutation } from "@/store/service/user/management";
 import GuestLayout from "@/components/Layouts/GuestLayout";
-import RequisitionPrintWhatsApp from "@/components/purchase-requisition/RequisitionPrintWhatsApp";
+import RequisitionPrintWhatsApp from "@/components/cash-requisition/RequisitionPrintWhatsApp";
+import { useGetSingleCashRequisitionQuery } from "@/store/service/cash/Index";
 
 export default function WhatsappView(props) {
     const printPageRef = useRef();
     const router = useRouter();
     const [loggedIn, setLoggedIn] = useState(false);
     const [onetimeLogin, {data: LoginData, isSuccess: loginSuccess}] = useOneTimeLoginMutation();
-    const {data, isLoading, isError, refetch} = useEditPurchaseRequisitionQuery(router.query.id, {
+    const {data, isLoading, isError, refetch} = useGetSingleCashRequisitionQuery(router.query.id, {
         skip: !router.query.id || !loggedIn
     });
     const [statusKey, setStatusKey] = useState(Math.round(Math.random() * 100000))
@@ -34,7 +34,7 @@ export default function WhatsappView(props) {
         }
     }, [loginSuccess])
 
-    const requisition_products = data?.data?.purchase_requisition_products;
+    const requisition_products = data?.data?.items;
     const mainData = data?.data;
 
     const handlePrint = useReactToPrint({

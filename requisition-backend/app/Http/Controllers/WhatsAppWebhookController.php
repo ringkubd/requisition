@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashRequisition;
 use App\Models\PurchaseRequisition;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use stdClass;
 
@@ -22,15 +24,26 @@ class WhatsAppWebhookController extends Controller
             $message = $this->messages(json_decode(json_encode($request->entry), true));
             if ($message->message_type == "button"){
                 $payload = explode('_', $message->button['payload']);
+                Log::info($message->button['payload']);
                 $requisition_id = $payload[0];
                 $requisitor_id = $payload[1];
                 $status = $payload[2];
                 $stage = $payload[3] ?? 'ceo';
-                $requisition = PurchaseRequisition::find($requisition_id);
-                $requisition->approval_status([
-                    'ceo_status' => $status,
-                    'ceo_approved_at' => now()
-                ]);
+                $type = $payload[4] ?? 'purchase';
+                if ($type == 'purchase'){
+                    $requisition = PurchaseRequisition::find($requisition_id);
+                    $requisition->approval_status([
+                        'ceo_status' => $status,
+                        'ceo_approved_at' => now()
+                    ]);
+                }
+                if ($type == "cash"){
+                    $requisition = CashRequisition::find($requisition_id);
+                    $requisition->approval_status([
+                        'ceo_status' => $status,
+                        'ceo_approved_at' => now()
+                    ]);
+                }
             }
         }
     }
