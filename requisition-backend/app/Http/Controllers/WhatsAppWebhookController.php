@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PurchaseRequisition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -21,21 +22,17 @@ class WhatsAppWebhookController extends Controller
         if ($validity){
             $message = $this->messages(json_decode(json_encode($request->entry), true));
             if ($message->message_type == "button"){
-                Log::info(json_encode($message->button));
-                //$requisition->id.'_'.$requisitor_name->id.'_2_ceo'
                 $payload = explode('_', $message->button['payload']);
                 $requisition_id = $payload[0];
                 $requisitor_id = $payload[1];
                 $status = $payload[2];
                 $stage = $payload[3] ?? 'ceo';
-                Log::error('payload', [
-                    'id' => $requisition_id,
-                    'requisitor_id' => $requisitor_id,
-                    'status' => $status,
-                    'stage' => $stage,
+                $requisition = PurchaseRequisition::find($requisition_id);
+                $requisition->approval_status([
+                    'ceo_status' => $status,
+                    'ceo_approved_at' => now()
                 ]);
             }
-            Log::info(json_encode($message));
         }
     }
 
