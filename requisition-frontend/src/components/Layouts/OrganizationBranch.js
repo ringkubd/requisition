@@ -57,6 +57,7 @@ export default function OrganizationBranch({user, changingEffect}){
                     <label htmlFor={`user_organization_id`} className={`flex flex-col sm:flex-row sm:items-center`}>
                         Organization
                         <Select
+                            className={`dark:text-black`}
                             id={`user_organization_id`}
                             value={organization_id}
                             onChange={(e) => {
@@ -77,6 +78,7 @@ export default function OrganizationBranch({user, changingEffect}){
                     <label htmlFor={'user_branch_id'} className={`flex flex-col sm:flex-row sm:items-center`}>
                         Branch
                         <Select
+                            className={`dark:text-black`}
                             id={`user_branch_id`}
                             value={branch_id}
                             onChange={(e) => {
@@ -97,6 +99,7 @@ export default function OrganizationBranch({user, changingEffect}){
                     <label htmlFor={`user_department_id`} className={`flex flex-col sm:flex-row sm:items-center`}>
                         Departments
                         <Select
+                            className={`dark:text-black`}
                             id={`user_department_id`}
                             value={department_id}
                             onChange={(e) => {
