@@ -19,7 +19,7 @@ class WhatsAppWebhookController extends Controller
         }
         $validity = $this->verifySignature($request);
         if ($validity){
-            $message = $this->messages($request->entry);
+            $message = $this->messages(json_decode(json_encode($request->entry), true));
             Log::info(json_encode($message));
         }
     }
