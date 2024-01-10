@@ -43,7 +43,7 @@ class WhatsAppWebhookController extends Controller
     private function messages($entry): stdClass
     {
         if (!empty($entry)){
-            $firstEntry = $entry[0];
+            $firstEntry = collect($entry[0]);
             $this->messages->id = $firstEntry->id;
             $this->messages->changes = $firstEntry->changes;
             $this->messages->first_change = $this->messages->changes[0];
