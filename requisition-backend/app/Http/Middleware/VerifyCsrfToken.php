@@ -17,7 +17,8 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'api/suppliers',
-        'whatsapp_hook'
+        'whatsapp_hook',
+        'api/one_time_login',
     ];
     /**
      * Add the CSRF token to the response cookies.
