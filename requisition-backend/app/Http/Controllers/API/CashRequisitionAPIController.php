@@ -354,7 +354,6 @@ class CashRequisitionAPIController extends AppBaseController
                         $user = $request->user();
                         $one_time_key = new OneTimeLogin();
                         $key = $one_time_key->generate($ceo->id);
-
                         $ceo->notify(new WhatsAppNotification(
                                 Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
                                 $ceo->mobile_no,

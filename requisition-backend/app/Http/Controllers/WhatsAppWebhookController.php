@@ -30,19 +30,34 @@ class WhatsAppWebhookController extends Controller
                 $status = $payload[2];
                 $stage = $payload[3] ?? 'ceo';
                 $type = $payload[4] ?? 'purchase';
+                Log::info($type);
                 if ($type == 'purchase'){
                     $requisition = PurchaseRequisition::find($requisition_id);
-                    $requisition->approval_status([
-                        'ceo_status' => $status,
-                        'ceo_approved_at' => now()
-                    ]);
+                    if ($requisition->approval_status){
+                        $update = $requisition->approval_status()->update([
+                            'ceo_status' => $status,
+                            'ceo_approved_at' => now()
+                        ]);
+                    }else{
+                        $update = $requisition->approval_status()->updateOrCreate([
+                            'ceo_status' => $status,
+                            'ceo_approved_at' => now()
+                        ]);
+                    }
                 }
                 if ($type == "cash"){
                     $requisition = CashRequisition::find($requisition_id);
-                    $requisition->approval_status([
-                        'ceo_status' => $status,
-                        'ceo_approved_at' => now()
-                    ]);
+                    if ($requisition->approval_status){
+                        $update = $requisition->approval_status()->update([
+                            'ceo_status' => $status,
+                            'ceo_approved_at' => now()
+                        ]);
+                    }else{
+                        $update = $requisition->approval_status()->updateOrCreate([
+                            'ceo_status' => $status,
+                            'ceo_approved_at' => now()
+                        ]);
+                    }
                 }
             }
         }
