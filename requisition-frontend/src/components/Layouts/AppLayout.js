@@ -126,7 +126,7 @@ const AppLayout = ({ header, children }) => {
 
 
     return (
-        <div className="min-h-screen min-w-fit bg-gray-100">
+        <div className="min-h-screen min-w-fit bg-gray-100 dark:bg-gray-100 dark:text-sky-200">
             <Navigation user={user} />
             {/* Page Heading */}
             <header className="bg-white shadow-md flex flex-row">
@@ -137,7 +137,7 @@ const AppLayout = ({ header, children }) => {
             </header>
 
             {/* Page Content */}
-            <main>
+            <main className={`dark:bg-gray-100`}>
                 <Suspense fallback={<Loading />} children={children}>
                     {load ? (
                         <Loading />
