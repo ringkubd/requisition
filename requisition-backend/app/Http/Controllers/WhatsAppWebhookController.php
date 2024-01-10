@@ -13,7 +13,7 @@ class WhatsAppWebhookController extends Controller
 
     public function verify(Request $request)
     {
-        Storage::put("whatsapp_".rand(1,999999999).'.txt', $request->all());
+        Storage::put("whatsapp_".rand(1,999999999).'.txt', json_encode($request->all()));
         if ($request->isMethod('GET') && $request->has('hub_verify_token') && $request->hub_verify_token == "verification_token") {
             return $request->hub_challenge;
         }
