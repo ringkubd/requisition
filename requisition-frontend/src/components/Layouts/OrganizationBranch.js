@@ -51,10 +51,10 @@ export default function OrganizationBranch({user, changingEffect}){
     }, [updateOrganizationResult.isSuccess]);
 
     return (
-        <div className="max-w-7xl flex flex-row mx-auto py-6 px-4 my-1 sm:px-6 lg:px-8 gap-2">
+        <div className="max-w-7xl flex flex-col  sm:flex-row mx-auto sm:py-6 px-4 my-1 sm:px-6 lg:px-8 gap-2">
             {
                 organizations?.data?.length > 1 && (
-                    <label htmlFor={`user_organization_id`} className={`flex flex-row items-center`}>
+                    <label htmlFor={`user_organization_id`} className={`flex flex-col sm:flex-row sm:items-center`}>
                         Organization
                         <Select
                             id={`user_organization_id`}
@@ -74,7 +74,7 @@ export default function OrganizationBranch({user, changingEffect}){
             }
             {
                 branches?.data?.length && (
-                    <label htmlFor={'user_branch_id'} className={`flex flex-row items-center`}>
+                    <label htmlFor={'user_branch_id'} className={`flex flex-col sm:flex-row sm:items-center`}>
                         Branch
                         <Select
                             id={`user_branch_id`}
@@ -94,7 +94,7 @@ export default function OrganizationBranch({user, changingEffect}){
             }
             {
 
-                    <label htmlFor={`user_department_id`} className={`flex flex-row items-center`}>
+                    <label htmlFor={`user_department_id`} className={`flex flex-col sm:flex-row sm:items-center`}>
                         Departments
                         <Select
                             id={`user_department_id`}

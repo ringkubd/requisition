@@ -28,6 +28,7 @@ class InitialRequisitionProductResource extends JsonResource
             'required_quantity' => $this->required_quantity,
             'available_quantity' => $this->available_quantity,
             'quantity_to_be_purchase' => $this->quantity_to_be_purchase,
+            'useInCategory' => $this->useInCategory,
             'purpose' => $this->purpose,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

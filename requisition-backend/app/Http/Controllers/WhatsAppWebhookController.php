@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\PurchaseRequisition;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use stdClass;
 
@@ -63,15 +62,15 @@ class WhatsAppWebhookController extends Controller
             $this->messages->changes = $firstEntry['changes'];
             $this->messages->first_change = collect($this->messages->changes[0]);
             $this->messages->message_value = collect($this->messages->first_change['value']);
-            $this->messages->metadata = $this->messages->message_value['metadata'] ?? new stdClass();
-            $this->messages->contacts = $this->messages->message_value['contacts'] ?? new stdClass();
-            $this->messages->messages = $this->messages->message_value['messages'] ?? new stdClass();
-            $this->messages->first_message = collect($this->messages->messages[0]) ?? new stdClass();
+            $this->messages->metadata = $this->messages->message_value['metadata'] ?? [];
+            $this->messages->contacts = $this->messages->message_value['contacts'] ?? [];
+            $this->messages->messages = $this->messages->message_value['messages'] ?? [];
+            $this->messages->first_message = collect($this->messages->messages[0]) ?? [];
             $this->messages->message_type = $this->messages->first_message['type'] ?? '';
             $this->messages->context = $this->messages->first_message['context'] ?? "";
             $this->messages->from = $this->messages->first_message['from'] ?? "";
             $this->messages->timestamp = $this->messages->first_message['timestamp'] ?? "";
-            $this->messages->button = $this->messages->first_message['button'] ?? new stdClass();
+            $this->messages->button = $this->messages->first_message['button'] ?? [];
         }
         return $this->messages;
     }

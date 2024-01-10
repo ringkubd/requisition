@@ -34,7 +34,7 @@ class PurchaseResource extends JsonResource
             'rateLog' => $this->rateLog,
             'qty' => $this->qty,
             'unit_price' => $this->unit_price,
-            'total_price' => $this->total_price,
+            'total_price' => round($this->total_price),
             'purchase_date' => $this->purchase_date,
             'available_qty' => $this->available_qty,
             'notes' => $this->notes,

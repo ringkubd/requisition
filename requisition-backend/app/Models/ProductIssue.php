@@ -82,6 +82,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         'store_status',
         'department_approved_at',
         'store_approved_at',
+        'use_in_category',
     ];
 
     public static array $rules = [
@@ -141,5 +142,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     public function storeApprovedBY(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'store_approved_by');
+    }
+    public function useInCategory(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'use_in_category');
     }
 }

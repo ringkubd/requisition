@@ -51,6 +51,10 @@ const InitialRequisitionCreate = (props) => {
     }, [products]);
 
     const submit = () => {
+        if (!paymentType){
+            toast.error("Please select payment type.");
+            return;
+        }
         if (products.length){
             if (!totalPrice){
                 const check = confirm("Are you sure you want to submit an estimated amount of 0?");

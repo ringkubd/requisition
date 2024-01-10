@@ -223,8 +223,7 @@ const InitialRequisitionCreate = (props) => {
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                         Add new requisition.
                     </h2>
-                }
-            >
+                }>
                 <Head>
                     <title>Add new requisition</title>
                 </Head>
@@ -232,14 +231,17 @@ const InitialRequisitionCreate = (props) => {
                     <Card className="min-h-screen">
                         <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
                             <NavLink
-                                active={router.pathname === 'initial-requisition'}
-                                href={`/initial-requisition`}
-                            >
+                                active={
+                                    router.pathname === 'initial-requisition'
+                                }
+                                href={`/initial-requisition`}>
                                 <Button>Back</Button>
                             </NavLink>
                         </div>
-                        <div className={`flex flex-col justify-center justify-items-center items-center basis-2/4 w-full space-y-4`}>
-                            <div className={`shadow-md w-full shadow-amber-500`}>
+                        <div
+                            className={`flex flex-col justify-center justify-items-center items-center basis-2/4 w-full space-y-4`}>
+                            <div
+                                className={`shadow-md w-full shadow-amber-500`}>
                                 <DataTable
                                     columns={tableColumns}
                                     data={requisitionData}
@@ -249,289 +251,441 @@ const InitialRequisitionCreate = (props) => {
                                 initialValues={initValues}
                                 onSubmit={addItems}
                                 validationSchema={validationSchema}
-                                innerRef={formikForm}
-                            >
-                                {
-                                    ({handleSubmit, handleChange, handleBlur,setFieldValue, values, errors, isSubmitting, setErrors}) => (
-                                        <>
-                                            <div className="flex flex-col xl:flex-row gap-4 w-full shadow-md py-6 px-4">
-                                                <div className="flex flex-row w-full gap-4">
-                                                    <div className="w-full">
-                                                        <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="category_id"
-                                                                value="Category"
-                                                            />
-                                                        </div>
-                                                        <AsyncPaginate
-                                                            defaultOptions
-                                                            name='category_id'
-                                                            id='category_id'
-                                                            className={`select`}
-                                                            classNames={{
-                                                                control: state => 'select'
-                                                            }}
-                                                            onChange={(newValue) => {
-                                                                setSelectedCategory(newValue?.value)
-                                                            }}
-                                                            additional={{
-                                                                page: 1,
-                                                            }}
-                                                            loadOptions={loadCategory}
-                                                            data-placeholder="Select options..."
+                                innerRef={formikForm}>
+                                {({
+                                    handleSubmit,
+                                    handleChange,
+                                    handleBlur,
+                                    setFieldValue,
+                                    values,
+                                    errors,
+                                    isSubmitting,
+                                    setErrors,
+                                }) => (
+                                    <div className={`flex flex-col w-full m-auto`}>
+                                        <div
+                                            className={`flex flex-row w-full justify-end justify-items-end items-end`}>
+                                            <Button
+                                                isProcessing={isSubmitting}
+                                                onClick={submit}
+                                                type="submit"
+                                                color={`success`}>
+                                                Submit
+                                            </Button>
+                                        </div>
+                                        <div className="flex flex-col xl:flex-row gap-4 w-full justify-center shadow-md py-6 px-4">
+                                            <div className="flex flex-row w-full gap-4">
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                            htmlFor="category_id"
+                                                            value="Category"
                                                         />
-                                                        <ErrorMessage
-                                                            name='category_id'
-                                                            render={(msg) => <span className='text-red-500'>{msg}</span>} />
                                                     </div>
+                                                    <AsyncPaginate
+                                                        defaultOptions
+                                                        name="category_id"
+                                                        id="category_id"
+                                                        className={`select`}
+                                                        classNames={{
+                                                            control: state =>
+                                                                'select',
+                                                        }}
+                                                        onChange={newValue => {
+                                                            setSelectedCategory(
+                                                                newValue?.value,
+                                                            )
+                                                        }}
+                                                        additional={{
+                                                            page: 1,
+                                                        }}
+                                                        loadOptions={
+                                                            loadCategory
+                                                        }
+                                                        data-placeholder="Select options..."
+                                                    />
+                                                    <ErrorMessage
+                                                        name="category_id"
+                                                        render={msg => (
+                                                            <span className="text-red-500">
+                                                                {msg}
+                                                            </span>
+                                                        )}
+                                                    />
                                                 </div>
                                             </div>
-                                            <div className="flex flex-col xl:flex-row gap-4 w-full shadow-md py-6 px-4">
-                                                <div className="flex flex-row w-full gap-4">
-                                                    <div className="w-full">
-                                                        <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="product_id"
-                                                                value="Product"
-                                                            />
-                                                        </div>
-                                                        <AsyncPaginate
-                                                            key={selectedCategory}
-                                                            name='product_id'
-                                                            id='product_id'
-                                                            selectRef={selectRef}
-                                                            className={`select`}
-                                                            loadOptionsOnMenuOpen
-                                                            classNames={{
-                                                                control: state => 'select'
-                                                            }}
-                                                            onChange={(newValue) => {
-                                                                setProductOptions(newValue.product_options)
-                                                                setProductUnit(newValue.unit)
-                                                                setFieldValue('product_id', newValue.value)
-                                                                setFieldValue('product_title', newValue.label)
-                                                                setFieldValue('last_purchase_date', newValue.last_purchase?.created_at ? moment(newValue?.last_purchase?.created_at)?.format('Y-M-DD') : null);
-                                                            }}
-                                                            additional={{
-                                                                page: 1,
-                                                            }}
-                                                            loadOptions={loadOptions}
-                                                            data-placeholder="Select options..."
+                                        </div>
+                                        <div className="flex flex-col  gap-4 w-full shadow-md py-6 px-4 justify-center">
+                                            <div className="flex flex-col md:flex-row w-full gap-4">
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                            htmlFor="product_id"
+                                                            value="Product"
                                                         />
-                                                        <ErrorMessage
-                                                            name='product_id'
-                                                            render={(msg) => <span
-                                                                className='text-red-500'>{msg}</span>} />
                                                     </div>
+                                                    <AsyncPaginate
+                                                        key={selectedCategory}
+                                                        name="product_id"
+                                                        id="product_id"
+                                                        selectRef={selectRef}
+                                                        className={`select`}
+                                                        loadOptionsOnMenuOpen
+                                                        classNames={{
+                                                            control: state =>
+                                                                'select',
+                                                        }}
+                                                        onChange={newValue => {
+                                                            setProductOptions(
+                                                                newValue.product_options,
+                                                            )
+                                                            setProductUnit(
+                                                                newValue.unit,
+                                                            )
+                                                            setFieldValue(
+                                                                'product_id',
+                                                                newValue.value,
+                                                            )
+                                                            setFieldValue(
+                                                                'product_title',
+                                                                newValue.label,
+                                                            )
+                                                            setFieldValue(
+                                                                'last_purchase_date',
+                                                                newValue
+                                                                    .last_purchase
+                                                                    ?.created_at
+                                                                    ? moment(
+                                                                          newValue
+                                                                              ?.last_purchase
+                                                                              ?.created_at,
+                                                                      )?.format(
+                                                                          'Y-M-DD',
+                                                                      )
+                                                                    : null,
+                                                            )
+                                                        }}
+                                                        additional={{
+                                                            page: 1,
+                                                        }}
+                                                        loadOptions={
+                                                            loadOptions
+                                                        }
+                                                        data-placeholder="Select options..."
+                                                    />
+                                                    <ErrorMessage
+                                                        name="product_id"
+                                                        render={msg => (
+                                                            <span className="text-red-500">
+                                                                {msg}
+                                                            </span>
+                                                        )}
+                                                    />
                                                 </div>
-                                                <div className="flex flex-row w-full lg:w-1/2 gap-4">
-                                                    <div className="w-full">
-                                                        <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="unit"
-                                                                value="Unit"
-                                                            />
-                                                        </div>
-                                                        <TextInput
-                                                            value={productUnit}
-                                                            id='unit'
-                                                            name='unit'
-                                                            onChange={handleChange}
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                            htmlFor="product_option_id"
+                                                            value="Varient"
                                                         />
-                                                        <ErrorMessage
-                                                            name='Unit'
-                                                            render={(msg) => <span
-                                                                className='text-red-500'>{msg}</span>} />
                                                     </div>
-                                                </div>
-                                                <div className="flex flex-row w-full lg:w-1/2 gap-4">
-                                                    <div className="w-full">
-                                                        <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="product_option_id"
-                                                                value="Varient"
-                                                            />
-                                                        </div>
-                                                        <Select
-                                                            value={productOptions?.filter((po) => po.id == values.product_option_id)?.map(po => ({
-                                                                label: po.option_value,
-                                                                value: po.id
+                                                    <Select
+                                                        value={productOptions
+                                                            ?.filter(
+                                                                po =>
+                                                                    po.id ==
+                                                                    values.product_option_id,
+                                                            )
+                                                            ?.map(po => ({
+                                                                label:
+                                                                    po.option_value,
+                                                                value: po.id,
                                                             }))}
-                                                            onChange={(newValue) => {
-                                                                setFieldValue('product_option_id', newValue.value)
-                                                                setFieldValue('product_option_name', newValue.label)
-                                                                setFieldValue('available_quantity', newValue.stock ?? 0);
-                                                            }}
-                                                            id='product_option_id'
-                                                            name="product_option_id"
-                                                            options={productOptions?.map((o) => ({
-                                                                label: o.option_value,
+                                                        onChange={newValue => {
+                                                            setFieldValue(
+                                                                'product_option_id',
+                                                                newValue.value,
+                                                            )
+                                                            setFieldValue(
+                                                                'product_option_name',
+                                                                newValue.label,
+                                                            )
+                                                            setFieldValue(
+                                                                'available_quantity',
+                                                                newValue.stock ??
+                                                                    0,
+                                                            )
+                                                        }}
+                                                        id="product_option_id"
+                                                        name="product_option_id"
+                                                        options={productOptions?.map(
+                                                            o => ({
+                                                                label:
+                                                                    o.option_value,
                                                                 value: o.id,
                                                                 stock: o.stock,
-                                                            }))}
-                                                            className={`select`}
-                                                            classNames={{
-                                                                control: state => `select`
-                                                            }}
-                                                        />
-                                                        <ErrorMessage
-                                                            name='product_option_id'
-                                                            render={(msg) => <span
-                                                                className='text-red-500'>{msg}</span>} />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-row w-full lg:w-1/2 gap-4">
-                                                    <div className="w-full">
-                                                        <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="required_quantity"
-                                                                value="Required Quantity"
-                                                            />
-                                                        </div>
-                                                        <TextInput
-                                                            value={values.required_quantity}
-                                                            id='required_quantity'
-                                                            name='required_quantity'
-                                                            type={`number`}
-                                                            step={0.1}
-                                                            onChange={(e) => {
-                                                                handleChange(e);
-                                                                setFieldValue('quantity_to_be_purchase', (e.target.value - values.available_quantity) < 0 ? 0 : (e.target.value - values.available_quantity))
-                                                            }}
-                                                        />
-                                                        <ErrorMessage
-                                                            name='required_quantity'
-                                                            render={(msg) => <span
-                                                                className='text-red-500'>{msg}</span>} />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-row w-full lg:w-1/2 gap-4">
-                                                    <div className="w-full">
-                                                        <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="available_quantity"
-                                                                value="Available Quantity"
-                                                            />
-                                                        </div>
-                                                        <TextInput
-                                                            value={values.available_quantity}
-                                                            id='available_quantity'
-                                                            name='available_quantity'
-                                                            type={`number`}
-                                                            step={0.1}
-                                                            onChange={handleChange}
-                                                            onBlur={handleChange}
-                                                        />
-                                                        <ErrorMessage
-                                                            name='available_quantity'
-                                                            render={(msg) => <span
-                                                                className='text-red-500'>{msg}</span>} />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-row  w-full lg:w-1/2 gap-4">
-                                                    <div className="w-full">
-                                                        <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="quantity_to_be_purchase"
-                                                                value="Qty to be purchase"
-                                                            />
-                                                        </div>
-                                                        <TextInput
-                                                            value={values.quantity_to_be_purchase}
-                                                            id='quantity_to_be_purchase'
-                                                            name='quantity_to_be_purchase'
-                                                            type={`number`}
-                                                            step={0.1}
-                                                            onChange={handleChange}
-                                                        />
-                                                        <ErrorMessage
-                                                            name='quantity_to_be_purchase'
-                                                            render={(msg) => <span
-                                                                className='text-red-500'>{msg}</span>} />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-row w-full gap-4 relative">
-                                                    <div className="w-full">
-                                                        <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="purpose"
-                                                                value="Purpose"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <div className="flex">
-                                                                <div className="relative w-full">
-                                                                    <input
-                                                                        className="block w-full border disabled:cursor-not-allowed disabled:opacity-50 bg-gray-50 border-gray-300 text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-cyan-500 dark:focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
-                                                                        id="purpose"
-                                                                        name="purpose"
-                                                                        ref={purposRef}
-                                                                        value={values.purpose}
-                                                                        onChange={(e) => {
-                                                                            handleChange(e)
-                                                                        }}
-                                                                        onFocus={() => {
-                                                                            setSelectedProduct(values.product_id)
-                                                                            setSelectedProductOption(values.product_option_id)
-                                                                            setSuggestState(true)
-                                                                        }}
-                                                                        onBlur={() => setSuggestState(false)}
-                                                                        autoComplete={`off`}
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                            <SwitchTransition>
-                                                                <CSSTransition
-                                                                    key={suggestState}
-                                                                    nodeRef={nodeRef}
-                                                                    addEndListener={(done) => nodeRef.current.addEventListener("transitionend", done, false)}
-                                                                    classNames='fade'
-                                                                >
-                                                                    <div ref={nodeRef}>
-                                                                        {
-                                                                            suggestState ? (!suggestionQuery.isLoading && !suggestionQuery.isError && suggestionQuery.data ? (
-                                                                                    <ul className={`py-1 mt-1 space-y-2 bg-green-100 px-1 z-50 absolute w-full`}
-                                                                                        ref={suggestRef}>
-                                                                                        {
-                                                                                            suggestionQuery.data.data.map((s, i) => (
-                                                                                                <li key={i}
-                                                                                                    className={`bg-gray-300 px-2 rounded hover:drop-shadow-md hover:cursor-pointer hover:bg-gray-400`}>{s.purpose}</li>
-                                                                                            ))
-                                                                                        }
-                                                                                    </ul>
-                                                                                ) : suggestionQuery.isLoading ? "Loading..." : '')
-                                                                                : <div></div>
-                                                                        }
-                                                                    </div>
-                                                                </CSSTransition>
-                                                            </SwitchTransition>
-                                                        </div>
-                                                        <ErrorMessage
-                                                            name='purpose'
-                                                            render={(msg) => <span
-                                                                className='text-red-500'>{msg}</span>} />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-row gap-4 justify-end mt-8">
-                                                    <Button
-                                                        isProcessing={isSubmitting}
-                                                        onClick={handleSubmit}
-                                                        type='submit'
-                                                        color={`warning`}>Add</Button>
+                                                            }),
+                                                        )}
+                                                        className={`select`}
+                                                        classNames={{
+                                                            control: state =>
+                                                                `select`,
+                                                        }}
+                                                    />
+                                                    <ErrorMessage
+                                                        name="product_option_id"
+                                                        render={msg => (
+                                                            <span className="text-red-500">
+                                                                {msg}
+                                                            </span>
+                                                        )}
+                                                    />
                                                 </div>
                                             </div>
-                                            <div
-                                                className={`flex flex-row w-full justify-end justify-items-end items-end`}>
+                                            <div className="flex flex-row w-full gap-4">
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                            htmlFor="unit"
+                                                            value="Unit"
+                                                        />
+                                                    </div>
+                                                    <TextInput
+                                                        value={productUnit}
+                                                        id="unit"
+                                                        name="unit"
+                                                        onChange={handleChange}
+                                                    />
+                                                    <ErrorMessage
+                                                        name="Unit"
+                                                        render={msg => (
+                                                            <span className="text-red-500">
+                                                                {msg}
+                                                            </span>
+                                                        )}
+                                                    />
+                                                </div>
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                            htmlFor="required_quantity"
+                                                            value="Required Quantity"
+                                                        />
+                                                    </div>
+                                                    <TextInput
+                                                        value={
+                                                            values.required_quantity
+                                                        }
+                                                        id="required_quantity"
+                                                        name="required_quantity"
+                                                        type={`number`}
+                                                        step={0.1}
+                                                        onChange={e => {
+                                                            handleChange(e)
+                                                            setFieldValue(
+                                                                'quantity_to_be_purchase',
+                                                                e.target.value -
+                                                                    values.available_quantity <
+                                                                    0
+                                                                    ? 0
+                                                                    : e.target
+                                                                          .value -
+                                                                          values.available_quantity,
+                                                            )
+                                                        }}
+                                                    />
+                                                    <ErrorMessage
+                                                        name="required_quantity"
+                                                        render={msg => (
+                                                            <span className="text-red-500">
+                                                                {msg}
+                                                            </span>
+                                                        )}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-row w-full gap-4">
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                            htmlFor="available_quantity"
+                                                            value="Available Quantity"
+                                                        />
+                                                    </div>
+                                                    <TextInput
+                                                        value={
+                                                            values.available_quantity
+                                                        }
+                                                        id="available_quantity"
+                                                        name="available_quantity"
+                                                        type={`number`}
+                                                        step={0.1}
+                                                        onChange={handleChange}
+                                                        onBlur={handleChange}
+                                                    />
+                                                    <ErrorMessage
+                                                        name="available_quantity"
+                                                        render={msg => (
+                                                            <span className="text-red-500">
+                                                                {msg}
+                                                            </span>
+                                                        )}
+                                                    />
+                                                </div>
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                            htmlFor="quantity_to_be_purchase"
+                                                            value="Qty to be purchase"
+                                                        />
+                                                    </div>
+                                                    <TextInput
+                                                        value={
+                                                            values.quantity_to_be_purchase
+                                                        }
+                                                        id="quantity_to_be_purchase"
+                                                        name="quantity_to_be_purchase"
+                                                        type={`number`}
+                                                        step={0.1}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <ErrorMessage
+                                                        name="quantity_to_be_purchase"
+                                                        render={msg => (
+                                                            <span className="text-red-500">
+                                                                {msg}
+                                                            </span>
+                                                        )}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-row  w-full gap-4"></div>
+                                            <div className="flex flex-row  w-full gap-4 relative">
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                            htmlFor="purpose"
+                                                            value="Purpose"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex">
+                                                            <div className="relative w-full">
+                                                                <input
+                                                                    className="block w-full border disabled:cursor-not-allowed disabled:opacity-50 bg-gray-50 border-gray-300 text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-cyan-500 dark:focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
+                                                                    id="purpose"
+                                                                    name="purpose"
+                                                                    ref={
+                                                                        purposRef
+                                                                    }
+                                                                    value={
+                                                                        values.purpose
+                                                                    }
+                                                                    onChange={e => {
+                                                                        handleChange(
+                                                                            e,
+                                                                        )
+                                                                    }}
+                                                                    onFocus={() => {
+                                                                        setSelectedProduct(
+                                                                            values.product_id,
+                                                                        )
+                                                                        setSelectedProductOption(
+                                                                            values.product_option_id,
+                                                                        )
+                                                                        setSuggestState(
+                                                                            true,
+                                                                        )
+                                                                    }}
+                                                                    onBlur={() =>
+                                                                        setSuggestState(
+                                                                            false,
+                                                                        )
+                                                                    }
+                                                                    autoComplete={`off`}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <SwitchTransition>
+                                                            <CSSTransition
+                                                                key={
+                                                                    suggestState
+                                                                }
+                                                                nodeRef={
+                                                                    nodeRef
+                                                                }
+                                                                addEndListener={done =>
+                                                                    nodeRef.current.addEventListener(
+                                                                        'transitionend',
+                                                                        done,
+                                                                        false,
+                                                                    )
+                                                                }
+                                                                classNames="fade">
+                                                                <div
+                                                                    ref={
+                                                                        nodeRef
+                                                                    }>
+                                                                    {suggestState ? (
+                                                                        !suggestionQuery.isLoading &&
+                                                                        !suggestionQuery.isError &&
+                                                                        suggestionQuery.data ? (
+                                                                            <ul
+                                                                                className={`py-1 mt-1 space-y-2 bg-green-100 px-1 z-50 absolute w-full`}
+                                                                                ref={
+                                                                                    suggestRef
+                                                                                }>
+                                                                                {suggestionQuery.data.data.map(
+                                                                                    (
+                                                                                        s,
+                                                                                        i,
+                                                                                    ) => (
+                                                                                        <li
+                                                                                            key={
+                                                                                                i
+                                                                                            }
+                                                                                            className={`bg-gray-300 px-2 rounded hover:drop-shadow-md hover:cursor-pointer hover:bg-gray-400`}>
+                                                                                            {
+                                                                                                s.purpose
+                                                                                            }
+                                                                                        </li>
+                                                                                    ),
+                                                                                )}
+                                                                            </ul>
+                                                                        ) : suggestionQuery.isLoading ? (
+                                                                            'Loading...'
+                                                                        ) : (
+                                                                            ''
+                                                                        )
+                                                                    ) : (
+                                                                        <div></div>
+                                                                    )}
+                                                                </div>
+                                                            </CSSTransition>
+                                                        </SwitchTransition>
+                                                    </div>
+                                                    <ErrorMessage
+                                                        name="purpose"
+                                                        render={msg => (
+                                                            <span className="text-red-500">
+                                                                {msg}
+                                                            </span>
+                                                        )}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-row w-full gap-4">
                                                 <Button
                                                     isProcessing={isSubmitting}
-                                                    onClick={submit}
-                                                    type='submit'
-                                                    color={`success`}>Submit</Button>
+                                                    onClick={handleSubmit}
+                                                    type="submit"
+                                                    color={`warning`}>
+                                                    Add
+                                                </Button>
                                             </div>
-                                        </>
-                                    )
-                                }
-
+                                        </div>
+                                    </div>
+                                )}
                             </Formik>
                         </div>
                     </Card>

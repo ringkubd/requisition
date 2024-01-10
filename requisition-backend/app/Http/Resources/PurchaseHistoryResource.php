@@ -29,7 +29,7 @@ class PurchaseHistoryResource extends JsonResource
             'expiry_date' => $this->expiry_date,
             'available_qty' => $this->available_qty,
             'unit_price' => $this->unit_price,
-            'total_price' => $this->total_price,
+            'total_price' => round($this->total_price),
             'user_id' => $this->user_id,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,

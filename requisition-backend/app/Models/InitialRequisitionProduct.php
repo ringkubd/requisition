@@ -23,4 +23,8 @@ class InitialRequisitionProduct extends BaseModel
     {
         return $this->belongsTo(ProductOption::class, 'product_option_id', 'id');
     }
+    public function useInCategory(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'use_in_category');
+    }
 }

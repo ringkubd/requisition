@@ -25,7 +25,7 @@ class ProductIssueResource extends JsonResource
             'variant' => new ProductOptionResource($this->productOption),
             'rateLog' => $this->rateLog,
             'average_rate' => max($this->rateLog->sum('unit_price'), 1) / max($this->rateLog->count(), 1),
-            'total_price' => $this->rateLog->sum('total_price'),
+            'total_price' =>  round($this->rateLog->sum('total_price')),
             'quantity' => $this->quantity,
             'receiver_id' => $this->receiver_id,
             'receiver' => $this->receiver,
@@ -45,6 +45,8 @@ class ProductIssueResource extends JsonResource
             'storeApprovedBY' => $this->storeApprovedBY,
             'store_approved_at' => $this->store_approved_at,
             'store_status' => $this->store_status,
+            'use_in_category' => $this->use_in_category,
+            'useInCategory' => $this->useInCategory,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

@@ -126,11 +126,11 @@ const AppLayout = ({ header, children }) => {
 
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen min-w-fit bg-gray-100">
             <Navigation user={user} />
             {/* Page Heading */}
             <header className="bg-white shadow-md flex flex-row">
-                <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <div className="sm:max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     {header}
                 </div>
                 <OrganizationBranch changingEffect={changingEffect} user={user} />

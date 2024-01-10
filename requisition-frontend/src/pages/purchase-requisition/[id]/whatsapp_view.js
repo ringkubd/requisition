@@ -9,6 +9,7 @@ import { useReactToPrint } from "react-to-print";
 import Status from "@/components/requisition/status";
 import { useOneTimeLoginMutation } from "@/store/service/user/management";
 import GuestLayout from "@/components/Layouts/GuestLayout";
+import RequisitionPrintWhatsApp from "@/components/purchase-requisition/RequisitionPrintWhatsApp";
 
 export default function WhatsappView(props) {
     const printPageRef = useRef();
@@ -84,7 +85,7 @@ export default function WhatsappView(props) {
 
                     </div>
                     <div className={`mx-auto shadow-none`}>
-                        <RequisitionPrint
+                        <RequisitionPrintWhatsApp
                             requisition_products={requisition_products}
                             mainData={mainData}
                             ref={printPageRef} />
