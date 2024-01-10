@@ -45,14 +45,14 @@ class WhatsAppWebhookController extends Controller
     {
         if (!empty($entry)){
             $firstEntry = collect($entry[0]);
-            $this->messages->id = $firstEntry->id;
-            $this->messages->changes = $firstEntry->changes;
-            $this->messages->first_change = $this->messages->changes[0];
-            $this->messages->message_value = $this->messages->first_change->value;
+            $this->messages->id = $firstEntry['id'];
+            $this->messages->changes = $firstEntry['changes'];
+            $this->messages->first_change = collect($this->messages->changes[0]);
+            $this->messages->message_value = collect($this->messages->first_change->value);
             $this->messages->metadata = $this->messages->message_value->metadata;
             $this->messages->contacts = $this->messages->message_value->contacts;
             $this->messages->messages = $this->messages->message_value->messages;
-            $this->messages->first_message = $this->messages->messages[0];
+            $this->messages->first_message = collect($this->messages->messages[0]);
             $this->messages->message_type = $this->messages->first_message->type;
             $this->messages->context = $this->messages->first_message->context;
             $this->messages->from = $this->messages->first_message->from;
