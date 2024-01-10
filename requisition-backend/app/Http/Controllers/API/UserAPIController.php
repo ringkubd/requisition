@@ -357,7 +357,7 @@ class UserAPIController extends AppBaseController
                 $token = $user->createToken($tokenExist->user_id);
                 $tokenExist->update([
                     'used_at' => now(),
-                    'user_ip' => $request->ip()
+                    'used_ip' => $request->ip()
                 ]);
                 return response()->json([
                     'token' => $token->plainTextToken,
