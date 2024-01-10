@@ -25,7 +25,7 @@ const RequisitionPrintWhatsApp = forwardRef(({mainData, requisition_products}, r
 
     return (
         <div
-            className={`flex flex-col w-full m-2 justify-center justify-items-center p-4 shadow-none `}
+            className={`flex flex-col w-full m-2 justify-center justify-items-center p-4 shadow-none dark:bg-white`}
             ref={ref}>
             <div
                 className={`flex flex-col w-full justify-center justify-items-center shadow-none printBody`}>
