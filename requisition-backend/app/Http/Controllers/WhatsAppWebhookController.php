@@ -23,7 +23,7 @@ class WhatsAppWebhookController extends Controller
             if ($message->message_type == "button"){
                 Log::info(json_encode($message->button));
                 //$requisition->id.'_'.$requisitor_name->id.'_2_ceo'
-                $payload = explode('_', $message->button);
+                $payload = explode('_', $message->button['payload']);
                 $requisition_id = $payload[0];
                 $requisitor_id = $payload[1];
                 $status = $payload[2];
