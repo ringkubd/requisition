@@ -20,6 +20,21 @@ class WhatsAppWebhookController extends Controller
         $validity = $this->verifySignature($request);
         if ($validity){
             $message = $this->messages(json_decode(json_encode($request->entry), true));
+            if ($message->message_type == "button"){
+                Log::info(json_encode($message->button));
+                //$requisition->id.'_'.$requisitor_name->id.'_2_ceo'
+                $payload = explode('_', $message->button);
+                $requisition_id = $payload[0];
+                $requisitor_id = $payload[1];
+                $status = $payload[2];
+                $stage = $payload[3] ?? 'ceo';
+                Log::error('payload', [
+                    'id' => $requisition_id,
+                    'requisitor_id' => $requisitor_id,
+                    'status' => $status,
+                    'stage' => $stage,
+                ]);
+            }
             Log::info(json_encode($message));
         }
     }
