@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use stdClass;
 
 class WhatsAppWebhookController extends Controller
@@ -12,7 +13,7 @@ class WhatsAppWebhookController extends Controller
 
     public function verify(Request $request)
     {
-        Log::error('whatsapp_response', ['message' => json_encode(collect($request->entry))]);
+        Storage::put("whatsapp_".rand(1,999999999).'.txt', $request->all());
         if ($request->isMethod('GET') && $request->has('hub_verify_token') && $request->hub_verify_token == "verification_token") {
             return $request->hub_challenge;
         }
