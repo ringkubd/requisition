@@ -50,7 +50,8 @@ class WhatsAppWebhookController extends Controller
             $this->messages->id = $firstEntry['id'];
             $this->messages->changes = $firstEntry['changes'];
             $this->messages->first_change = collect($this->messages->changes[0]);
-            $this->messages->message_value = collect($this->messages->first_change->value);
+            Log::error('first_change', [$this->messages->first_change]);
+            $this->messages->message_value = collect($this->messages->first_change['value']);
             $this->messages->metadata = $this->messages->message_value->metadata;
             $this->messages->contacts = $this->messages->message_value->contacts;
             $this->messages->messages = $this->messages->message_value->messages;
