@@ -34,6 +34,9 @@ return [
     'whatsapp' => [
         'from-phone-number-id' => env('WHATSAPP_FROM_PHONE_NUMBER_ID'),
         'token' => env('WHATSAPP_TOKEN'),
+        'app_id' => env('WHATSAPP_APP_ID'),
+        'app_secret' => env('WHATSAPP_APP_SECRET'),
+        'webhook_verification_token' => env('WHATSAPP_WEBHOOK_VERIFICATION_TOKEN'),
     ],
 
 ];

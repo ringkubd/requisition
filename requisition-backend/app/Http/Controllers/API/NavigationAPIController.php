@@ -52,6 +52,6 @@ class NavigationAPIController extends AppBaseController
 
     public function subscribeWebPush(Request $request){
 
-        return $request->user()->updatePushSubscription($request->endpoint, $request->keys['p256dh']?? "", $request->keys['auth'] ?? "");
+        return $request->user()?->updatePushSubscription($request->endpoint, $request->keys['p256dh']?? "", $request->keys['auth'] ?? "");
     }
 }
