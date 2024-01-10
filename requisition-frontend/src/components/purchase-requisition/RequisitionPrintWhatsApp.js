@@ -215,7 +215,7 @@ const RequisitionPrintWhatsApp = forwardRef(({mainData, requisition_products}, r
                         {/*Table Two*/}
                         <div className="relative overflow-x-auto">
                             <table
-                                className={`w-full text-left text-gray-800 dark:text-gray-400 text-xs shadow-none`}>
+                                className={`w-full text-left text-xs shadow-none`}>
                                 <tbody className={`shadow-none`}>
                                     <tr>
                                         <td className={`border px-2 py-2`}>
