@@ -43,12 +43,12 @@ const Dashboard = () => {
                     maxWidth: "61px",
                     minWidth: "10px"
                 },
-                {
-                    name: 'I.R. NO.',
-                    selector: row => <Link className={`underline text-blue-600`} href={`/initial-requisition/${row.id}/print_view`}>{row.irf_no}</Link>,
-                    sortable: true,
-                    maxWidth: "150px",
-                },
+                // {
+                //     name: 'I.R. NO.',
+                //     selector: row => <Link className={`underline text-blue-600`} href={`/initial-requisition/${row.id}/print_view`}>{row.irf_no}</Link>,
+                //     sortable: true,
+                //     maxWidth: "150px",
+                // },
                 {
                     name: 'P.R. NO.',
                     selector: row =>  row.purchase_requisitions ? <Link className={`underline text-blue-600`} href={`/purchase-requisition/${row.purchase_requisitions.id}/print_view`}>{row.purchase_requisitions?.prf_no}</Link> : null,
@@ -88,7 +88,7 @@ const Dashboard = () => {
                 {
                     name: 'Initial',
                     selector: row => <Status key={initialPending+row.id} requisition={row} type={'initial'} />,
-                    omit: false
+                    omit: pending
                 },
                 {
                     name: 'Purchase',
