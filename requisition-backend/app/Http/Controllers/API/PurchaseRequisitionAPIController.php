@@ -462,7 +462,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                     $data['ceo_status'] = $request->status;
                     if ($request->status == 2){
                         $data['ceo_approved_at'] = now();
-                        $notifiedUsers[] = $requisition->initialRequisition()->user;
+                        $notifiedUsers[] = $requisition->initialRequisition->user;
                         $notifiedUsers[] = User::whereHas('organizations', function ($q){
                             $q->where('id', auth_organization_id());
                         })

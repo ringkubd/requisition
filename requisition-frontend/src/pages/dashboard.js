@@ -100,7 +100,7 @@ const Dashboard = () => {
     useEffect(() => {
         if (cashISSuccess && cash && user){
             const pending = cash.cash.filter(d => {
-                return d.current_status.status === "Pending"
+                return d.current_status?.status === "Pending"
             }).length;
             setCashPending(pending);
             setCashColumns([
