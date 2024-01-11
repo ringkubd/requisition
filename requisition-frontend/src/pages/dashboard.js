@@ -85,11 +85,13 @@ const Dashboard = () => {
                     selector: row => row.created_at,
                     sortable: true,
                 },
-                {
-                    name: 'Initial',
-                    selector: row => <Status key={initialPending+row.id} requisition={row} type={'initial'} />,
-                    omit: pending
-                },
+                // {
+                //     name: 'Initial',
+                //     selector: row => <Status key={initialPending+row.id} requisition={row} type={'initial'} />,
+                //     omit: (row) =>  {
+                //         console.log(row)
+                //     }
+                // },
                 {
                     name: 'Purchase',
                     selector: row => row.purchase_requisitions ? <Status key={initialPending + row.purchase_requisitions.id} requisition={row} type={'purchase'} /> : ''
