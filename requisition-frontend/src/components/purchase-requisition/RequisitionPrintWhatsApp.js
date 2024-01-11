@@ -1,12 +1,14 @@
-import React, { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 import moment from "moment/moment";
 import number2wordEnglish from "number2english_word";
 import './RequisitionPrint.module.css';
+import Image from "next/image";
 
 const RequisitionPrintWhatsApp = forwardRef(({mainData, requisition_products}, ref) => {
     const accountsCopy = useRef();
     const requisitorCopy = useRef();
     const hrRef = useRef();
+    const [rejected, setRejected] = useState(false);
 
     useEffect(() => {
         const accountsCopyHeight = accountsCopy.current.offsetHeight;
@@ -22,11 +24,28 @@ const RequisitionPrintWhatsApp = forwardRef(({mainData, requisition_products}, r
             hrRef.current?.classList?.remove('hidden');
         }
     })
+    useEffect(() => {
+        if (mainData?.purchase_current_status?.status === "Rejected"){
+            setRejected(true)
+        }
+        if (mainData?.current_status?.status === "Rejected"){
+            setRejected(true)
+        }
+    }, [mainData])
 
     return (
         <div
             className={`flex flex-col w-full m-2 justify-center justify-items-center p-4 shadow-none dark:bg-white`}
             ref={ref}>
+            {
+                rejected ? (
+                    <Image
+                        src={require('../../../public/rejected.png')}
+                        alt={`rejected`}
+                        className={`absolute opacity-5 top-[50%] left-[35%]`}
+                    />
+                ) : ""
+            }
             <div
                 className={`flex flex-col w-full justify-center justify-items-center shadow-none printBody`}>
                 {/*Header*/}

@@ -98,10 +98,10 @@ const Status = ({ requisition, type, from='dashboard', changeStatus = false }) =
     return (
         <div>
             {
-                (currentStatus?.stage ===  "ceo" && currentStatus?.status !== "Approved" && user?.designation_name === "CEO" && type !== "initial") ||
-                (currentStatus?.stage ===  "department" && currentStatus?.status !== "Approved" && isDepartmentHead && (parseInt(requisition.department_id) === user?.current_department_head)) ||
-                (currentStatus?.stage ===  "accounts" && currentStatus?.status !== "Approved" && (isDepartmentHead || manualPermission) && user?.default_department_name === "Accounts"  && type !== "initial") ||
-                (parseInt(requisition.department_id) === parseInt(user?.default_department_id) && isDepartmentHead && (currentStatus?.stage ===  "department" || !currentStatus?.stage))
+                (currentStatus?.stage ===  "ceo" && currentStatus?.status === "Pending" && user?.designation_name === "CEO" && type !== "initial") ||
+                (currentStatus?.stage ===  "department" && currentStatus?.status === "Pending" && isDepartmentHead && (parseInt(requisition.department_id) === user?.current_department_head)) ||
+                (currentStatus?.stage ===  "accounts" && currentStatus?.status === "Pending" && (isDepartmentHead || manualPermission) && user?.default_department_name === "Accounts"  && type !== "initial") ||
+                (parseInt(requisition.department_id) === parseInt(user?.default_department_id) && isDepartmentHead && (currentStatus?.stage ===  "department" || !currentStatus?.stage) && currentStatus?.status === "Pending")
                     ? (
                         <div className="flex flex-wrap">
                             <Tooltip content={`Approve`} placement={`left-start`}>

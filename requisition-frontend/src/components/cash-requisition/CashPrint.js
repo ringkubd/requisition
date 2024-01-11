@@ -1,12 +1,14 @@
-import React, { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 import moment from "moment/moment";
 import number2wordEnglish from "number2english_word";
 import './CashPrint.module.css';
+import Image from "next/image";
 
 const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
     const accountsCopy = useRef();
     const requisitorCopy = useRef();
     const hrRef = useRef();
+    const [rejected, setRejected] = useState(false);
 
     useEffect(() => {
         const accountsCopyHeight = accountsCopy.current.offsetHeight;
@@ -23,11 +25,28 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
             accountsCopy.current.classList.remove('break-after-page')
         }
     })
+    useEffect(() => {
+        if (mainData?.purchase_current_status?.status === "Rejected"){
+            setRejected(true)
+        }
+        if (mainData?.current_status?.status === "Rejected"){
+            setRejected(true)
+        }
+    }, [mainData])
 
     return (
         <div
             className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none`}
             ref={ref}>
+            {
+                rejected ? (
+                    <Image
+                        src={require('../../../public/rejected.png')}
+                        alt={`rejected`}
+                        className={`absolute opacity-5 top-[50%] left-[35%]`}
+                    />
+                ) : ""
+            }
             {/*Header*/}
             <div className={`flex flex-col shadow-none`} ref={accountsCopy}>
                 <div className={`text-center font-bold`}>

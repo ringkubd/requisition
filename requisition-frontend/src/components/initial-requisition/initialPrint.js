@@ -1,10 +1,12 @@
-import React, { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 import moment from "moment";
+import Image from "next/image";
 
 const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
     const accountsCopy = useRef();
     const requisitorCopy = useRef();
     const hrRef = useRef();
+    const [rejected, setRejected] = useState(false);
 
     useEffect(() => {
         const accountsCopyHeight = accountsCopy.current.offsetHeight;
@@ -22,13 +24,29 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
         }
     })
 
-
+    useEffect(() => {
+        if (mainData?.purchase_current_status?.status === "Rejected"){
+            setRejected(true)
+        }
+        if (mainData?.current_status?.status === "Rejected"){
+            setRejected(true)
+        }
+    }, [mainData])
 
     return (
         <div
             className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none print:m-5`}
             ref={ref}>
             {/*Header*/}
+            {
+                rejected ? (
+                    <Image
+                        src={require('../../../public/rejected.png')}
+                        alt={`rejected`}
+                        className={`absolute opacity-5 top-[50%] left-[35%]`}
+                    />
+                ) : ""
+            }
             <div
                 className={`flex flex-col shadow-none min-h-[450px]`}
                 ref={accountsCopy}>

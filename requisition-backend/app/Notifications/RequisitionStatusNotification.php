@@ -54,7 +54,7 @@ class RequisitionStatusNotification extends Notification implements ShouldQueue
         }
         $message = "A requisition has been submitted for your approval.";
         if ($notifiable->hasRole('Store Manager')){
-            $message = "A requisition has been submitted and approved by the authority.";
+            $message = "A submitted requisition has been approved by the authority.";
         }
         if ($requisition->user->id === $notifiable->id && $requisition->approval_status?->ceo_status == 2){
             $message = "Your requisition is approved by the authority. Please contact with Procurement Officer.";
