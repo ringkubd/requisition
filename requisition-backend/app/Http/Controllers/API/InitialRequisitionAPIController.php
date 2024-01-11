@@ -165,6 +165,7 @@ class InitialRequisitionAPIController extends AppBaseController
                 "$user->name is generated an initial requisition I.R.F. No. $irf_no. Please approve or reject it.",
                 $initialRequisition
             ));
+            $head_of_department->notify(new RequisitionStatusNotification($initialRequisition));
         }
 
         return $this->sendResponse(

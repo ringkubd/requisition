@@ -144,7 +144,7 @@ abstract class BaseRepository
      *
      * @return bool|mixed|null
      */
-    public function delete(int $id)
+    public function delete(int $id): mixed
     {
         $query = $this->model->newQuery();
 

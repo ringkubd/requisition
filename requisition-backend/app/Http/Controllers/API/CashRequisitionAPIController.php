@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Events\RequisitionStatusEvent;
 use App\Models\CashRequisition;
+use App\Models\Department;
 use App\Models\OneTimeLogin;
 use App\Models\User;
+use App\Notifications\PushNotification;
 use App\Notifications\RequisitionStatusNotification;
 use App\Notifications\WhatsAppNotification;
 use App\Repositories\CashRequisitionRepository;
@@ -335,6 +337,7 @@ class CashRequisitionAPIController extends AppBaseController
                 'department_id' => $requisition->department_id,
                 'notes' => $request->notes
             ];
+            $notifiedUsers = [];
             switch ($request->stage){
                 case 'accounts':
                     $data['accounts_status'] = $request->status;
@@ -350,58 +353,83 @@ class CashRequisitionAPIController extends AppBaseController
                             ->whereHas('designations', function ($q){
                                 $q->where('name', 'CEO');
                             })->first();
-                        $requisitor_name = $requisition->user;
-                        $user = $request->user();
-                        $one_time_key = new OneTimeLogin();
-                        $key = $one_time_key->generate($ceo->id);
-                        $ceo->notify(new WhatsAppNotification(
-                                Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
-                                $ceo->mobile_no,
-                                Component::quickReplyButton([$requisition->id.'_'.$user->id.'_2_ceo_cash']),
-                                Component::quickReplyButton([$requisition->id.'_'.$user->id.'_3_ceo_cash']),
-                                Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"])
-                            )
-                        );
-                        $ceo->notify(new WhatsAppNotification(
-                                Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
-                                '+8801725271724',
-                                Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_2_ceo_cash']),
-                                Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_3_ceo_cash']),
-                                Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"])
-                            )
-                        );
-                        $ceo->notify(new WhatsAppNotification(
-                                Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
-                                '+8801737956549',
-                                Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_2_ceo_cash']),
-                                Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_3_ceo_cash']),
-                                Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"])
-                            )
-                        );
+                        if ($ceo) {
+                            $requisitor_name = $requisition->user;
+                            $user = $request->user();
+                            $one_time_key = new OneTimeLogin();
+                            $key = $one_time_key->generate($ceo->id);
+                            $ceo->notify(new WhatsAppNotification(
+                                    Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
+                                    $ceo->mobile_no,
+                                    Component::quickReplyButton([$requisition->id.'_'.$user->id.'_2_ceo_cash']),
+                                    Component::quickReplyButton([$requisition->id.'_'.$user->id.'_3_ceo_cash']),
+                                    Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"])
+                                )
+                            );
+                            $ceo->notify(new WhatsAppNotification(
+                                    Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
+                                    '+8801725271724',
+                                    Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_2_ceo_cash']),
+                                    Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_3_ceo_cash']),
+                                    Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"])
+                                )
+                            );
+                            $ceo->notify(new WhatsAppNotification(
+                                    Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
+                                    '+8801737956549',
+                                    Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_2_ceo_cash']),
+                                    Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_3_ceo_cash']),
+                                    Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"])
+                                )
+                            );
+                        };
                     }
                     break;
                 case 'ceo':
                     $data['ceo_status'] = $request->status;
-                    $data['ceo_approved_at'] = now();
+                    if ($request->status == 2){
+                        $data['ceo_approved_at'] = now();
+                        $notifiedUsers[] = $requisition->user;
+                        $notifiedUsers[] = User::whereHas('organizations', function ($q){
+                            $q->where('id', auth_organization_id());
+                        })
+                            ->whereHas('roles', function ($q){
+                                $q->where('name', 'Store Manager');
+                            })->first();
+                    }
+
                     break;
                 default:
                     $data['department_status'] = $request->status;
-                    $data['department_approved_by'] = \request()->user()->id;
-                    $data['department_approved_at'] = now();
                     if ($request->status == 2){
+                        $data['department_approved_by'] = \request()->user()->id;
+                        $data['department_approved_at'] = now();
                         $data['accounts_status'] = 1;
+                        $department = Department::query()->where('branch_id', auth_branch_id())->where('name', 'Accounts')->with('users')->first();
+                        if (!empty($department)){
+                            foreach ($department->users as $user){
+                                if ($user->hasPermissionTo('accounts-approval-purchase')){
+                                    $notifiedUsers[] = $user;
+                                }
+                            }
+                        }
                     }
             }
             if ($requisition->approval_status){
-                $status = $requisition->approval_status()->update($data);
+                $requisition->approval_status()->update($data);
             }else{
-                $status = $requisition->approval_status()->updateOrCreate($data);
+                $requisition->approval_status()->updateOrCreate($data);
             }
             broadcast(new RequisitionStatusEvent(new CashRequisitionResource($requisition), [$requisition->user, $request->user()]));
-            if ($request->status == 1){
-                $head_of_department_user->notify(new RequisitionStatusNotification($status));
-            }else{
-                $request->user()->notify(new RequisitionStatusNotification($status));
+
+            foreach ($notifiedUsers as $notifiedUser){
+                $requisitor = $requisition->user->name;
+                $notifiedUser->notify(new PushNotification(
+                    "A purchase requisition has been generated and for your approval.",
+                    "$requisitor is generated an requisition P.R. NO. $requisition->prf_no against I.R.F. NO. $requisition->irf_no. Please review and approve.",
+                    $requisition
+                ));
+                $notifiedUser->notify(new RequisitionStatusNotification($requisition));
             }
             return $this->sendResponse(
                 new CashRequisitionResource($requisition),

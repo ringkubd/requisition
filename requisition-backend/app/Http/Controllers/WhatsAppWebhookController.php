@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\CashRequisition;
 use App\Models\PurchaseRequisition;
+use App\Models\User;
+use App\Notifications\PushNotification;
+use App\Notifications\RequisitionStatusNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -20,6 +23,7 @@ class WhatsAppWebhookController extends Controller
             return $request->hub_challenge;
         }
         $validity = $this->verifySignature($request);
+        $notifiedUsers = [];
         if ($validity){
             $message = $this->messages(json_decode(json_encode($request->entry), true));
             if ($message->message_type == "button"){
@@ -57,6 +61,26 @@ class WhatsAppWebhookController extends Controller
                             'ceo_status' => $status,
                             'ceo_approved_at' => now()
                         ]);
+                    }
+                }
+
+                if ($update){
+                    $notifiedUsers[] = $requisition->user;
+                    $notifiedUsers[] = User::whereHas('organizations', function ($q){
+                        $q->where('id', auth_organization_id());
+                    })
+                        ->whereHas('roles', function ($q){
+                            $q->where('name', 'Store Manager');
+                        })
+                        ->first();
+                    foreach ($notifiedUsers as $notifiedUser){
+                        $requisitor = $requisition->user->name;
+                        $notifiedUser->notify(new PushNotification(
+                            "A purchase requisition has been generated and for your approval.",
+                            "$requisitor is generated an requisition P.R. NO. $requisition->prf_no against I.R.F. NO. $requisition->irf_no. Please review and approve.",
+                            $requisition
+                        ));
+                        $notifiedUser->notify(new RequisitionStatusNotification($requisition));
                     }
                 }
             }

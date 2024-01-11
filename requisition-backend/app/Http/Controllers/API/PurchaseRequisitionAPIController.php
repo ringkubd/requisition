@@ -184,6 +184,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
                 "$requisitor_name generated a purchase requisition P.R. No. $prfNo against I.R.F. No. $initial_requisition->irf_no. Please approve or reject it.",
                 $purchaseRequisition
             ));
+
+            $head_of_department->notify(new RequisitionStatusNotification($purchaseRequisition));
         }
         return $this->sendResponse(
             new PurchaseRequisitionResource($purchaseRequisition),
@@ -423,7 +425,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                             ->whereHas('designations', function ($q){
                                 $q->where('name', 'CEO');
                             })->first();
-                        if ($ceo) $notifiedUsers[] = $ceo;
+                        if (!$ceo) break;
 
                         $requisitor_name = $requisition->user;
                         $user = $request->user();
@@ -458,8 +460,18 @@ class PurchaseRequisitionAPIController extends AppBaseController
                     break;
                 case 'ceo':
                     $data['ceo_status'] = $request->status;
-                    $data['ceo_approved_at'] = now();
-                    $notifiedUsers[] = $requisition->user;
+                    if ($request->status){
+                        $data['ceo_approved_at'] = now();
+                        $notifiedUsers[] = $requisition->user;
+                        $notifiedUsers[] = User::whereHas('organizations', function ($q){
+                            $q->where('id', auth_organization_id());
+                        })
+                            ->whereHas('roles', function ($q){
+                                $q->where('name', 'Store Manager');
+                            })
+                            ->first();
+                    }
+
                     break;
                 default:
                     $data['department_status'] = $request->status;
@@ -470,16 +482,18 @@ class PurchaseRequisitionAPIController extends AppBaseController
                         $department = Department::query()->where('branch_id', auth_branch_id())->where('name', 'Accounts')->with('users')->first();
                         if (!empty($department)){
                             foreach ($department->users as $user){
-                                $notifiedUsers[] = $user;
+                                if ($user->hasPermissionTo('accounts-approval-purchase')){
+                                    $notifiedUsers[] = $user;
+                                }
                             }
                         }
                     }
             }
             $requisition->initialRequisition->approval_status()->update($data);
             if ($requisition->approval_status){
-                $status = $requisition->approval_status()->update($data);
+                $requisition->approval_status()->update($data);
             }else{
-                $status = $requisition->approval_status()->updateOrCreate($data);
+                $requisition->approval_status()->updateOrCreate($data);
             }
 
 
@@ -492,13 +506,9 @@ class PurchaseRequisitionAPIController extends AppBaseController
                     "$requisitor is generated an requisition P.R. NO. $requisition->prf_no against I.R.F. NO. $requisition->irf_no. Please review and approve.",
                     $requisition
                 ));
+                $notifiedUser->notify(new RequisitionStatusNotification($requisition));
             }
 
-            if ($request->status == 1){
-                $head_of_department_user->notify(new RequisitionStatusNotification($status));
-            }else{
-                $request->user()->notify(new RequisitionStatusNotification($status));
-            }
             return $this->sendResponse(
                 new PurchaseRequisitionResource($requisition),
                 __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])

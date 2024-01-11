@@ -70,7 +70,7 @@ const CashRequisitionCreate = (props) => {
     setRequisitionData([...requisitionData, values])
     pageProps.setSubmitting(false);
     pageProps.resetForm();
-    selectRef.current.resetSelect();
+    // selectRef.current.resetSelect();
   }
 
   const validationSchema = Yup.object().shape({
