@@ -149,7 +149,12 @@ const Dashboard = () => {
                     sortable: true,
                 },
                 {
-                    name: 'Status',
+                    name: 'Dept. Approved by',
+                    selector: row => row?.approval_status?.departmentApprovedBy?.name,
+                    sortable: true,
+                },
+                {
+                    name: 'Approval Status',
                     selector: row => <Status key={cashPending+row.id} requisition={row} type={'cash'} />
                 }
             ])
