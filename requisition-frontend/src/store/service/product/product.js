@@ -55,7 +55,7 @@ export const ProductApiService = createApi({
         }),
         report: builder.mutation({
             query: (arg) => ({
-                url: `product_report`,
+                url: `report/product`,
                 method: 'GET',
                 params: arg
             }),

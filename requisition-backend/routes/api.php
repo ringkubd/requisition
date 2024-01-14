@@ -165,6 +165,8 @@ Route::get('activity', [\App\Http\Controllers\API\ActivityController::class, 'in
 Route::prefix('report')->group(function (){
     Route::get('product', [\App\Http\Controllers\API\ProductAPIController::class, 'report']);
     Route::get('daily', [\App\Http\Controllers\API\ReportAPIController::class, 'dailyReport']);
+    Route::get('purchase', [\App\Http\Controllers\API\ReportAPIController::class, 'purchaseReport']);
+    Route::get('issues', [\App\Http\Controllers\API\ReportAPIController::class, 'issueReport']);
 });
 
 Route::put('update_initial_status/{requisition}', [InitialRequisitionAPIController::class, 'changeStatusDepartment']);

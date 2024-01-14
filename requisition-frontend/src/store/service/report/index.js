@@ -11,10 +11,26 @@ export const ReportAPI = createApi({
                 url: 'daily',
                 params: arg
             })
+        }),
+        purchaseReport: builder.mutation({
+            query: arg => ({
+                url: 'report/purchase',
+                params: arg,
+                method: 'GET'
+            })
+        }),
+        issuesReport: builder.mutation({
+            query: arg => ({
+                url: 'report/issues',
+                params: arg,
+                method: 'GET'
+            })
         })
     })
 });
 
 export const {
-    useDailyQuery
+    useDailyQuery,
+    usePurchaseReportMutation,
+    useIssuesReportMutation,
 } = ReportAPI;

@@ -211,10 +211,10 @@ const RequisitionPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             </td>
                                             <td
                                                 className={`border p-0 text-right`}>
-                                                {parseFloat(
+                                                {Math.round(parseFloat(
                                                     rp.unit_price *
                                                         rp.quantity_to_be_purchase,
-                                                ).toLocaleString()}
+                                                )).toLocaleString()}
                                             </td>
                                         </tr>
                                     ))}

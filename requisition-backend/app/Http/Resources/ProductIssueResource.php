@@ -47,6 +47,8 @@ class ProductIssueResource extends JsonResource
             'store_status' => $this->store_status,
             'use_in_category' => $this->use_in_category,
             'useInCategory' => $this->useInCategory,
+            'category' => empty($this->useInCategory) ? $this->product->category :  $this->useInCategory,
+            'category_title' => empty($this->useInCategory) ? $this->product?->category?->title :  $this->useInCategory?->title,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

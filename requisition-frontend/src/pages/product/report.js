@@ -7,11 +7,15 @@ import Select from "react-select";
 import { useGetNavigationDepartmentQuery } from "@/store/service/navigation";
 import { useGetCategoryQuery } from "@/store/service/category";
 import { useEffect, useRef, useState } from "react";
-import { useGetProductQuery, useReportMutation } from "@/store/service/product/product";
+import { useGetProductQuery } from "@/store/service/product/product";
 import { ErrorMessage, Formik } from "formik";
 import * as Yup from 'yup';
 import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment";
+import PurchaseReport from "@/components/report/purchaseReport";
+import IssueReport from "@/components/report/issueReport";
+
+import { useIssuesReportMutation, usePurchaseReportMutation } from "@/store/service/report";
 
 const Report = () => {
     const router = useRouter();
@@ -21,12 +25,11 @@ const Report = () => {
     const {data: products, isLoading: productISLoading, isError: productISError} = useGetProductQuery({category: selectedCategory}, {
         skip: !selectedCategory
     });
-    const [productReport, {data: reports, isLoading: reportISLoading, isError: reportISError, isSuccess: reportISSuccess}] = useReportMutation();
-    const dateRef = useRef();
+    const [submitIssueReport, {data: issueReports, isLoading:issueReportsISLoading, isError:issueReportsISError, isSuccess: issueReportsISSuccess}] = useIssuesReportMutation();
+    const [submitPurchaseReport, {data: purchaseReport, isLoading:PurchaseReportISLoading, isError:PurchaseReportISError, isSuccess: PurchaseReportISSuccess}] = usePurchaseReportMutation();
 
-    useEffect(() => {
-        console.log(dateRef)
-    }, [dateRef])
+    const printRef = useRef();
+    const [reportType, setReportType] = useState('purchase');
 
     const times = [
         {label: 'Weekly', value: 'weekly'},
@@ -43,13 +46,14 @@ const Report = () => {
         product: '',
         report_type: 'usage',
     };
-    useEffect(() => {
-        if (reportISSuccess){
-            console.log(reports)
-        }
-    }, [reportISLoading, reportISSuccess])
+
     const submit = (values, formikHelper) => {
-        productReport(values);
+        if (values.report_type === "purchase"){
+            submitPurchaseReport(values);
+        }else{
+            submitIssueReport(values);
+        }
+
     }
     Yup.addMethod(Yup.mixed, 'atLeastOneOf', function(list, v) {
         return this.test({
@@ -114,7 +118,12 @@ const Report = () => {
                                                     name="report_type"
                                                     value="purchase"
                                                     defaultChecked={values.report_type === "purchase"}
-                                                    onChange={handleChange}
+                                                    onChange={(e) => {
+                                                        handleChange(e)
+                                                        if(e.target.checked) {
+                                                            setReportType('purchase');
+                                                        }
+                                                    }}
                                                 />
                                                 <Label htmlFor="purchase" className={`font-bold`}>
                                                     Purchase
@@ -126,7 +135,12 @@ const Report = () => {
                                                     name="report_type"
                                                     value="usage"
                                                     defaultChecked={values.report_type === "usage"}
-                                                    onChange={handleChange}
+                                                    onChange={(e) => {
+                                                        handleChange(e)
+                                                        if(e.target.checked) {
+                                                            setReportType('usage');
+                                                        }
+                                                    }}
                                                 />
                                                 <Label htmlFor="usage" className={`font-bold`}>
                                                     Usage
@@ -153,35 +167,39 @@ const Report = () => {
                                             />
                                             <ErrorMessage name={'time'} />
                                         </div>
-                                        <div className={`w-full`}>
-                                            <Label
-                                                htmlFor={`department`}
-                                                value={'Department'}
-                                                className={`font-bold`}
-                                            />
-                                            <Select
-                                                id={`department`}
-                                                className={`select`}
-                                                classNames={{
-                                                    control: state => 'select',
-                                                }}
-                                                isLoading={departmentISLoading}
-                                                options={departments?.data?.map(
-                                                    d => ({
-                                                        label: d.name,
-                                                        value: d.id,
-                                                    }),
-                                                )}
-                                                onChange={newValue =>
-                                                    setFieldValue(
-                                                        'department',
-                                                        newValue?.value ?? '',
-                                                    )
-                                                }
-                                                isClearable={true}
-                                            />
-                                            <ErrorMessage name={'department'} />
-                                        </div>
+                                        {
+                                            values.report_type === "usage" ? (
+                                                <div className={`w-full`}>
+                                                    <Label
+                                                        htmlFor={`department`}
+                                                        value={'Department'}
+                                                        className={`font-bold`}
+                                                    />
+                                                    <Select
+                                                        id={`department`}
+                                                        className={`select`}
+                                                        classNames={{
+                                                            control: state => 'select',
+                                                        }}
+                                                        isLoading={departmentISLoading}
+                                                        options={departments?.data?.map(
+                                                            d => ({
+                                                                label: d.name,
+                                                                value: d.id,
+                                                            }),
+                                                        )}
+                                                        onChange={newValue =>
+                                                            setFieldValue(
+                                                                'department',
+                                                                newValue?.value ?? '',
+                                                            )
+                                                        }
+                                                        isClearable={true}
+                                                    />
+                                                    <ErrorMessage name={'department'} />
+                                                </div>
+                                            ): null
+                                        }
                                     </div>
                                     <div
                                         className={`flex flex-col sm:flex-row w-full sm:space-x-4`}>
@@ -291,7 +309,9 @@ const Report = () => {
                         </Formik>
                     </div>
                     <div>
-
+                        {
+                             reportType === "purchase" ? <PurchaseReport ref={printRef} data={purchaseReport} /> : <IssueReport  ref={printRef} data={issueReports} />
+                        }
                     </div>
                 </Card>
             </div>

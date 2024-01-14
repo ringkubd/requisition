@@ -350,6 +350,8 @@ class ProductAPIController extends AppBaseController
         $last = $request->end_date;
         $first = $request->start_date;
 
+        $groupBy = false;
+
         $product = Product::query()
             ->when($request->category, function ($q) use($categories){
                 $q->whereIn('category_id', $categories);
@@ -357,7 +359,7 @@ class ProductAPIController extends AppBaseController
             ->when($request->product, function ($q) use($products){
                 $q->whereIn('id', $products);
             })
-            ->with(['category', 'purchaseRequisition', 'purchaseHistory', 'issues'])
+            ->with(['category', 'purchaseRequisition', 'purchaseHistory', 'issues.issuerDepartment'])
             ->when($report_type == "usage", function ($q) use($first, $last, $department){
                 $q->whereHas('issues', function ($q) use($first, $last, $department){
                     $q->whereRaw("date(issue_time) between '$first' and '$last'")
@@ -379,6 +381,12 @@ class ProductAPIController extends AppBaseController
             ->latest()
             ->get();
 
+        if (!empty($request->department)){
+            $product = $product->groupBy('issues.issuerDepartment.name');
+        }
+
+
         return $this->sendResponse($product,   __('messages.report', ['model' => __('models/products.singular')]));
     }
+
 }

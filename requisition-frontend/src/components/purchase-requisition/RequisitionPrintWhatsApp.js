@@ -209,10 +209,10 @@ const RequisitionPrintWhatsApp = forwardRef(({mainData, requisition_products}, r
                                             </td>
                                             <td
                                                 className={`border p-0 text-right`}>
-                                                {parseFloat(
+                                                {Math.round(parseFloat(
                                                     rp.unit_price *
                                                         rp.quantity_to_be_purchase,
-                                                ).toLocaleString()}
+                                                )).toLocaleString()}
                                             </td>
                                         </tr>
                                     ))}

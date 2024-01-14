@@ -32,6 +32,7 @@ const create = (props) => {
     const [items, setItems] = useState([]);
     const [columns, setColumns] = useState([]);
     const [unit, setUnit] = useState("");
+    const [useINCategory, setUseINCategory] = useState({});
 
     useEffect(() => {
         if (items.length){
@@ -96,6 +97,7 @@ const create = (props) => {
         receiver_name: '',
         purpose: '',
         uses_area: '',
+        use_in_category: '',
         note: '',
         issue_time: moment().format('Y-MM-DDThh:mm'),
     }
@@ -115,6 +117,7 @@ const create = (props) => {
         }
     }, [storeResult]);
     const submit = async (values, pageProps) => {
+        console.log(values)
         setItems([...items, values]);
     }
 
@@ -140,6 +143,7 @@ const create = (props) => {
             uses_area: i.uses_area,
             note: i.note,
             issue_time: i.issue_time,
+            use_in_category: i.use_in_category,
         }))
         storeProductIssue(newItems)
     }
@@ -262,6 +266,7 @@ const create = (props) => {
                                                             setSelectedCategory(
                                                                 newValue?.value,
                                                             )
+                                                            setUseINCategory(newValue)
                                                         }}
                                                         additional={{
                                                             page: 1,
@@ -576,6 +581,48 @@ const create = (props) => {
                                             </div>
                                             {' '}
                                             {/*Date Time*/}
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row gap-4">
+                                            <div className="flex flex-row w-full gap-4">
+                                                <div className="w-full">
+                                                    <div className="mb-2 block">
+                                                        <Label
+                                                            htmlFor="use_in_category"
+                                                            value="Use in Category"
+                                                        />
+                                                    </div>
+                                                    <AsyncPaginate
+                                                        defaultOptions
+                                                        name="use_in_category"
+                                                        id="use_in_category"
+                                                        className={`select`}
+                                                        classNames={{
+                                                            control: state =>
+                                                                'select',
+                                                        }}
+                                                        onChange={newValue => {
+                                                            setFieldValue('use_in_category',newValue?.value)
+                                                            setUseINCategory(newValue)
+                                                        }}
+                                                        additional={{
+                                                            page: 1,
+                                                        }}
+                                                        loadOptions={
+                                                            loadCategory
+                                                        }
+                                                        value={useINCategory}
+                                                        data-placeholder="Select options..."
+                                                    />
+                                                    <ErrorMessage
+                                                        name="category_id"
+                                                        render={msg => (
+                                                            <span className="text-red-500">
+                                                                    {msg}
+                                                                </span>
+                                                        )}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className="flex flex-col sm:flex-row gap-4">
                                             <div className="w-full">
