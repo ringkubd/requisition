@@ -70,7 +70,7 @@ const Dashboard = () => {
                 },
                 {
                     name: 'Est. Cost',
-                    selector: row => parseFloat(row.purchase_requisitions?.estimated_total_amount ?? 0).toLocaleString('bd'),
+                    selector: row => Math.round(parseFloat(row.purchase_requisitions?.estimated_total_amount ?? 0)).toLocaleString('bd'),
                     sortable: true,
                     maxWidth: "140px",
                     minWidth: "10px",
@@ -85,6 +85,11 @@ const Dashboard = () => {
                     selector: row => row.created_at,
                     sortable: true,
                 },
+                {
+                    name: 'Dept. Approved by',
+                    selector: row => row?.approval_status?.departmentApprovedBy?.name,
+                    sortable: true,
+                },
                 // {
                 //     name: 'Initial',
                 //     selector: row => <Status key={initialPending+row.id} requisition={row} type={'initial'} />,
@@ -93,7 +98,7 @@ const Dashboard = () => {
                 //     }
                 // },
                 {
-                    name: 'Purchase',
+                    name: 'Approval Status',
                     selector: row => row.purchase_requisitions ? <Status key={initialPending + row.purchase_requisitions.id} requisition={row} type={'purchase'} /> : ''
                 }
             ])
