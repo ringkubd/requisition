@@ -84,11 +84,11 @@ const IssueReport = forwardRef(({data}, ref) => {
                     <th colSpan={10} className={`text-right border`}>Total</th>
                     <th className={`text-center border`}>
                         {
-                            data && Object.values(data).reduce((prev, nw) => {
+                            data && parseFloat(Object.values(data).reduce((prev, nw) => {
                                 return nw.reduce((p, n) => {
                                     return p + n.total_price
                                 },prev)
-                            }, 0)
+                            }, 0)).toLocaleString()
                         }
                     </th>
                 </tr>
