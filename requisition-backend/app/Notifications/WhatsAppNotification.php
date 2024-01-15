@@ -18,19 +18,19 @@ class WhatsAppNotification extends Notification
 
     public Component $body;
     public string $to;
-    public QuickReplyButton $approve;
-    public QuickReplyButton $reject;
+//    public QuickReplyButton $approve;
+//    public QuickReplyButton $reject;
     public UrlButton $viewButton;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Component $body, string $to, QuickReplyButton $approve, QuickReplyButton $reject, UrlButton $viewButton)
+    public function __construct(Component $body, string $to, UrlButton $viewButton)
     {
         $this->body = $body;
         $this->to = $to;
-        $this->approve = $approve;
-        $this->reject = $reject;
+//        $this->approve = $approve;
+//        $this->reject = $reject;
         $this->viewButton = $viewButton;
     }
 
