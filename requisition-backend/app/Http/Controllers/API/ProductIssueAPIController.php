@@ -89,14 +89,14 @@ class ProductIssueAPIController extends AppBaseController
                 });
             })
             ->orWhere(function ($q) use ($storeManager){
-                $q->whereRaw("true = $storeManager")->where('department_status', 1);
+                $q->whereRaw("true = $storeManager")
+                    ->where('department_status', 1);
             })
-            ->latest()
-            ->paginate(\request()->per_page ?? 10);
+            ->latest()->get();
 
         return response()->json([
             'product_issue' =>  ProductIssueResource::collection($productIssues)->collection->groupBy('uuid'),
-            'number_of_rows' => $productIssues->total()
+            'number_of_rows' => 0
         ]);
     }
 
