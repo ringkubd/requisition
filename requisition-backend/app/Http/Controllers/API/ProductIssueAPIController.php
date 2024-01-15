@@ -261,20 +261,20 @@ class ProductIssueAPIController extends AppBaseController
         if ($request->has('department')){
             switch ($request->department){
                 case 'both':
-                    $input['department_status'] = 1;
+                    $input['department_status'] = $request->status;
                     $input['department_approved_by'] = $request->user()->id;
                     $input['department_approved_at'] = now();
-                    $input['store_status'] = 1;
+                    $input['store_status'] = $request->status;;
                     $input['store_approved_by'] = $request->user()->id;
                     $input['store_approved_at'] = now();
                     break;
                 case 'department':
-                    $input['department_status'] = 1;
+                    $input['department_status'] = $request->status;;
                     $input['department_approved_by'] = $request->user()->id;
                     $input['department_approved_at'] = now();
                     break;
                 case 'store':
-                    $input['store_status'] = 1;
+                    $input['store_status'] = $request->status;;
                     $input['store_approved_by'] = $request->user()->id;
                     $input['store_approved_at'] = now();
                     break;
@@ -290,7 +290,7 @@ class ProductIssueAPIController extends AppBaseController
 
                     $productIssue->update($input);
 
-                    if ($request->user()->hasRole('Store Manager')){
+                    if ($request->user()->hasRole('Store Manager') && $request->status == 1){
                         $productOption = ProductOption::find($productIssue->product_option_id);
                         $productOption->stock = (double)$productOption->stock - (double)$productIssue->quantity;
                         $productOption->save();
@@ -385,7 +385,7 @@ class ProductIssueAPIController extends AppBaseController
         }
         DB::transaction(function () use ($productIssues, $uuid){
             try {
-                foreach ($productIssues->get() as $productIssue){
+                foreach ($productIssues->where('store_status', 1)->get() as $productIssue){
                     $productOptionId = $productIssue->product_option_id;
                     $quantity = $productIssue->quantity;
 

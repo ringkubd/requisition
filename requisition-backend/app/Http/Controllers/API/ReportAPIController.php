@@ -67,8 +67,8 @@ class ReportAPIController extends AppBaseController
     {
         $categories = explode(',',$request->category);
         $products = explode(',',$request->product);
-        $last = $request->end_date;
-        $first = $request->start_date;
+        $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
+        $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
 
         $issues = ProductIssueResource::collection(ProductIssue::query()
             ->when(!empty($request->category), function ($q) use ($categories){

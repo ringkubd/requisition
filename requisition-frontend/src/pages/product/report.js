@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import Select from "react-select";
 import { useGetNavigationDepartmentQuery } from "@/store/service/navigation";
 import { useGetCategoryQuery } from "@/store/service/category";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useGetProductQuery } from "@/store/service/product/product";
 import { ErrorMessage, Formik } from "formik";
 import * as Yup from 'yup';
@@ -104,13 +104,13 @@ const Report = () => {
                             onSubmit={submit}
                             validationSchema={validationSchema}>
                             {({
-                                handleSubmit,
-                                handleChange,
-                                values,
-                                errors,
-                                isSubmitting,
-                                setFieldValue,
-                            }) => (
+                                  handleSubmit,
+                                  handleChange,
+                                  values,
+                                  errors,
+                                  isSubmitting,
+                                  setFieldValue,
+                              }) => (
                                 <div
                                     className={`flex flex-col w-full space-y-6`}>
                                     <div className="flex flex-col sm:flex-row sm:space-x-4">
@@ -238,7 +238,7 @@ const Report = () => {
                                                             options: [
                                                                 {
                                                                     label:
-                                                                        c.title,
+                                                                    c.title,
                                                                     value: c.id,
                                                                 },
                                                                 ...sub,
@@ -319,9 +319,33 @@ const Report = () => {
                             <div>
                                 <Button onClick={handlePrint}>Print</Button>
                             </div>
-                            {
-                                reportType === "purchase" ? <PurchaseReport ref={printRef} data={purchaseReport} /> : <IssueReport  ref={printRef} data={issueReports} />
-                            }
+                            <div className="flex flex-col relative overflow-x-auto" ref={printRef}>
+                                <div className={`flex flex-col`}>
+                                    <div className={`text-center font-bold`}>
+                                        <h2>
+                                            IsDB-Bangladesh Islamic Solidarity Educational Wakf
+                                            (IsDB-BISEW)
+                                        </h2>
+                                    </div>
+                                    <div
+                                        className={`flex flex-col justify-center items-center justify-items-center text-center`}>
+                                        <p className={`py-1 px-4 underline bg-gray-300 w-fit`}>
+                                            Product Issue Report
+                                        </p>
+                                    </div>
+                                    <div
+                                        className={`flex justify-center items-center justify-items-center text-center`}>
+                                        <i className={`px-4 w-fit font-extralight font-serif`}>
+                                            Date:
+                                        </i>
+                                    </div>
+                                </div>
+                                {
+                                    reportType === "purchase" ?
+                                        <PurchaseReport data={purchaseReport} /> :
+                                        <IssueReport data={issueReports} />
+                                }
+                            </div>
                         </div>
 
                     </div>

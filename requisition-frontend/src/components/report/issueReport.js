@@ -1,5 +1,4 @@
 import { forwardRef } from "react";
-import { Table } from "flowbite-react";
 import moment from "moment";
 import './Print.module.css';
 
@@ -26,7 +25,7 @@ const IssueReport = forwardRef(({data}, ref) => {
                         Issuer
                     </th>
                     <th scope="col" className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                        Department
+                        Dep.
                     </th>
                     <th scope="col" className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>Qty.</th>
                     <th scope="col" className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
@@ -52,7 +51,7 @@ const IssueReport = forwardRef(({data}, ref) => {
                                                         {i + 1}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}
+                                                        className={`border p-0 break-words`}
                                                         rowSpan={data[d].length}>
                                                         {d}
                                                     </td>
@@ -67,7 +66,7 @@ const IssueReport = forwardRef(({data}, ref) => {
                                         <td
                                             className={`border p-0`}>{moment(item.issue_time).format('DD MMM Y')}</td>
                                         <td
-                                            className={`border p-0`}>{item.issuer.name}</td>
+                                            className={`border p-0 break-words`}>{item.issuer.name}</td>
                                         <td
                                             className={`border p-0`}>{item.issuer_department?.name}</td>
                                         <td
