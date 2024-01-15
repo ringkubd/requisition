@@ -29,7 +29,7 @@ const Report = () => {
     const [submitPurchaseReport, {data: purchaseReport, isLoading:PurchaseReportISLoading, isError:PurchaseReportISError, isSuccess: PurchaseReportISSuccess}] = usePurchaseReportMutation();
 
     const printRef = useRef();
-    const [reportType, setReportType] = useState('purchase');
+    const [reportType, setReportType] = useState('usage');
 
     const times = [
         {label: 'Weekly', value: 'weekly'},

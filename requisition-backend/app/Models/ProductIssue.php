@@ -147,4 +147,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     {
         return $this->belongsTo(Category::class, 'use_in_category');
     }
+
+    public function getCategoryAttribute()
+    {
+        return empty($this->useInCategory) ? $this->product?->category : $this->useInCategory;
+    }
 }

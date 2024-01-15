@@ -53,8 +53,8 @@ class WhatsAppNotification extends Notification
             ->language('en')
             ->name('inventory_approval_notice_2')
             ->body($this->body)
-            ->buttons($this->approve)
-            ->buttons($this->reject)
+//            ->buttons($this->approve)
+//            ->buttons($this->reject)
             ->buttons($this->viewButton)
             ->to($this->to);
     }

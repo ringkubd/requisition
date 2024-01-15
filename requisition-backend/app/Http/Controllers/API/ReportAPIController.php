@@ -85,6 +85,7 @@ class ReportAPIController extends AppBaseController
             ->whereRaw("date(issue_time) between '$first' and '$last'")
             ->latest()
             ->get());
+        return  response()->json($issues->collection->groupBy('category.title'));
         return $this->sendResponse($issues->collection->groupBy('category_title'),   __('messages.report', ['model' => __('models/products.singular')]));
     }
 
