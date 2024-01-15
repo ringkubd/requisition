@@ -16,6 +16,7 @@ import PurchaseReport from "@/components/report/purchaseReport";
 import IssueReport from "@/components/report/issueReport";
 
 import { useIssuesReportMutation, usePurchaseReportMutation } from "@/store/service/report";
+import { useReactToPrint } from "react-to-print";
 
 const Report = () => {
     const router = useRouter();
@@ -74,6 +75,11 @@ const Report = () => {
         end_date: Yup.date(),
         product: Yup.mixed().atLeastOneOf(['department', 'start_date', 'end_date', 'product', 'category']),
         report_type: Yup.string().required().label('Report Type'),
+    });
+
+    const handlePrint = useReactToPrint({
+        content: () => printRef.current,
+        onBeforePrint: (a) => console.log(a)
     });
     return (
         <AppLayout
@@ -309,9 +315,15 @@ const Report = () => {
                         </Formik>
                     </div>
                     <div>
-                        {
-                             reportType === "purchase" ? <PurchaseReport ref={printRef} data={purchaseReport} /> : <IssueReport  ref={printRef} data={issueReports} />
-                        }
+                        <div className={`flex flex-col`}>
+                            <div>
+                                <Button onClick={handlePrint}>Print</Button>
+                            </div>
+                            {
+                                reportType === "purchase" ? <PurchaseReport ref={printRef} data={purchaseReport} /> : <IssueReport  ref={printRef} data={issueReports} />
+                            }
+                        </div>
+
                     </div>
                 </Card>
             </div>
