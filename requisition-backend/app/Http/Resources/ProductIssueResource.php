@@ -33,6 +33,7 @@ class ProductIssueResource extends JsonResource
             'receiver_department_id' => $this->receiver_department_id,
             'issuer_id' => $this->issuer_id,
             'issuer' => $this->issuer,
+            'issuer_department' => $this->issuerDepartment,
             'purpose' => $this->purpose,
             'uses_area' => $this->uses_area,
             'note' => $this->note,

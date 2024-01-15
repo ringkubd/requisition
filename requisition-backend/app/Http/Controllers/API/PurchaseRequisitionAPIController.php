@@ -433,27 +433,22 @@ class PurchaseRequisitionAPIController extends AppBaseController
                         $key = $one_time_key->generate($ceo->id);
 
                         if (!config('app.debug')){
+                            //Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_2_ceo_purchase']),
                             $ceo->notify(new WhatsAppNotification(
                                     Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no, I.R.F. NO.: $requisition->irf_no."),
                                     $ceo->mobile_no,
-//                                    Component::quickReplyButton([$requisition->id.'_'.$user->id.'_2_ceo_purchase']),
-//                                    Component::quickReplyButton([$requisition->id.'_'.$user->id.'_3_ceo_purchase']),
                                     Component::urlButton(["/purchase-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"])
                                 )
                             );
                             $ceo->notify(new WhatsAppNotification(
                                     Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no, I.R.F. NO.: $requisition->irf_no."),
                                     '+8801725271724',
-//                                    Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_2_ceo_purchase']),
-//                                    Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_3_ceo_purchase']),
                                     Component::urlButton(["/purchase-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"])
                                 )
                             );
                             $ceo->notify(new WhatsAppNotification(
                                     Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no, I.R.F. NO.: $requisition->irf_no."),
                                     '+8801737956549',
-//                                    Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_2_ceo_purchase']),
-//                                    Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_3_ceo_purchase']),
                                     Component::urlButton(["/purchase-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"])
                                 )
                             );
@@ -491,7 +486,11 @@ class PurchaseRequisitionAPIController extends AppBaseController
                         }
                     }
             }
-            $requisition->initialRequisition->approval_status()->update($data);
+            if ( $requisition->initialRequisition->approval_status){
+                $requisition->initialRequisition->approval_status()->update($data);
+            }else{
+                $requisition->initialRequisition->approval_status()->updateOrCreate($data);
+            }
             if ($requisition->approval_status){
                 $requisition->approval_status()->update($data);
             }else{
