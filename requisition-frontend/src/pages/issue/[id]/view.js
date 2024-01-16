@@ -6,8 +6,6 @@ import { useRouter } from "next/router";
 import { useEditIssueQuery } from "@/store/service/issue";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import IssueStatus from "@/components/issue/Status";
-import Actions from "@/components/actions";
 import DataTable from "react-data-table-component";
 
 const IssueView = () => {
@@ -27,6 +25,11 @@ const IssueView = () => {
                 {
                     name: 'Qty',
                     selector: row => row.quantity,
+                    sortable: true,
+                },
+                {
+                    name: 'Unit',
+                    selector: row => row.product?.unit,
                     sortable: true,
                 },
                 {

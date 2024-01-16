@@ -179,6 +179,20 @@ const Navigation = ({ user }) => {
                                                     Issue
                                                 </DropdownLink>
                                             ) : null }
+                                        {
+                                            checkPermission([
+                                                'view_purchases',
+                                                'create_purchases',
+                                                'update_purchases',
+                                                'delete_purchases',
+                                            ]) ? (
+                                                <DropdownLink
+                                                    href="/product/report"
+                                                    active={router.pathname.includes('report').toString()}
+                                                >
+                                                    Report
+                                                </DropdownLink>
+                                            ) : null }
                                     </Dropdown>
                                 ) : null }
                             {
