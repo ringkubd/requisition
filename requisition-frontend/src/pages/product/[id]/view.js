@@ -208,7 +208,7 @@ const View = (props) => {
                                                                             <Table.Cell
                                                                                 className={`border border-gray-300`}>{(parseFloat(pur?.unit_price) * parseFloat(pur?.available_qty)).toLocaleString()}</Table.Cell>
                                                                             <Table.Cell
-                                                                                className={`border border-gray-300`}>{moment(pur?.created_at).format("HH:m - DD MMM YYYY")}</Table.Cell>
+                                                                                className={`border border-gray-300`}>{moment(pur?.purchase_date).format("DD MMM YYYY")}</Table.Cell>
                                                                             <Table.Cell
                                                                                 className={`border border-gray-300`}>{pur.expiry_date ? moment(pur.expiry_date).format("DD MMM YYYY") : ''}</Table.Cell>
                                                                         </Table.Row>
