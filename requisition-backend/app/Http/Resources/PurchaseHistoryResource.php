@@ -31,6 +31,7 @@ class PurchaseHistoryResource extends JsonResource
             'unit_price' => $this->unit_price,
             'total_price' => round($this->total_price),
             'user_id' => $this->user_id,
+            'purchase_date' => $this->purchase_date,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
