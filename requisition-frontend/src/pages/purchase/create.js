@@ -28,6 +28,7 @@ const create = (props) => {
     const [selectedProductOptionId, setSelectedProductOptionId] = useState([]);
     const [columns, setColumns] = useState([]);
     const [requisitionDisabled, setRequisitionDisabled] = useState(false);
+    const [unit, setUnit] = useState(null);
 
     const [items, setItems] = useState([]);
 
@@ -45,9 +46,9 @@ const create = (props) => {
             const actual_purchase = products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.actual_purchase;
 
             formikForm.current.setFieldValue('product_id',products.filter((p) => parseInt(p.product_option_id) === parseInt(selectedProductOptionId))[0]?.product_id)
-            formikForm.current.setFieldValue('qty',(quantity - actual_purchase)?.toString() )
+            formikForm.current.setFieldValue('qty',quantity ? (quantity - actual_purchase)?.toString() : 0 )
             formikForm.current.setFieldValue('unit_price',unitPrice?.toString())
-            formikForm.current.setFieldValue('total_price',((quantity - actual_purchase) * unitPrice)?.toString())
+            formikForm.current.setFieldValue('total_price',(quantity ? (quantity - actual_purchase) * unitPrice : 0)?.toString())
         }
     }, [selectedProductOptionId])
 
@@ -60,7 +61,7 @@ const create = (props) => {
         purchase_requisition_prf_no: '',
         product_option_id: '',
         product_option_name: '',
-        qty: '',
+        qty: 0,
         unit_price: '',
         total_price: '',
         brand_id: '',
@@ -341,8 +342,9 @@ const create = (props) => {
                                                             setFieldValue('product_title',newValue?.label)
                                                             setFieldValue('product_id',newValue?.product_options?.product_id)
                                                             setSelectedProductOptionId(newValue?.value);
+                                                            setUnit(newValue?.unit);
                                                         }}
-                                                        options={products?.map((p) => ({value: p.product_option_id, product_options: p, label: p.title + (!p.product_option?.option_value?.includes('N/A') ? " - "+p.product_option?.option_value : "")}))}
+                                                        options={products?.map((p) => ({value: p.product_option_id, product_options: p, label: p.title + (!p.product_option?.option_value?.includes('N/A') ? " - "+p.product_option?.option_value : ""), unit: p?.product?.unit}))}
                                                     />
 
                                                     <ErrorMessage
@@ -415,14 +417,13 @@ const create = (props) => {
                                                     <div className="mb-2 block">
                                                         <Label
                                                             htmlFor="qty"
-                                                            value="Quantity"
+                                                            value={`Quantity ${unit ? '('+unit+')' : ''}`}
                                                         />
                                                     </div>
                                                     <TextInput
                                                         id="qty"
                                                         placeholder="5"
-                                                        type="number"
-                                                        step={0.1}
+                                                        type="text"
                                                         required
                                                         onChange={(e) => {
                                                             handleChange(e);
@@ -446,8 +447,7 @@ const create = (props) => {
                                                         id="unit_price"
                                                         name="unit_price"
                                                         placeholder="10.0"
-                                                        type="number"
-                                                        step={0.1}
+                                                        type="text"
                                                         required
                                                         value={values.unit_price}
                                                         onChange={(e) => {
@@ -471,11 +471,13 @@ const create = (props) => {
                                                         id="total_price"
                                                         name="total_price"
                                                         placeholder="10.0"
-                                                        type="number"
-                                                        step={0.1}
+                                                        type="text"
                                                         required
                                                         value={values.total_price}
-                                                        onChange={handleChange}
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue('unit_price', e.target.value / values.qty);
+                                                        }}
                                                         onBlur={handleBlur}
                                                     />
                                                     <ErrorMessage
