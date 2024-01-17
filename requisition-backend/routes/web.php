@@ -56,3 +56,5 @@ Route::prefix('import')->group(function (){
     Route::get('branch', [\App\Http\Controllers\API\ImportUsersFromEMSController::class, 'importBranch']);
 });
 Route::any('whatsapp_hook', [\App\Http\Controllers\WhatsAppWebhookController::class, 'verify']);
+
+Route::resource('product-issue-items', App\Http\Controllers\ProductIssueItemsController::class);

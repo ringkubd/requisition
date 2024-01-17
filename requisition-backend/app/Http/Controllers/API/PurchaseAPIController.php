@@ -122,8 +122,9 @@ class PurchaseAPIController extends AppBaseController
         foreach ($input as $item){
             $item['user_id'] = $request->user()->id;
             $item['uuid'] = $uuid;
-            $purchase = $this->purchaseRepository->create($item);
             $product_option = ProductOption::query()->find($item['product_option_id']);
+            $item['old_balance'] = $product_option->stock;
+            $purchase = $this->purchaseRepository->create($item);
             $stock = (float)$item['qty'] + $product_option->stock;
             $update = $product_option->update(['stock' => $stock]);
             $purchaseRequisitionProduct = PurchaseRequisitionProduct::query()

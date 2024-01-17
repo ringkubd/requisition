@@ -28,6 +28,7 @@ class PurchaseHistoryResource extends JsonResource
             'chalan_no' => $this->chalan_no,
             'expiry_date' => $this->expiry_date,
             'available_qty' => $this->available_qty,
+            'old_balance' => $this->old_balance,
             'unit_price' => $this->unit_price,
             'total_price' => round($this->total_price),
             'user_id' => $this->user_id,

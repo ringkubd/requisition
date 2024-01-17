@@ -106,6 +106,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         return $this->belongsTo(\App\Models\Department::class, 'issuer_department_id');
     }
 
+    public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProductIssueItems::class);
+    }
+
     public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\Product::class, 'product_id');

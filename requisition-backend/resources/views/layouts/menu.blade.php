@@ -174,3 +174,24 @@
         <p>@lang('models/cashRequisitionItems.plural')</p>
     </a>
 </li>
+
+<li class="nav-item">
+    <a href="{{ route('appModelsProductIssueBasics.index') }}" class="nav-link {{ Request::is('appModelsProductIssueBasics*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/appModelsProductIssueBasics.plural')</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('productIssueBasics.index') }}" class="nav-link {{ Request::is('productIssueBasics*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/productIssueBasics.plural')</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('productIssueItems.index') }}" class="nav-link {{ Request::is('productIssueItems*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>@lang('models/productIssueItems.plural')</p>
+    </a>
+</li>

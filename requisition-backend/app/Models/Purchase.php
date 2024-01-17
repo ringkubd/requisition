@@ -82,6 +82,7 @@ class Purchase extends BaseModel
         'bill_no',
         'chalan_no',
         'expiry_date',
+        'old_balance',
     ];
 
     protected $casts = [

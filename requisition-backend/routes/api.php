@@ -175,3 +175,7 @@ Route::put('update_cash_status/{requisition}', [\App\Http\Controllers\API\CashRe
 
 Route::post('subscribe-push', [NavigationAPIController::class, 'subscribeWebPush']);
 Route::post('one_time_login', [\App\Http\Controllers\API\UserAPIController::class, 'oneTimeLogin']);
+
+
+Route::resource('product-issue-items', App\Http\Controllers\API\ProductIssueItemsAPIController::class)
+    ->except(['create', 'edit']);
