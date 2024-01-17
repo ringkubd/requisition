@@ -57,7 +57,7 @@ export const IssueApiService = createApi({
                 method: 'PUT',
                 body: patch
             }),
-            invalidatesTags: ['issue'],
+            invalidatesTags: ['issue', 'editIssue'],
             onQueryStarted: onQueryStartedErrorToast,
         })
     }),

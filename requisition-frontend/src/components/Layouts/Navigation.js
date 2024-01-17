@@ -165,20 +165,20 @@ const Navigation = ({ user }) => {
                                                     Receive
                                                 </DropdownLink>
                                             ) : null }
-                                        {/*{*/}
-                                        {/*    checkPermission([*/}
-                                        {/*        'view_product-issues',*/}
-                                        {/*        'create_product-issues',*/}
-                                        {/*        'update_product-issues',*/}
-                                        {/*        'delete_product-issues',*/}
-                                        {/*    ]) ? (*/}
-                                        {/*        <DropdownLink*/}
-                                        {/*            href="/issue"*/}
-                                        {/*            active={router.pathname.includes('issue').toString()}*/}
-                                        {/*        >*/}
-                                        {/*            Issue*/}
-                                        {/*        </DropdownLink>*/}
-                                        {/*    ) : null }*/}
+                                        {
+                                            checkPermission([
+                                                'view_product-issues',
+                                                'create_product-issues',
+                                                'update_product-issues',
+                                                'delete_product-issues',
+                                            ]) ? (
+                                                <DropdownLink
+                                                    href="/issue"
+                                                    active={router.pathname.includes('issue').toString()}
+                                                >
+                                                    Issue
+                                                </DropdownLink>
+                                            ) : null }
                                         {
                                             checkPermission([
                                                 'view_purchases',

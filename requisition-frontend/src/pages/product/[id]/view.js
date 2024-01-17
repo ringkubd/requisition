@@ -262,7 +262,7 @@ const View = (props) => {
                                                     {
                                                         product_options.map((p, index) => (
                                                             <>
-                                                                <Table.Row className={`border border-gray-300`} key={index}>
+                                                                <Table.Row className={`border border-gray-300`} key={index * 44}>
                                                                     <Table.Cell className={`border border-gray-300`}
                                                                                 rowSpan={p?.product_issue?.length + 1}>{index + 1}</Table.Cell>
                                                                     <Table.Cell className={`border border-gray-300`}
@@ -271,7 +271,7 @@ const View = (props) => {
                                                                 {
                                                                     p?.product_issue?.map((pur, i) => (
                                                                         <Table.Row className={`border border-gray-300`}
-                                                                                   key={i}>
+                                                                                   key={i * 99}>
                                                                             <Table.Cell
                                                                                 className={`border border-gray-300`}>{pur?.receiver_department?.name}</Table.Cell>
                                                                             <Table.Cell

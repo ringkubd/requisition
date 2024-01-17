@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Resources\ProductIssueItemsResource;
 use App\Models\ProductIssue;
+use App\Models\ProductIssueItems;
 use App\Models\ProductOption;
 use App\Models\Purchase;
 use App\Models\User;
@@ -94,11 +96,11 @@ class ProductIssueAPIController extends AppBaseController
                     ->where('department_status', 1);
             })
             ->latest()
-            ->get();
+            ->paginate();
 
         return response()->json([
-            'product_issue' =>  ProductIssueResource::collection($productIssues)->collection->groupBy('uuid'),
-            'number_of_rows' => 0
+            'product_issue' =>  ProductIssueResource::collection($productIssues),
+            'number_of_rows' => $productIssues->total()
         ]);
     }
 
@@ -219,7 +221,7 @@ class ProductIssueAPIController extends AppBaseController
     public function show($uuid): JsonResponse
     {
         /** @var ProductIssue $productIssue */
-        $productIssue = $this->productIssueRepository->allQuery()->where('uuid', $uuid)->get();
+        $productIssue = $this->productIssueRepository->allQuery()->where('uuid', $uuid)->first();
 
         if (empty($productIssue)) {
             return $this->sendError(
@@ -228,7 +230,7 @@ class ProductIssueAPIController extends AppBaseController
         }
 
         return $this->sendResponse(
-            ProductIssueResource::collection($productIssue),
+            new ProductIssueResource($productIssue),
             __('messages.retrieved', ['model' => __('models/productIssues.singular')])
         );
     }
@@ -278,7 +280,7 @@ class ProductIssueAPIController extends AppBaseController
         $input = $request->all();
 
         /** @var ProductIssue $productIssues */
-        $productIssues = ProductIssue::where('uuid', $uuid)->get();
+        $productIssues = ProductIssue::where('uuid', $uuid)->first();
 
         if (empty($productIssues)) {
             return $this->sendError(
@@ -313,12 +315,16 @@ class ProductIssueAPIController extends AppBaseController
         DB::transaction(function () use($productIssues, $input, $uuid, $request){
             try {
                 // TODO check is it store person or not if yes then reduce the stock;
-                foreach ($productIssues as $productIssue) {
-
-                    $productIssue->update($input);
+                foreach ($productIssues->items as $productIssue) {
 
                     if ($request->user()->hasRole('Store Manager') && $request->status == 1){
                         $productOption = ProductOption::find($productIssue->product_option_id);
+
+                        $productIssue->update([
+                            'balance_before_issue' => $productOption->stock,
+                            'balance_after_issue' => (double)$productOption->stock - (double)$productIssue->quantity
+                        ]);
+
                         $productOption->stock = (double)$productOption->stock - (double)$productIssue->quantity;
                         $productOption->save();
 
@@ -354,13 +360,14 @@ class ProductIssueAPIController extends AppBaseController
                         }
                         $productIssue->rateLog()->createMany($purchase_log);
                     }
+                    $productIssues->update($input);
                 }
             }catch (\PDOException $exception){
                 Log::error('product issue update error', $exception->getMessage());
             }
         }, 2);
         return $this->sendResponse(
-            ProductIssueResource::collection($productIssues),
+            new ProductIssueResource($productIssues),
             __('messages.updated', ['model' => __('models/productIssues.singular')])
         );
     }
@@ -404,25 +411,32 @@ class ProductIssueAPIController extends AppBaseController
     public function destroy($uuid): JsonResponse
     {
         /** @var ProductIssue $productIssues */
-        $productIssues = ProductIssue::query()->where('uuid', $uuid);
+        $productIssues = ProductIssue::query()
+            ->with('items')
+            ->where('uuid', $uuid)
+            ->first();
         if (empty($productIssues)) {
             return $this->sendError(
                 __('messages.not_found', ['model' => __('models/productIssues.singular')])
             );
         }
+
         DB::transaction(function () use ($productIssues, $uuid){
             try {
-                foreach ($productIssues->where('store_status', 1)->get() as $productIssue){
-                    $productOptionId = $productIssue->product_option_id;
-                    $quantity = $productIssue->quantity;
+                if ($productIssues->store_status == 1){
+                    foreach ($productIssues->items as $item){
+                        $productOptionId = $item->product_option_id;
+                        $quantity = $item->quantity;
 
-                    if (!empty($productIssue)){
-                        $productOption = ProductOption::find($productOptionId);
-                        $productOption->stock = (double)$productOption->stock + (double)$quantity;
-                        $productOption->save();
+                        if (!empty($item)){
+                            $productOption = ProductOption::find($productOptionId);
+                            $productOption->stock = (double)$productOption->stock + (double)$quantity;
+                            $productOption->save();
+                        }
                     }
                 }
-                ProductIssue::query()->where('uuid', $uuid)->delete();
+                $productIssues->items()->delete();
+                $productIssues->delete();
             }catch (\PDOException $exception){
                 Log::error('product issue update error', $exception->getMessage());
             }
@@ -443,7 +457,7 @@ class ProductIssueAPIController extends AppBaseController
 
     public function updateQuantity($id, Request $request): JsonResponse
     {
-        $issue =  ProductIssue::find($id);
+        $issue =  ProductIssueItems::find($id);
         if (empty($issue)) {
             return $this->sendError(
                 __('messages.not_found', ['model' => __('models/productIssues.singular')])
@@ -455,7 +469,7 @@ class ProductIssueAPIController extends AppBaseController
             ]);
         }
         return $this->sendResponse(
-            new ProductIssueResource($issue),
+            new ProductIssueItemsResource($issue),
             __('messages.updated', ['model' => __('models/productIssues.singular')])
         );
 

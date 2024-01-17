@@ -102,11 +102,19 @@ use Illuminate\Database\Eloquent\Model;
         return $this->hasMany(Purchase::class);
     }
 
-    public function productIssue(){
+    public function productIssue(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
         return $this->hasMany(ProductIssueItems::class);
     }
 
-    public function issuePurchaseLog()
+    public function productApprovedIssue(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProductIssueItems::class)->with('productIssue')->whereHas('productIssue', function ($q){
+            $q->where('store_status', 1);
+        });
+    }
+
+    public function issuePurchaseLog(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(IssuePurchaseLog::class);
     }

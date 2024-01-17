@@ -44,31 +44,31 @@ const ProductIssue = () => {
     useEffect(() => {
         if (!isLoading && !isError && data ) {
             const issueData = data?.product_issue;
-            const tableData = Object.keys(issueData).map((pi) => {
-                return {
-                    uuid : pi,
-                    number_of_item : issueData[pi].length,
-                    receiver : issueData[pi].reduce((prev, curr) => {
-                        if (!prev.includes(curr.receiver?.name)){
-                            return prev ? prev + "," + curr.receiver?.name : curr.receiver?.name
-                        }
-                        return curr.receiver.name
-                    }, ""),
-                    issuer : issueData[pi].reduce((prev, curr) => {
-                        if (!prev.includes(curr.issuer.name)){
-                            return prev ? prev + "," + curr.issuer?.name : curr.issuer?.name
-                        }
-                        return curr.issuer?.name
-                    }, ""),
-                    issue_time: issueData[pi][0].issue_time,
-                    receiver_department_id: issueData[pi][0].receiver_department_id,
-                    department_status: issueData[pi][0].department_status,
-                    store_status: issueData[pi][0].store_status,
-                    receiver_department: issueData[pi][0].receiver_department,
-                };
-            })
+            // const tableData = Object.keys(issueData).map((pi) => {
+            //     return {
+            //         uuid : pi,
+            //         number_of_item : issueData[pi].length,
+            //         receiver : issueData[pi].reduce((prev, curr) => {
+            //             if (!prev.includes(curr.receiver?.name)){
+            //                 return prev ? prev + "," + curr.receiver?.name : curr.receiver?.name
+            //             }
+            //             return curr.receiver.name
+            //         }, ""),
+            //         issuer : issueData[pi].reduce((prev, curr) => {
+            //             if (!prev.includes(curr.issuer.name)){
+            //                 return prev ? prev + "," + curr.issuer?.name : curr.issuer?.name
+            //             }
+            //             return curr.issuer?.name
+            //         }, ""),
+            //         issue_time: issueData[pi][0].issue_time,
+            //         receiver_department_id: issueData[pi][0].receiver_department_id,
+            //         department_status: issueData[pi][0].department_status,
+            //         store_status: issueData[pi][0].store_status,
+            //         receiver_department: issueData[pi][0].receiver_department,
+            //     };
+            // })
 
-            setDataTableData(tableData);
+            setDataTableData(issueData);
             setColumns([
                 {
                     name: 'SL.',
@@ -77,12 +77,12 @@ const ProductIssue = () => {
                 },
                 {
                     name: 'No. of Item',
-                    selector: row => row.number_of_item,
+                    selector: row => row.products?.length,
                     sortable: true,
                 },
                 {
                     name: 'Receiver',
-                    selector: row => row.receiver,
+                    selector: row => row.receiver?.name,
                     sortable: true,
                 },
                 {
@@ -92,7 +92,7 @@ const ProductIssue = () => {
                 },
                 {
                     name: 'Issuer',
-                    selector: row => row.issuer,
+                    selector: row => row.issuer?.name,
                     sortable: true,
                 },
                 // {

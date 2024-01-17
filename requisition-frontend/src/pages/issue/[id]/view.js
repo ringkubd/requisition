@@ -7,6 +7,7 @@ import { useEditIssueQuery } from "@/store/service/issue";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import DataTable from "react-data-table-component";
+import { data } from "autoprefixer";
 
 const IssueView = () => {
     const router = useRouter();
@@ -33,16 +34,6 @@ const IssueView = () => {
                     sortable: true,
                 },
                 {
-                    name: 'Receiver',
-                    selector: row => row.receiver?.name,
-                    sortable: true,
-                },
-                {
-                    name: 'Issuer',
-                    selector: row => row.issuer?.name,
-                    sortable: true,
-                },
-                {
                     name: 'Purpose',
                     selector: row => row.purpose,
                     sortable: false,
@@ -62,15 +53,19 @@ const IssueView = () => {
                     selector: row => moment(row.issue_time).format('D MMM Y @ H:mm '),
                     sortable: true,
                 },
+                {
+                    name: 'Before',
+                    selector: row => row.balance_before_issue,
+                    sortable: true,
+                },
+                {
+                    name: 'After',
+                    selector: row => row.balance_after_issue,
+                    sortable: true,
+                },
             ])
         }
     }, [issueISLoading, issue])
-
-    useEffect(() => {
-        if (issueISSuccess){
-            console.log(issue)
-        }
-    }, [issue, issueISSuccess])
 
     return (
         <AppLayout
@@ -78,8 +73,7 @@ const IssueView = () => {
                 <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                     Product Issue Details.
                 </h2>
-            }
-        >
+            }>
             <Head>
                 <title>Product Issue Details</title>
             </Head>
@@ -87,19 +81,48 @@ const IssueView = () => {
                 <Card>
                     <div className="flex flex-row space-x-4 space-y-4  shadow-lg py-4 px-4">
                         <NavLink
-                            active={router.pathname === "issue"}
-                            href={`/issue`}
-                        >
+                            active={router.pathname === 'issue'}
+                            href={`/issue`}>
                             <Button>Back</Button>
                         </NavLink>
                     </div>
-                    <div className={`overflow-auto hidden sm:flex w-full flex-col`}>
-                        <DataTable
-                            columns={columns}
-                            data={issue?.data}
-                            expandableRowDisabled={false}
-                            title={`Issued product list`}
-                        />
+                    <div
+                        className={`overflow-auto hidden sm:flex w-full flex-col`}>
+                        <div
+                            className={`flex flex-col my-4 p-4  sm:max-w-2xl`}>
+                            <div className={`flex flex-row space-x-8 mt-4`}>
+                                <h2 className={`font-bold`}>Receiver</h2>
+                                <h4>{issue?.data?.receiver?.name}</h4>
+                            </div>
+                            <div className={`flex flex-row space-x-8 mt-4`}>
+                                <h2 className={`font-bold`}>
+                                    Receiver Department
+                                </h2>
+                                <h4>
+                                    {issue?.data?.receiver_department?.name}
+                                </h4>
+                            </div>
+                            <div className={`flex flex-row space-x-8 mt-4`}>
+                                <h2 className={`font-bold`}>Issuer</h2>
+                                <h4>{issue?.data?.issuer?.name}</h4>
+                            </div>
+                            <div className={`flex flex-row space-x-8 mt-4`}>
+                                <h2 className={`font-bold`}>
+                                    Issuer Department
+                                </h2>
+                                <h4>
+                                    {issue?.data?.issuer_department?.name}
+                                </h4>
+                            </div>
+                        </div>
+                        <div>
+                            <DataTable
+                                columns={columns}
+                                data={issue?.data.products}
+                                expandableRowDisabled={false}
+                                title={`Issued product list`}
+                            />
+                        </div>
                     </div>
                     <div className={`overflow-auto my-8`}>
                         <h2 className={`border-b-2 mb-2`}>Product Rate Log</h2>
@@ -112,28 +135,46 @@ const IssueView = () => {
                                 <Table.HeadCell>Total Price</Table.HeadCell>
                             </Table.Head>
                             <Table.Body>
-                                {
-                                    issue?.data && (
-                                        issue?.data?.map((p) => (
-                                            p?.rateLog.map((r, i) => (
-                                                <Table.Row className={`border-2`} key={r.id}>
-                                                    <Table.HeadCell  className={`border-2`}>{p?.product?.title}</Table.HeadCell>
-                                                    <Table.Cell className={`border-2`}>{moment(r.purchase_date).format("DD MMM Y")}</Table.Cell>
-                                                    <Table.Cell className={`border-2`}>{r.qty}</Table.Cell>
-                                                    <Table.Cell className={`border-2`}>{r.unit_price}</Table.Cell>
-                                                    <Table.Cell className={`border-2`}>{parseFloat(r.total_price).toLocaleString('bd')}</Table.Cell>
-                                                </Table.Row>
-                                            ))
-                                        ))
-                                    )
-                                }
+                                {issue?.data &&
+                                    issue?.data?.products?.map(p =>
+                                        p?.rateLog.map((r, i) => (
+                                            <Table.Row
+                                                className={`border-2`}
+                                                key={r.id}>
+                                                <Table.HeadCell
+                                                    className={`border-2`}>
+                                                    {p?.product?.title}
+                                                </Table.HeadCell>
+                                                <Table.Cell
+                                                    className={`border-2`}>
+                                                    {moment(
+                                                        r.purchase_date,
+                                                    ).format('DD MMM Y')}
+                                                </Table.Cell>
+                                                <Table.Cell
+                                                    className={`border-2`}>
+                                                    {r.qty}
+                                                </Table.Cell>
+                                                <Table.Cell
+                                                    className={`border-2`}>
+                                                    {r.unit_price}
+                                                </Table.Cell>
+                                                <Table.Cell
+                                                    className={`border-2`}>
+                                                    {parseFloat(
+                                                        r.total_price,
+                                                    ).toLocaleString('bd')}
+                                                </Table.Cell>
+                                            </Table.Row>
+                                        )),
+                                    )}
                             </Table.Body>
                         </Table>
                     </div>
                 </Card>
             </div>
         </AppLayout>
-)
+    )
 }
 
 export default IssueView;

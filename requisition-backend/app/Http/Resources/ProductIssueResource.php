@@ -17,7 +17,7 @@ class ProductIssueResource extends JsonResource
         return [
             'id' => $this->id,
             'uuid' => $this->uuid,
-            'products' => $this->items,
+            'products' => ProductIssueItemsResource::collection($this->items),
             'receiver_id' => $this->receiver_id,
             'receiver' => $this->receiver,
             'receiver_department' => $this->receiverDepartment,

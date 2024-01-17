@@ -20,9 +20,6 @@ import Quantity from "@/components/issue/Quantity";
 const Edit = (props) => {
     const router = useRouter();
     const { user } = useAuth()
-    const [storeProductIssue, storeResult] = useUpdateIssueMutation();
-    let formikForm = useRef();
-    const selectRef = useRef();
     const {data: users , isLoading: userIsLoading} = useGetUsersQuery({
         branch_id: user?.selected_branch,
         department_id: user?.selected_department
@@ -30,8 +27,6 @@ const Edit = (props) => {
     const { data: issue, isLoading: issueISLoading, isError: issueISError, isSuccess: issueISSuccess } = useEditIssueQuery(router.query.id, {
         skip: !router.query.id
     })
-    const [productOptions, setProductOptions] = useState([]);
-    const [stock, setStock] = useState(0);
     const [items, setItems] = useState([]);
     const [columns, setColumns] = useState([]);
 
@@ -40,7 +35,7 @@ const Edit = (props) => {
     }, [issue, issueISSuccess]);
 
     useEffect(() => {
-        if (items.length){
+        if (issueISSuccess){
             setColumns([
                 {
                     name: 'Product',
@@ -50,11 +45,6 @@ const Edit = (props) => {
                 {
                     name: 'Qty',
                     selector: row => <Quantity row={row} />,
-                    sortable: true,
-                },
-                {
-                    name: 'Receiver',
-                    selector: row => row.receiver_name ?? row?.receiver?.name,
                     sortable: true,
                 },
                 {
@@ -79,7 +69,7 @@ const Edit = (props) => {
                 }
             ]);
         }
-    }, [items]);
+    }, [issueISSuccess, issue]);
 
 
     return (
@@ -104,10 +94,39 @@ const Edit = (props) => {
                                 <Button>Back</Button>
                             </NavLink>
                         </div>
-                        <div className={`flex flex-col justify-center justify-items-center items-center basis-2/4 w-full`}>
+                        <div
+                            className={`flex flex-col basis-2/4 w-full`}>
+                            <div
+                                className={`flex flex-col my-4 p-4  sm:max-w-2xl`}>
+                                <div className={`flex flex-row space-x-8 mt-4`}>
+                                    <h2 className={`font-bold`}>Receiver</h2>
+                                    <h4>{issue?.data?.receiver?.name}</h4>
+                                </div>
+                                <div className={`flex flex-row space-x-8 mt-4`}>
+                                    <h2 className={`font-bold`}>
+                                        Receiver Department
+                                    </h2>
+                                    <h4>
+                                        {issue?.data?.receiver_department?.name}
+                                    </h4>
+                                </div>
+                                <div className={`flex flex-row space-x-8 mt-4`}>
+                                    <h2 className={`font-bold`}>Issuer</h2>
+                                    <h4>{issue?.data?.issuer?.name}</h4>
+                                </div>
+                                <div className={`flex flex-row space-x-8 mt-4`}>
+                                    <h2 className={`font-bold`}>
+                                        Issuer Department
+                                    </h2>
+                                    <h4>
+                                        {issue?.data?.issuer_department?.name}
+                                    </h4>
+                                </div>
+                            </div>
                             <DataTable
                                 columns={columns}
-                                data={items}
+                                progressPending={issueISLoading}
+                                data={items?.products}
                             />
                         </div>
                     </Card>
