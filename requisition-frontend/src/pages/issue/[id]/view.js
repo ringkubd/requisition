@@ -49,11 +49,6 @@ const IssueView = () => {
                     sortable: false,
                 },
                 {
-                    name: 'Issue Time',
-                    selector: row => moment(row.issue_time).format('D MMM Y @ H:mm '),
-                    sortable: true,
-                },
-                {
                     name: 'Before',
                     selector: row => row.balance_before_issue,
                     sortable: true,
@@ -88,8 +83,7 @@ const IssueView = () => {
                     </div>
                     <div
                         className={`overflow-auto hidden sm:flex w-full flex-col`}>
-                        <div
-                            className={`flex flex-col my-4 p-4  sm:max-w-2xl`}>
+                        <div className={`flex flex-col my-4 p-4  sm:max-w-2xl`}>
                             <div className={`flex flex-row space-x-8 mt-4`}>
                                 <h2 className={`font-bold`}>Receiver</h2>
                                 <h4>{issue?.data?.receiver?.name}</h4>
@@ -110,9 +104,13 @@ const IssueView = () => {
                                 <h2 className={`font-bold`}>
                                     Issuer Department
                                 </h2>
-                                <h4>
-                                    {issue?.data?.issuer_department?.name}
-                                </h4>
+                                <h4>{issue?.data?.issuer_department?.name}</h4>
+                            </div>
+                            <div className={`flex flex-row space-x-8 mt-4`}>
+                                <h2 className={`font-bold`}>
+                                    Issue Time
+                                </h2>
+                                <h4>{ issue?.data?.issue_time ? moment(issue?.data?.issue_time).format('DD MMM Y @ H:mm A') : null}</h4>
                             </div>
                         </div>
                         <div>
