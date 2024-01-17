@@ -420,6 +420,7 @@ class InitialRequisitionAPIController extends AppBaseController
             ->skip($start)
             ->limit(20)
             ->get());
+
         $count = Product::query()
                 ->when($request->search, function ($q, $s){
                     $q->where('title', 'like', "%$s%");

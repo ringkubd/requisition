@@ -141,4 +141,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     {
         return $this->belongsTo(\App\Models\Product::class, 'product_id');
     }
+    public function getCategoryAttribute()
+    {
+        return empty($this->useInCategory) ? $this->product?->category : $this->useInCategory;
+    }
+    public function rateLog(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(IssuePurchaseLog::class);
+    }
 }

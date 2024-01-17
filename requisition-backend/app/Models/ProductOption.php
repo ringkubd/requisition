@@ -103,7 +103,7 @@ use Illuminate\Database\Eloquent\Model;
     }
 
     public function productIssue(){
-        return $this->hasMany(ProductIssue::class);
+        return $this->hasMany(ProductIssueItems::class);
     }
 
     public function issuePurchaseLog()

@@ -108,17 +108,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
     public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(ProductIssueItems::class);
-    }
-
-    public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(\App\Models\Product::class, 'product_id');
-    }
-
-    public function productOption(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(\App\Models\ProductOption::class, 'product_option_id');
+        return $this->hasMany(ProductIssueItems::class, 'uuid', 'uuid');
     }
 
     public function receiver(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -135,11 +125,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         return $this->belongsTo(\App\Models\Branch::class, 'receiver_branch_id');
     }
 
-    public function rateLog(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(IssuePurchaseLog::class);
-    }
-
     public function departmentApprovedBY(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'department_approved_by');
@@ -147,14 +132,5 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     public function storeApprovedBY(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'store_approved_by');
-    }
-    public function useInCategory(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Category::class, 'use_in_category');
-    }
-
-    public function getCategoryAttribute()
-    {
-        return empty($this->useInCategory) ? $this->product?->category : $this->useInCategory;
     }
 }

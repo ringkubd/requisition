@@ -150,7 +150,7 @@ class Product extends BaseModel
 
     public function issues(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(ProductIssue::class);
+        return $this->hasMany(ProductIssueItems::class);
     }
 
     public function purchaseRequisition(){

@@ -14,6 +14,7 @@ use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductIssueResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use OpenApi\Annotations as OA;
 use Ramsey\Uuid\Nonstandard\Uuid;
 
 /**
@@ -92,7 +93,8 @@ class ProductIssueAPIController extends AppBaseController
                 $q->whereRaw("true = $storeManager")
                     ->where('department_status', 1);
             })
-            ->latest()->get();
+            ->latest()
+            ->get();
 
         return response()->json([
             'product_issue' =>  ProductIssueResource::collection($productIssues)->collection->groupBy('uuid'),
@@ -136,17 +138,42 @@ class ProductIssueAPIController extends AppBaseController
         $input = $request->all();
         $uuid = Uuid::uuid4();
 
-        foreach ($input as $item){
-            $item['uuid'] = $uuid;
-            $item['issuer_id'] = $request->user()->id;
-            $item['issuer_branch_id'] = auth_branch_id();
-            $item['issuer_department_id'] = auth_department_id();
-            $item['issue_time'] = Carbon::parse($item['issue_time'])->toDateTimeString();
-            $item['receiver_branch_id'] = auth_branch_id();
-            $item['receiver_department_id'] = auth_department_id();
+        $productIssue = new ProductIssue();
+        if (!empty($input)){
+            DB::transaction(function () use ($uuid, $request, $input){
+                $productIssue = ProductIssue::create([
+                    'uuid' => $uuid,
+                    'issuer_id' => $request->user()->id,
+                    'issuer_branch_id' => auth_branch_id(),
+                    'issuer_department_id' => auth_department_id(),
+                    'issue_time' => Carbon::parse($input[0]['issue_time'])->toDateTimeString(),
+                    'receiver_id' => $input[0]['receiver_id'],
+                    'receiver_branch_id' => auth_branch_id(),
+                    'receiver_department_id' => auth_branch_id(),
+                ]);
 
-            $productIssue = $this->productIssueRepository->create($item);
+                $input = array_map(function ($it) use ($uuid, $productIssue){
+                    $it['uuid'] = $uuid;
+                    $it['product_issue_id'] = $productIssue->id;
+                    return $it;
+                }, $input);
+
+                $productIssue->items()->createMany($input);
+            }, 2);
         }
+
+
+//        foreach ($input as $item){
+//            $item['uuid'] = $uuid;
+//            $item['issuer_id'] = $request->user()->id;
+//            $item['issuer_branch_id'] = auth_branch_id();
+//            $item['issuer_department_id'] = auth_department_id();
+//            $item['issue_time'] = Carbon::parse($item['issue_time'])->toDateTimeString();
+//            $item['receiver_branch_id'] = auth_branch_id();
+//            $item['receiver_department_id'] = auth_department_id();
+//
+//            $productIssue = $this->productIssueRepository->create($item);
+//        }
         return $this->sendResponse(
             new ProductIssueResource($productIssue),
             __('messages.saved', ['model' => __('models/productIssues.singular')])
