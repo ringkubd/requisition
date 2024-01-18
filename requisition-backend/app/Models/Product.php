@@ -137,12 +137,6 @@ class Product extends BaseModel
     {
         return $this->hasMany(\App\Models\ProductOption::class, 'product_id');
     }
-
-    public function lastPurchaseRequisition(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
-    {
-        return $this->hasOneThrough(PurchaseRequisition::class, PurchaseRequisitionProduct::class, 'product_id', 'id', 'id', 'purchase_requisition_id');
-    }
-
     public function purchaseHistory(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Purchase::class);

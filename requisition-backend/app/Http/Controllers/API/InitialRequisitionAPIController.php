@@ -436,7 +436,13 @@ class InitialRequisitionAPIController extends AppBaseController
         );
     }
 
-    public function lastPurchase(Request $request){
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+
+    public function lastPurchase(Request $request): JsonResponse
+    {
         $request->validate([
             'product_id' => $request->product_id,
             'product_option_id' => $request->product_option_id

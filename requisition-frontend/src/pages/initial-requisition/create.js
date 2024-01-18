@@ -186,7 +186,6 @@ const InitialRequisitionCreate = (props) => {
                     value: r.id,
                     product_options: r.product_options,
                     unit: r.unit,
-                    last_purchase: r.last_purchase,
                 }
             }),
             hasMore: responseJSON.data.count > 20,
@@ -350,20 +349,6 @@ const InitialRequisitionCreate = (props) => {
                                                                 'product_title',
                                                                 newValue.label,
                                                             )
-                                                            setFieldValue(
-                                                                'last_purchase_date',
-                                                                newValue
-                                                                    .last_purchase
-                                                                    ?.created_at
-                                                                    ? moment(
-                                                                          newValue
-                                                                              ?.last_purchase
-                                                                              ?.created_at,
-                                                                      )?.format(
-                                                                          'Y-M-DD',
-                                                                      )
-                                                                    : null,
-                                                            )
                                                         }}
                                                         additional={{
                                                             page: 1,
@@ -415,6 +400,10 @@ const InitialRequisitionCreate = (props) => {
                                                                 newValue.stock ??
                                                                     0,
                                                             )
+                                                            setFieldValue(
+                                                                'last_purchase_date',
+                                                                newValue.last_purchase_date ? moment(newValue.last_purchase_date,)?.format('Y-M-DD') : null,
+                                                            )
                                                         }}
                                                         id="product_option_id"
                                                         name="product_option_id"
@@ -424,6 +413,7 @@ const InitialRequisitionCreate = (props) => {
                                                                     o.option_value,
                                                                 value: o.id,
                                                                 stock: o.stock,
+                                                                last_purchase_date: o.option_purchase_history[0]?.purchase_date
                                                             }),
                                                         )}
                                                         className={`select`}

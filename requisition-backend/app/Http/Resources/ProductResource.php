@@ -24,7 +24,6 @@ class ProductResource extends JsonResource
             'product_metas' => $this->productMetas,
             'product_options' => ProductOptionResource::collection($this->productOptions),
             'total_stock' => $this->productOptions->sum('stock'),
-            'last_purchase' => $this->lastPurchaseRequisition,
             'description' => $this->description,
             'status' => $this->status,
             'deleted_at' => $this->deleted_at,

@@ -99,7 +99,7 @@ use Illuminate\Database\Eloquent\Model;
 
     public function purchaseHistory(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Purchase::class);
+        return $this->hasMany(Purchase::class)->latest('purchase_date');
     }
 
     public function productIssue(): \Illuminate\Database\Eloquent\Relations\HasMany
