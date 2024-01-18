@@ -20,7 +20,7 @@ class ProductIssueWithRateLogResource extends JsonResource
             'purchase_requisition' => $this->purchaseRequisition,
             'product_id' => $this->product_id,
             'product_option_id' => $this->product_option_id,
-            'average_rate' => max($this->rateLog->sum('unit_price'), 0) / max($this->rateLog->count(), 0),
+            'average_rate' => max($this->rateLog->sum('unit_price'), 0) / max($this->rateLog->count(), 1),
             'total_price' => $this->rateLog->sum('total_price'),
             'rateLog' => $this->rateLog,
             'quantity' => $this->quantity,
