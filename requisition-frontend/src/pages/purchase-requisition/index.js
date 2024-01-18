@@ -46,8 +46,14 @@ const PurchaseRequisition = () => {
                     sortable: true,
                 },
                 {
-                    name: 'Total Req. Unit',
-                    selector: row => row.total_required_unit,
+                    name: 'Category',
+                    selector: row => row.purchase_requisition_products[0]?.product?.category?.title,
+                    sortable: true,
+                    maxWidth: "200px",
+                },
+                {
+                    name: 'No. of Item',
+                    selector: row => row.purchase_requisition_products.length,
                     sortable: true,
                 },
                 {

@@ -4,10 +4,11 @@ import { Button, Card, Table } from "flowbite-react";
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import { useEditIssueQuery } from "@/store/service/issue";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import moment from "moment";
 import DataTable from "react-data-table-component";
 import { data } from "autoprefixer";
+import Status from "@/components/issue/Status";
 
 const IssueView = () => {
     const router = useRouter();
@@ -80,6 +81,9 @@ const IssueView = () => {
                             href={`/issue`}>
                             <Button>Back</Button>
                         </NavLink>
+                        <div className={`pt-1`}>
+                            {issue?.data ? <Status row={issue?.data} /> : null}
+                        </div>
                     </div>
                     <div
                         className={`overflow-auto hidden sm:flex w-full flex-col`}>
@@ -107,10 +111,14 @@ const IssueView = () => {
                                 <h4>{issue?.data?.issuer_department?.name}</h4>
                             </div>
                             <div className={`flex flex-row space-x-8 mt-4`}>
-                                <h2 className={`font-bold`}>
-                                    Issue Time
-                                </h2>
-                                <h4>{ issue?.data?.issue_time ? moment(issue?.data?.issue_time).format('DD MMM Y @ H:mm A') : null}</h4>
+                                <h2 className={`font-bold`}>Issue Time</h2>
+                                <h4>
+                                    {issue?.data?.issue_time
+                                        ? moment(
+                                              issue?.data?.issue_time,
+                                          ).format('DD MMM Y @ H:mm A')
+                                        : null}
+                                </h4>
                             </div>
                         </div>
                         <div>

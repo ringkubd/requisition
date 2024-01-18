@@ -21,12 +21,6 @@ const IssuePrint = forwardRef(({products}, ref) => {
                         Issue Form
                     </p>
                 </div>
-                {/*<div*/}
-                {/*    className={`flex justify-center items-center justify-items-center text-center`}>*/}
-                {/*    <i className={`px-4 w-fit font-extralight font-serif`}>*/}
-                {/*        (Receiver copy)*/}
-                {/*    </i>*/}
-                {/*</div>*/}
                 <div
                     className={`flex flex-row items-stretch justify-between my-2 w-full`}>
                     <div className={`flex flex-row w-full justify-start`}>

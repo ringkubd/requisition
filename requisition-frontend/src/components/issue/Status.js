@@ -21,6 +21,7 @@ const IssueStatus = ({row}) => {
         }else if (parseInt(row?.receiver_department_id) === parseInt(user?.selected_department) && !row.department_status){
             setSelectedDropdown('Pending');
         }
+        console.log(row)
         if (user?.role_object?.filter(r => r.name === "Store Manager").length && row.store_status){
             setSelectedDropdown('Approved');
         }else if (user?.role_object?.filter(r => r.name === "Store Manager").length && !row.store_status){

@@ -6,6 +6,7 @@ import { Button, Card } from "flowbite-react";
 import { useReactToPrint } from "react-to-print";
 import { useEditIssueQuery } from "@/store/service/issue";
 import IssuePrint from "@/components/issue/IssuePrint";
+import Status from "@/components/issue/Status";
 
 export default function PrintView(props) {
     const printPageRef = useRef();
@@ -13,8 +14,6 @@ export default function PrintView(props) {
     const {data, isLoading, isError} = useEditIssueQuery(router.query.id, {
         skip: !router.query.id
     });
-    const mainData = data?.data;
-
     const handlePrint = useReactToPrint({
         content: () => printPageRef.current,
         onBeforePrint: (a) => console.log(a)
@@ -38,18 +37,25 @@ export default function PrintView(props) {
                             <Button
                                 onClick={handlePrint}
                                 gradientDuoTone="purpleToBlue"
-                                outline
-                            >Print</Button>
+                                outline>
+                                Print
+                            </Button>
+                        </div>
+                        <div className={`pt-1`}>
+                            {
+                                data?.data ? <Status row={data?.data} /> : null
+                            }
+
                         </div>
                     </div>
                     <div className={`mx-auto shadow-none`}>
                         <IssuePrint
                             products={data?.data ?? []}
-                            ref={printPageRef} />
+                            ref={printPageRef}
+                        />
                     </div>
                 </Card>
             </div>
-
         </AppLayout>
     )
 }

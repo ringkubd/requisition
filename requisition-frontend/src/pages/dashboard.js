@@ -56,6 +56,12 @@ const Dashboard = () => {
                     maxWidth: "50px",
                 },
                 {
+                    name: 'Category',
+                    selector: row => row.requisition_products[0]?.product?.category?.title,
+                    sortable: true,
+                    maxWidth: "200px",
+                },
+                {
                     name: 'Req. Item',
                     selector: row => row.requisition_products?.length,
                     sortable: true,

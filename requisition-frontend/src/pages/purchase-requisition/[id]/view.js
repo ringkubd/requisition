@@ -21,6 +21,12 @@ const View = (props) => {
         if (!isLoading && !isError && requisition_products){
             setColumns([
                 {
+                    name: 'Sl#',
+                    selector: (row, index) => index + 1,
+                    sortable: true,
+                    maxWidth: "40px",
+                },
+                {
                     name: 'Name of the Item',
                     selector: row => row.title,
                     sortable: true,
@@ -144,7 +150,6 @@ const View = (props) => {
                           <DataTable
                             columns={columns}
                             data={requisition_products}
-                            pagination
                             responsive
                             progressPending={isLoading}
                             persistTableHead
