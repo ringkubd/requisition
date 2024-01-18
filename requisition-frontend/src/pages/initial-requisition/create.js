@@ -376,11 +376,7 @@ const InitialRequisitionCreate = (props) => {
                                                     </div>
                                                     <Select
                                                         value={productOptions
-                                                            ?.filter(
-                                                                po =>
-                                                                    po.id ==
-                                                                    values.product_option_id,
-                                                            )
+                                                            ?.filter(po => parseInt(po.id) === parseInt(values.product_option_id))
                                                             ?.map(po => ({
                                                                 label:
                                                                     po.option_value,
@@ -402,7 +398,7 @@ const InitialRequisitionCreate = (props) => {
                                                             )
                                                             setFieldValue(
                                                                 'last_purchase_date',
-                                                                newValue.last_purchase_date ? moment(newValue.last_purchase_date,)?.format('Y-M-DD') : null,
+                                                                newValue.last_purchase_date ? moment(newValue.last_purchase_date,)?.format('Y-MM-DD') : null,
                                                             )
                                                         }}
                                                         id="product_option_id"
