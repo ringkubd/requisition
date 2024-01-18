@@ -62,11 +62,12 @@ class SupplierAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $suppliers = $this->supplierRepository->all(
-            $request->except(['skip', 'limit']),
-            $request->get('skip'),
-            $request->get('limit')
-        );
+        $suppliers = Supplier::query()
+            ->when($request->name, function ($q, $v){
+                $q->where('name', 'like', "%$v%")
+                    ->orWhere('address', 'like', "%$v%")
+                    ->orWhere('contact', 'like', "%$v%");
+            })->get();
 
         return $this->sendResponse(
             SupplierResource::collection($suppliers),

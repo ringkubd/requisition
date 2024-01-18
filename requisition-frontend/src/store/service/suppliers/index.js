@@ -8,8 +8,9 @@ export const SuppliersApiService = createApi({
     tagTypes: ['getSuppliers', 'editSuppliers'],
     endpoints: builder => ({
         getSuppliers: builder.query({
-            query: () => ({
+            query: (query) => ({
                 url: 'suppliers',
+                params: query
             }),
             providesTags: ['getSuppliers'],
             onQueryStarted: onQueryStartedErrorToast,
