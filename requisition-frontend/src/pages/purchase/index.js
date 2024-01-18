@@ -42,7 +42,7 @@ const Purchase = () => {
             name: 'Product',
             selector: row => row.product?.title + " - " +  row.productOption?.title,
             sortable: true,
-            minWidth: "200px"
+            minWidth: "220px"
         },
         {
             name: 'Supplier',
@@ -54,11 +54,6 @@ const Purchase = () => {
             selector: row => row.brand?.logo ? <Image width={50} height={50} alt={row.brand?.name} src={row.brand?.logo} /> : row.brand?.name,
             sortable: true,
         },
-        // {
-        //     name: 'Requisition',
-        //     selector: row => row.purchaseRequisition?.irf_no,
-        //     sortable: true,
-        // },
         {
             name: 'P.R. No.',
             selector: row => row.purchaseRequisition?.prf_no,
@@ -67,15 +62,15 @@ const Purchase = () => {
         },
         {
             name: 'Qty',
-            selector: row => row.qty,
+            selector: row => row.qty + " (" + row.product?.unit +")",
             sortable: true,
-            width: "70px",
+            width: "90px",
         },
         {
             name: 'Unit Price',
             selector: row => row.unit_price,
             sortable: true,
-            width: "96px",
+            width: "100px",
         },
         {
             name: 'Purchase Date',

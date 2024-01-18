@@ -57,16 +57,16 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
                                         Name of the Item
                                     </th>
-                                    <th
-                                        scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
-                                        Avg. Rate
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className={`border bg-white leading-3 py-0 px-0 normal-case`}>
-                                        Unit
-                                    </th>
+                                    {/*<th*/}
+                                    {/*    scope="col"*/}
+                                    {/*    className={`border bg-white leading-3 py-0 px-2 normal-case`}>*/}
+                                    {/*    Avg. Rate*/}
+                                    {/*</th>*/}
+                                    {/*<th*/}
+                                    {/*    scope="col"*/}
+                                    {/*    className={`border bg-white leading-3 py-0 px-0 normal-case`}>*/}
+                                    {/*    Unit*/}
+                                    {/*</th>*/}
                                     <th
                                         scope="col"
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
@@ -115,16 +115,16 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                                   p?.variant?.option_value
                                                 : ''}
                                         </td>
+                                        {/*<td className={`border p-1`}>*/}
+                                        {/*    {parseFloat(*/}
+                                        {/*        p?.average_rate,*/}
+                                        {/*    ).toLocaleString()}*/}
+                                        {/*</td>*/}
+                                        {/*<td className={`border p-1`}>*/}
+                                        {/*    {p?.product?.unit}*/}
+                                        {/*</td>*/}
                                         <td className={`border p-1`}>
-                                            {parseFloat(
-                                                p?.average_rate,
-                                            ).toLocaleString()}
-                                        </td>
-                                        <td className={`border p-1`}>
-                                            {p?.product?.unit}
-                                        </td>
-                                        <td className={`border p-1`}>
-                                            {p?.quantity}
+                                            {p?.quantity} {p?.product?.unit}
                                         </td>
                                         <td className={`border p-1`}>
                                             {p?.purpose}

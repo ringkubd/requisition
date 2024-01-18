@@ -117,8 +117,8 @@ const InitialRequisitionCreate = (props) => {
         setSubmitRemoveProcessing(true)
         setRequisitionData(requisitionData.filter(r => item.product_id !== r.product_id && item.product_option_id !== r.product_option_id));
         setSubmitRemoveProcessing(false);
-        selectRef.current.clearValue();
-        selectRef.current.removeValue()
+        selectRef.current?.clearValue();
+        selectRef.current?.removeValue()
     }
 
     const tableColumns = [
@@ -262,16 +262,21 @@ const InitialRequisitionCreate = (props) => {
                                     setErrors,
                                 }) => (
                                     <div className={`flex flex-col w-full m-auto`}>
-                                        <div
-                                            className={`flex flex-row w-full justify-end justify-items-end items-end`}>
-                                            <Button
-                                                isProcessing={isSubmitting}
-                                                onClick={submit}
-                                                type="submit"
-                                                color={`success`}>
-                                                Submit
-                                            </Button>
-                                        </div>
+                                        {
+                                            requisitionData.length ? (
+                                                <div
+                                                    className={`flex flex-row w-full justify-end justify-items-end items-end`}>
+                                                    <Button
+                                                        isProcessing={isSubmitting}
+                                                        onClick={submit}
+                                                        type="submit"
+                                                        color={`success`}>
+                                                        Submit
+                                                    </Button>
+                                                </div>
+                                            ) : null
+                                        }
+
                                         <div className="flex flex-col xl:flex-row gap-4 w-full justify-center shadow-md py-6 px-4">
                                             <div className="flex flex-row w-full gap-4">
                                                 <div className="w-full">
@@ -336,18 +341,18 @@ const InitialRequisitionCreate = (props) => {
                                                         }}
                                                         onChange={newValue => {
                                                             setProductOptions(
-                                                                newValue.product_options,
+                                                                newValue?.product_options,
                                                             )
                                                             setProductUnit(
-                                                                newValue.unit,
+                                                                newValue?.unit,
                                                             )
                                                             setFieldValue(
                                                                 'product_id',
-                                                                newValue.value,
+                                                                newValue?.value,
                                                             )
                                                             setFieldValue(
                                                                 'product_title',
-                                                                newValue.label,
+                                                                newValue?.label,
                                                             )
                                                         }}
                                                         additional={{
