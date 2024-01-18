@@ -9,6 +9,7 @@ import { useGetOptionsQuery, useStoreOptionsMutation } from "@/store/service/opt
 import { setActiveForm } from "@/store/service/product/product_active_form";
 import Creatable from 'react-select/creatable';
 import EditStock from "@/components/product/EditStock";
+import EditVariant from "@/components/product/EditVariant";
 
 export default function VariantForm(props) {
     const options = useGetOptionsQuery();
@@ -51,7 +52,8 @@ export default function VariantForm(props) {
     const optionsColumns = [
         {
             name: 'Option',
-            selector: row => !options.isLoading && !options.isError && options.data ? options.data.data.filter((o) => o.id === parseInt(row.option_id))[0]?.name : '',
+            // selector: row => !options.isLoading && !options.isError && options.data ? options.data.data.filter((o) => o.id === parseInt(row.option_id))[0]?.name : '',
+            selector: row => !options.isLoading && !options.isError && options.data ? <EditVariant options={options?.data} selectedOption={row.option_id} rowId={row.id} /> : '',
             sortable: true,
         },
         {
