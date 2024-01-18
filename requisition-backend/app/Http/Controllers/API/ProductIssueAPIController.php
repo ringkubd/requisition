@@ -151,7 +151,7 @@ class ProductIssueAPIController extends AppBaseController
                     'issue_time' => Carbon::parse($input[0]['issue_time'])->toDateTimeString(),
                     'receiver_id' => $input[0]['receiver_id'],
                     'receiver_branch_id' => auth_branch_id(),
-                    'receiver_department_id' => auth_branch_id(),
+                    'receiver_department_id' => auth_department_id(),
                 ]);
 
                 $input = array_map(function ($it) use ($uuid, $productIssue){
