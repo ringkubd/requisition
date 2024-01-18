@@ -54,6 +54,7 @@ const Department = () => {
             cell: (row) => <Actions
                 itemId={row.id}
                 destroy={destroy}
+                edit={`/suppliers/${row.id}/edit`}
                 progressing={destroyResponse.isLoading}
                 permissionModule={`suppliers`}
             />,

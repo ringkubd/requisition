@@ -163,19 +163,6 @@ class ProductIssueAPIController extends AppBaseController
                 $productIssue->items()->createMany($input);
             }, 2);
         }
-
-
-//        foreach ($input as $item){
-//            $item['uuid'] = $uuid;
-//            $item['issuer_id'] = $request->user()->id;
-//            $item['issuer_branch_id'] = auth_branch_id();
-//            $item['issuer_department_id'] = auth_department_id();
-//            $item['issue_time'] = Carbon::parse($item['issue_time'])->toDateTimeString();
-//            $item['receiver_branch_id'] = auth_branch_id();
-//            $item['receiver_department_id'] = auth_department_id();
-//
-//            $productIssue = $this->productIssueRepository->create($item);
-//        }
         return $this->sendResponse(
             new ProductIssueResource($productIssue),
             __('messages.saved', ['model' => __('models/productIssues.singular')])
