@@ -3,8 +3,6 @@ import moment from "moment/moment";
 
 const IssuePrint = forwardRef(({products}, ref) => {
     const accountsCopy = useRef();
-    console.log(products)
-
     return (
         <div
             className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none`}
@@ -35,7 +33,7 @@ const IssuePrint = forwardRef(({products}, ref) => {
                         <i className={`pr-4`}>Date: </i>
                         <p className={`underline`}>
                             {moment(products?.issue_time).format(
-                                'DD MMM Y @ hh:mm',
+                                'DD MMM Y',
                             )}
                         </p>
                     </div>
@@ -124,7 +122,7 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                         {/*    {p?.product?.unit}*/}
                                         {/*</td>*/}
                                         <td className={`border p-1`}>
-                                            {p?.quantity} {p?.product?.unit}
+                                            {p?.quantity}{p?.product?.unit}
                                         </td>
                                         <td className={`border p-1`}>
                                             {p?.purpose}
