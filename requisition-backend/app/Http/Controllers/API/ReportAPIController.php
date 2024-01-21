@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
-use App\Http\Resources\ProductIssueResource;
+use App\Http\Resources\ProductIssueItemReportResource;
 use App\Models\Product;
-use App\Models\ProductIssue;
+use App\Models\ProductIssueItems;
 use App\Models\Purchase;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -67,26 +67,35 @@ class ReportAPIController extends AppBaseController
     {
         $categories = explode(',',$request->category);
         $products = explode(',',$request->product);
-        $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
         $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
+        $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
 
-        $issues = ProductIssueResource::collection(ProductIssue::query()
+        $issues = ProductIssueItemReportResource::collection(ProductIssueItems::query()
             ->when(!empty($request->category), function ($q) use ($categories){
                 $q->whereHas('product', function ($query) use ($categories){
-                    $query->whereIn('category_id', $categories);
-                })->orWhereIn('use_in_category', $categories);
+                    $query->whereIn('category_id', $categories)->orWhereIn('use_in_category', $categories);
+                });
             })
             ->when(!empty($request->product), function ($q) use ($products){
-                $q->whereIn('product_id', $products);
+                    $q->whereIn('product_id', $products);
             })
             ->when($request->department, function ($q, $v){
-                $q->where('issuer_department_id', $v);
+                $q->whereHas('productIssue', function ($q) use ($v){
+                    $q->where('issuer_department_id', $v);
+                });
             })
-            ->whereRaw("date(issue_time) between '$first' and '$last'")
-            ->where('store_status', 1)
+            ->whereHas('productIssue', function ($q) use($first, $last){
+                $q->whereRaw("date(issue_time) between '$first' and '$last'")
+                    ->where('store_status', 1);
+            })
+
             ->latest()
             ->get());
-        return  response()->json($issues->collection->groupBy('category.title'));
+        return  response()->json([
+            'issues' => $issues->collection->groupBy('category.title'),
+            'start_date' => $first,
+            'end_date' => $last
+        ]);
     }
 
     /**
