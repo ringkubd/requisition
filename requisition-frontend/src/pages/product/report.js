@@ -345,7 +345,7 @@ const Report = () => {
                                 {
                                     reportType === "purchase" ?
                                         <PurchaseReport data={purchaseReport} /> :
-                                        <IssueReport data={issueReports} />
+                                        <IssueReport isLoading={issueReportsISLoading} data={issueReports} />
                                 }
                             </div>
                         </div>

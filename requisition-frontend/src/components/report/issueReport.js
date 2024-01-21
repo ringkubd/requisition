@@ -1,9 +1,13 @@
 import { forwardRef } from "react";
 import moment from "moment";
 import './Print.module.css';
+import Loading from "@/components/loading";
 
-const IssueReport = forwardRef(({data}, ref) => {
+const IssueReport = forwardRef(({data, isLoading}, ref) => {
     const {issues} = data ?? {};
+    if (isLoading){
+        return <Loading />
+    }
     return (
         <div
             className={`flex flex-col m-2 justify-center justify-items-center p-4 shadow-none`}
