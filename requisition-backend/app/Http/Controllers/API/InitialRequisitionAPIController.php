@@ -289,7 +289,6 @@ class InitialRequisitionAPIController extends AppBaseController
         $estimated_cost = collect($allProduct)->sum('estimated_cost');
 
         $initialRequisition = $this->initialRequisitionRepository->update([
-            'user_id' => $user->id,
             'estimated_cost' => $estimated_cost
         ], $id);
 

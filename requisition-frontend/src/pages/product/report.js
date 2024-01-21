@@ -34,13 +34,6 @@ const Report = () => {
 
     const {start_date, end_date} = issueReports ?? purchaseReport ?? {};
 
-    const times = [
-        {label: 'Weekly', value: 'weekly'},
-        {label: 'Last month', value: 'last_month'},
-        {label: 'Quarterly', value: 'quarterly'},
-        {label: 'Last Six Month', value: 'last_six_month'},
-        {label: 'Yearly', value: 'yearly'},
-    ]
     const initialValues = {
         category: '',
         department: '',
@@ -125,15 +118,22 @@ const Report = () => {
                                                     id="purchase"
                                                     name="report_type"
                                                     value="purchase"
-                                                    defaultChecked={values.report_type === "purchase"}
-                                                    onChange={(e) => {
+                                                    defaultChecked={
+                                                        values.report_type ===
+                                                        'purchase'
+                                                    }
+                                                    onChange={e => {
                                                         handleChange(e)
-                                                        if(e.target.checked) {
-                                                            setReportType('purchase');
+                                                        if (e.target.checked) {
+                                                            setReportType(
+                                                                'purchase',
+                                                            )
                                                         }
                                                     }}
                                                 />
-                                                <Label htmlFor="purchase" className={`font-bold`}>
+                                                <Label
+                                                    htmlFor="purchase"
+                                                    className={`font-bold`}>
                                                     Purchase
                                                 </Label>
                                             </div>
@@ -142,15 +142,22 @@ const Report = () => {
                                                     id="usage"
                                                     name="report_type"
                                                     value="usage"
-                                                    defaultChecked={values.report_type === "usage"}
-                                                    onChange={(e) => {
+                                                    defaultChecked={
+                                                        values.report_type ===
+                                                        'usage'
+                                                    }
+                                                    onChange={e => {
                                                         handleChange(e)
-                                                        if(e.target.checked) {
-                                                            setReportType('usage');
+                                                        if (e.target.checked) {
+                                                            setReportType(
+                                                                'usage',
+                                                            )
                                                         }
                                                     }}
                                                 />
-                                                <Label htmlFor="usage" className={`font-bold`}>
+                                                <Label
+                                                    htmlFor="usage"
+                                                    className={`font-bold`}>
                                                     Usage
                                                 </Label>
                                             </div>
@@ -167,47 +174,59 @@ const Report = () => {
                                             <Datepicker
                                                 inputId={`date_range`}
                                                 inputName={`date_range`}
-                                                onChange={(d) => {
-                                                    setFieldValue('start_date', d.startDate);
-                                                    setFieldValue('end_date', d.endDate);
+                                                onChange={d => {
+                                                    setFieldValue(
+                                                        'start_date',
+                                                        d.startDate,
+                                                    )
+                                                    setFieldValue(
+                                                        'end_date',
+                                                        d.endDate,
+                                                    )
                                                 }}
-                                                value={{startDate: values.start_date, endDate: values.end_date}}
+                                                value={{
+                                                    startDate:
+                                                    values.start_date,
+                                                    endDate: values.end_date,
+                                                }}
                                             />
                                             <ErrorMessage name={'time'} />
                                         </div>
-                                        {
-                                            values.report_type === "usage" ? (
-                                                <div className={`w-full`}>
-                                                    <Label
-                                                        htmlFor={`department`}
-                                                        value={'Department'}
-                                                        className={`font-bold`}
-                                                    />
-                                                    <Select
-                                                        id={`department`}
-                                                        className={`select`}
-                                                        classNames={{
-                                                            control: state => 'select',
-                                                        }}
-                                                        isLoading={departmentISLoading}
-                                                        options={departments?.data?.map(
-                                                            d => ({
-                                                                label: d.name,
-                                                                value: d.id,
-                                                            }),
-                                                        )}
-                                                        onChange={newValue =>
-                                                            setFieldValue(
-                                                                'department',
-                                                                newValue?.value ?? '',
-                                                            )
-                                                        }
-                                                        isClearable={true}
-                                                    />
-                                                    <ErrorMessage name={'department'} />
-                                                </div>
-                                            ): null
-                                        }
+                                        <div className={`w-full`}>
+                                            <Label
+                                                htmlFor={`department`}
+                                                value={'Department'}
+                                                className={`font-bold`}
+                                            />
+                                            <Select
+                                                id={`department`}
+                                                className={`select`}
+                                                classNames={{
+                                                    control: state =>
+                                                        'select',
+                                                }}
+                                                isLoading={
+                                                    departmentISLoading
+                                                }
+                                                options={departments?.data?.map(
+                                                    d => ({
+                                                        label: d.name,
+                                                        value: d.id,
+                                                    }),
+                                                )}
+                                                onChange={newValue =>
+                                                    setFieldValue(
+                                                        'department',
+                                                        newValue?.value ??
+                                                        '',
+                                                    )
+                                                }
+                                                isClearable={true}
+                                            />
+                                            <ErrorMessage
+                                                name={'department'}
+                                            />
+                                        </div>
                                     </div>
                                     <div
                                         className={`flex flex-col sm:flex-row w-full sm:space-x-4`}>
@@ -321,35 +340,52 @@ const Report = () => {
                             <div>
                                 <Button onClick={handlePrint}>Print</Button>
                             </div>
-                            <div className="flex flex-col relative overflow-x-auto" ref={printRef}>
+                            <div
+                                className="flex flex-col relative overflow-x-auto"
+                                ref={printRef}>
                                 <div className={`flex flex-col`}>
                                     <div className={`text-center font-bold`}>
                                         <h2>
-                                            IsDB-Bangladesh Islamic Solidarity Educational Wakf
-                                            (IsDB-BISEW)
+                                            IsDB-Bangladesh Islamic Solidarity
+                                            Educational Wakf (IsDB-BISEW)
                                         </h2>
                                     </div>
                                     <div
                                         className={`flex flex-col justify-center items-center justify-items-center text-center`}>
-                                        <p className={`py-1 px-4 underline bg-gray-300 w-fit`}>
-                                            Product Issue Report
+                                        <p
+                                            className={`py-1 px-4 underline bg-gray-300 w-fit`}>
+                                            Product { reportType === "purchase" ? 'Purchase' : 'Issue'} Report
                                         </p>
                                     </div>
                                     <div
                                         className={`flex justify-center items-center justify-items-center text-center`}>
-                                        <i className={`px-4 w-fit font-extralight font-serif`}>
-                                            Date: {start_date ? moment(start_date).format("DD MMM Y") : ''} - {end_date ? moment(end_date).format("DD MMM Y") : ""}
+                                        <i
+                                            className={`px-4 w-fit font-extralight font-serif`}>
+                                            Date:{' '}
+                                            {start_date
+                                                ? moment(start_date).format(
+                                                    'DD MMM Y',
+                                                )
+                                                : ''}{' '}
+                                            -{' '}
+                                            {end_date
+                                                ? moment(end_date).format(
+                                                    'DD MMM Y',
+                                                )
+                                                : ''}
                                         </i>
                                     </div>
                                 </div>
-                                {
-                                    reportType === "purchase" ?
-                                        <PurchaseReport data={purchaseReport} /> :
-                                        <IssueReport isLoading={issueReportsISLoading} data={issueReports} />
-                                }
+                                {reportType === 'purchase' ? (
+                                    <PurchaseReport data={purchaseReport} />
+                                ) : (
+                                    <IssueReport
+                                        isLoading={issueReportsISLoading}
+                                        data={issueReports}
+                                    />
+                                )}
                             </div>
                         </div>
-
                     </div>
                 </Card>
             </div>

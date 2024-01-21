@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductIssueItemReportResource;
+use App\Http\Resources\PurchaseResource;
 use App\Models\Product;
 use App\Models\ProductIssueItems;
 use App\Models\Purchase;
@@ -107,10 +108,10 @@ class ReportAPIController extends AppBaseController
     {
         $categories = explode(',',$request->category);
         $products = explode(',',$request->product);
-        $last = $request->end_date;
-        $first = $request->start_date;
+        $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
+        $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
 
-        $purchase = Purchase::query()
+        $purchase = PurchaseResource::collection(Purchase::query()
             ->when(!empty($request->category), function ($q) use ($categories){
                 $q->whereHas('product', function ($query) use ($categories){
                     $query->whereIn('category_id', $categories);
@@ -119,9 +120,18 @@ class ReportAPIController extends AppBaseController
             ->when(!empty($request->product), function ($q) use ($products){
                 $q->whereIn('product_id', $products);
             })
-            ->whereBetween('purchase_date', [$first, $last])
+            ->when($request->department, function ($q, $v){
+                $q->whereHas('purchaseRequisition', function ($q) use ($v){
+                    $q->where('department_id', $v);
+                });
+            })
+            ->whereBetween('purchase_date', ["$first", "$last"])
             ->latest()
-            ->get();
-        return $this->sendResponse($purchase,   __('messages.report', ['model' => __('models/products.singular')]));
+            ->get());
+        return response()->json([
+            'purchase' => $purchase,
+            'start_date' => $first,
+            'end_date' => $last
+        ]);
     }
 }
