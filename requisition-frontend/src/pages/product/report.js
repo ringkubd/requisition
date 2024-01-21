@@ -32,6 +32,8 @@ const Report = () => {
     const printRef = useRef();
     const [reportType, setReportType] = useState('usage');
 
+    const {start_date, end_date} = issueReports ?? purchaseReport ?? {};
+
     const times = [
         {label: 'Weekly', value: 'weekly'},
         {label: 'Last month', value: 'last_month'},
@@ -336,7 +338,7 @@ const Report = () => {
                                     <div
                                         className={`flex justify-center items-center justify-items-center text-center`}>
                                         <i className={`px-4 w-fit font-extralight font-serif`}>
-                                            Date:
+                                            Date: {start_date ? moment(start_date).format("DD MMM Y") : ''} - {end_date ? moment(end_date).format("DD MMM Y") : ""}
                                         </i>
                                     </div>
                                 </div>
