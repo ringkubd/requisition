@@ -73,7 +73,7 @@ export default function WhatsappView(props) {
                         </div>
                         <div className={`flex flex-row items-center`}>
                             {
-                                mainData ? <Status key={statusKey} type={`purchase`} changeStatus={(a) => {
+                                mainData ? <Status key={statusKey} type={`cash`} changeStatus={(a) => {
                                     refetch();
                                     setStatusKey(Math.round(Math.random() * 100000))
                                     router.reload()
