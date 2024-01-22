@@ -431,6 +431,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                         $user = $request->user();
                         $one_time_key = new OneTimeLogin();
                         $key = $one_time_key->generate($ceo->id);
+                        broadcast(new RequisitionStatusEvent(new PurchaseRequisitionResource($requisition), [$requisition->user, $requisition->initialRequisition->user]));
 
                         if (!config('app.debug')){
                             //Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_2_ceo_purchase']),
@@ -467,8 +468,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
                                 $q->where('name', 'Store Manager');
                             })
                             ->first();
+                        broadcast(new RequisitionStatusEvent(new PurchaseRequisitionResource($requisition), [$requisition->user, $requisition->initialRequisition->user]));
                     }
-
                     break;
                 default:
                     $data['department_status'] = $request->status;
@@ -484,6 +485,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                                 }
                             }
                         }
+                        broadcast(new RequisitionStatusEvent(new PurchaseRequisitionResource($requisition), [$requisition->user, $requisition->initialRequisition->user]));
                     }
             }
             if ( $requisition->initialRequisition->approval_status){

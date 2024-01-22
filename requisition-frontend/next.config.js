@@ -27,5 +27,6 @@ module.exports = withBundleAnalyzer({
         SOKETI_URL: process.env.SOKETI_URL,
         SOKETI_PORT: process.env.SOKETI_PORT,
         SOKETI_FORCE_TLS: process.env.SOKETI_FORCE_TLS,
+        SOKETI_APP_KEY: process.env.SOKETI_APP_KEY,
     }
 })

@@ -7,7 +7,7 @@ const EchoConfig = () =>{
     window.Echo = new Echo({
         broadcaster: 'pusher',
         cluster: 'ap2',
-        key: '90c92a8a0e2ca163bdb3',// same key used in the pusher key
+        key: process.env.SOKETI_APP_KEY,// same key used in the pusher key
         wsHost: process.env.SOKETI_URL ?? 'soketi.isdb-bisew.org',// host when you deploy would be your domain
         wsPort: process.env.SOKETI_PORT ?? 443,// same port
         forceTLS: process.env.SOKETI_FORCE_TLS !== "false", // force https to false

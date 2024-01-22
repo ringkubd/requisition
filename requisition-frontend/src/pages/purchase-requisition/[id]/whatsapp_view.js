@@ -87,7 +87,9 @@ export default function WhatsappView(props) {
                         <RequisitionPrintWhatsApp
                             requisition_products={requisition_products}
                             mainData={mainData}
-                            ref={printPageRef} />
+                            ref={printPageRef}
+                            key={statusKey * 457}
+                        />
                     </div>
                 </Card>
             </div>

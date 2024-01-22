@@ -116,27 +116,29 @@ class PurchaseAPIController extends AppBaseController
      */
     public function store(Request $request): JsonResponse
     {
-        $input = $request->all();
-        $uuid = Uuid::uuid4();
+        DB::transaction(function () use ($request){
+            $input = $request->all();
+            $uuid = Uuid::uuid4();
+            foreach ($input as $item){
+                $item['user_id'] = $request->user()->id;
+                $item['uuid'] = $uuid;
+                $product_option = ProductOption::query()->find($item['product_option_id']);
+                $item['old_balance'] = $product_option->stock;
+                $stock = (float)$item['qty'] + $product_option->stock;
+                $update = $product_option->update(['stock' => $stock]);
+                $purchase = $this->purchaseRepository->create($item);
+                $purchaseRequisitionProduct = PurchaseRequisitionProduct::query()
+                    ->where('purchase_requisition_id', $item['purchase_requisition_id'])
+                    ->where('product_id', $item['product_id'])
+                    ->where('product_option_id', $item['product_option_id'])
+                    ->first();
+                $purchaseRequisitionProduct->update(['actual_purchase' => $purchaseRequisitionProduct->actual_purchase + $item['qty']]);
+            }
 
-        foreach ($input as $item){
-            $item['user_id'] = $request->user()->id;
-            $item['uuid'] = $uuid;
-            $product_option = ProductOption::query()->find($item['product_option_id']);
-            $item['old_balance'] = $product_option->stock;
-            $purchase = $this->purchaseRepository->create($item);
-            $stock = (float)$item['qty'] + $product_option->stock;
-            $update = $product_option->update(['stock' => $stock]);
-            $purchaseRequisitionProduct = PurchaseRequisitionProduct::query()
-                ->where('purchase_requisition_id', $item['purchase_requisition_id'])
-                ->where('product_id', $item['product_id'])
-                ->where('product_option_id', $item['product_option_id'])
-                ->first();
-            $purchaseRequisitionProduct->update(['actual_purchase' => $purchaseRequisitionProduct->actual_purchase + $item['qty']]);
-        }
+        });
 
         return $this->sendResponse(
-            new PurchaseResource($purchase),
+            $request->all(),
             __('messages.saved', ['model' => __('models/purchases.singular')])
         );
     }
