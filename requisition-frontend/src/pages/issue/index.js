@@ -184,6 +184,7 @@ const ProductIssue = () => {
                                 per_page: currentRowsPerPage
                             })}
                             paginationTotalRows={data?.number_of_rows}
+                            paginationPerPage={15}
                         />
                     </Card>
                 </div>
