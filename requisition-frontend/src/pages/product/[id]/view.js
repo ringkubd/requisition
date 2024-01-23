@@ -173,7 +173,7 @@ const View = (props) => {
                                                     {
                                                         product_options.map((p, index) => (
                                                             <>
-                                                                <Table.Row className={`border border-gray-300`} key={index}>
+                                                                <Table.Row className={`border border-gray-300`} key={index * Math.round(Math.random() * 111)}>
                                                                     <Table.Cell className={`border border-gray-300`}
                                                                                 rowSpan={p?.option_purchase_history?.length + 1}>{index + 1}</Table.Cell>
                                                                     <Table.Cell className={`border border-gray-300`}
@@ -182,7 +182,7 @@ const View = (props) => {
                                                                 {
                                                                     p?.option_purchase_history?.map((pur, i) => (
                                                                         <Table.Row className={`border border-gray-300`}
-                                                                                   key={i}>
+                                                                                   key={i * Math.round(Math.random() * 222)}>
                                                                             <Table.Cell
                                                                                 className={`border border-gray-300`}>{pur?.origin}</Table.Cell>
                                                                             <Table.Cell
@@ -262,20 +262,20 @@ const View = (props) => {
                                                     {
                                                         product_options.map((p, index) => (
                                                             <>
-                                                                <Table.Row className={`border border-gray-300`} key={index * 44}>
+                                                                <Table.Row className={`border border-gray-300`} key={index * Math.round(Math.random() * 444)}>
                                                                     <Table.Cell className={`border border-gray-300`}
-                                                                                rowSpan={p?.product_issue?.length + 1}>{index + 1}</Table.Cell>
+                                                                                rowSpan={p?.product_issue?.length + 2}>{index + 1}</Table.Cell>
                                                                     <Table.Cell className={`border border-gray-300`}
-                                                                                rowSpan={p?.product_issue?.length + 1}>{p?.title}</Table.Cell>
+                                                                                rowSpan={p?.product_issue?.length + 2}>{p?.title}</Table.Cell>
                                                                 </Table.Row>
                                                                 {
                                                                     p?.product_issue?.map((pur, i) => (
                                                                         <Table.Row className={`border border-gray-300`}
-                                                                                   key={i * 99}>
+                                                                                   key={i * Math.round(Math.random() * 555)}>
                                                                             <Table.Cell
                                                                                 className={`border border-gray-300`}>{pur?.receiver_department?.name}</Table.Cell>
                                                                             <Table.Cell
-                                                                                className={`border border-gray-300`}>{parseFloat(pur?.quantity).toLocaleString()}</Table.Cell>
+                                                                                className={`border border-gray-300`}>{parseFloat(pur?.quantity).toLocaleString()} {data?.data?.unit}</Table.Cell>
                                                                             <Table.Cell
                                                                                 className={`border border-gray-300`}>{parseFloat(pur?.average_rate).toLocaleString()}</Table.Cell>
                                                                             {/*<Table.Cell*/}
@@ -292,6 +292,35 @@ const View = (props) => {
                                                             </>
                                                         ))
                                                     }
+                                                    {
+                                                        product_options.reduce(function(o, n) {
+                                                            return 0 + n.issue_qty;
+                                                        },0) > 0 ? (
+                                                            <Table.Row>
+                                                                <Table.Cell className={`border border-gray-300 text-right text-black font-bold`}>Total</Table.Cell>
+                                                                <Table.Cell className={`border border-gray-300 text-black`}>{
+                                                                    product_options.reduce(function(o, n) {
+                                                                        return 0 + n.issue_qty;
+                                                                    },0)
+                                                                } {data?.data?.unit}</Table.Cell>
+                                                                <Table.Cell className={`border border-gray-300 text-black`}>{
+                                                                    product_options.reduce(function(o, n) {
+                                                                        return n.product_issue.reduce((old, nw) => {
+                                                                            return old + nw.average_rate;
+                                                                        }, o) / n.product_issue?.length
+                                                                    },0)
+                                                                }</Table.Cell>
+                                                                <Table.Cell className={`border border-gray-300 text-black`}>{
+                                                                    product_options.reduce(function(o, n) {
+                                                                        return n.product_issue.reduce((old, nw) => {
+                                                                            return old + nw.total_price;
+                                                                        }, o)
+                                                                    },0)
+                                                                }</Table.Cell>
+                                                            </Table.Row>
+                                                        ) : null
+                                                    }
+
                                                 </Table.Body>
                                             </Table>
                                         </>
