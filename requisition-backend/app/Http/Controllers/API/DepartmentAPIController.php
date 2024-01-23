@@ -286,7 +286,9 @@ class DepartmentAPIController extends AppBaseController
     }
 
     public function getDepartmentByBranchOrganization(Request $request){
-        $departments = DepartmentResource::collection(Department::where('organization_id', $request->organization_id)->where('branch_id', $request->branch_id)->get());
+        $organization = $request->organization_id ?? auth_organization_id();
+        $branch = $request->branch_id ?? auth_branch_id();
+        $departments = DepartmentResource::collection(Department::where('organization_id', $organization)->where('branch_id', $branch)->get());
         return $this->sendResponse(
             $departments,
             __('messages.deleted', ['model' => __('models/departments.plurals')])

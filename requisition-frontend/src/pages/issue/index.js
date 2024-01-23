@@ -1,38 +1,48 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { wrapper } from "@/store";
-import { Button, Card } from "flowbite-react";
+import { Button, Card, Label, Select } from "flowbite-react";
 import DataTable from 'react-data-table-component';
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import Actions from "@/components/actions";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
     useGetIssueQuery,
-    useEditIssueQuery,
     useDestroyIssueMutation,
     getRunningQueriesThunk, getIssue
 } from "@/store/service/issue";
 import moment from "moment";
 import IssueStatus from "@/components/issue/Status";
 import { useAuth } from "@/hooks/auth";
+import Datepicker from "react-tailwindcss-datepicker";
+import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 
 const ProductIssue = () => {
     const { user } = useAuth();
     const router = useRouter();
     const [searchParams, setSearchParams] = useState({});
     const {data, isLoading, isError} = useGetIssueQuery(searchParams);
+    const {data: departments, isLoading: departmentsISLoading, isError: departmentsISError} = useGetDepartmentByOrganizationBranchQuery();
     const [destroy, destroyResponse] = useDestroyIssueMutation();
     const [columns, setColumns] = useState([]);
-    const [isStoreManager, setISStoreManager] = useState(user?.role_object?.filter(r => r.name === "Store Manager").length);
+    const [isStoreManager, setISStoreManager] = useState(user?.role_object?.filter(r => r.name === "Store Manager" || r.name === "Super Admin").length);
     const [dataTableData, setDataTableData] = useState([]);
+    const [dateRange, setDateRange] = useState({
+        startDate: moment().startOf('month').format('Y-MM-DD'),
+        endDate: moment().endOf('month').format('Y-MM-DD')
+    })
 
     useEffect(() => {
         if (user){
-            setISStoreManager(user?.role_object?.filter(r => r.name === "Store Manager").length);
+            setISStoreManager(user?.role_object?.filter(r => r.name === "Store Manager" || r.name === "Super Admin").length);
         }
     }, [user]);
+
+    useEffect(() => {
+        console.log(departments,isStoreManager)
+    }, [departments]);
 
 
     useEffect(() => {
@@ -44,30 +54,6 @@ const ProductIssue = () => {
     useEffect(() => {
         if (!isLoading && !isError && data ) {
             const issueData = data?.product_issue;
-            // const tableData = Object.keys(issueData).map((pi) => {
-            //     return {
-            //         uuid : pi,
-            //         number_of_item : issueData[pi].length,
-            //         receiver : issueData[pi].reduce((prev, curr) => {
-            //             if (!prev.includes(curr.receiver?.name)){
-            //                 return prev ? prev + "," + curr.receiver?.name : curr.receiver?.name
-            //             }
-            //             return curr.receiver.name
-            //         }, ""),
-            //         issuer : issueData[pi].reduce((prev, curr) => {
-            //             if (!prev.includes(curr.issuer.name)){
-            //                 return prev ? prev + "," + curr.issuer?.name : curr.issuer?.name
-            //             }
-            //             return curr.issuer?.name
-            //         }, ""),
-            //         issue_time: issueData[pi][0].issue_time,
-            //         receiver_department_id: issueData[pi][0].receiver_department_id,
-            //         department_status: issueData[pi][0].department_status,
-            //         store_status: issueData[pi][0].store_status,
-            //         receiver_department: issueData[pi][0].receiver_department,
-            //     };
-            // })
-
             setDataTableData(issueData);
             setColumns([
                 {
@@ -95,21 +81,6 @@ const ProductIssue = () => {
                     selector: row => row.issuer?.name,
                     sortable: true,
                 },
-                // {
-                //     name: 'Purpose',
-                //     selector: row => row.purpose,
-                //     sortable: false,
-                // },
-                // {
-                //     name: 'Uses Area',
-                //     selector: row => row.uses_area,
-                //     sortable: false,
-                // },
-                // {
-                //     name: 'Note',
-                //     selector: row => row.note,
-                //     sortable: false,
-                // },
                 {
                     name: 'Issue Time',
                     selector: row => moment(row.issue_time).format('D MMM Y @ H:mm '),
@@ -140,6 +111,15 @@ const ProductIssue = () => {
         setSearchParams({...searchParams , [key]: value, page: 1});
     }
 
+    useEffect(() => {
+        const filterdData = Object.fromEntries(Object.entries(dateRange).filter(([_, v]) => v != null));
+        if (filterdData.length){
+            changeSearchParams('dateRange', JSON.stringify(dateRange))
+        }else{
+            changeSearchParams(dateRange, "");
+        }
+    }, [dateRange]);
+
     return (
         <>
             <Head>
@@ -157,13 +137,50 @@ const ProductIssue = () => {
                 </Head>
                 <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
                     <Card>
-                        <div className="flex flex-row space-x-4 space-y-4  shadow-lg py-4 px-4">
+                        <div className="flex sm:flex-row flex-col space-x-4 space-y-4  shadow-lg py-4 px-4">
                             <NavLink
                                 active={router.pathname === 'issue/create'}
                                 href={`issue/create`}
                             >
                                 <Button>Create</Button>
                             </NavLink>
+                            <div className={`flex sm:flex-row flex-col`}>
+                                <Label
+                                    htmlFor={`date_range`}
+                                    value={'Date Range'}
+                                    className={`font-bold`}
+                                />
+                                <Datepicker
+                                    inputId={`date_range`}
+                                    inputName={`date_range`}
+                                    onChange={d => {
+                                        setDateRange(d);
+                                    }}
+                                    value={dateRange}
+                                />
+                            </div>
+                            <div>
+                                {
+                                    departments && isStoreManager ? (
+                                            <label htmlFor={`user_department_id`} className={`flex flex-col sm:flex-row sm:items-center dark:text-black`}>
+                                                Departments
+                                                <Select
+                                                    className={`dark:text-black`}
+                                                    id={`user_department_id`}
+                                                    onChange={(e) => {
+                                                        changeSearchParams('issuer_department_id', e.target.value)
+                                                    }}
+                                                >
+                                                    <option></option>
+                                                    {
+                                                        departments?.data?.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)
+                                                    }
+                                                </Select>
+                                            </label>
+                                        )
+                                        : null
+                                }
+                            </div>
                         </div>
 
                         <DataTable

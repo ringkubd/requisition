@@ -71,29 +71,40 @@ class ProductIssueAPIController extends AppBaseController
     public function index(Request $request): JsonResponse
     {
         $storeManager = $request->user()->hasRole('Store Manager') ? 'TRUE' : 'FALSE';
+
         $productIssues = $this->productIssueRepository->allQuery(
             $request->except(['skip', 'limit']),
             $request->get('skip'),
             $request->get('limit')
         )
-            ->where(function ($q) use($request){
-                $q->whereHas('receiverBranch', function($branch) use ($request){
-                    $branch->when($request->branch_id, function ($q) use ($request){
-                        $q->where('id', $request->branch_id);
-                    }, function ($q){
-                        $q->where('id', auth_branch_id());
+            ->where(function ($q) use($request, $storeManager){
+                $q->where(function ($q) use($request){
+                    $q->whereHas('receiverBranch', function($branch) use ($request){
+                        $branch->when($request->branch_id, function ($q) use ($request){
+                            $q->where('id', $request->branch_id);
+                        }, function ($q){
+                            $q->where('id', auth_branch_id());
+                        });
+                    })->whereHas('receiverDepartment', function ($department)use ($request){
+                        $department->when($request->department_id, function ($q, $d){
+                            $q->where('id', $d);
+                        }, function ($q){
+                            $q->where('id', auth_department_id());
+                        });
                     });
-                })->whereHas('receiverDepartment', function ($department)use ($request){
-                    $department->when($request->department_id, function ($q, $d){
-                        $q->where('id', $d);
-                    }, function ($q){
-                        $q->where('id', auth_department_id());
+                })
+                    ->orWhere(function ($q) use ($storeManager){
+                        $q->whereRaw("true = $storeManager")
+                            ->where('department_status', 1);
                     });
-                });
             })
-            ->orWhere(function ($q) use ($storeManager){
-                $q->whereRaw("true = $storeManager")
-                    ->where('department_status', 1);
+            ->when($request->issuer_department_id, function ($q, $v){
+                $q->where('issuer_department_id', $v);
+            })
+
+            ->when($request->dateRange, function ($q, $v){
+                $dateRange = json_decode($v);
+                $q->whereRaw("date(issue_time) between '$dateRange->startDate' and '$dateRange->endDate'");
             })
             ->latest()
             ->paginate();
