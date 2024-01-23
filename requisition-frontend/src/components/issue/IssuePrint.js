@@ -26,9 +26,7 @@ const IssuePrint = forwardRef(({products}, ref) => {
                     <div className={`flex flex-row w-full justify-start`}>
                         <i className={`pr-4`}>Date: </i>
                         <p className={`underline`}>
-                            {moment(products?.issue_time).format(
-                                'DD MMM Y',
-                            )}
+                            {moment(products?.issue_time).format('DD MMM Y')}
                         </p>
                     </div>
                 </div>
@@ -41,53 +39,56 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                 <tr>
                                     <th
                                         scope="col"
+                                        rowSpan={2}
                                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                                         Sl.#
                                     </th>
                                     <th
                                         scope="col"
+                                        rowSpan={2}
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
                                         Name of the Item
                                     </th>
-                                    {/*<th*/}
-                                    {/*    scope="col"*/}
-                                    {/*    className={`border bg-white leading-3 py-0 px-2 normal-case`}>*/}
-                                    {/*    Avg. Rate*/}
-                                    {/*</th>*/}
-                                    {/*<th*/}
-                                    {/*    scope="col"*/}
-                                    {/*    className={`border bg-white leading-3 py-0 px-0 normal-case`}>*/}
-                                    {/*    Unit*/}
-                                    {/*</th>*/}
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
-                                        Qty.
-                                    </th>
-                                    <th
-                                        scope="col"
+                                        rowSpan={2}
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
                                         Purpose
                                     </th>
                                     <th
                                         scope="col"
+                                        rowSpan={2}
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
                                         Uses Area
                                     </th>
                                     <th
                                         scope="col"
+                                        rowSpan={2}
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
                                         Note
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
-                                        Before Qty.
+                                        colSpan={3}
+                                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                                        Stock Status
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-2 px-2 normal-case`}>
+                                        Stock
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
-                                        After Qty.
+                                        className={`border bg-white leading-3 py-2 px-2 normal-case`}>
+                                        Issued
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-2 px-2 normal-case`}>
+                                        Balance
                                     </th>
                                 </tr>
                             </thead>
@@ -107,17 +108,6 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                                   p?.variant?.option_value
                                                 : ''}
                                         </td>
-                                        {/*<td className={`border p-1`}>*/}
-                                        {/*    {parseFloat(*/}
-                                        {/*        p?.average_rate,*/}
-                                        {/*    ).toLocaleString()}*/}
-                                        {/*</td>*/}
-                                        {/*<td className={`border p-1`}>*/}
-                                        {/*    {p?.product?.unit}*/}
-                                        {/*</td>*/}
-                                        <td className={`border p-1`}>
-                                            {p?.quantity}{p?.product?.unit}
-                                        </td>
                                         <td className={`border p-1`}>
                                             {p?.purpose}
                                         </td>
@@ -129,9 +119,15 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                         </td>
                                         <td className={`border p-1`}>
                                             {p?.balance_before_issue}
+                                            {p?.product?.unit}
+                                        </td>
+                                        <td className={`border p-1`}>
+                                            {p?.quantity}
+                                            {p?.product?.unit}
                                         </td>
                                         <td className={`border p-1`}>
                                             {p?.balance_after_issue}
+                                            {p?.product?.unit}
                                         </td>
                                     </tr>
                                 ))}
