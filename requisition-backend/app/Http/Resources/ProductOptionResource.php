@@ -23,7 +23,7 @@ class ProductOptionResource extends JsonResource
             'option_name' => $this->option?->name,
             'option_purchase_history' => PurchaseHistoryResource::collection($this->purchaseHistory),
             'purchase_history_count' => $this->purchaseHistory->count(),
-            'product_issue' => ProductIssueWithRateLogResource::collection($this->productApprovedIssue->sortBy('issue_time')),
+            'product_issue' => ProductIssueWithRateLogResource::collection($this->productApprovedIssue->sortBy('productIssue.issue_time')),
             'product_issue_count' => $this->productApprovedIssue->count(),
             'sku' => $this->sku,
             'option_value' => $this->option_value,
