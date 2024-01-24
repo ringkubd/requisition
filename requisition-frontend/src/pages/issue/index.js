@@ -41,11 +41,6 @@ const ProductIssue = () => {
     }, [user]);
 
     useEffect(() => {
-        console.log(departments,isStoreManager)
-    }, [departments]);
-
-
-    useEffect(() => {
         if (!destroyResponse.isLoading && destroyResponse.isSuccess){
             toast.success('Product Issue removed.')
         }

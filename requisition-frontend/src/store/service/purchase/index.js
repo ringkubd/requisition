@@ -1,5 +1,4 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getCookie } from "@/lib/cookie";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
 
@@ -9,8 +8,9 @@ export const PurchaseApiService = createApi({
     tagTypes: ['getPurchase', 'editPurchase'],
     endpoints: builder => ({
         getPurchase: builder.query({
-            query: () => ({
+            query: (arg) => ({
                 url: 'purchases',
+                params: arg
             }),
             providesTags: ['getPurchase'],
             onQueryStarted: onQueryStartedErrorToast,
