@@ -180,6 +180,11 @@ const Dashboard = () => {
         setSearchParams({...searchParams , [key]: value, page: 1});
     }
 
+    const conditionalRowStyles = [{
+        when: row => row?.current_status?.status == 'Rejected',
+        style: row => ({ backgroundColor:'pink' }),
+    }];
+
     return (
         <AppLayout
             header={
@@ -217,6 +222,7 @@ const Dashboard = () => {
                                             })}
                                             paginationTotalRows={data?.number_of_rows}
                                             paginationPerPage={15}
+                                            conditionalRowStyles={conditionalRowStyles}
                                         />
                                     </Tabs.Item>
                                     <Tabs.Item title={<div className={`flex flex-row`}>Cash Requisition { cashPending ? <sup><Badge className={`animate-bounce`} color={`pink`}>{cashPending}</Badge></sup> : ""}</div>} icon={AiFillMoneyCollect}>
@@ -239,6 +245,7 @@ const Dashboard = () => {
                                             })}
                                             paginationTotalRows={cash?.number_of_rows}
                                             paginationPerPage={15}
+                                            conditionalRowStyles={conditionalRowStyles}
                                         />
                                     </Tabs.Item>
                                 </Tabs.Group>
