@@ -2,7 +2,6 @@ import AppLayout from "@/components/Layouts/AppLayout";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { Button, Card } from "flowbite-react";
-import NavLink from "@/components/navLink";
 import React, { useRef, useState } from "react";
 
 import { useReactToPrint } from "react-to-print";
@@ -62,8 +61,8 @@ const PrintView = (props) => {
                                     from={`print_view`}
                                     key={statusKey}
                                     changeStatus={(a) => {
-                                        refetch();
                                         setStatusKey(Math.round(Math.random() * 100000))
+                                        refetch();
                                         router.reload()
                                     }}
                                 />
