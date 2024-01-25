@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { Button, Card } from "flowbite-react";
 import NavLink from "@/components/navLink";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 
 import { useReactToPrint } from "react-to-print";
 import { useGetSingleCashRequisitionQuery } from "@/store/service/cash/Index";
@@ -12,7 +12,8 @@ import Status from "@/components/requisition/status";
 
 const PrintView = (props) => {
     const router = useRouter();
-    const {data, isLoading, isError} = useGetSingleCashRequisitionQuery(router.query.id, {
+    const [statusKey, setStatusKey] = useState(Math.round(Math.random() * 100000))
+    const {data, isLoading, isError, refetch} = useGetSingleCashRequisitionQuery(router.query.id, {
         skip: !router.query.id
     });
 
@@ -59,6 +60,12 @@ const PrintView = (props) => {
                                     type={`cash`}
                                     requisition={mainData}
                                     from={`print_view`}
+                                    key={statusKey}
+                                    changeStatus={(a) => {
+                                        refetch();
+                                        setStatusKey(Math.round(Math.random() * 100000))
+                                        router.reload()
+                                    }}
                                 />
                             ) : null}
                         </div>

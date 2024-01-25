@@ -10,7 +10,7 @@ import {
 } from "@/store/service/dashboard";
 import { dispatch } from "@/store";
 import { PurchaseRequisitionApi } from "@/store/service/requisitions/purchase";
-const Status = ({ requisition, type, from='dashboard', changeStatus = false }) => {
+const Status = ({ requisition, type, from='dashboard', changeStatus = undefined }) => {
     const { user } = useAuth()
     const [selectedDropdown, setSelectedDropdown] = useState('Status')
     const isDepartmentHead = user?.current_department_head === parseInt(user?.id);
