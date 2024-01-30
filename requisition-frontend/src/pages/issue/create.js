@@ -410,8 +410,7 @@ const create = (props) => {
                                                     id="quantity"
                                                     name="quantity"
                                                     placeholder="5"
-                                                    type="number"
-                                                    step={0.1}
+                                                    type="text"
                                                     required
                                                     onChange={e => {
                                                         handleChange(e)
