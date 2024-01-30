@@ -135,7 +135,7 @@ const Status = ({ requisition, type, from='dashboard', changeStatus = undefined 
 
                         </div>
                     )
-                    : (currentStatus?.stage ? (currentStatus?.status === "Pending" ? 'Pending in ' : currentStatus?.status + ' by ') +  (currentStatus?.stage === 'department' ? requisition?.department?.name: currentStatus?.stage) + " Department" : "").replace('ceo dept.', 'CEO').replace('dept.', " ")
+                    : (currentStatus?.stage ? (currentStatus?.status === "Pending" ? 'Pending in ' : currentStatus?.status + ' by ') +  (currentStatus?.stage === 'department' ? requisition?.department?.name: currentStatus?.stage) + " Department" : "").replace('ceo Department', 'CEO').replace('dept.', " ")
             }
         </div>
     )
