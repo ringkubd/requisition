@@ -77,26 +77,26 @@ class Handler extends ExceptionHandler
                 ], 404);
             }
         });
-//        $this->renderable(function (\Exception $exception, Request $request){
-//            if ($request->is('api/*')){
-//                $exceptionData = Exception::create([
-//                    'user_id' => $request->user()?->id,
-//                    'trace' => json_encode($exception->getTrace()),
-//                    'message' => $exception->getMessage(),
-//                    'code' => $exception->getCode(),
-//                    'file' => $exception->getFile(),
-//                    'line' => $exception->getLine(),
-//                    'url' => $request->url(),
-//                    'ip_address' => $request->getClientIp(),
-//                    'request' => json_encode($request->all()),
-//                    'exception_type' => 'Exception'
-//                ]);
-//                broadcast(new ExceptionEvent($exceptionData));
-//                return response()->json([
-//                    'message' => 'General Exception.'
-//                ], $exception->status());
-//            }
-//        });
+        $this->renderable(function (\Exception $exception, Request $request){
+            if ($request->is('api/*')){
+                $exceptionData = Exception::create([
+                    'user_id' => $request->user()?->id,
+                    'trace' => json_encode($exception->getTrace()),
+                    'message' => $exception->getMessage(),
+                    'code' => $exception->getCode(),
+                    'file' => $exception->getFile(),
+                    'line' => $exception->getLine(),
+                    'url' => $request->url(),
+                    'ip_address' => $request->getClientIp(),
+                    'request' => json_encode($request->all()),
+                    'exception_type' => 'Exception'
+                ]);
+                broadcast(new ExceptionEvent($exceptionData));
+                return response()->json([
+                    'message' => $exception->getMessage()
+                ], $exception->getCode());
+            }
+        });
 
     }
 }

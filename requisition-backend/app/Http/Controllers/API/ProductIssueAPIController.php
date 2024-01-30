@@ -359,7 +359,7 @@ class ProductIssueAPIController extends AppBaseController
                         $productIssue->rateLog()->createMany($purchase_log);
                     }else if ($request->user()->hasRole('Store Manager') && $request->status == 1){
                         $product_title = $productOption?->product?->title;
-                        throw new \Exception("Kindly ensure that the product '$product_title' is updated. Current balance- $productOption->stock. Request Quantity- $productIssue->quantity");
+                        throw new \Exception("Kindly ensure that the product '$product_title' is updated. Current balance- $productOption->stock. Request Quantity- $productIssue->quantity", 413);
                     }
                     $productIssues->update($input);
                 }
