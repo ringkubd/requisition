@@ -75,14 +75,20 @@ class PurchaseAPIController extends AppBaseController
             $request->except(['skip', 'limit']),
             $request->get('skip'),
             $request->get('limit')
-        )->when($request->department_id, function ($q, $v){
-            $q->whereHas('purchaseRequisition', function ($r) use ($v){
-                $r->where('department_id', $v);
-            });
-        })
+        )
+            ->when($request->department_id, function ($q, $v){
+                $q->whereHas('purchaseRequisition', function ($r) use ($v){
+                    $r->where('department_id', $v);
+                });
+            })
             ->when($request->dateRange, function ($q, $v){
                 $dateRange = json_decode($v);
                 $q->whereRaw("date(purchase_date) between '$dateRange->startDate' and '$dateRange->endDate'");
+            })
+            ->when($request->search, function ($q, $v){
+                $q->whereHas('product', function ($b) use ($v){
+                    $b->where('title', "like", "%$v%");
+                });
             })
             ->latest('purchase_date')
             ->paginate($request->per_page ?? 10);

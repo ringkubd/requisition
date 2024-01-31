@@ -1,7 +1,7 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { wrapper } from "@/store";
-import { Button, Card, Label, Select } from "flowbite-react";
+import { Button, Card, Label, Select, TextInput } from "flowbite-react";
 import DataTable from 'react-data-table-component';
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
@@ -18,6 +18,7 @@ import {
 import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment/moment";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
+import { AiOutlineSearch } from "react-icons/ai";
 
 const Purchase = () => {
     const router = useRouter()
@@ -136,10 +137,10 @@ const Purchase = () => {
 
     useEffect(() => {
         const filterdData = Object.fromEntries(Object.entries(dateRange).filter(([_, v]) => v != null));
-        if (filterdData.length){
+        if (Object.keys(filterdData).length){
             changeSearchParams('dateRange', JSON.stringify(dateRange))
         }else{
-            changeSearchParams(dateRange, "");
+            changeSearchParams('dateRange', "");
         }
     }, [dateRange]);
 
@@ -181,28 +182,40 @@ const Purchase = () => {
                                 />
                             </div>
                             <div>
-                                {
-                                    departments ? (
-                                            <label htmlFor={`department_id`}
-                                                   className={`flex flex-col sm:flex-row sm:items-center dark:text-black`}>
-                                                Departments
-                                                <Select
-                                                    className={`dark:text-black`}
-                                                    id={`department_id`}
-                                                    onChange={(e) => {
-                                                        changeSearchParams('department_id', e.target.value)
-                                                    }}
-                                                >
-                                                    <option></option>
-                                                    {
-                                                        departments?.data?.map((o) => <option key={o.id}
-                                                                                              value={o.id}>{o.name}</option>)
-                                                    }
-                                                </Select>
-                                            </label>
+                                {departments ? (
+                                    <label
+                                        htmlFor={`department_id`}
+                                        className={`flex flex-col sm:flex-row sm:items-center dark:text-black`}>
+                                        Departments
+                                        <Select
+                                            className={`dark:text-black`}
+                                            id={`department_id`}
+                                            onChange={e => {
+                                                changeSearchParams(
+                                                    'department_id',
+                                                    e.target.value,
+                                                )
+                                            }}>
+                                            <option></option>
+                                            {departments?.data?.map(o => (
+                                                <option key={o.id} value={o.id}>
+                                                    {o.name}
+                                                </option>
+                                            ))}
+                                        </Select>
+                                    </label>
+                                ) : null}
+                            </div>
+                            <div>
+                                <TextInput
+                                    icon={AiOutlineSearch}
+                                    onBlur={e => {
+                                        changeSearchParams(
+                                            'search',
+                                            e.target.value,
                                         )
-                                        : null
-                                }
+                                    }}
+                                />
                             </div>
                         </div>
                         {!isLoading && !isError && data && (
@@ -214,15 +227,22 @@ const Purchase = () => {
                                 progressPending={isLoading}
                                 persistTableHead={true}
                                 paginationServer
-                                onChangePage={(page, totalRows) => setSearchParams({
-                                    ...searchParams,
-                                    'page': page
-                                })}
-                                onChangeRowsPerPage={(currentRowsPerPage, currentPage) => setSearchParams({
-                                    ...searchParams,
-                                    'page': currentPage,
-                                    per_page: currentRowsPerPage
-                                })}
+                                onChangePage={(page, totalRows) =>
+                                    setSearchParams({
+                                        ...searchParams,
+                                        page: page,
+                                    })
+                                }
+                                onChangeRowsPerPage={(
+                                    currentRowsPerPage,
+                                    currentPage,
+                                ) =>
+                                    setSearchParams({
+                                        ...searchParams,
+                                        page: currentPage,
+                                        per_page: currentRowsPerPage,
+                                    })
+                                }
                                 paginationTotalRows={data?.total_rows}
                                 paginationPerPage={10}
                             />
