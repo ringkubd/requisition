@@ -102,6 +102,13 @@ class ProductIssueAPIController extends AppBaseController
                 $q->where('issuer_department_id', $v);
             })
 
+            ->when($request->search, function ($q, $v){
+              $q->whereHas('items', function ($q) use($v){
+                  $q->whereHas('product', function ($r) use ($v){
+                      $r->where('title', 'like', "%$v%");
+                  } );
+              });
+            })
             ->when($request->dateRange, function ($q, $v){
                 $dateRange = json_decode($v);
                 $q->whereRaw("date(issue_time) between '$dateRange->startDate' and '$dateRange->endDate'");

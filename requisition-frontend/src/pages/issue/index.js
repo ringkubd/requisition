@@ -1,7 +1,7 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { wrapper } from "@/store";
-import { Button, Card, Label, Select } from "flowbite-react";
+import { Button, Card, Label, Select, TextInput } from "flowbite-react";
 import DataTable from 'react-data-table-component';
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
@@ -18,38 +18,51 @@ import IssueStatus from "@/components/issue/Status";
 import { useAuth } from "@/hooks/auth";
 import Datepicker from "react-tailwindcss-datepicker";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
+import { AiOutlineSearch } from "react-icons/ai";
 
 const ProductIssue = () => {
-    const { user } = useAuth();
-    const router = useRouter();
-    const [searchParams, setSearchParams] = useState({});
-    const {data, isLoading, isError} = useGetIssueQuery(searchParams);
-    const {data: departments, isLoading: departmentsISLoading, isError: departmentsISError} = useGetDepartmentByOrganizationBranchQuery();
-    const [destroy, destroyResponse] = useDestroyIssueMutation();
-    const [columns, setColumns] = useState([]);
-    const [isStoreManager, setISStoreManager] = useState(user?.role_object?.filter(r => r.name === "Store Manager" || r.name === "Super Admin").length);
-    const [dataTableData, setDataTableData] = useState([]);
+    const { user } = useAuth()
+    const router = useRouter()
+    const [searchParams, setSearchParams] = useState({})
+    const { data, isLoading, isError } = useGetIssueQuery(searchParams)
+    const {
+        data: departments,
+        isLoading: departmentsISLoading,
+        isError: departmentsISError,
+    } = useGetDepartmentByOrganizationBranchQuery()
+    const [destroy, destroyResponse] = useDestroyIssueMutation()
+    const [columns, setColumns] = useState([])
+    const [isStoreManager, setISStoreManager] = useState(
+        user?.role_object?.filter(
+            r => r.name === 'Store Manager' || r.name === 'Super Admin',
+        ).length,
+    )
+    const [dataTableData, setDataTableData] = useState([])
     const [dateRange, setDateRange] = useState({
         startDate: moment().startOf('month').format('Y-MM-DD'),
-        endDate: moment().endOf('month').format('Y-MM-DD')
+        endDate: moment().endOf('month').format('Y-MM-DD'),
     })
 
     useEffect(() => {
-        if (user){
-            setISStoreManager(user?.role_object?.filter(r => r.name === "Store Manager" || r.name === "Super Admin").length);
+        if (user) {
+            setISStoreManager(
+                user?.role_object?.filter(
+                    r => r.name === 'Store Manager' || r.name === 'Super Admin',
+                ).length,
+            )
         }
-    }, [user]);
+    }, [user])
 
     useEffect(() => {
-        if (!destroyResponse.isLoading && destroyResponse.isSuccess){
+        if (!destroyResponse.isLoading && destroyResponse.isSuccess) {
             toast.success('Product Issue removed.')
         }
     }, [destroyResponse])
 
     useEffect(() => {
-        if (!isLoading && !isError && data ) {
-            const issueData = data?.product_issue;
-            setDataTableData(issueData);
+        if (!isLoading && !isError && data) {
+            const issueData = data?.product_issue
+            setDataTableData(issueData)
             setColumns([
                 {
                     name: 'SL.',
@@ -78,42 +91,51 @@ const ProductIssue = () => {
                 },
                 {
                     name: 'Issue Time',
-                    selector: row => moment(row.issue_time).format('D MMM Y @ H:mm '),
+                    selector: row =>
+                        moment(row.issue_time).format('D MMM Y @ H:mm '),
                     sortable: true,
                 },
                 {
                     name: 'Status',
-                    selector: row => <IssueStatus key={row.uuid} row={row} />
+                    selector: row => <IssueStatus key={row.uuid} row={row} />,
                 },
                 {
                     name: 'Actions',
-                    cell: (row) => <Actions
-                        itemId={row.uuid}
-                        edit={isStoreManager && !row.store_status ? `/issue/${row.uuid}/edit` : false}
-                        // view={`/issue/${row.uuid}/view`}
-                        destroy={destroy}
-                        print={`/issue/${row.uuid}/print_view`}
-                        progressing={destroyResponse.isLoading}
-                        permissionModule={`product-issues`}
-                    />,
+                    cell: row => (
+                        <Actions
+                            itemId={row.uuid}
+                            edit={
+                                isStoreManager && !row.store_status
+                                    ? `/issue/${row.uuid}/edit`
+                                    : false
+                            }
+                            // view={`/issue/${row.uuid}/view`}
+                            destroy={destroy}
+                            print={`/issue/${row.uuid}/print_view`}
+                            progressing={destroyResponse.isLoading}
+                            permissionModule={`product-issues`}
+                        />
+                    ),
                     ignoreRowClick: true,
-                }
+                },
             ])
         }
     }, [isLoading, data, isStoreManager])
 
     const changeSearchParams = (key, value) => {
-        setSearchParams({...searchParams , [key]: value, page: 1});
+        setSearchParams({ ...searchParams, [key]: value, page: 1 })
     }
 
     useEffect(() => {
-        const filterdData = Object.fromEntries(Object.entries(dateRange).filter(([_, v]) => v != null));
-        if (Object.keys(filterdData).length){
+        const filterdData = Object.fromEntries(
+            Object.entries(dateRange).filter(([_, v]) => v != null),
+        )
+        if (Object.keys(filterdData).length) {
             changeSearchParams('dateRange', JSON.stringify(dateRange))
-        }else{
-            changeSearchParams('dateRange', "");
+        } else {
+            changeSearchParams('dateRange', '')
         }
-    }, [dateRange]);
+    }, [dateRange])
 
     return (
         <>
@@ -125,8 +147,7 @@ const ProductIssue = () => {
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                         Product Issue Management.
                     </h2>
-                }
-            >
+                }>
                 <Head>
                     <title>Product Issue Management.</title>
                 </Head>
@@ -135,8 +156,7 @@ const ProductIssue = () => {
                         <div className="flex sm:flex-row flex-col space-x-4 space-y-4  shadow-lg py-4 px-4">
                             <NavLink
                                 active={router.pathname === 'issue/create'}
-                                href={`issue/create`}
-                            >
+                                href={`issue/create`}>
                                 <Button>Create</Button>
                             </NavLink>
                             <div className={`flex sm:flex-row flex-col`}>
@@ -149,32 +169,43 @@ const ProductIssue = () => {
                                     inputId={`date_range`}
                                     inputName={`date_range`}
                                     onChange={d => {
-                                        setDateRange(d);
+                                        setDateRange(d)
                                     }}
                                     value={dateRange}
                                 />
                             </div>
                             <div>
-                                {
-                                    departments && isStoreManager ? (
-                                            <label htmlFor={`user_department_id`} className={`flex flex-col sm:flex-row sm:items-center dark:text-black`}>
-                                                Departments
-                                                <Select
-                                                    className={`dark:text-black`}
-                                                    id={`user_department_id`}
-                                                    onChange={(e) => {
-                                                        changeSearchParams('issuer_department_id', e.target.value)
-                                                    }}
-                                                >
-                                                    <option></option>
-                                                    {
-                                                        departments?.data?.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)
-                                                    }
-                                                </Select>
-                                            </label>
-                                        )
-                                        : null
-                                }
+                                {departments && isStoreManager ? (
+                                    <label
+                                        htmlFor={`user_department_id`}
+                                        className={`flex flex-col sm:flex-row sm:items-center dark:text-black`}>
+                                        Departments
+                                        <Select
+                                            className={`dark:text-black`}
+                                            id={`user_department_id`}
+                                            onChange={e => {
+                                                changeSearchParams(
+                                                    'issuer_department_id',
+                                                    e.target.value,
+                                                )
+                                            }}>
+                                            <option></option>
+                                            {departments?.data?.map(o => (
+                                                <option key={o.id} value={o.id}>
+                                                    {o.name}
+                                                </option>
+                                            ))}
+                                        </Select>
+                                    </label>
+                                ) : null}
+                            </div>
+                            <div>
+                                <TextInput
+                                    icon={AiOutlineSearch}
+                                    onBlur={e => {
+                                        changeSearchParams('search',e.target.value)
+                                    }}
+                                />
                             </div>
                         </div>
 
@@ -186,15 +217,22 @@ const ProductIssue = () => {
                             progressPending={isLoading}
                             persistTableHead={true}
                             paginationServer
-                            onChangePage={(page, totalRows) => setSearchParams({
-                                ...searchParams,
-                                'page': page
-                            })}
-                            onChangeRowsPerPage={(currentRowsPerPage, currentPage) => setSearchParams({
-                                ...searchParams,
-                                'page': currentPage,
-                                per_page: currentRowsPerPage
-                            })}
+                            onChangePage={(page, totalRows) =>
+                                setSearchParams({
+                                    ...searchParams,
+                                    page: page,
+                                })
+                            }
+                            onChangeRowsPerPage={(
+                                currentRowsPerPage,
+                                currentPage,
+                            ) =>
+                                setSearchParams({
+                                    ...searchParams,
+                                    page: currentPage,
+                                    per_page: currentRowsPerPage,
+                                })
+                            }
                             paginationTotalRows={data?.number_of_rows}
                             paginationPerPage={15}
                         />
@@ -205,13 +243,15 @@ const ProductIssue = () => {
     )
 }
 
-export const getServerSideProps = wrapper.getServerSideProps((store) => async (context) => {
-    // const params = context.params
-    store.dispatch(getIssue.initiate())
-    await Promise.all(store.dispatch(getRunningQueriesThunk()));
-    return {
-        props: {},
-    };
-})
+export const getServerSideProps = wrapper.getServerSideProps(
+    store => async context => {
+        // const params = context.params
+        store.dispatch(getIssue.initiate())
+        await Promise.all(store.dispatch(getRunningQueriesThunk()))
+        return {
+            props: {},
+        }
+    },
+)
 
-export default ProductIssue;
+export default ProductIssue
