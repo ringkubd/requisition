@@ -1,20 +1,12 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, Textarea, TextInput } from "flowbite-react";
+import { Button, Card } from "flowbite-react";
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
-import { ErrorMessage, Formik } from "formik";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
-import * as Yup from 'yup';
+import { useEffect, useState } from "react";
 import { useGetUsersQuery } from "@/store/service/user/management";
-import { useEditIssueQuery, useStoreIssueMutation, useUpdateIssueMutation } from "@/store/service/issue";
-import moment from "moment";
-import Select from "react-select";
+import { useEditIssueQuery } from "@/store/service/issue";
 import DataTable from "react-data-table-component";
-import Actions from "@/components/actions";
-import axios from "@/lib/axios";
-import { AsyncPaginate } from "react-select-async-paginate";
 import { useAuth } from "@/hooks/auth";
 import Quantity from "@/components/issue/Quantity";
 const Edit = (props) => {

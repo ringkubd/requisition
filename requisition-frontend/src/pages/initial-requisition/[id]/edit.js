@@ -366,8 +366,7 @@ const Edit = (props) => {
                                                                     value={values.required_quantity}
                                                                     id='required_quantity'
                                                                     name='required_quantity'
-                                                                    type={`number`}
-                                                                    step={0.1}
+                                                                    type={`text`}
                                                                     onChange={(e) => {
                                                                         handleChange(e);
                                                                         setFieldValue('quantity_to_be_purchase', (e.target.value - values.available_quantity) < 0 ? 0 : (e.target.value - values.available_quantity))
@@ -390,8 +389,7 @@ const Edit = (props) => {
                                                                     value={values.available_quantity}
                                                                     id='available_quantity'
                                                                     name='available_quantity'
-                                                                    type={`number`}
-                                                                    step={0.1}
+                                                                    type={`text`}
                                                                     onChange={handleChange}
                                                                     onBlur={handleChange}
                                                                 />
@@ -412,8 +410,7 @@ const Edit = (props) => {
                                                                     value={values.quantity_to_be_purchase }
                                                                     id='quantity_to_be_purchase'
                                                                     name='quantity_to_be_purchase'
-                                                                    type={`number`}
-                                                                    step={0.1}
+                                                                    type={`text`}
                                                                     onChange={handleChange}
                                                                 />
                                                                 <ErrorMessage

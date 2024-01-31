@@ -469,8 +469,7 @@ const InitialRequisitionCreate = (props) => {
                                                         }
                                                         id="required_quantity"
                                                         name="required_quantity"
-                                                        type={`number`}
-                                                        step={0.1}
+                                                        type={`text`}
                                                         onChange={e => {
                                                             handleChange(e)
                                                             setFieldValue(
@@ -509,8 +508,7 @@ const InitialRequisitionCreate = (props) => {
                                                         }
                                                         id="available_quantity"
                                                         name="available_quantity"
-                                                        type={`number`}
-                                                        step={0.1}
+                                                        type={`text`}
                                                         onChange={handleChange}
                                                         onBlur={handleChange}
                                                     />
@@ -536,8 +534,7 @@ const InitialRequisitionCreate = (props) => {
                                                         }
                                                         id="quantity_to_be_purchase"
                                                         name="quantity_to_be_purchase"
-                                                        type={`number`}
-                                                        step={0.1}
+                                                        type={`text`}
                                                         onChange={handleChange}
                                                     />
                                                     <ErrorMessage

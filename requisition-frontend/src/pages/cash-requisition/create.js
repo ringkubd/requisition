@@ -249,7 +249,7 @@ const CashRequisitionCreate = (props) => {
                               value={values.required_unit}
                               id='required_unit'
                               name='required_unit'
-                              type={`number`}
+                              type={`text`}
                               required
                               onChange={(e) => {
                                 handleChange(e);
