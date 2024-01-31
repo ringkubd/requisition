@@ -80,6 +80,7 @@ const create = (props) => {
                         // view={`/purchase/${row.id}/view`}
                         destroy={() => removeItem(row)}
                         // progressing={destroyResponse.isLoading}
+                        permissionModule={`add`}
                     />,
                     ignoreRowClick: true,
                 }
