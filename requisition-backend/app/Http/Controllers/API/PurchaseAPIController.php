@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\PurchaseResource;
 use Illuminate\Support\Facades\DB;
+use OpenApi\Annotations as OA;
 use Ramsey\Uuid\Nonstandard\Uuid;
 
 /**

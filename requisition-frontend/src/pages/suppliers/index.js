@@ -58,6 +58,7 @@ const Department = () => {
                 itemId={row.id}
                 destroy={destroy}
                 edit={`/suppliers/${row.id}/edit`}
+                view={`/suppliers/${row.id}/view`}
                 progressing={destroyResponse.isLoading}
                 permissionModule={`suppliers`}
             />,

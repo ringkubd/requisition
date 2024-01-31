@@ -3,7 +3,6 @@ import React from "react";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { useRouter } from "next/router";
 import { useEditPurchaseQuery } from "@/store/service/purchase";
-import NavLink from "@/components/navLink";
 import { Button, Card, Table } from "flowbite-react";
 import Image from "next/image";
 
