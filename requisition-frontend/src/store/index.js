@@ -128,7 +128,7 @@ const makeStore = () => configureStore({
     reducer: _persistedReducer,
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({ immutableCheck: true,
         serializableCheck: {
-            /* ignore persistance actions */
+            /* ignore persistence actions */
             ignoredActions: [
                 FLUSH,
                 REHYDRATE,
@@ -142,7 +142,7 @@ const makeStore = () => configureStore({
 
 setupListeners(makeStore().dispatch);
 
-export const wrapper = createWrapper(makeStore, { debug: true });
+export const wrapper = createWrapper(makeStore, process.env.NODE_ENV === 'development' ? { debug: true }: {});
 export const store = makeStore();
 export const perStore = persistStore(store);
 export const dispatch = store.dispatch;
