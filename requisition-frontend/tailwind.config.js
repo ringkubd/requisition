@@ -33,6 +33,9 @@ module.exports = {
                     '50%': { transform: 'translate(0%,0%) skewX(-10deg)' },
                     '100%': { transform: 'translate(0%,150%) skewX(0deg)' },
                 },
+            },
+            a: {
+                color: 'text-red'
             }
         },
     },

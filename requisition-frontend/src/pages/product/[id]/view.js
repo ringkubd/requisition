@@ -27,11 +27,7 @@ const View = (props) => {
             <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
                 <Card className="min-h-screen">
                     <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
-                        <NavLink
-                            active={router.pathname === 'product'}
-                            href={`/product`}>
-                            <Button>Back</Button>
-                        </NavLink>
+                        <Button onClick={() => router.back()}>Back</Button>
                     </div>
                     <div className="flex flex-col space-y-2 md:gap-2 md:space-x-4 md:flex-row">
                         <div className={`w-full gap-2 space-x-4 shadow p-2 overflow-scroll`}>

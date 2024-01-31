@@ -380,3 +380,6 @@ input:-webkit-autofill {
 /*  height: 5px;*/
 /*  !*-webkit-box-shadow: .1rem .1rem #E0F2FE;*!*/
 /*}*/
+a{
+    @apply text-violet-500
+}

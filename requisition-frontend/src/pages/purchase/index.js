@@ -19,6 +19,7 @@ import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment/moment";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 import { AiOutlineSearch } from "react-icons/ai";
+import Link from "next/link";
 
 const Purchase = () => {
     const router = useRouter()
@@ -52,11 +53,11 @@ const Purchase = () => {
                 },
                 {
                     name: 'Product',
-                    selector: row =>
-                        row.product?.title +
+                    selector: row => <Link href={`product/${row.product?.id}/view`}>
+                        { row.product?.title +
                         (row.productOption?.title.includes('N/A')
                             ? ''
-                            : ' - ' + row.productOption?.title),
+                            : ' - ' + row.productOption?.title) }</Link>,
                     sortable: true,
                     minWidth: '220px',
                 },
@@ -64,20 +65,22 @@ const Purchase = () => {
                     name: 'Supplier',
                     selector: row =>
                         row.supplier?.logo ? (
-                            <Image
-                                width={30}
-                                height={30}
-                                alt={row.supplier?.name}
-                                src={row.supplier?.logo}
-                            />
+                            <Link href={`/suppliers/${row.supplier_id}/view`}>
+                                <Image
+                                    width={30}
+                                    height={30}
+                                    alt={row.supplier?.name}
+                                    src={row.supplier?.logo}
+                                />
+                            </Link>
                         ) : (
-                            row.supplier?.name
+                            row.supplier?.name ?  <Link href={`/suppliers/${row.supplier_id}/view`}> {row.supplier?.name} </Link> : null
                         ),
                     sortable: true,
                 },
                 {
                     name: 'P.R. No.',
-                    selector: row => row.purchaseRequisition?.prf_no,
+                    selector: row => <Link href={`purchase-requisition/${row.purchaseRequisition?.id}/view`}>{row.purchaseRequisition?.prf_no}</Link>,
                     sortable: true,
                     width: '96px',
                 },

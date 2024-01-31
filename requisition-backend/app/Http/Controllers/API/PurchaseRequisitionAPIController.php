@@ -81,6 +81,13 @@ class PurchaseRequisitionAPIController extends AppBaseController
             ->when($request->date, function ($q, $date){
                 $q->whereRaw("date(created_at) = '$date'");
             })
+            ->when($request->search, function ($r, $v){
+                $r->whereHas('purchaseRequisitionProducts', function ($q) use ($v){
+                    $q->whereHas('product', function ($p) use ($v){
+                        $p->where('title', 'like', "%$v%");
+                    });
+                });
+            })
             ->where('department_id', auth_department_id())
             ->where('branch_id', auth_branch_id())
             ->latest()
