@@ -83,6 +83,13 @@ class InitialRequisitionAPIController extends AppBaseController
             })
             ->where('department_id', auth_department_id())
             ->where('branch_id', auth_branch_id())
+            ->when($request->search, function ($r, $v){
+                $r->whereHas('initialRequisitionProducts', function ($q) use ($v){
+                    $q->whereHas('product', function ($p) use ($v){
+                        $p->where('title', 'like', "%$v%");
+                    });
+                });
+            })
             ->latest()
             ->paginate(\request()->per_page ?? 10);;
 
