@@ -73,18 +73,6 @@ const Actions = ({edit, destroy, view , itemId, progressing, print, other, permi
                     ) : <></> : <></>
               }
               {
-                  checkPermission('delete') ?
-                    destroy ?  (
-                      <Button
-                        onClick={submitDestroy}
-                        gradientMonochrome={`failure`}
-                        isProcessing={progressing}
-                      >
-                          <AiFillDelete />
-                      </Button>
-                    ) : <></> : <></>
-              }
-              {
                   checkPermission('view') ?
                     print ? (
                           <Button
@@ -105,6 +93,18 @@ const Actions = ({edit, destroy, view , itemId, progressing, print, other, permi
                               <AiFillSetting />
                           </Button>
                     ) : <></> : <></>
+              }
+              {
+                  checkPermission('delete') ?
+                      destroy ?  (
+                          <Button
+                              onClick={submitDestroy}
+                              gradientMonochrome={`failure`}
+                              isProcessing={progressing}
+                          >
+                              <AiFillDelete />
+                          </Button>
+                      ) : <></> : <></>
               }
               {!edit && !view && !destroy && !print && !other ? <Button>No Action</Button> : <></>}
           </Button.Group>

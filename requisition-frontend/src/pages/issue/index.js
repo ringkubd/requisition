@@ -90,9 +90,9 @@ const ProductIssue = () => {
                     cell: (row) => <Actions
                         itemId={row.uuid}
                         edit={isStoreManager && !row.store_status ? `/issue/${row.uuid}/edit` : false}
-                        view={`/issue/${row.uuid}/view`}
-                        print={`/issue/${row.uuid}/print_view`}
+                        // view={`/issue/${row.uuid}/view`}
                         destroy={destroy}
+                        print={`/issue/${row.uuid}/print_view`}
                         progressing={destroyResponse.isLoading}
                         permissionModule={`product-issues`}
                     />,
@@ -108,10 +108,10 @@ const ProductIssue = () => {
 
     useEffect(() => {
         const filterdData = Object.fromEntries(Object.entries(dateRange).filter(([_, v]) => v != null));
-        if (filterdData.length){
+        if (Object.keys(filterdData).length){
             changeSearchParams('dateRange', JSON.stringify(dateRange))
         }else{
-            changeSearchParams(dateRange, "");
+            changeSearchParams('dateRange', "");
         }
     }, [dateRange]);
 
