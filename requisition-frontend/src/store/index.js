@@ -48,6 +48,7 @@ import ActivitySlice from "@/store/slice/activitySlice";
 import { ReportAPI } from "@/store/service/report";
 import { UserOnlineSlice } from "@/store/slice/userOnlineSlice";
 import { DashboardAPI } from "@/store/service/dashboard";
+import { encryptTransform } from "redux-persist-transform-encrypt";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -76,11 +77,23 @@ const middlewares = [
     DashboardAPI.middleware,
 ];
 
+let transforms = null;
+
+if (process.env.NODE_ENV === "production") {
+    const encrypt = encryptTransform({
+        secretKey: process.env.NEXT_PUBLIC_REDUX_SECRET,
+        onError: function (error) {
+            // Handle the error.
+        },
+    });
+    transforms = [encrypt];
+}
+
 const persistConfig = {
     key: 'root',
     storage: storage,
     stateReconciler: autoMergeLevel1,
-    transforms: [],
+    transforms,
     blacklist: [],
 };
 
