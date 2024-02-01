@@ -3,7 +3,7 @@ import './Print.module.css';
 import moment from "moment/moment";
 
 const PurchaseReport = forwardRef(({data}, ref) => {
-
+    console.log(data)
     return (
         <div
             className={`flex flex-col m-2 justify-center justify-items-center p-4 shadow-none`}
@@ -51,12 +51,12 @@ const PurchaseReport = forwardRef(({data}, ref) => {
                     <th
                         scope="col"
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                        Balance
+                        Qty.
                     </th>
                     <th
                         scope="col"
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                        Avg. Rate
+                        Rate
                     </th>
                     <th
                         scope="col"
@@ -66,7 +66,30 @@ const PurchaseReport = forwardRef(({data}, ref) => {
                 </tr>
                 </thead>
                 <tbody className={`shadow-none text-gray-800`}>
-
+                {
+                    data && data?.purchase?.map((p, index) => (
+                        <tr key={p.id} className={`border bg-white`}>
+                            <td className={`border`}>{index + 1}</td>
+                            <td className={`border text-left p-1`}>{p.product_category}</td>
+                            <td className={`border text-left p-1`}>{p.product_title}</td>
+                            <td className={`border`}>{p?.productOption?.title}</td>
+                            <td className={`border`}>{moment(p?.purchase_date).format("DD MMM Y")}</td>
+                            <td className={`border text-left p-1`}>{p?.supplier?.name}</td>
+                            <td className={`border`}>{p?.requisite_department}</td>
+                            <td className={`border`}>{p.qty}{p.product?.unit}</td>
+                            <td className={`border`}>{parseFloat(p.unit_price).toLocaleString()}</td>
+                            <td className={`border`}>{parseFloat(p?.total_price).toLocaleString()}</td>
+                        </tr>
+                    ))
+                }
+                <tr>
+                    <td className={`border text-right p-2 font-bold`} colSpan={9}>Total Amount</td>
+                    <td className={`border p-1 font-bold`}>{
+                        parseFloat(data?.purchase?.reduce((p,c) =>{
+                            return c.total_price + p;
+                        } ,0)).toLocaleString()
+                    }</td>
+                </tr>
                 </tbody>
             </table>
         </div>

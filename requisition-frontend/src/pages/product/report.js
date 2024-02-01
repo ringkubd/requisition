@@ -158,7 +158,7 @@ const Report = () => {
                                                 <Label
                                                     htmlFor="usage"
                                                     className={`font-bold`}>
-                                                    Usage
+                                                    Issue
                                                 </Label>
                                             </div>
                                         </fieldset>

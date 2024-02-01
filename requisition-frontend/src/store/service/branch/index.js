@@ -12,18 +12,20 @@ const CustomBaseQuery = fetchBaseQuery({
                 credentials: 'include',
             },
         )
-        let cookieArray = document.cookie.split(";");
+        if (document){
+            let cookieArray = document.cookie.split(";");
+            // this can probably be improved by using a regex.. but this works for now
+            for(var i = 0; i < cookieArray.length; i++) {
+                let cookiePair = cookieArray[i].split("=");
 
-        // this can probably be improved by using a regex.. but this works for now
-        for(var i = 0; i < cookieArray.length; i++) {
-            let cookiePair = cookieArray[i].split("=");
+                if (cookiePair[0].trim() == 'XSRF-TOKEN-PORTAL') {
+                    headers.set('X-XSRF-TOKEN-PORTAL', decodeURIComponent(cookiePair[1]))
+                }
 
-            if (cookiePair[0].trim() == 'XSRF-TOKEN-PORTAL') {
-                headers.set('X-XSRF-TOKEN-PORTAL', decodeURIComponent(cookiePair[1]))
             }
-
+            headers.set('Accept', `application/json`)
         }
-        headers.set('Accept', `application/json`)
+
         return headers
     },
     credentials: 'include',
