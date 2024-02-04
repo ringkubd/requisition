@@ -105,7 +105,7 @@ const ProductIssue = () => {
                         <Actions
                             itemId={row.uuid}
                             edit={
-                                isStoreManager && !row.store_status
+                                isStoreManager && (!row.store_status || moment().diff(moment(row.updated_at), 'days') < 4)
                                     ? `/issue/${row.uuid}/edit`
                                     : false
                             }

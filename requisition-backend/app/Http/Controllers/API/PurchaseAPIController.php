@@ -395,6 +395,9 @@ class PurchaseAPIController extends AppBaseController
             ->whereHas('purchaseRequisitionProducts', function ($q) {
                 $q->whereRaw('actual_purchase < quantity_to_be_purchase');
             })
+            ->whereHas('approval_status', function ($q){
+                $q->where('ceo_status', 2);
+            })
             ->where('branch_id', auth_branch_id())
             ->skip($start)
             ->limit($end)
