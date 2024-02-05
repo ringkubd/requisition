@@ -21,6 +21,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\InitialRequisitionResource;
+use Illuminate\Support\Facades\DB;
 use OpenApi\Annotations as OA;
 
 /**
@@ -292,33 +293,33 @@ class InitialRequisitionAPIController extends AppBaseController
             );
         }
 
-        $allProduct = $request->all();
-        $estimated_cost = collect($allProduct)->sum('estimated_cost');
+        DB::transaction(function () use ($request, $id){
+            $allProduct = $request->all();
+            $estimated_cost = collect($allProduct)->sum('estimated_cost');
+            $initialRequisition = $this->initialRequisitionRepository->update([
+                'estimated_cost' => $estimated_cost
+            ], $id);
 
-        $initialRequisition = $this->initialRequisitionRepository->update([
-            'estimated_cost' => $estimated_cost
-        ], $id);
-
-        $allProduct = array_map(function($p){
-            unset($p['estimated_cost']);
-            unset($p['title']);
-            unset($p['id']);
-            unset($p['product']);
-            unset($p['product_option']);
-            unset($p['stock']);
-            if (array_key_exists('last_purchase_date', $p) && ($p['last_purchase_date'] == "" || $p['last_purchase_date'] == null)){
-                $p['last_purchase_date'] = Carbon::now()->toDateString();
-            }else{
-                $p['last_purchase_date'] = Carbon::parse($p['last_purchase_date'])->toDateString();
-            }
-            if (!array_key_exists('last_purchase_date', $p)){
-                $p['last_purchase_date'] = Carbon::now()->toDateString();
-            }
-            return $p;
-        }, $allProduct);
-        $initialRequisition->initialRequisitionProducts()->delete();
-        $initialRequisition->initialRequisitionProducts()->createMany($allProduct);
-
+            $allProduct = array_map(function($p){
+                unset($p['estimated_cost']);
+                unset($p['title']);
+                unset($p['id']);
+                unset($p['product']);
+                unset($p['product_option']);
+                unset($p['stock']);
+                if (array_key_exists('last_purchase_date', $p) && ($p['last_purchase_date'] == "" || $p['last_purchase_date'] == null)){
+                    $p['last_purchase_date'] = Carbon::now()->toDateString();
+                }else{
+                    $p['last_purchase_date'] = Carbon::parse($p['last_purchase_date'])->toDateString();
+                }
+                if (!array_key_exists('last_purchase_date', $p)){
+                    $p['last_purchase_date'] = Carbon::now()->toDateString();
+                }
+                return $p;
+            }, $allProduct);
+            $initialRequisition->initialRequisitionProducts()->delete();
+            $initialRequisition->initialRequisitionProducts()->createMany($allProduct);
+        });
         return $this->sendResponse(
             new InitialRequisitionResource($initialRequisition),
             __('messages.updated', ['model' => __('models/initialRequisitions.singular')])
