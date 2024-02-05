@@ -275,6 +275,7 @@ const create = (props) => {
                                                         loadOptions={
                                                             loadCategory
                                                         }
+                                                        isClearable={true}
                                                         data-placeholder="Select options..."
                                                     />
                                                     <ErrorMessage

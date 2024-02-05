@@ -260,9 +260,9 @@ const View = (props) => {
                                                             <>
                                                                 <Table.Row className={`border border-gray-300`} key={index * Math.round(Math.random() * 444)}>
                                                                     <Table.Cell className={`border border-gray-300`}
-                                                                                rowSpan={p?.product_issue?.length + 2}>{index + 1}</Table.Cell>
+                                                                                rowSpan={p?.product_issue?.length + 1}>{index + 1}</Table.Cell>
                                                                     <Table.Cell className={`border border-gray-300`}
-                                                                                rowSpan={p?.product_issue?.length + 2}>{p?.title}</Table.Cell>
+                                                                                rowSpan={p?.product_issue?.length + 1}>{p?.title}</Table.Cell>
                                                                 </Table.Row>
                                                                 {
                                                                     p?.product_issue?.map((pur, i) => (

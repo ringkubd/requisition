@@ -103,11 +103,11 @@ class ProductIssueAPIController extends AppBaseController
             })
 
             ->when($request->search, function ($q, $v){
-              $q->whereHas('items', function ($q) use($v){
-                  $q->whereHas('product', function ($r) use ($v){
-                      $r->where('title', 'like', "%$v%");
-                  } );
-              });
+                $q->whereHas('items', function ($q) use($v){
+                    $q->whereHas('product', function ($r) use ($v){
+                        $r->where('title', 'like', "%$v%");
+                    } );
+                });
             })
             ->when($request->dateRange, function ($q, $v){
                 $dateRange = json_decode($v);
@@ -355,7 +355,7 @@ class ProductIssueAPIController extends AppBaseController
                                     'purchase_date' => $purchase->purchase_date,
                                 ];
                                 $qty = $qty <= $purchase->available_qty ? 0 : $qty - $purchase->available_qty;
-                                $purchase->available_qty = $request_quantity < $purchase->available_qty ? $purchase->available_qty - $request_quantity : 0;
+                                $purchase->available_qty = $request_quantity <= $purchase->available_qty ? $purchase->available_qty - $request_quantity : 0;
                                 $request_quantity = $qty;
                                 $purchase->save();
                                 continue;
@@ -471,11 +471,67 @@ class ProductIssueAPIController extends AppBaseController
                 __('messages.not_found', ['model' => __('models/productIssues.singular')])
             );
         }
-        if ($request->has('quantity')){
-            $issue->update([
-                'quantity' => $request->quantity
-            ]);
-        }
+        DB::transaction(function () use($request, $id, $issue){
+            try {
+
+                if ($request->has('quantity')){
+                    if ($issue->productIssue->store_status == 1){
+                        $productOption = ProductOption::find($issue->product_option_id);
+
+                        $productOption->stock = $issue->balance_before_issue - $request->quantity;
+                        $productOption->save();
+                        $issue_rate_log = $issue->rateLog;
+                        foreach ($issue_rate_log as $rl){
+                            $purchase = Purchase::find($rl->purchase_id);
+                            $purchase->available_qty = $purchase->available_qty + $rl->qty;
+                            $purchase->save();
+                        }
+                        $purchase_history = Purchase::query()
+                            ->where('product_id', $issue->product_id)
+                            ->where('product_option_id', $issue->product_option_id)
+                            ->where('available_qty', '>', 0)
+                            ->oldest()
+                            ->get();
+
+                        $qty = $request->quantity;
+                        $purchase_log = [];
+                        $request_quantity = (double)$request->quantity;
+                        foreach ($purchase_history as $purchase) {
+                            if ($qty > 0) {
+                                $purchase_log[] = [
+                                    'product_id' => $purchase->product_id,
+                                    'product_option_id' => $purchase->product_option_id,
+                                    'purchase_id' => $purchase->id,
+                                    'qty' => min($request_quantity, $purchase->available_qty),
+                                    'unit_price' => $purchase->unit_price,
+                                    'total_price' => min($request_quantity, $purchase->available_qty) * $purchase->unit_price,
+                                    'purchase_date' => $purchase->purchase_date,
+                                ];
+                                $qty = $qty <= $purchase->available_qty ? 0 : $qty - $purchase->available_qty;
+                                $purchase->available_qty = $request_quantity <= $purchase->available_qty ? $purchase->available_qty - $request_quantity : 0;
+                                $request_quantity = $qty;
+                                $purchase->save();
+                                continue;
+                            } else {
+                                break;
+                            }
+                        }
+                        $issue->rateLog()->delete();
+                        $issue->rateLog()->createMany($purchase_log);
+                    }
+
+                    $issue->update([
+                        'quantity' => $request->quantity,
+                        'balance_before_issue' => $issue->balance_before_issue,
+                        'balance_after_issue' => (double)$issue->balance_before_issue - (double)$request->quantity
+                    ]);
+                }
+
+            }catch (\PDOException $exception){
+
+            }
+        });
+
         return $this->sendResponse(
             new ProductIssueItemsResource($issue),
             __('messages.updated', ['model' => __('models/productIssues.singular')])
