@@ -1,24 +1,25 @@
-import Head from "next/head";
-import AppLayout from "@/components/Layouts/AppLayout";
-import { wrapper } from "@/store";
-import { Button, Card, Label, Select, TextInput } from "flowbite-react";
-import DataTable from 'react-data-table-component';
-import NavLink from "@/components/navLink";
-import { useRouter } from "next/router";
-import Actions from "@/components/actions";
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import Head from 'next/head'
+import AppLayout from '@/components/Layouts/AppLayout'
+import { wrapper } from '@/store'
+import { Button, Card, Label, Select, TextInput } from 'flowbite-react'
+import DataTable from 'react-data-table-component'
+import NavLink from '@/components/navLink'
+import { useRouter } from 'next/router'
+import Actions from '@/components/actions'
+import React, { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 import {
     useGetIssueQuery,
     useDestroyIssueMutation,
-    getRunningQueriesThunk, getIssue
-} from "@/store/service/issue";
-import moment from "moment";
-import IssueStatus from "@/components/issue/Status";
-import { useAuth } from "@/hooks/auth";
-import Datepicker from "react-tailwindcss-datepicker";
-import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
-import { AiOutlineSearch } from "react-icons/ai";
+    getRunningQueriesThunk,
+    getIssue,
+} from '@/store/service/issue'
+import moment from 'moment'
+import IssueStatus from '@/components/issue/Status'
+import { useAuth } from '@/hooks/auth'
+import Datepicker from 'react-tailwindcss-datepicker'
+import { useGetDepartmentByOrganizationBranchQuery } from '@/store/service/deparment'
+import { AiOutlineSearch } from 'react-icons/ai'
 
 const ProductIssue = () => {
     const { user } = useAuth()
@@ -105,7 +106,12 @@ const ProductIssue = () => {
                         <Actions
                             itemId={row.uuid}
                             edit={
-                                isStoreManager && (!row.store_status || moment().diff(moment(row.updated_at), 'days') < 7)
+                                isStoreManager &&
+                                (!row.store_status ||
+                                    moment().diff(
+                                        moment(row.updated_at),
+                                        'days',
+                                    ) < 1)
                                     ? `/issue/${row.uuid}/edit`
                                     : false
                             }
@@ -203,7 +209,10 @@ const ProductIssue = () => {
                                 <TextInput
                                     icon={AiOutlineSearch}
                                     onBlur={e => {
-                                        changeSearchParams('search',e.target.value)
+                                        changeSearchParams(
+                                            'search',
+                                            e.target.value,
+                                        )
                                     }}
                                 />
                             </div>
