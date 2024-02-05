@@ -293,7 +293,7 @@ const View = (props) => {
                                                             return 0 + n.issue_qty;
                                                         },0) > 0 ? (
                                                             <Table.Row>
-                                                                <Table.Cell className={`border border-gray-300 text-right text-black font-bold`}>Total</Table.Cell>
+                                                                <Table.Cell className={`border border-gray-300 text-right text-black font-bold`} colSpan={3}>Total</Table.Cell>
                                                                 <Table.Cell className={`border border-gray-300 text-black`}>{
                                                                     product_options.reduce(function(o, n) {
                                                                         return 0 + n.issue_qty;
