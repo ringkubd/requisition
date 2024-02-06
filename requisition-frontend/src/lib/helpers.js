@@ -39,6 +39,8 @@ function isCompositeTypeElement(element) {
     return isElement(element) && typeof element.type === 'function';
 }
 
+
+
 export {
     toBase64,
     isClassComponent,

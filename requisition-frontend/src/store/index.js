@@ -18,8 +18,10 @@ import {
     PERSIST,
     PURGE,
     REGISTER,
-    persistStore
+    persistStore,
 } from "reduxjs-toolkit-persist";
+import storage from 'reduxjs-toolkit-persist/lib/storage'
+// import storage from "@/store/persistStorage";
 import autoMergeLevel1 from "reduxjs-toolkit-persist/lib/stateReconciler/autoMergeLevel1";
 import { ProductOptionApiService } from "@/store/service/product/product_option";
 import { optionSlice } from '@/store/service/options/optionSlice'
@@ -35,7 +37,6 @@ import { SuppliersApiService } from "@/store/service/suppliers";
 import { PurchaseApiService } from "@/store/service/purchase";
 import { IssueApiService } from "@/store/service/issue";
 import { BrandsApiService } from "@/store/service/brands";
-import storage from "@/store/persistStorage";
 import { CountryApiService } from "@/store/service/country";
 import { UnitsApiService } from "@/store/service/units";
 import { RolesApiService } from "@/store/service/roles";
@@ -49,6 +50,7 @@ import { ReportAPI } from "@/store/service/report";
 import { UserOnlineSlice } from "@/store/slice/userOnlineSlice";
 import { DashboardAPI } from "@/store/service/dashboard";
 import { encryptTransform } from "redux-persist-transform-encrypt";
+import { FilterDateRange } from "@/store/slice/filterDateRange";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -133,6 +135,7 @@ const combineReducer = combineReducers({
     [CashRequisitionAPIService.reducerPath]: CashRequisitionAPIService.reducer,
     [ReportAPI.reducerPath]: ReportAPI.reducer,
     [DashboardAPI.reducerPath]: DashboardAPI.reducer,
+    filter_date_range: FilterDateRange.reducer,
 });
 
 const _persistedReducer = persistReducer(persistConfig, combineReducer);

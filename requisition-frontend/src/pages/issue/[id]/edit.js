@@ -54,11 +54,6 @@ const Edit = (props) => {
                     selector: row => row.note,
                     sortable: true,
                 },
-                {
-                    name: 'issue_time',
-                    selector: row => row.issue_time,
-                    sortable: true,
-                }
             ]);
         }
     }, [issueISSuccess, issue]);

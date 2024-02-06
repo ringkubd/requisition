@@ -28,11 +28,11 @@ const Actions = ({edit, destroy, view , itemId, progressing, print, other, permi
                 return true;
             }
             if (
-              !roles.filter(r => r.name === "Super Admin").length &&
-              !roles.filter(r => r.name === "Store Manager").length &&
-              permissionModule?.includes('requisition') &&
-              (item.user_id !== user.id || selected_department.head_of_department !== user.id) &&
-              (permission === 'update' || permission === 'delete')
+                !roles.filter(r => r.name === "Super Admin").length &&
+                !roles.filter(r => r.name === "Store Manager").length &&
+                permissionModule?.includes('requisition') &&
+                (item.user_id !== user.id || selected_department.head_of_department !== user.id) &&
+                (permission === 'update' || permission === 'delete')
             )
             {
                 return  false;
@@ -48,67 +48,67 @@ const Actions = ({edit, destroy, view , itemId, progressing, print, other, permi
         return false;
     }
     return (
-      <>
-          <Button.Group>
-              {
-                  checkPermission('view') ?
-                    view && !isElement(view) ?  (
-                      <Button
-                        onClick={submitView}
-                        gradientMonochrome={`cyan`}
-                      >
-                          <AiFillEye />
-                      </Button>
-                    ) :  view && isElement(view) ? {...view} : <></> : <></>
-              }
-              {
-                  checkPermission('update') ?
-                    edit ? (
-                      <Button
-                        onClick={submitEdit}
-                        gradientMonochrome={`lime`}
-                      >
-                          <AiFillEdit />
-                      </Button>
-                    ) : <></> : <></>
-              }
-              {
-                  checkPermission('view') ?
-                    print ? (
-                          <Button
-                            gradientMonochrome="info"
-                            onClick={() => router.push(print)}
-                          >
-                              <AiFillPrinter />
-                          </Button>
-                    ) : <></> : <></>
-              }
-              {
-                  checkPermission('view') ?
-                    other ? (
-                          <Button
-                            gradientMonochrome="teal"
-                            onClick={() => router.push(other)}
-                          >
-                              <AiFillSetting />
-                          </Button>
-                    ) : <></> : <></>
-              }
-              {
-                  checkPermission('delete') ?
-                      destroy ?  (
-                          <Button
-                              onClick={submitDestroy}
-                              gradientMonochrome={`failure`}
-                              isProcessing={progressing}
-                          >
-                              <AiFillDelete />
-                          </Button>
-                      ) : <></> : <></>
-              }
-              {!edit && !view && !destroy && !print && !other ? <Button>No Action</Button> : <></>}
-          </Button.Group>
-      </>
+        <>
+            <Button.Group>
+                {
+                    checkPermission('view') ?
+                        view && !isElement(view) ?  (
+                            <Button
+                                onClick={submitView}
+                                gradientMonochrome={`cyan`}
+                            >
+                                <AiFillEye />
+                            </Button>
+                        ) :  view && isElement(view) ? {...view} : <></> : <></>
+                }
+                {
+                    checkPermission('update') ?
+                        edit ? (
+                            <Button
+                                onClick={submitEdit}
+                                gradientMonochrome={`lime`}
+                            >
+                                <AiFillEdit />
+                            </Button>
+                        ) : <></> : <></>
+                }
+                {
+                    checkPermission('view') ?
+                        print ? (
+                            <Button
+                                gradientMonochrome="info"
+                                onClick={() => router.push(print)}
+                            >
+                                <AiFillPrinter/>
+                            </Button>
+                        ) : <></> : <></>
+                }
+                {
+                    checkPermission('view') ?
+                        other ? (
+                            <Button
+                                gradientMonochrome="teal"
+                                onClick={() => router.push(other)}
+                            >
+                                <AiFillSetting />
+                            </Button>
+                        ) : <></> : <></>
+                }
+                {
+                    checkPermission('delete') ?
+                        destroy ?  (
+                            <Button
+                                onClick={submitDestroy}
+                                gradientMonochrome={`failure`}
+                                isProcessing={progressing}
+                            >
+                                <AiFillDelete />
+                            </Button>
+                        ) : <></> : <></>
+                }
+                {!edit && !view && !destroy && !print && !other ? <Button>No Action</Button> : <></>}
+            </Button.Group>
+        </>
     )
 }
 

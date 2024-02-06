@@ -134,7 +134,7 @@ const Report = () => {
                                                 <Label
                                                     htmlFor="purchase"
                                                     className={`font-bold`}>
-                                                    Purchase
+                                                    Receive
                                                 </Label>
                                             </div>
                                             <div className="flex items-center gap-2">

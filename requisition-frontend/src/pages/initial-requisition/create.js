@@ -508,6 +508,7 @@ const InitialRequisitionCreate = (props) => {
                                                         }
                                                         id="available_quantity"
                                                         name="available_quantity"
+                                                        disabled
                                                         type={`text`}
                                                         onChange={handleChange}
                                                         onBlur={handleChange}
@@ -535,6 +536,7 @@ const InitialRequisitionCreate = (props) => {
                                                         id="quantity_to_be_purchase"
                                                         name="quantity_to_be_purchase"
                                                         type={`text`}
+                                                        disabled
                                                         onChange={handleChange}
                                                     />
                                                     <ErrorMessage

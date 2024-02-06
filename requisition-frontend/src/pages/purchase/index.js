@@ -20,6 +20,8 @@ import moment from "moment/moment";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 import { AiOutlineSearch } from "react-icons/ai";
 import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { setDateRange } from "@/store/slice/filterDateRange";
 
 const Purchase = () => {
     const router = useRouter()
@@ -28,10 +30,8 @@ const Purchase = () => {
     const [destroy, destroyResponse] = useDestroyPurchaseMutation()
     const [columns, setColumns] = useState([]);
     const {data: departments, isLoading: departmentsISLoading, isError: departmentsISError} = useGetDepartmentByOrganizationBranchQuery();
-    const [dateRange, setDateRange] = useState({
-        startDate: moment().startOf('month').format('Y-MM-DD'),
-        endDate: moment().endOf('month').format('Y-MM-DD')
-    })
+    const dispatch = useDispatch();
+    const dateRange = useSelector(state => state.filter_date_range);
 
     useEffect(() => {
         if (!destroyResponse.isLoading && destroyResponse.isSuccess) {
@@ -179,7 +179,7 @@ const Purchase = () => {
                                     inputId={`date_range`}
                                     inputName={`date_range`}
                                     onChange={d => {
-                                        setDateRange(d)
+                                        dispatch(setDateRange(d))
                                     }}
                                     value={dateRange}
                                 />

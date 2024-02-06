@@ -6,7 +6,7 @@ import DataTable from 'react-data-table-component'
 import NavLink from '@/components/navLink'
 import { useRouter } from 'next/router'
 import Actions from '@/components/actions'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from 'react-toastify'
 import {
     useGetIssueQuery,
@@ -20,10 +20,14 @@ import { useAuth } from '@/hooks/auth'
 import Datepicker from 'react-tailwindcss-datepicker'
 import { useGetDepartmentByOrganizationBranchQuery } from '@/store/service/deparment'
 import { AiOutlineSearch } from 'react-icons/ai'
+import { useDispatch, useSelector } from "react-redux";
+import { setDateRange } from "@/store/slice/filterDateRange";
 
 const ProductIssue = () => {
     const { user } = useAuth()
     const router = useRouter()
+    const dispatch = useDispatch();
+    const dateRange = useSelector(state => state.filter_date_range);
     const [searchParams, setSearchParams] = useState({})
     const { data, isLoading, isError } = useGetIssueQuery(searchParams)
     const {
@@ -39,10 +43,7 @@ const ProductIssue = () => {
         ).length,
     )
     const [dataTableData, setDataTableData] = useState([])
-    const [dateRange, setDateRange] = useState({
-        startDate: moment().startOf('month').format('Y-MM-DD'),
-        endDate: moment().endOf('month').format('Y-MM-DD'),
-    })
+
 
     useEffect(() => {
         if (user) {
@@ -175,7 +176,7 @@ const ProductIssue = () => {
                                     inputId={`date_range`}
                                     inputName={`date_range`}
                                     onChange={d => {
-                                        setDateRange(d)
+                                        dispatch(setDateRange(d));
                                     }}
                                     value={dateRange}
                                 />
@@ -242,6 +243,7 @@ const ProductIssue = () => {
                                     per_page: currentRowsPerPage,
                                 })
                             }
+                            paginationResetDefaultPage={false}
                             paginationTotalRows={data?.number_of_rows}
                             paginationPerPage={15}
                         />
