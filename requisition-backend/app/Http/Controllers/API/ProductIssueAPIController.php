@@ -440,6 +440,12 @@ class ProductIssueAPIController extends AppBaseController
                             $productOption = ProductOption::find($productOptionId);
                             $productOption->stock = (double)$productOption->stock + (double)$quantity;
                             $productOption->save();
+                            foreach ($item->rateLog as $rl){
+                                $purchase = Purchase::find($rl->purchase_id);
+                                $purchase->available_qty = $purchase->available_qty + $rl->qty;
+                                $purchase->save();
+                            }
+                            $item->rateLog()->delete();
                         }
                     }
                 }
