@@ -10,10 +10,17 @@ const IssuePrint = forwardRef(({products}, ref) => {
             {/*Header*/}
             <div className={`flex flex-col shadow-none`} ref={accountsCopy}>
                 <div className={`text-center font-bold`}>
-                    <h2>
-                        IsDB-Bangladesh Islamic Solidarity Educational Wakf
-                        (IsDB-BISEW)
-                    </h2>
+                    <div className={`flex flex-row justify-center`}>
+                        <div className={`w-5/6 justify-center`}>
+                            <h2 className={`p-1`}>
+                                IsDB-Bangladesh Islamic Solidarity Educational
+                                Wakf (IsDB-BISEW)
+                            </h2>
+                        </div>
+                        <div>
+                            <div className={`border-2 p-1 font-normal text-xs`}>SL. {products.receiver_department?.name}/{products.id}</div>
+                        </div>
+                    </div>
                 </div>
                 <div
                     className={`flex flex-col justify-center items-center justify-items-center text-center`}>
@@ -119,7 +126,9 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                         </td>
                                         <td className={`border p-1`}>
                                             {p?.balance_before_issue}
-                                            {p?.balance_before_issue ? p?.product?.unit : ''}
+                                            {p?.balance_before_issue
+                                                ? p?.product?.unit
+                                                : ''}
                                         </td>
                                         <td className={`border p-1`}>
                                             {p?.quantity}
@@ -127,7 +136,9 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                         </td>
                                         <td className={`border p-1`}>
                                             {p?.balance_after_issue}
-                                            {p?.balance_after_issue ? p?.product?.unit : ''}
+                                            {p?.balance_after_issue
+                                                ? p?.product?.unit
+                                                : ''}
                                         </td>
                                     </tr>
                                 ))}

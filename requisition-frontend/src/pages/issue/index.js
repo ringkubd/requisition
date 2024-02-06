@@ -68,7 +68,7 @@ const ProductIssue = () => {
             setColumns([
                 {
                     name: 'SL.',
-                    selector: (row, index) => index + 1,
+                    selector: (row, index) =>  row.receiver_department?.name+'/'+row.id,
                     sortable: true,
                 },
                 {

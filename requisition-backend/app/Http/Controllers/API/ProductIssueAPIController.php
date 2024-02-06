@@ -107,7 +107,7 @@ class ProductIssueAPIController extends AppBaseController
                     $q->whereHas('product', function ($r) use ($v){
                         $r->where('title', 'like', "%$v%");
                     } );
-                });
+                })->orWhere('id', 'like', "%$v%");
             })
             ->when($request->dateRange, function ($q, $v){
                 $dateRange = json_decode($v);
@@ -524,13 +524,17 @@ class ProductIssueAPIController extends AppBaseController
                         }
                         $issue->rateLog()->delete();
                         $issue->rateLog()->createMany($purchase_log);
+                        $issue->update([
+                            'quantity' => $request->quantity,
+                            'balance_before_issue' => $issue->balance_before_issue,
+                            'balance_after_issue' => (double)$issue->balance_before_issue - (double)$request->quantity
+                        ]);
+                    }else{
+                        $issue->update([
+                            'quantity' => $request->quantity,
+                        ]);
                     }
 
-                    $issue->update([
-                        'quantity' => $request->quantity,
-                        'balance_before_issue' => $issue->balance_before_issue,
-                        'balance_after_issue' => (double)$issue->balance_before_issue - (double)$request->quantity
-                    ]);
                 }
 
             }catch (\PDOException $exception){

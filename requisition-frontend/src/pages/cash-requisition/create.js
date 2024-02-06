@@ -82,9 +82,8 @@ const CashRequisitionCreate = (props) => {
   })
   const removeItem = (item) => {
     setSubmitRemoveProcessing(true)
-    setRequisitionData(requisitionData.filter(r => item.product_id !== r.product_id && item.product_option_id !== r.product_option_id));
+    setRequisitionData(requisitionData.filter(r => item.item !== r.item));
     setSubmitRemoveProcessing(false);
-    selectRef.current.resetSelect();
   }
 
   const tableColumns = [
@@ -182,6 +181,7 @@ const CashRequisitionCreate = (props) => {
                               classNames={{
                                 control: state => 'select'
                               }}
+                              ref={selectRef}
                               id="item"
                               isClearable
                               isDisabled={cashProductIsError}
