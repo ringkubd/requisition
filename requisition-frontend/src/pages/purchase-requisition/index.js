@@ -80,7 +80,7 @@ const PurchaseRequisition = () => {
                         itemId={row.id}
                         view={`/purchase-requisition/${row.id}/view`}
                         print={`/purchase-requisition/${row.id}/print_view`}
-                        edit={moment(row.created_at).diff(moment(), 'days') <= 2 ? `/purchase-requisition/${row.id}/edit` : false}
+                        edit={moment(row.created_at).diff(moment(), 'days') <= 7 && !row.approval_status?.department_approved_by ? `/purchase-requisition/${row.id}/edit` : false}
                         destroy={destroy}
                         item={row}
                         progressing={destroyResponse.isLoading}
