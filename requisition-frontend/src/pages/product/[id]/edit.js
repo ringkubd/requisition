@@ -15,8 +15,8 @@ import {
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { resetProductBasicInfo, setProductBasicInfo } from "@/store/service/product/product_basic_form";
-import { resetProductMeta, setProductMeta, setEditProductMeta } from "@/store/service/product/productMetaSlice";
-import { resetProductOptionsLocal, setProductOptionsLocal, setEditProductOptionsLocal } from "@/store/service/options/optionSlice";
+import { resetProductMeta, setEditProductMeta } from "@/store/service/product/productMetaSlice";
+import { resetProductOptionsLocal, setEditProductOptionsLocal } from "@/store/service/options/optionSlice";
 
 const edit = props => {
     const router = useRouter();

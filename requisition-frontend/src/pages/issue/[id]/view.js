@@ -7,7 +7,6 @@ import { useEditIssueQuery } from "@/store/service/issue";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
 import DataTable from "react-data-table-component";
-import { data } from "autoprefixer";
 import Status from "@/components/issue/Status";
 
 const IssueView = () => {

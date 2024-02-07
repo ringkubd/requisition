@@ -1,6 +1,5 @@
-import React, { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef } from "react";
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
-import moment from "moment";
 import Table from "@/components/ReactPDF/table";
 
 const InitialPDF = forwardRef(({mainData, requisition_products}, ref) => {

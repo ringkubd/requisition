@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Dropdown, Tooltip } from "flowbite-react";
+import { Button, Tooltip } from "flowbite-react";
 import { useAuth } from "@/hooks/auth";
 import { useUpdateIssueMutation } from "@/store/service/issue";
 import { AiFillCheckSquare, AiFillDelete } from "react-icons/ai";

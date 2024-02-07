@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import Select from "react-select";
 import { useGetNavigationDepartmentQuery } from "@/store/service/navigation";
 import { useGetCategoryQuery } from "@/store/service/category";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useGetProductQuery } from "@/store/service/product/product";
 import { ErrorMessage, Formik } from "formik";
 import * as Yup from 'yup';

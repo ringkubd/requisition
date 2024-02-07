@@ -13,7 +13,6 @@ import { setSingleActivity } from "@/store/slice/activitySlice";
 import { addNewOnline, removeOnline, setAllOnline } from "@/store/slice/userOnlineSlice";
 import { Badge, ListGroup, Tooltip } from "flowbite-react";
 import { DashboardAPI } from "@/store/service/dashboard";
-import { dispatch } from "@/store";
 import { PurchaseRequisitionApi } from "@/store/service/requisitions/purchase";
 import { useSubscribePushNotificationMutation } from "@/store/service/navigation";
 
@@ -96,10 +95,10 @@ const AppLayout = ({ header, children }) => {
                 serviceWorkerRegistration.pushManager
                     .getSubscription()
                     .then((subscription) => {
-                        if (!subscription) {
+                        /*if (!subscription) {
                             console.log(subscription, 456)
                             return;
-                        }
+                        }*/
                     })
                     .catch((err) => {
                         console.error(`Error during getSubscription(): ${err}`);

@@ -15,8 +15,6 @@ import {
     getRunningQueriesThunk
 } from "@/store/service/requisitions/purchase";
 import moment from "moment";
-import UpdatePno from "@/components/purchase-requisition/UpdatePno";
-import Status from "@/components/requisition/status";
 import { AiOutlineSearch } from "react-icons/ai";
 
 const PurchaseRequisition = () => {
@@ -82,7 +80,7 @@ const PurchaseRequisition = () => {
                         itemId={row.id}
                         view={`/purchase-requisition/${row.id}/view`}
                         print={`/purchase-requisition/${row.id}/print_view`}
-                        edit={moment(row.created_at).format("YYYY-MM-DD") == moment().format("YYYY-MM-DD") ? `/purchase-requisition/${row.id}/edit` : false}
+                        edit={moment(row.created_at).diff(moment(), 'days') <= 2 ? `/purchase-requisition/${row.id}/edit` : false}
                         destroy={destroy}
                         item={row}
                         progressing={destroyResponse.isLoading}

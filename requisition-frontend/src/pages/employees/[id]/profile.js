@@ -5,18 +5,9 @@ import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Form, Formik } from "formik";
 import * as Yup from 'yup';
-import { useGetOrganizationQuery } from "@/store/service/organization";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { useGetBranchByOrganizationQuery } from "@/store/service/branch";
 import { useEditUserQuery, useUpdateUserMutation } from "@/store/service/user/management";
-import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
-import { useGetDesignationByOrganizationBranchQuery } from "@/store/service/designation";
-import { useGetRolesQuery } from "@/store/service/roles";
-import Select from 'react-select';
-import makeAnimated from 'react-select/animated';
-
-const animatedComponents = makeAnimated();
 const Edit = (props) => {
     const router = useRouter();
     const [updateUser, updateResult] = useUpdateUserMutation();

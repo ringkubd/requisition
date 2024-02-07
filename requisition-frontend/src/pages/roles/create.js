@@ -1,6 +1,6 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, Textarea, TextInput } from "flowbite-react";
+import { Button, Card, Label, TextInput } from "flowbite-react";
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import { ErrorMessage, Formik } from "formik";
@@ -13,7 +13,6 @@ const create = (props) => {
     const router = useRouter();
     const [storeRole, storeResult] = useStoreRolesMutation();
     let formikForm = useRef();
-    let selectRef = useRef();
 
     const initValues = {
         name: '',

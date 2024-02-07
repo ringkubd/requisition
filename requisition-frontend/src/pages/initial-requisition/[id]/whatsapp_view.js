@@ -7,7 +7,6 @@ import { useReactToPrint } from "react-to-print";
 import Status from "@/components/requisition/status";
 import { useOneTimeLoginMutation } from "@/store/service/user/management";
 import GuestLayout from "@/components/Layouts/GuestLayout";
-import RequisitionPrintWhatsApp from "@/components/cash-requisition/RequisitionPrintWhatsApp";
 import { useEditInitialRequisitionQuery } from "@/store/service/requisitions/initial";
 import InitialPrint from "@/components/initial-requisition/initialPrint";
 

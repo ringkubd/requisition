@@ -5,7 +5,6 @@ import {
     useDestroyOrganizationMutation,
     useGetOrganizationQuery
 } from "@/store/service/organization";
-import { useAuth } from "@/hooks/auth";
 import AppLayout from "@/components/Layouts/AppLayout";
 import { wrapper } from "@/store";
 import { Button, Card } from "flowbite-react";

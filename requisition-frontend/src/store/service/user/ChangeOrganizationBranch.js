@@ -1,5 +1,4 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getCookie } from "@/lib/cookie";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
 
 export const ChangeOrganizationBranchApi = createApi({
