@@ -38,15 +38,15 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
         <div
             className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none`}
             ref={ref}>
-            {
-                rejected ? (
-                    <Image
-                        src={require('../../../public/rejected.png')}
-                        alt={`rejected`}
-                        className={`absolute opacity-5 top-[50%] left-[35%]`}
-                    />
-                ) : ""
-            }
+            {rejected ? (
+                <Image
+                    src={require('../../../public/rejected.png')}
+                    alt={`rejected`}
+                    className={`absolute opacity-5 top-[50%] left-[35%]`}
+                />
+            ) : (
+                ''
+            )}
             {/*Header*/}
             <div className={`flex flex-col shadow-none`} ref={accountsCopy}>
                 <div className={`text-center font-bold`}>
@@ -203,11 +203,24 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                 <tr>
                                     <td className={`border px-2 py-2`}>
                                         <div className={`flex flex-col`}>
-                                            <div>
-                                                Requisitioned by{' '}
-                                                <span className={`underline`}>
-                                                    {mainData?.user?.name}
-                                                </span>
+                                            <div
+                                                className={`flex flex-row my-4 items-center`}>
+                                                <div className={`min-w-fit`}>
+                                                    Requisitioned by{' '}
+                                                </div>
+                                                <div
+                                                    className={`border-b border-black w-full flex flex-col`}>
+                                                    <span className={`ml-2`}>
+                                                        {mainData?.user?.name}
+                                                    </span>
+                                                    <span className={`ml-2`}>
+                                                        {moment(
+                                                            mainData?.created_at,
+                                                        ).format(
+                                                            'hh:mm A - DD MMM Y',
+                                                        )}
+                                                    </span>
+                                                </div>
                                             </div>
                                             {/*<div*/}
                                             {/*    className={`flex flex-row my-4`}>*/}

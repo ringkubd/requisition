@@ -39,7 +39,7 @@ const CashRequisitionCreate = (props) => {
   const initValues = {
     item: '',
     unit: '',
-    required_unit: '',
+    required_unit: 1,
     unit_price: '',
     last_purchase_date: '',
     purpose: '',

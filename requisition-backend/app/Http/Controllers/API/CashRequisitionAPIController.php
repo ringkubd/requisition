@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\CashRequisitionResource;
+use Illuminate\Support\Facades\DB;
 use NotificationChannels\WhatsApp\Component;
 use OpenApi\Annotations as OA;
 
@@ -244,28 +245,27 @@ class CashRequisitionAPIController extends AppBaseController
     public function update($id, Request $request): JsonResponse
     {
         $input = $request->all();
-
         /** @var CashRequisition $cashRequisition */
         $cashRequisition = $this->cashRequisitionRepository->find($id);
-
         if (empty($cashRequisition)) {
             return $this->sendError(
                 __('messages.not_found', ['model' => __('models/cashRequisitions.singular')])
             );
         }
+        DB::transaction(function () use ($id, $input, $cashRequisition){
+            $cashRequisition = $this->cashRequisitionRepository->update([
+                'total_cost' => collect($input)->sum('cost')
+            ], $id);
 
-        $cashRequisition = $this->cashRequisitionRepository->update([
-            'total_cost' => collect($input)->sum('cost')
-        ], $id);
+            $newItems = collect($input)->map(function ($a) {
+                return collect($a)->except(['cost','id']);
+            });
 
-        $newItems =collect($input)->map(function ($a) {
-            return collect($a)->except(['cost']);
+            if ($cashRequisition){
+                $cashRequisition->cashRequisitionItems()->delete();
+                $cashRequisition->cashRequisitionItems()->createMany($newItems->toArray());
+            }
         });
-
-        if ($cashRequisition){
-            $cashRequisition->cashRequisitionItems()->delete();
-            $cashRequisition->cashRequisitionItems()->createMany($newItems->toArray());
-        }
 
         return $this->sendResponse(
             new CashRequisitionResource($cashRequisition),

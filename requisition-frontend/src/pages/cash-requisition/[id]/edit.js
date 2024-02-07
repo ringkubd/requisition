@@ -119,9 +119,8 @@ const Edit = (props) => {
   })
   const removeItem = (item) => {
     setSubmitRemoveProcessing(true)
-    setRequisitionData(requisitionData.filter(r => item.product_id !== r.product_id && item.product_option_id !== r.product_option_id));
+    setRequisitionData(requisitionData.filter(r => item.item !== r.item));
     setSubmitRemoveProcessing(false);
-    selectRef.current.resetSelect();
   }
 //products.filter(p => p.id == row.product_id)[0]?.product_options?.filter(o => o.id == row.product_option_id).map(o => (o.option.name + `(${o.option_value})`))[0] ?? `${row?.product_option?.option_name}(${ row?.product_option?.option_value})`,
   const tableColumns = [

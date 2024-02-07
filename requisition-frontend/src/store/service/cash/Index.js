@@ -33,7 +33,7 @@ export const CashRequisitionAPIService = createApi({
                 method: 'PUT',
                 body: params
             }),
-            providesTags: ['edit-cash-requisition'],
+            invalidatesTags: ['edit-cash-requisition', 'cash-requisition'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         deleteCashRequisition: build.mutation({
