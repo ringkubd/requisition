@@ -18,7 +18,10 @@ const IssuePrint = forwardRef(({products}, ref) => {
                             </h2>
                         </div>
                         <div>
-                            <div className={`border-2 p-1 font-normal text-xs`}>SL. {products.receiver_department?.name}/{products.id}</div>
+                            <div className={`border-2 p-1 font-normal text-xs`}>
+                                SL. {products.receiver_department?.name}/
+                                {products.id}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -33,7 +36,7 @@ const IssuePrint = forwardRef(({products}, ref) => {
                     <div className={`flex flex-row w-full justify-start`}>
                         <i className={`pr-4`}>Date: </i>
                         <p className={`underline`}>
-                            {moment(products?.issue_time).format('DD MMM Y')}
+                            {moment(products?.created_at).format('DD MMM Y')}
                         </p>
                     </div>
                 </div>
@@ -55,6 +58,12 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                         rowSpan={2}
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
                                         Name of the Item
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        rowSpan={2}
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Use Date
                                     </th>
                                     <th
                                         scope="col"
@@ -114,6 +123,9 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                                 ? '- ' +
                                                   p?.variant?.option_value
                                                 : ''}
+                                        </td>
+                                        <td className={`border p-1`}>
+                                            {moment(p?.use_date).format('DD MMM Y')}
                                         </td>
                                         <td className={`border p-1`}>
                                             {p?.purpose}

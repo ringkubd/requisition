@@ -32,7 +32,7 @@ class ProductIssueWithRateLogResource extends JsonResource
             'purpose' => $this->purpose,
             'uses_area' => $this->uses_area,
             'note' => $this->note,
-            'issue_time' => $this->productIssue->issue_time,
+            'use_date' => $this->use_date,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

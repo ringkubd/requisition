@@ -111,7 +111,7 @@ class ProductIssueAPIController extends AppBaseController
             })
             ->when($request->dateRange, function ($q, $v){
                 $dateRange = json_decode($v);
-                $q->whereRaw("date(issue_time) between '$dateRange->startDate' and '$dateRange->endDate'");
+                $q->whereRaw("date(created_at) between '$dateRange->startDate' and '$dateRange->endDate'");
             })
             ->latest()
             ->paginate();
@@ -166,7 +166,6 @@ class ProductIssueAPIController extends AppBaseController
                     'issuer_id' => $request->user()->id,
                     'issuer_branch_id' => auth_branch_id(),
                     'issuer_department_id' => auth_department_id(),
-                    'issue_time' => Carbon::parse($input[0]['issue_time'])->toDateTimeString(),
                     'receiver_id' => $input[0]['receiver_id'],
                     'receiver_branch_id' => auth_branch_id(),
                     'receiver_department_id' => auth_department_id(),
@@ -175,6 +174,7 @@ class ProductIssueAPIController extends AppBaseController
                 $input = array_map(function ($it) use ($uuid, $productIssue){
                     $it['uuid'] = $uuid;
                     $it['product_issue_id'] = $productIssue->id;
+                    $it['use_date'] =   Carbon::parse($it['issue_time'])->toDateTimeString();
                     return $it;
                 }, $input);
 

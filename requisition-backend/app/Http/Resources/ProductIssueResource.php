@@ -28,7 +28,6 @@ class ProductIssueResource extends JsonResource
             'purpose' => $this->purpose,
             'uses_area' => $this->uses_area,
             'note' => $this->note,
-            'issue_time' => $this->issue_time,
             'department_status' => $this->department_status,
             'department_approved_by' => $this->department_approved_by,
             'departmentApprovedBY' => $this->departmentApprovedBY,

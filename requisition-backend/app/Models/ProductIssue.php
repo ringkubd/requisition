@@ -72,7 +72,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         'issuer_id',
         'issuer_branch_id',
         'issuer_department_id',
-        'issue_time',
         'purpose',
         'uses_area',
         'note',

@@ -94,7 +94,7 @@ const ProductIssue = () => {
                 {
                     name: 'Issue Time',
                     selector: row =>
-                        moment(row.issue_time).format('D MMM Y @ H:mm '),
+                        moment(row.created_at).format('D MMM Y @ H:mm '),
                     sortable: true,
                 },
                 {

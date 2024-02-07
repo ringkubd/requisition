@@ -92,6 +92,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         'quantity',
         'balance_before_issue',
         'balance_after_issue',
+        'use_date',
         'purpose',
         'uses_area',
         'note'

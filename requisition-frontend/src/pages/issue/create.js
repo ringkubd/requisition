@@ -558,13 +558,13 @@ const create = (props) => {
                                                 <div className="mb-2 block">
                                                     <Label
                                                         htmlFor="issue_time"
-                                                        value="Date"
+                                                        value="Use Date"
                                                     />
                                                 </div>
                                                 <TextInput
                                                     id="issue_time"
                                                     name="issue_time"
-                                                    type="datetime-local"
+                                                    type="date"
                                                     onChange={e => {
                                                         handleChange(e)
                                                     }}

@@ -32,6 +32,7 @@ class ProductIssueItemsResource extends JsonResource
             'balance_after_issue' => $this->balance_after_issue,
             'purpose' => $this->purpose,
             'uses_area' => $this->uses_area,
+            'use_date' => $this->use_date,
             'note' => $this->note,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
