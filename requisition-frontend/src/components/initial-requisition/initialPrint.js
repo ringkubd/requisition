@@ -389,7 +389,7 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             {rp.last_purchase_date
                                                 ? moment(
                                                       rp.last_purchase_date,
-                                                  ).format('hh:mm A - DD MMM Y')
+                                                  ).format('DD MMM Y')
                                                 : ''}
                                         </td>
                                         <td className={`border p-0`}>
