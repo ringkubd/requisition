@@ -36,6 +36,9 @@ module.exports = {
             },
             a: {
                 color: 'text-red'
+            },
+            backgroundImage: {
+                noise: "url('/noise.png')"
             }
         },
     },

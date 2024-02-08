@@ -15,6 +15,7 @@ import { Badge, ListGroup, Tooltip } from "flowbite-react";
 import { DashboardAPI } from "@/store/service/dashboard";
 import { PurchaseRequisitionApi } from "@/store/service/requisitions/purchase";
 import { useSubscribePushNotificationMutation } from "@/store/service/navigation";
+import bg from "../../../public/noise.png";
 
 const AppLayout = ({ header, children }) => {
     const router = useRouter();
@@ -125,49 +126,55 @@ const AppLayout = ({ header, children }) => {
 
 
     return (
-        <div className="min-h-screen min-w-fit bg-gray-100 dark:bg-gray-100">
-            <Navigation user={user} />
-            {/* Page Heading */}
-            <header className="bg-white shadow-md flex flex-row">
-                <div className="sm:max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    {header}
-                </div>
-                <OrganizationBranch changingEffect={changingEffect} user={user} />
-            </header>
-
-            {/* Page Content */}
-            <main>
-                <Suspense fallback={<Loading />} children={children}>
-                    {load ? (
-                        <Loading />
-                    ) : children}
-                    <div className={`fixed bottom-2 right-5 h-fit w-fit`}>
-                        <Tooltip className={`flex w-full h-full justify-center items-center justify-items-center align-middle`} content={
-                            <ListGroup>
-                                {
-                                    online_users?.user_list ? online_users?.user_list?.map((user, index) => (
-                                        <ListGroup.Item key={index}>{user.name}</ListGroup.Item>
-                                    )) : <ListGroup.Item>No one is online currently.</ListGroup.Item>
-                                }
-                            </ListGroup>
-                        }>
-                            <Badge className={`h-fit w-fit text-2xl font-bold rounded-full`}>{online_users?.number_of_user ?? 0}</Badge>
-                        </Tooltip>
+        <div
+            className={` before:content-[''] before:bg-noise relative before:w-full before:h-full before:block before:absolute before:opacity-20`}>
+            <div className="min-h-screen min-w-fit relative">
+                <Navigation user={user} />
+                {/* Page Heading */}
+                <header className="bg-white shadow-md flex flex-row">
+                    <div className="sm:max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {header}
                     </div>
-                </Suspense>
-            </main>
-            <ToastContainer
-                position="bottom-right"
-                autoClose={2000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-            />
+                    <OrganizationBranch changingEffect={changingEffect} user={user} />
+                </header>
+
+                {/* Page Content */}
+                <main>
+                    <Suspense fallback={<Loading />} children={children}>
+                        {load ? (
+                            <Loading />
+                        ) : children}
+                        <div className={`fixed bottom-2 right-5 h-fit w-fit`}>
+                            <Tooltip
+                                className={`flex w-full h-full justify-center items-center justify-items-center align-middle`}
+                                content={
+                                    <ListGroup>
+                                        {
+                                            online_users?.user_list ? online_users?.user_list?.map((user, index) => (
+                                                <ListGroup.Item key={index}>{user.name}</ListGroup.Item>
+                                            )) : <ListGroup.Item>No one is online currently.</ListGroup.Item>
+                                        }
+                                    </ListGroup>
+                                }>
+                                <Badge
+                                    className={`h-fit w-fit text-2xl font-bold rounded-full`}>{online_users?.number_of_user ?? 0}</Badge>
+                            </Tooltip>
+                        </div>
+                    </Suspense>
+                </main>
+                <ToastContainer
+                    position="bottom-right"
+                    autoClose={2000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                />
+            </div>
         </div>
     )
 }
