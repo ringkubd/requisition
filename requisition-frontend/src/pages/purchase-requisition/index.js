@@ -1,6 +1,6 @@
 import Head from "next/head";
 import AppLayout from "@/components/Layouts/AppLayout";
-import { wrapper } from "@/store";
+import { dispatch, wrapper } from "@/store";
 import { Button, Card, Datepicker, TextInput } from "flowbite-react";
 import DataTable from 'react-data-table-component';
 import NavLink from "@/components/navLink";
@@ -16,6 +16,7 @@ import {
 } from "@/store/service/requisitions/purchase";
 import moment from "moment";
 import { AiOutlineSearch } from "react-icons/ai";
+import { InitialRequisitionApi } from "@/store/service/requisitions/initial";
 
 const PurchaseRequisition = () => {
     const router = useRouter();
@@ -27,7 +28,8 @@ const PurchaseRequisition = () => {
 
     useEffect(() => {
         if (!destroyResponse.isLoading && destroyResponse.isSuccess){
-            toast.success('Options deleted.')
+            toast.success('Requisition deleted.')
+            dispatch(InitialRequisitionApi.util.invalidateTags(['initial-requisition']));
         }
     }, [destroyResponse])
     useEffect(() => {
