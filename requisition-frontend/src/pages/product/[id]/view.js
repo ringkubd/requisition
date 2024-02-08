@@ -248,8 +248,9 @@ const View = (props) => {
                                                     {/*    Qty.</Table.HeadCell>*/}
                                                     <Table.HeadCell
                                                         className={`border border-gray-300`}>Total</Table.HeadCell>
-                                                    <Table.HeadCell className={`border border-gray-300`}>Issue
+                                                    <Table.HeadCell className={`border border-gray-300`}>Use
                                                         Date</Table.HeadCell>
+                                                    <Table.HeadCell className={`border border-gray-300`}>Issue @</Table.HeadCell>
                                                     {/*<Table.HeadCell className={`border border-gray-300`}>Expiry*/}
                                                     {/*    Date</Table.HeadCell>*/}
                                                 </Table.Head>
@@ -279,8 +280,8 @@ const View = (props) => {
                                                                                 className={`border border-gray-300`}>{parseFloat(pur?.total_price).toLocaleString()}</Table.Cell>
                                                                             <Table.Cell
                                                                                 className={`border border-gray-300`}>{pur?.use_date ? moment(pur?.use_date).format("DD MMM YYYY") : null}</Table.Cell>
-                                                                            {/*<Table.Cell*/}
-                                                                            {/*    className={`border border-gray-300`}>{pur.expiry_date ? moment(pur.expiry_date).format("DD MMM YYYY") : ''}</Table.Cell>*/}
+                                                                            <Table.Cell
+                                                                                className={`border border-gray-300`}>{pur.created_at ? moment(pur.created_at).format("DD MMM YYYY @ HH:m:ss") : ''}</Table.Cell>
                                                                         </Table.Row>
                                                                     ))
                                                                 }
