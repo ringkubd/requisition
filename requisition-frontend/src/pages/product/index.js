@@ -58,11 +58,11 @@ const Product = () => {
                     selector: row => row.category?.title,
                     sortable: true,
                 },
-                {
-                    name: 'Last Purchase',
-                    selector: row => row.last_purchase?.created_at ? moment(row.last_purchase?.created_at).format('DD MMM Y') : null,
-                    sortable: true,
-                },
+                // {
+                //     name: 'Last Purchase',
+                //     selector: row => row.last_purchase?.created_at ? moment(row.last_purchase?.created_at).format('DD MMM Y') : null,
+                //     sortable: true,
+                // },
                 {
                     name: 'Actions',
                     cell: (row) => <Actions
