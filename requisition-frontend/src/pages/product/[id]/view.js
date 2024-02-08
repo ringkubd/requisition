@@ -278,7 +278,7 @@ const View = (props) => {
                                                                             <Table.Cell
                                                                                 className={`border border-gray-300`}>{parseFloat(pur?.total_price).toLocaleString()}</Table.Cell>
                                                                             <Table.Cell
-                                                                                className={`border border-gray-300`}>{pur?.issue_time ? moment(pur?.issue_time).format("DD MMM YYYY") : null}</Table.Cell>
+                                                                                className={`border border-gray-300`}>{pur?.use_date ? moment(pur?.use_date).format("DD MMM YYYY") : null}</Table.Cell>
                                                                             {/*<Table.Cell*/}
                                                                             {/*    className={`border border-gray-300`}>{pur.expiry_date ? moment(pur.expiry_date).format("DD MMM YYYY") : ''}</Table.Cell>*/}
                                                                         </Table.Row>
