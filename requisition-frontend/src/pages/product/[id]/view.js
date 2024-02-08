@@ -281,7 +281,7 @@ const View = (props) => {
                                                                             <Table.Cell
                                                                                 className={`border border-gray-300`}>{pur?.use_date ? moment(pur?.use_date).format("DD MMM YYYY") : null}</Table.Cell>
                                                                             <Table.Cell
-                                                                                className={`border border-gray-300`}>{pur.created_at ? moment(pur.created_at).format("DD MMM YYYY @ HH:m:ss") : ''}</Table.Cell>
+                                                                                className={`border border-gray-300`}>{pur.created_at ? moment(pur.created_at).format("DD MMM YYYY @ HH:mm:ss") : ''}</Table.Cell>
                                                                         </Table.Row>
                                                                     ))
                                                                 }
