@@ -1,4 +1,5 @@
-import React from "react";
+import React from "react"
+import { useAuth } from "@/hooks/auth";
 const toBase64 = file => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -39,6 +40,14 @@ function isCompositeTypeElement(element) {
     return isElement(element) && typeof element.type === 'function';
 }
 
+function hasPermission(permission, user){
+    if (user && user.permissions){
+        return user.permissions.map(p => p.name === permission).length ||
+            user.role_object?.map(r => r.name === "Super Admin").length ||
+            user.role_object?.permissions?.map(p => p.name === permission).length
+    }
+    return false;
+}
 
 
 export {
@@ -48,5 +57,6 @@ export {
     isDOMTypeElement,
     isElement,
     isFunctionComponent,
-    isReactComponent
+    isReactComponent,
+    hasPermission,
 }

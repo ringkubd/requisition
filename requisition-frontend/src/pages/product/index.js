@@ -17,6 +17,8 @@ import {
 import moment from "moment";
 import Select from "react-select";
 import { useGetCategoryQuery } from "@/store/service/category";
+import { hasPermission } from "@/lib/helpers";
+import { useAuth } from "@/hooks/auth";
 
 
 const Product = () => {
@@ -26,6 +28,7 @@ const Product = () => {
     const [destroy, destroyResponse] = useDestroyProductMutation();
     const [columns, setColumns] = useState([]);
     const {data: category, isLoading: categoryISLoading} = useGetCategoryQuery();
+    const { user } = useAuth();
 
     useEffect(() => {
         if (!destroyResponse.isLoading && destroyResponse.isSuccess){
@@ -96,12 +99,17 @@ const Product = () => {
                 <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
                     <Card>
                         <div className="flex flex-row space-x-4 shadow-lg py-4 px-4">
-                            <NavLink
-                                active={router.pathname === 'product/create'}
-                                href={`product/create`}
-                            >
-                                <Button>Create</Button>
-                            </NavLink>
+                            {
+                                hasPermission('create_products', user) ? (
+                                    <NavLink
+                                        active={router.pathname === 'product/create'}
+                                        href={`product/create`}
+                                    >
+                                        <Button>Create</Button>
+                                    </NavLink>
+                                ) : null
+                            }
+
                             <div className={`flex flex-row justify-center space-x-4 items-center`}>
                                 <Label htmlFor={`category`} value={`Category`} />
                                 <Select
