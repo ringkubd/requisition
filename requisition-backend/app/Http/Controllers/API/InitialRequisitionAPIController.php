@@ -308,12 +308,12 @@ class InitialRequisitionAPIController extends AppBaseController
                 unset($p['product_option']);
                 unset($p['stock']);
                 if (array_key_exists('last_purchase_date', $p) && ($p['last_purchase_date'] == "" || $p['last_purchase_date'] == null)){
-                    $p['last_purchase_date'] = Carbon::now()->toDateString();
+                    $p['last_purchase_date'] = null;
                 }else{
                     $p['last_purchase_date'] = Carbon::parse($p['last_purchase_date'])->toDateString();
                 }
                 if (!array_key_exists('last_purchase_date', $p)){
-                    $p['last_purchase_date'] = Carbon::now()->toDateString();
+                    $p['last_purchase_date'] = null;
                 }
                 return $p;
             }, $allProduct);

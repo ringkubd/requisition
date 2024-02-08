@@ -1,16 +1,16 @@
-import React, {useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useSingleProductQuery } from "@/store/service/product/product";
-import Select from "react-select";
+import { Select } from "flowbite-react";
 
 const UpdateVariantForm = ({row, changeProduct}) => {
     const reference = useRef();
+    const [value, setValue] = useState(row.product_option_id);
     const {data, isLoading, isSuccess, isError, refetch} = useSingleProductQuery(row.product_id, {
         skip: !row.product_id,
     });
 
     const updateProduct = (e, newProductOption) => {
-        const newOptionId = e.target.value;
-        newProductOption['product'] = row;
+        newProductOption['product'] = row.product;
         return changeProduct(newProductOption);
     }
     return (
@@ -19,16 +19,26 @@ const UpdateVariantForm = ({row, changeProduct}) => {
                 isSuccess && (
                     <Select
                         ref={reference}
-                        onChange={(newValue) => {
-                            updateProduct(newValue?.value, newValue?.data);
+                        onChange={(e) => {
+                            if ( e.target.selectedOptions[0].dataset?.data){
+                                updateProduct(e.target.value, JSON.parse(e.target.selectedOptions[0].dataset?.data));
+                            }
+                            setValue(e.target.value)
                         }}
-                        value={{value: row.product_option_id, label: row.product_option?.option_value}}
-                        options={ data?.data?.product_options?.map((po)=> ({value: po.id, label: po.option_value, data: po}))}
+                        value={value}
                         className={`select`}
                         classNames={{
                             control: state => `select`
                         }}
-                    />
+                    >
+                        <option value=""></option>
+                        {
+                            data?.data?.product_options?.map((po) => (
+                                <option data-data={JSON.stringify(po)} key={po.id} value={po.id}>{po.option_value}</option>
+                            ))
+                        }
+
+                    </Select>
                 )
             }
         </div>

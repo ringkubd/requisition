@@ -88,7 +88,7 @@ const Edit = (props) => {
 
     const updateItems = (values) => {
         const updated = requisitionData.map((rd) => {
-            if (rd.id == values.id && rd.product_id == values.product_id){
+            if (rd.product_id === values.product_id){
                 return {
                     product_id: values.product_id,
                     product_option_id: values.id,
@@ -104,10 +104,14 @@ const Edit = (props) => {
             }
             return rd;
         })
+        // console.log(requisitionData, updated)
+        // console.log(values)
+        setRequisitionData(updated);
+        // console.log(values)
     }
     const updateOtherItems = (label, value, row) => {
         const newRequisitionData = requisitionData.map((rd) => {
-            if (row.product_id == rd.product_id && row.product_option_id == rd.product_option_id){
+            if (row.product_id === rd.product_id && row.product_option_id === rd.product_option_id){
                 rd[label] = value
                 return rd;
             }
@@ -115,7 +119,6 @@ const Edit = (props) => {
         })
         setRequisitionData(newRequisitionData);
         selectRef.current.clearValue();
-        selectRef.current.removeValue()
     }
 
     const validationSchema = Yup.object().shape({
@@ -135,7 +138,7 @@ const Edit = (props) => {
         {
             name: 'Product',
             selector: row => {
-                return products.filter(p => p.id == row.product_id)[0]?.title ?? row?.product?.title
+                return products.filter(p => p.id === row.product_id)[0]?.title ?? row?.product?.title
             },
             sortable: true,
         },
@@ -157,7 +160,7 @@ const Edit = (props) => {
             name: 'Required Quantity',
             selector: row => <TextInput value={row.required_quantity} onChange={(e) => {
                 const newRequisitionData = requisitionData.map((rd) => {
-                    if (row.product_id == rd.product_id && row.product_option_id == rd.product_option_id){
+                    if (row.product_id === rd.product_id && row.product_option_id === rd.product_option_id){
                         return {
                             ...rd,
                             required_quantity: e.target.value,

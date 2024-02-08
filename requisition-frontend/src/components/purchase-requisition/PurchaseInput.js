@@ -9,12 +9,12 @@ const PurchaseInput = forwardRef(({ row, price, unit_price,...rest }, ref) => {
     const [updateRow, setUpdateRow] = useState(row);
     const onInputChange = async e => {
       const {name, value} = e.target;
-      var newRow = row;
-      if (unit_price){
-        newRow = {...row, unit_price: value}
-      }else{
-        newRow = {...row, price: value}
-      }
+        let newRow
+        if (unit_price) {
+            newRow = { ...row, unit_price: value }
+        } else {
+            newRow = { ...row, price: value }
+        }
       setUnitPrice(value);
       setUpdateRow(newRow);
       dispatch(updatePurchaseRequisitionData(newRow))
