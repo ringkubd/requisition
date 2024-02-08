@@ -94,7 +94,10 @@ const PurchaseRequisition = () => {
         }
     }, [isLoading, isError, data]);
 
-
+    const conditionalRowStyles = [{
+        when: row => row?.current_status?.status == 'Rejected',
+        style: row => ({ backgroundColor:'#f5e6f1', boxShadow: '10px 10px red', textShadow: 'text-shadow: 2px 2px red' }),
+    }];
     return (
         <>
             <Head>
@@ -157,6 +160,7 @@ const PurchaseRequisition = () => {
                                 per_page: currentRowsPerPage
                             })}
                             paginationTotalRows={data?.number_of_rows}
+                            conditionalRowStyles={conditionalRowStyles}
                         />
                     </Card>
                 </div>
