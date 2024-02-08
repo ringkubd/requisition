@@ -19,7 +19,7 @@ const IssuePrint = forwardRef(({products}, ref) => {
                         </div>
                         <div>
                             <div className={`border-2 p-1 font-normal text-xs`}>
-                                SL. {products.receiver_department?.name}/
+                                {products.receiver_department?.name}/
                                 {products.id}
                             </div>
                         </div>
