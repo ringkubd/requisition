@@ -1,21 +1,14 @@
-import { forwardRef, useState } from "react";
+'use client'
+import { forwardRef, useEffect, useState } from "react";
 import moment from "moment";
 import './Print.module.css';
 import Loading from "@/components/loading";
 
-const IssueReport = forwardRef(({data, isLoading}, ref) => {
+const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
     const {issues} = data ?? {};
     if (isLoading){
         return <Loading />
     }
-    const [activeColumn, setActiveColumn] = useState({
-        category: true,
-        variant: true,
-        date: true,
-        issuer: true,
-        dep: true,
-    });
-
     return (
         <div
             className={`flex flex-col m-2 justify-center justify-items-center p-4 shadow-none`}
@@ -30,20 +23,21 @@ const IssueReport = forwardRef(({data, isLoading}, ref) => {
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
                         SL#
                     </th>
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
-                        Category
-                    </th>
                     {
-                        activeColumn.category ? (
+                        columns.category ? (
                             <th
                                 scope="col"
                                 className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
-                                Item
+                                Category
                             </th>
                         ) : null
                     }
+                    <th
+                        scope="col"
+                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
+                        Item
+                    </th>
+
                     <th
                         scope="col"
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
@@ -54,26 +48,38 @@ const IssueReport = forwardRef(({data, isLoading}, ref) => {
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
                         Issue Date
                     </th>
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
-                        Issuer
-                    </th>
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
-                        Dep.
-                    </th>
+                    {
+                        columns.issuer  ? (
+                            <th
+                                scope="col"
+                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
+                                Issuer
+                            </th>
+                        ) : null
+                    }
+                    {
+                        columns.department === true ? (
+                            <th
+                                scope="col"
+                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
+                                Dep. {columns.department ? 12 : 34}
+                            </th>
+                        ) : null
+                    }
                     <th
                         scope="col"
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} colSpan={3}>
                         Balance
                     </th>
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}  rowSpan={2}>
-                        Avg. Rate
-                    </th>
+                    {
+                        columns.avg ? (
+                            <th
+                                scope="col"
+                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}  rowSpan={2}>
+                                Avg. Rate
+                            </th>
+                        ) : null
+                    }
                     <th
                         scope="col"
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
@@ -110,11 +116,11 @@ const IssueReport = forwardRef(({data, isLoading}, ref) => {
                                         <>
                                             <td
                                                 className={`border p-0`}
-                                                 rowSpan={activeColumn.category ? issues[d].length : 1}>
+                                                rowSpan={issues[d].length}>
                                                 {i + 1}
                                             </td>
                                             {
-                                                activeColumn.category ? (
+                                                columns.category ? (
                                                     <td
                                                         className={`border p-0 break-words`}
                                                         rowSpan={issues[d].length}>
@@ -122,6 +128,7 @@ const IssueReport = forwardRef(({data, isLoading}, ref) => {
                                                     </td>) : null }
                                         </>
                                     ) : null}
+
                                     <td className={`border p-0`}>
                                         {item.product?.title}
                                     </td>
@@ -131,16 +138,23 @@ const IssueReport = forwardRef(({data, isLoading}, ref) => {
                                             item.product_issue.issue_time,
                                         ).format('DD MMM Y')}
                                     </td>
-                                    <td
-                                        className={`border p-0 break-words`}>
-                                        {item.product_issue?.issuer?.name}
-                                    </td>
-                                    <td className={`border p-0`}>
-                                        {
-                                            item.product_issue
-                                                ?.issuer_department?.name
-                                        }
-                                    </td>
+                                    {
+                                        columns.issuer ? (
+                                            <td
+                                                className={`border p-0 break-words`}>
+                                                {item.product_issue?.issuer?.name}
+                                            </td>
+                                        ) : null
+                                    }
+                                    {
+                                        columns.issuer ? (
+                                            <td className={`border p-0`}>
+                                                {
+                                                    item.product_issue
+                                                        ?.issuer_department?.name
+                                                }
+                                            </td>
+                                        ) : null}
                                     <td className={`border p-0`}>
                                         {item.balance_before_issue}
                                         {item.product?.unit}
@@ -153,9 +167,13 @@ const IssueReport = forwardRef(({data, isLoading}, ref) => {
                                         {item.balance_after_issue}
                                         {item.product?.unit}
                                     </td>
-                                    <td className={`border p-0`}>
-                                        {item.average_rate}
-                                    </td>
+                                    {
+                                        columns.avg ? (
+                                            <td className={`border p-0`}>
+                                                {item.average_rate}
+                                            </td>
+                                        ) : null
+                                    }
                                     <td className={`border p-0`}>
                                         {item.total_price}
                                     </td>
@@ -164,7 +182,7 @@ const IssueReport = forwardRef(({data, isLoading}, ref) => {
                         </>
                     ))}
                 <tr>
-                    <th colSpan={11} className={`text-right border`}>
+                    <th colSpan={7+Object.keys(Object.filter(columns, ([name, status]) => status === true)).length} className={`text-right border`}>
                         Total
                     </th>
                     <th className={`text-center border`}>

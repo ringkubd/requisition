@@ -127,11 +127,11 @@ const AppLayout = ({ header, children }) => {
 
     return (
         <div
-            className={` before:content-[''] before:bg-noise relative before:w-full before:h-full before:block before:absolute before:opacity-20`}>
+            className={`before:content-[''] before:bg-noise relative before:w-full before:h-full before:block before:absolute before:opacity-20 shadow-lg`}>
             <div className="min-h-screen min-w-fit relative" style={{background: 'rgb(67,129,216, .2)'}}>
                 <Navigation user={user} />
                 {/* Page Heading */}
-                <header className="bg-white shadow-md flex flex-row">
+                <header className="bg-white shadow-md flex flex-row before:content-[''] before:bg-noise relative before:w-full before:h-full before:block before:absolute before:opacity-5">
                     <div className="sm:max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {header}
                     </div>

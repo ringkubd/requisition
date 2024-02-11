@@ -1,12 +1,12 @@
 import AppLayout from "@/components/Layouts/AppLayout";
 import Head from "next/head";
-import { Button, Card, Label, Radio } from "flowbite-react";
+import { Button, Card, Checkbox, Label, Radio } from "flowbite-react";
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import Select from "react-select";
 import { useGetNavigationDepartmentQuery } from "@/store/service/navigation";
 import { useGetCategoryQuery } from "@/store/service/category";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useGetProductQuery } from "@/store/service/product/product";
 import { ErrorMessage, Formik } from "formik";
 import * as Yup from 'yup';
@@ -14,10 +14,10 @@ import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment";
 import PurchaseReport from "@/components/report/purchaseReport";
 import IssueReport from "@/components/report/issueReport";
-
 import { useIssuesReportMutation, usePurchaseReportMutation } from "@/store/service/report";
 import { useReactToPrint } from "react-to-print";
 
+Object.filter = (obj, predicate) => Object.fromEntries(Object.entries(obj).filter(predicate));
 const Report = () => {
     const router = useRouter();
     const [selectedCategory, setSelectedCategory] = useState(false);
@@ -27,10 +27,16 @@ const Report = () => {
         skip: !selectedCategory
     });
     const [submitIssueReport, {data: issueReports, isLoading:issueReportsISLoading, isError:issueReportsISError, isSuccess: issueReportsISSuccess}] = useIssuesReportMutation();
-    const [submitPurchaseReport, {data: purchaseReport, isLoading:PurchaseReportISLoading, isError:PurchaseReportISError, isSuccess: PurchaseReportISSuccess}] = usePurchaseReportMutation();
+    const [submitPurchaseReport, {data: purchaseReport, isLoading: purchaseReportISLoading, isError:purchaseReportISError, isSuccess: purchaseReportISSuccess}] = usePurchaseReportMutation();
 
     const printRef = useRef();
     const [reportType, setReportType] = useState('usage');
+    const [columns, setColumns] = useState({
+        category: true,
+        issuer: true,
+        department: true,
+        avg: true
+    });
 
     const {start_date, end_date} = issueReports ?? purchaseReport ?? {};
 
@@ -76,6 +82,24 @@ const Report = () => {
         content: () => printRef.current,
         onBeforePrint: (a) => console.log(a)
     });
+
+    useEffect(() => {
+        if (reportType === "purchase"){
+            setColumns({
+                category: true,
+                supplier: true,
+                department: true,
+            })
+        }else if(reportType === "usage"){
+            setColumns({
+                category: true,
+                issuer: true,
+                department: true,
+                avg: true
+            });
+        }
+    }, [reportType])
+
     return (
         <AppLayout
             header={
@@ -99,13 +123,13 @@ const Report = () => {
                             onSubmit={submit}
                             validationSchema={validationSchema}>
                             {({
-                                  handleSubmit,
-                                  handleChange,
-                                  values,
-                                  errors,
-                                  isSubmitting,
-                                  setFieldValue,
-                              }) => (
+                                handleSubmit,
+                                handleChange,
+                                values,
+                                errors,
+                                isSubmitting,
+                                setFieldValue,
+                            }) => (
                                 <div
                                     className={`flex flex-col w-full space-y-6`}>
                                     <div className="flex flex-col sm:flex-row sm:space-x-4">
@@ -162,6 +186,32 @@ const Report = () => {
                                                 </Label>
                                             </div>
                                         </fieldset>
+                                        <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
+                                            <legend className="mb-4 font-bold">
+                                                Columns
+                                            </legend>
+                                            {Object.keys(columns).map(
+                                                (c, i) => (
+                                                    <div className="flex items-center gap-2" key={i}>
+                                                        <Checkbox
+                                                            id={c}
+                                                            name="column"
+                                                            defaultChecked={columns[c]}
+                                                            onChange={e => {
+                                                                handleChange(e)
+                                                                columns[c] = e.target.checked
+                                                                setColumns(columns);
+                                                            }}
+                                                        />
+                                                        <Label
+                                                            htmlFor={c}
+                                                            className={`font-bold`}>
+                                                            {c.toLocaleUpperCase()}
+                                                        </Label>
+                                                    </div>
+                                                ),
+                                            )}
+                                        </fieldset>
                                     </div>
                                     <div
                                         className={`flex flex-col sm:flex-row w-full sm:space-x-4`}>
@@ -186,7 +236,7 @@ const Report = () => {
                                                 }}
                                                 value={{
                                                     startDate:
-                                                    values.start_date,
+                                                        values.start_date,
                                                     endDate: values.end_date,
                                                 }}
                                             />
@@ -202,12 +252,9 @@ const Report = () => {
                                                 id={`department`}
                                                 className={`select`}
                                                 classNames={{
-                                                    control: state =>
-                                                        'select',
+                                                    control: state => 'select',
                                                 }}
-                                                isLoading={
-                                                    departmentISLoading
-                                                }
+                                                isLoading={departmentISLoading}
                                                 options={departments?.data?.map(
                                                     d => ({
                                                         label: d.name,
@@ -217,15 +264,12 @@ const Report = () => {
                                                 onChange={newValue =>
                                                     setFieldValue(
                                                         'department',
-                                                        newValue?.value ??
-                                                        '',
+                                                        newValue?.value ?? '',
                                                     )
                                                 }
                                                 isClearable={true}
                                             />
-                                            <ErrorMessage
-                                                name={'department'}
-                                            />
+                                            <ErrorMessage name={'department'} />
                                         </div>
                                     </div>
                                     <div
@@ -259,7 +303,7 @@ const Report = () => {
                                                             options: [
                                                                 {
                                                                     label:
-                                                                    c.title,
+                                                                        c.title,
                                                                     value: c.id,
                                                                 },
                                                                 ...sub,
@@ -354,7 +398,11 @@ const Report = () => {
                                         className={`flex flex-col justify-center items-center justify-items-center text-center`}>
                                         <p
                                             className={`py-1 px-4 underline bg-gray-300 w-fit`}>
-                                            Product { reportType === "purchase" ? 'Purchase' : 'Issue'} Report
+                                            Product{' '}
+                                            {reportType === 'purchase'
+                                                ? 'Purchase'
+                                                : 'Issue'}{' '}
+                                            Report
                                         </p>
                                     </div>
                                     <div
@@ -364,24 +412,30 @@ const Report = () => {
                                             Date:{' '}
                                             {start_date
                                                 ? moment(start_date).format(
-                                                    'DD MMM Y',
-                                                )
+                                                      'DD MMM Y',
+                                                  )
                                                 : ''}{' '}
                                             -{' '}
                                             {end_date
                                                 ? moment(end_date).format(
-                                                    'DD MMM Y',
-                                                )
+                                                      'DD MMM Y',
+                                                  )
                                                 : ''}
                                         </i>
                                     </div>
                                 </div>
                                 {reportType === 'purchase' ? (
-                                    <PurchaseReport data={purchaseReport} />
+                                    <PurchaseReport
+                                        data={purchaseReport}
+                                        columns={columns}
+                                        isLoading={purchaseReportISLoading}
+                                    />
                                 ) : (
                                     <IssueReport
                                         isLoading={issueReportsISLoading}
                                         data={issueReports}
+                                        columns={columns}
+                                        key={Object.keys(Object.filter(columns, ([name, status]) => status === true)).length * Math.random()}
                                     />
                                 )}
                             </div>
