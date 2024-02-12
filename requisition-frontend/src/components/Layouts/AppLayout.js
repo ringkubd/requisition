@@ -127,7 +127,7 @@ const AppLayout = ({ header, children }) => {
 
     return (
         <div
-            className={`before:content-[''] before:bg-noise relative before:w-full before:h-full before:block before:absolute before:opacity-20 shadow-lg`}>
+            className={`before:content-[''] before:bg-noise relative sm:before:w-[100%] before:h-full before:block before:absolute before:opacity-20 shadow-lg`}>
             <div className="min-h-screen min-w-fit relative" style={{background: 'rgb(67,129,216, .2)'}}>
                 <Navigation user={user} />
                 {/* Page Heading */}

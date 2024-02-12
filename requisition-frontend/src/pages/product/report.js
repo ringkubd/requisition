@@ -16,6 +16,7 @@ import PurchaseReport from "@/components/report/purchaseReport";
 import IssueReport from "@/components/report/issueReport";
 import { useIssuesReportMutation, usePurchaseReportMutation } from "@/store/service/report";
 import { useReactToPrint } from "react-to-print";
+import ItemBaseIssueReport from "@/components/report/itemBaseIssueReport";
 
 Object.filter = (obj, predicate) => Object.fromEntries(Object.entries(obj).filter(predicate));
 const Report = () => {
@@ -31,6 +32,7 @@ const Report = () => {
 
     const printRef = useRef();
     const [reportType, setReportType] = useState('usage');
+    const [reportFormat, setReportFormat] = useState('category_base');
     const [columns, setColumns] = useState({
         category: true,
         issuer: true,
@@ -47,6 +49,7 @@ const Report = () => {
         end_date: moment().format('Y-MM-DD'),
         product: '',
         report_type: 'usage',
+        report_format: 'category_base'
     };
 
     const submit = (values, formikHelper) => {
@@ -132,7 +135,7 @@ const Report = () => {
                             }) => (
                                 <div
                                     className={`flex flex-col w-full space-y-6`}>
-                                    <div className="flex flex-col sm:flex-row sm:space-x-4">
+                                    <div className="flex flex-col md:flex-row md:space-x-4">
                                         <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
                                             <legend className="mb-4 font-bold">
                                                 Report Type
@@ -192,15 +195,22 @@ const Report = () => {
                                             </legend>
                                             {Object.keys(columns).map(
                                                 (c, i) => (
-                                                    <div className="flex items-center gap-2" key={i}>
+                                                    <div
+                                                        className="flex items-center gap-2"
+                                                        key={i}>
                                                         <Checkbox
                                                             id={c}
                                                             name="column"
-                                                            defaultChecked={columns[c]}
+                                                            defaultChecked={
+                                                                columns[c]
+                                                            }
                                                             onChange={e => {
                                                                 handleChange(e)
-                                                                columns[c] = e.target.checked
-                                                                setColumns(columns);
+                                                                columns[c] =
+                                                                    e.target.checked
+                                                                setColumns(
+                                                                    columns,
+                                                                )
                                                             }}
                                                         />
                                                         <Label
@@ -211,6 +221,58 @@ const Report = () => {
                                                     </div>
                                                 ),
                                             )}
+                                        </fieldset>
+                                        <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
+                                            <legend className="mb-4 font-bold">
+                                                Report Format
+                                            </legend>
+
+                                            <div className="flex items-center gap-2">
+                                                <Radio
+                                                    id="category_base"
+                                                    name="report_format"
+                                                    defaultChecked={
+                                                        values.report_format ===
+                                                        'category_base'
+                                                    }
+                                                    onChange={e => {
+                                                        handleChange(e)
+                                                        if (e.target.checked) {
+                                                            setReportFormat(
+                                                                'category_base',
+                                                            )
+                                                        }
+                                                    }}
+                                                />
+                                                <Label
+                                                    htmlFor="category_base"
+                                                    className={`font-bold`}>
+                                                    Category Base
+                                                </Label>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Radio
+                                                    id="item_base"
+                                                    name="report_format"
+                                                    defaultChecked={
+                                                        values.report_format ===
+                                                        'item_base'
+                                                    }
+                                                    onChange={e => {
+                                                        handleChange(e)
+                                                        if (e.target.checked) {
+                                                            setReportFormat(
+                                                                'item_base',
+                                                            )
+                                                        }
+                                                    }}
+                                                />
+                                                <Label
+                                                    htmlFor="item_base"
+                                                    className={`font-bold`}>
+                                                    Item Base
+                                                </Label>
+                                            </div>
                                         </fieldset>
                                     </div>
                                     <div
@@ -430,14 +492,35 @@ const Report = () => {
                                         columns={columns}
                                         isLoading={purchaseReportISLoading}
                                     />
-                                ) : (
+                                ) : reportFormat === 'category_base' ? (
                                     <IssueReport
                                         isLoading={issueReportsISLoading}
                                         data={issueReports}
                                         columns={columns}
-                                        key={Object.keys(Object.filter(columns, ([name, status]) => status === true)).length * Math.random()}
+                                        key={
+                                            Object.keys(
+                                                Object.filter(
+                                                    columns,
+                                                    ([name, status]) =>
+                                                        status === true,
+                                                ),
+                                            ).length * Math.random()
+                                        }
                                     />
-                                )}
+                                ) : <ItemBaseIssueReport
+                                    isLoading={issueReportsISLoading}
+                                    data={issueReports}
+                                    columns={columns}
+                                    key={
+                                        Object.keys(
+                                            Object.filter(
+                                                columns,
+                                                ([name, status]) =>
+                                                    status === true,
+                                            ),
+                                        ).length * Math.random()
+                                    }
+                                />}
                             </div>
                         </div>
                     </div>

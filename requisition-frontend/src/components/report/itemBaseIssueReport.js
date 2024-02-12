@@ -4,8 +4,9 @@ import moment from "moment";
 import './Print.module.css';
 import Loading from "@/components/loading";
 
-const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
+const ItemBaseIssueReport = forwardRef(({data, isLoading, columns}, ref) => {
     const {issues} = data ?? {};
+    console.log(issues)
     if (isLoading){
         return <Loading />
     }
@@ -28,14 +29,14 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                             <th
                                 scope="col"
                                 className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
-                                Category
+                                Item
                             </th>
                         ) : null
                     }
                     <th
                         scope="col"
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
-                        Item
+                        Category
                     </th>
 
                     <th
@@ -49,7 +50,7 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                         Issue Date
                     </th>
                     {
-                        columns.issuer  ? (
+                        columns.issuer ? (
                             <th
                                 scope="col"
                                 className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
@@ -75,7 +76,7 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                         columns.avg ? (
                             <th
                                 scope="col"
-                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}  rowSpan={2}>
+                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
                                 Avg. Rate
                             </th>
                         ) : null
@@ -119,23 +120,23 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                                                 rowSpan={issues[d].length}>
                                                 {i + 1}
                                             </td>
+                                            <td
+                                                className={`border p-0 break-words`}
+                                                rowSpan={issues[d].length}>
+                                                {d}
+                                            </td>
                                             {
                                                 columns.category ? (
-                                                    <td
-                                                        className={`border p-0 break-words`}
-                                                        rowSpan={issues[d].length}>
-                                                        {d}
-                                                    </td>) : null }
+                                                    <td className={`border p-0`} rowSpan={issues[d].length}>
+                                                        {item.category.title}
+                                                    </td>
+                                                ) : null}
                                         </>
                                     ) : null}
-
-                                    <td className={`border p-0`}>
-                                        {item.product?.title}
-                                    </td>
                                     <td>{item.variant?.option_value}</td>
                                     <td className={`border p-0`}>
                                         {moment(
-                                            item.use_date,
+                                            item.product_issue.issue_time,
                                         ).format('DD MMM Y')}
                                     </td>
                                     {
@@ -182,7 +183,8 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                         </>
                     ))}
                 <tr>
-                    <th colSpan={7+Object.keys(Object.filter(columns, ([name, status]) => status === true)).length} className={`text-right border`}>
+                    <th colSpan={7 + Object.keys(Object.filter(columns, ([name, status]) => status === true)).length}
+                        className={`text-right border`}>
                         Total
                     </th>
                     <th className={`text-center border`}>
@@ -202,4 +204,4 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
     )
 });
 
-export default IssueReport;
+export default ItemBaseIssueReport;

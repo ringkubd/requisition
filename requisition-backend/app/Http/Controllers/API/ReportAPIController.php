@@ -70,6 +70,7 @@ class ReportAPIController extends AppBaseController
         $products = explode(',',$request->product);
         $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
         $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
+        $report_format = $request->report_format;
 
         $issues = ProductIssueItemReportResource::collection(ProductIssueItems::query()
             ->when(!empty($request->category), function ($q) use ($categories){
@@ -90,10 +91,10 @@ class ReportAPIController extends AppBaseController
                     ->where('store_status', 1);
             })
 
-            ->latest()
+            ->latest('updated_at')
             ->get());
         return  response()->json([
-            'issues' => $issues->collection->groupBy('category.title'),
+            'issues' => $report_format === "category_base" ? $issues->collection->groupBy('category.title') : $issues->collection->groupBy('product.title'),
             'start_date' => $first,
             'end_date' => $last
         ]);
