@@ -43,33 +43,6 @@ const ItemBaseIssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                         Variant
                     </th>
-                    {
-                        columns.use_date ? (
-                            <th
-                                scope="col"
-                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                                Use Date
-                            </th>
-                        ) : null
-                    }
-                    {
-                        columns.issuer ? (
-                            <th
-                                scope="col"
-                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                                Issuer
-                            </th>
-                        ) : null
-                    }
-                    {
-                        columns.department === true ? (
-                            <th
-                                scope="col"
-                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                                Dep.
-                            </th>
-                        ) : null
-                    }
                     <th
                         scope="col"
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
@@ -111,33 +84,6 @@ const ItemBaseIssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                                         </td>
                                     ) : null}
                                 <td>{issues[d][0].variant?.option_value}</td>
-                                {
-                                    columns.use_date ? (
-                                        <td className={`border p-0`}>
-                                            { issues[d].reduce((o, n) => {
-                                                return o + (o !== "" ? "," : "") + (!o.includes(moment(n?.use_date).format('DD MMM Y')) ? moment(n?.use_date).format('DD MMM Y') : '' )
-                                            },"")}
-                                        </td>
-                                    ) : null
-                                }
-                                {
-                                    columns.issuer ? (
-                                        <td
-                                            className={`border p-0 break-words`}>
-                                            { issues[d].reduce((o, n) => {
-                                                return o + (o !== "" ? ", " : "") + (!o.includes(n?.product_issue?.issuer?.name) ? n?.product_issue?.issuer?.name : '' )
-                                            },"")}
-                                        </td>
-                                    ) : null
-                                }
-                                {
-                                    columns.department ? (
-                                        <td className={`border p-0`}>
-                                            { issues[d].reduce((o, n) => {
-                                                return o + (o !== "" ? ", " : "") + (!o.includes(n?.product_issue?.issuer_department?.name) ? n?.product_issue?.issuer_department?.name : '' )
-                                            },"")}
-                                        </td>
-                                    ) : null}
                                 <td className={`border p-0`}>
                                     { issues[d].reduce((o, n) => {
                                         return o +  n?.quantity
