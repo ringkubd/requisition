@@ -147,7 +147,7 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                                         ) : null
                                     }
                                     {
-                                        columns.issuer ? (
+                                        columns.department ? (
                                             <td className={`border p-0`}>
                                                 {
                                                     item.product_issue
