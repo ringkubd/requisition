@@ -122,14 +122,14 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                                             {
                                                 columns.category ? (
                                                     <td
-                                                        className={`border p-0 break-words`}
+                                                        className={`border p-0 break-words align-middle`}
                                                         rowSpan={issues[d].length}>
                                                         {d}
                                                     </td>) : null }
                                         </>
                                     ) : null}
 
-                                    <td className={`border p-0`}>
+                                    <td className={`border p-0 text-left`}>
                                         {item.product?.title}
                                     </td>
                                     <td>{item.variant?.option_value}</td>
