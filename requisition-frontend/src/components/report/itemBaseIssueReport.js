@@ -69,8 +69,8 @@ const ItemBaseIssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                     }
                     <th
                         scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} colSpan={3}>
-                        Balance
+                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                        Issued
                     </th>
                     {
                         columns.avg ? (
@@ -87,103 +87,73 @@ const ItemBaseIssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                         Sum
                     </th>
                 </tr>
-                <tr>
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                        Before
-                    </th>
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                        Issued
-                    </th>
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                        After
-                    </th>
-                </tr>
                 </thead>
                 <tbody className={`shadow-none text-gray-800`}>
                 {issues &&
                     Object.keys(issues)?.map((d, i) => (
                         <>
-                            {issues[d].map((item, j) => (
-                                <tr
-                                    className={`border text-center bg-white`}
-                                    key={j * 9999}>
-                                    {j === 0 ? (
-                                        <>
-                                            <td
-                                                className={`border p-0`}
-                                                rowSpan={issues[d].length}>
-                                                {i + 1}
-                                            </td>
-                                            <td
-                                                className={`border p-0 break-words`}
-                                                rowSpan={issues[d].length}>
-                                                {d}
-                                            </td>
-                                            {
-                                                columns.category ? (
-                                                    <td className={`border p-0`} rowSpan={issues[d].length}>
-                                                        {item.category.title}
-                                                    </td>
-                                                ) : null}
-                                        </>
+                            <tr
+                                className={`border text-center bg-white`}
+                                key={i}>
+                                <td className={`border p-0`}>
+                                    {i + 1}
+                                </td>
+                                <td className={`border p-0 break-words text-left`}>
+                                    {d}
+                                </td>
+                                {
+                                    columns.category ? (
+                                        <td className={`border p-0 text-left`}>
+                                            {issues[d][0].category.title}
+                                        </td>
                                     ) : null}
-                                    <td>{item.variant?.option_value}</td>
-                                    <td className={`border p-0`}>
-                                        {moment(
-                                            item.product_issue.issue_time,
-                                        ).format('DD MMM Y')}
-                                    </td>
-                                    {
-                                        columns.issuer ? (
-                                            <td
-                                                className={`border p-0 break-words`}>
-                                                {item.product_issue?.issuer?.name}
-                                            </td>
-                                        ) : null
-                                    }
-                                    {
-                                        columns.issuer ? (
-                                            <td className={`border p-0`}>
-                                                {
-                                                    item.product_issue
-                                                        ?.issuer_department?.name
-                                                }
-                                            </td>
-                                        ) : null}
-                                    <td className={`border p-0`}>
-                                        {item.balance_before_issue}
-                                        {item.product?.unit}
-                                    </td>
-                                    <td className={`border p-0`}>
-                                        {item.quantity}
-                                        {item.product?.unit}
-                                    </td>
-                                    <td className={`border p-0`}>
-                                        {item.balance_after_issue}
-                                        {item.product?.unit}
-                                    </td>
-                                    {
-                                        columns.avg ? (
-                                            <td className={`border p-0`}>
-                                                {item.average_rate}
-                                            </td>
-                                        ) : null
-                                    }
-                                    <td className={`border p-0`}>
-                                        {item.total_price}
-                                    </td>
-                                </tr>
-                            ))}
+                                <td>{issues[d][0].variant?.option_value}</td>
+                                <td className={`border p-0`}>
+                                    { issues[d].reduce((o, n) => {
+                                        return o + (o !== "" ? "," : "") + (!o.includes(moment(n?.use_date).format('DD MMM Y')) ? moment(n?.use_date).format('DD MMM Y') : '' )
+                                    },"")}
+                                </td>
+                                {
+                                    columns.issuer ? (
+                                        <td
+                                            className={`border p-0 break-words`}>
+                                            { issues[d].reduce((o, n) => {
+                                                return o + (o !== "" ? ", " : "") + (!o.includes(n?.product_issue?.issuer?.name) ? n?.product_issue?.issuer?.name : '' )
+                                            },"")}
+                                        </td>
+                                    ) : null
+                                }
+                                {
+                                    columns.department ? (
+                                        <td className={`border p-0`}>
+                                            { issues[d].reduce((o, n) => {
+                                                return o + (o !== "" ? ", " : "") + (!o.includes(n?.product_issue?.issuer_department?.name) ? n?.product_issue?.issuer_department?.name : '' )
+                                            },"")}
+                                        </td>
+                                    ) : null}
+                                <td className={`border p-0`}>
+                                    { issues[d].reduce((o, n) => {
+                                        return o +  n?.quantity
+                                    },0)}
+                                    {issues[d][0].product?.unit}
+                                </td>
+                                {
+                                    columns.avg ? (
+                                        <td className={`border p-0`}>
+                                            {parseFloat(issues[d][0].average_rate).toFixed(2)}
+                                        </td>
+                                    ) : null
+                                }
+                                <td className={`border p-0`}>
+                                    { issues[d].reduce((o, n) => {
+                                        return o +  n?.total_price
+                                    },0).toFixed(2)}
+                                </td>
+                            </tr>
                         </>
                     ))}
                 <tr>
-                    <th colSpan={7 + Object.keys(Object.filter(columns, ([name, status]) => status === true)).length}
+                    <th colSpan={5 + Object.keys(Object.filter(columns, ([name, status]) => status === true)).length}
                         className={`text-right border`}>
                         Total
                     </th>

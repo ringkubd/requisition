@@ -122,7 +122,7 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                                             {
                                                 columns.category ? (
                                                     <td
-                                                        className={`border p-0 break-words align-middle`}
+                                                        className={`border p-0 px-1 break-words align-middle text-left`}
                                                         rowSpan={issues[d].length}>
                                                         {d}
                                                     </td>) : null }
