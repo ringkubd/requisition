@@ -132,7 +132,7 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                                     <td className={`border p-0 text-left`}>
                                         {item.product?.title}
                                     </td>
-                                    <td>{item.variant?.option_value}</td>
+                                    <td className={`text-left`}>{item.variant?.option_value}</td>
                                     <td className={`border p-0`}>
                                         {moment(
                                             item.use_date,
