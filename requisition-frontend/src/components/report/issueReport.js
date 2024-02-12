@@ -170,7 +170,7 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                                     {
                                         columns.avg ? (
                                             <td className={`border p-0`}>
-                                                {item.average_rate}
+                                                {parseFloat(item.average_rate).toFixed(2)}
                                             </td>
                                         ) : null
                                     }
