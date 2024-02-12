@@ -6,7 +6,6 @@ import Loading from "@/components/loading";
 
 const ItemBaseIssueReport = forwardRef(({data, isLoading, columns}, ref) => {
     const {issues} = data ?? {};
-    console.log(issues)
     if (isLoading){
         return <Loading />
     }
@@ -21,39 +20,43 @@ const ItemBaseIssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                 <tr>
                     <th
                         scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
+                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                         SL#
+                    </th>
+
+                    <th
+                        scope="col"
+                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                        Item
                     </th>
                     {
                         columns.category ? (
                             <th
                                 scope="col"
-                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
-                                Item
+                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                                Category
                             </th>
                         ) : null
                     }
                     <th
                         scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
-                        Category
-                    </th>
-
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
+                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                         Variant
                     </th>
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
-                        Issue Date
-                    </th>
+                    {
+                        columns.use_date ? (
+                            <th
+                                scope="col"
+                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                                Use Date
+                            </th>
+                        ) : null
+                    }
                     {
                         columns.issuer ? (
                             <th
                                 scope="col"
-                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
+                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                                 Issuer
                             </th>
                         ) : null
@@ -62,7 +65,7 @@ const ItemBaseIssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                         columns.department === true ? (
                             <th
                                 scope="col"
-                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
+                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                                 Dep.
                             </th>
                         ) : null
@@ -76,14 +79,14 @@ const ItemBaseIssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                         columns.avg ? (
                             <th
                                 scope="col"
-                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
+                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                                 Avg. Rate
                             </th>
                         ) : null
                     }
                     <th
                         scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
+                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                         Sum
                     </th>
                 </tr>
@@ -108,11 +111,15 @@ const ItemBaseIssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                                         </td>
                                     ) : null}
                                 <td>{issues[d][0].variant?.option_value}</td>
-                                <td className={`border p-0`}>
-                                    { issues[d].reduce((o, n) => {
-                                        return o + (o !== "" ? "," : "") + (!o.includes(moment(n?.use_date).format('DD MMM Y')) ? moment(n?.use_date).format('DD MMM Y') : '' )
-                                    },"")}
-                                </td>
+                                {
+                                    columns.use_date ? (
+                                        <td className={`border p-0`}>
+                                            { issues[d].reduce((o, n) => {
+                                                return o + (o !== "" ? "," : "") + (!o.includes(moment(n?.use_date).format('DD MMM Y')) ? moment(n?.use_date).format('DD MMM Y') : '' )
+                                            },"")}
+                                        </td>
+                                    ) : null
+                                }
                                 {
                                     columns.issuer ? (
                                         <td
@@ -153,7 +160,7 @@ const ItemBaseIssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                         </>
                     ))}
                 <tr>
-                    <th colSpan={5 + Object.keys(Object.filter(columns, ([name, status]) => status === true)).length}
+                    <th colSpan={4 + Object.keys(Object.filter(columns, ([name, status]) => status === true)).length}
                         className={`text-right border`}>
                         Total
                     </th>

@@ -37,7 +37,8 @@ const Report = () => {
         category: true,
         issuer: true,
         department: true,
-        avg: true
+        avg: true,
+        use_date: true
     });
 
     const {start_date, end_date} = issueReports ?? purchaseReport ?? {};
@@ -98,7 +99,8 @@ const Report = () => {
                 category: true,
                 issuer: true,
                 department: true,
-                avg: true
+                avg: true,
+                use_date: true
             });
         }
     }, [reportType])
