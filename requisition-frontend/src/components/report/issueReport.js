@@ -129,10 +129,10 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                                         </>
                                     ) : null}
 
-                                    <td className={`border p-0 text-left`}>
+                                    <td className={`border px-1 text-left`}>
                                         {item.product?.title}
                                     </td>
-                                    <td className={`text-left`}>{item.variant?.option_value}</td>
+                                    <td className={`text-left px-1`}>{item.variant?.option_value}</td>
                                     <td className={`border p-0`}>
                                         {moment(
                                             item.use_date,
@@ -141,7 +141,7 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                                     {
                                         columns.issuer ? (
                                             <td
-                                                className={`border p-0 break-words`}>
+                                                className={`border px-1 break-words text-left`}>
                                                 {item.product_issue?.issuer?.name}
                                             </td>
                                         ) : null
