@@ -141,7 +141,7 @@ const ItemBaseIssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                                 <td className={`border p-0`}>
                                     { issues[d].reduce((o, n) => {
                                         return o +  n?.quantity
-                                    },0)}
+                                    },0).toFixed(2)}
                                     {issues[d][0].product?.unit}
                                 </td>
                                 {
