@@ -189,7 +189,7 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                         </>
                     ))}
                 <tr>
-                    <th colSpan={6+Object.keys(Object.filter(columns, ([name, status]) => status === true)).length} className={`text-right border`}>
+                    <th colSpan={5+Object.keys(Object.filter(columns, ([name, status]) => status === true)).length} className={`text-right border`}>
                         Total
                     </th>
                     <th className={`text-center border`}>

@@ -19,6 +19,8 @@ import { useReactToPrint } from "react-to-print";
 import ItemBaseIssueReport from "@/components/report/itemBaseIssueReport";
 import ItemBasePurchaseReport from "@/components/report/itemBasePurchaseReport";
 import BothReport from "@/components/report/BothReport";
+import axios from "@/lib/axios";
+import { AsyncPaginate } from "react-select-async-paginate";
 
 Object.filter = (obj, predicate) => Object.fromEntries(Object.entries(obj).filter(predicate));
 const Report = () => {
@@ -106,7 +108,7 @@ const Report = () => {
                 category: true,
                 variant: true,
             })
-        }else if(reportType === "usage"){
+        }else if(reportType === "usage"  && reportFormat === "category_base"){
             setColumns({
                 category: true,
                 issuer: true,
@@ -115,9 +117,38 @@ const Report = () => {
                 use_date: true,
                 variant: true,
             });
+        }else if(reportType === "usage" && reportFormat !== "category_base"){
+            setColumns({
+                category: true,
+                avg: true,
+            });
         }
     }, [reportType, reportFormat])
+    async function loadOptions(search, loadedOptions, { page }) {
+        const response = await axios.get(`/api/product-select`, {
+            params: {
+                search: search,
+                page: page,
+                category_id: selectedCategory
+            }
+        });
+        const responseJSON = response.data?.data;
 
+        return {
+            options: responseJSON?.products.map((r,index) => {
+                return {
+                    label: r.title,
+                    value: r.id,
+                    product: r,
+                    product_options: r.product_options,
+                }
+            }),
+            hasMore: responseJSON.count > 20,
+            additional: {
+                page: search ? 1 : page + 1,
+            },
+        };
+    }
     return (
         <AppLayout
             header={
@@ -228,91 +259,109 @@ const Report = () => {
                                                 </Label>
                                             </div>
                                         </fieldset>
-                                        <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
-                                            <legend className="mb-4 font-bold">
-                                                Columns
-                                            </legend>
-                                            {Object.keys(columns).map(
-                                                (c, i) => (
-                                                    <div
-                                                        className="flex items-center gap-2"
-                                                        key={i}>
-                                                        <Checkbox
-                                                            id={c}
-                                                            name="column"
+                                        {reportType !== 'both' ? (
+                                            <>
+                                                <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
+                                                    <legend className="mb-4 font-bold">
+                                                        Columns
+                                                    </legend>
+                                                    {Object.keys(columns).map(
+                                                        (c, i) => (
+                                                            <div
+                                                                className="flex items-center gap-2"
+                                                                key={i}>
+                                                                <Checkbox
+                                                                    id={c}
+                                                                    name="column"
+                                                                    defaultChecked={
+                                                                        columns[
+                                                                            c
+                                                                        ]
+                                                                    }
+                                                                    onChange={e => {
+                                                                        handleChange(
+                                                                            e,
+                                                                        )
+                                                                        columns[
+                                                                            c
+                                                                        ] =
+                                                                            e.target.checked
+                                                                        setColumns(
+                                                                            columns,
+                                                                        )
+                                                                    }}
+                                                                />
+                                                                <Label
+                                                                    htmlFor={c}
+                                                                    className={`font-bold`}>
+                                                                    {c.toLocaleUpperCase()}
+                                                                </Label>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </fieldset>
+                                                <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
+                                                    <legend className="mb-4 font-bold">
+                                                        Report Format
+                                                    </legend>
+
+                                                    <div className="flex items-center gap-2">
+                                                        <Radio
+                                                            id="category_base"
+                                                            name="report_format"
                                                             defaultChecked={
-                                                                columns[c]
+                                                                values.report_format ===
+                                                                'category_base'
                                                             }
                                                             onChange={e => {
                                                                 handleChange(e)
-                                                                columns[c] =
-                                                                    e.target.checked
-                                                                setColumns(
-                                                                    columns,
-                                                                )
+                                                                if (
+                                                                    e.target
+                                                                        .checked
+                                                                ) {
+                                                                    setReportFormat(
+                                                                        'category_base',
+                                                                    )
+                                                                }
                                                             }}
                                                         />
                                                         <Label
-                                                            htmlFor={c}
+                                                            htmlFor="category_base"
                                                             className={`font-bold`}>
-                                                            {c.toLocaleUpperCase()}
+                                                            Category Base
                                                         </Label>
                                                     </div>
-                                                ),
-                                            )}
-                                        </fieldset>
-                                        <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
-                                            <legend className="mb-4 font-bold">
-                                                Report Format
-                                            </legend>
-
-                                            <div className="flex items-center gap-2">
-                                                <Radio
-                                                    id="category_base"
-                                                    name="report_format"
-                                                    defaultChecked={
-                                                        values.report_format ===
-                                                        'category_base'
-                                                    }
-                                                    onChange={e => {
-                                                        handleChange(e)
-                                                        if (e.target.checked) {
-                                                            setReportFormat(
-                                                                'category_base',
-                                                            )
-                                                        }
-                                                    }}
-                                                />
-                                                <Label
-                                                    htmlFor="category_base"
-                                                    className={`font-bold`}>
-                                                    Category Base
-                                                </Label>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Radio
-                                                    id="item_base"
-                                                    name="report_format"
-                                                    defaultChecked={
-                                                        values.report_format ===
-                                                        'item_base'
-                                                    }
-                                                    onChange={e => {
-                                                        handleChange(e)
-                                                        if (e.target.checked) {
-                                                            setReportFormat(
-                                                                'item_base',
-                                                            )
-                                                        }
-                                                    }}
-                                                />
-                                                <Label
-                                                    htmlFor="item_base"
-                                                    className={`font-bold`}>
-                                                    Item Base
-                                                </Label>
-                                            </div>
-                                        </fieldset>
+                                                    <div className="flex items-center gap-2">
+                                                        <Radio
+                                                            id="item_base"
+                                                            name="report_format"
+                                                            defaultChecked={
+                                                                values.report_format ===
+                                                                'item_base'
+                                                            }
+                                                            onChange={e => {
+                                                                handleChange(e)
+                                                                if (
+                                                                    e.target
+                                                                        .checked
+                                                                ) {
+                                                                    setReportFormat(
+                                                                        'item_base',
+                                                                    )
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Label
+                                                            htmlFor="item_base"
+                                                            className={`font-bold`}>
+                                                            Item Base
+                                                        </Label>
+                                                    </div>
+                                                </fieldset>
+                                            </>
+                                        ) : (
+                                            ''
+                                        )}
                                     </div>
                                     <div
                                         className={`flex flex-col sm:flex-row w-full sm:space-x-4`}>
@@ -437,19 +486,16 @@ const Report = () => {
                                                 value={'Product'}
                                                 className={`font-bold`}
                                             />
-                                            <Select
+                                            <AsyncPaginate
+                                                defaultOptions
+                                                key={selectedCategory}
+                                                name="product_id"
+                                                id="product_id"
                                                 className={`select`}
                                                 classNames={{
                                                     control: state => 'select',
                                                 }}
                                                 isMulti
-                                                isLoading={productISLoading}
-                                                options={products?.data?.map(
-                                                    p => ({
-                                                        label: p.title,
-                                                        value: p.id,
-                                                    }),
-                                                )}
                                                 onChange={newValue =>
                                                     setFieldValue(
                                                         'product',
@@ -458,7 +504,13 @@ const Report = () => {
                                                         ),
                                                     )
                                                 }
+                                                additional={{
+                                                    page: 1,
+                                                }}
+                                                loadOptions={loadOptions}
+                                                data-placeholder="Select options..."
                                             />
+
                                             <ErrorMessage
                                                 name={'product'}
                                                 className={`text-red-600`}>
@@ -502,7 +554,9 @@ const Report = () => {
                                             Product{' '}
                                             {reportType === 'purchase'
                                                 ? 'Purchase'
-                                                : reportType === 'usage' ? 'Issue' : 'Purchase and Issue'}{' '}
+                                                : reportType === 'usage'
+                                                ? 'Issue'
+                                                : 'Purchase and Issue'}{' '}
                                             Report
                                         </p>
                                     </div>
@@ -539,41 +593,26 @@ const Report = () => {
                                             isLoading={purchaseReportISLoading}
                                         />
                                     )
-                                ) : reportType === 'usage' ?   reportFormat === 'category_base' ? (
-                                    <IssueReport
-                                        isLoading={issueReportsISLoading}
-                                        data={issueReports}
-                                        columns={columns}
-                                        key={
-                                            Object.keys(
-                                                Object.filter(
-                                                    columns,
-                                                    ([name, status]) =>
-                                                        status === true,
-                                                ),
-                                            ).length * Math.random()
-                                        }
-                                    />
-                                ) : (
-                                    <ItemBaseIssueReport
-                                        isLoading={issueReportsISLoading}
-                                        data={issueReports}
-                                        columns={columns}
-                                        key={
-                                            Object.keys(
-                                                Object.filter(
-                                                    columns,
-                                                    ([name, status]) =>
-                                                        status === true,
-                                                ),
-                                            ).length * Math.random()
-                                        }
-                                    />
-                                )
-                                    : (
-                                        <BothReport
-                                            isLoading={bothReportISLoading}
-                                            data={bothReport}
+                                ) : reportType === 'usage' ? (
+                                    reportFormat === 'category_base' ? (
+                                        <IssueReport
+                                            isLoading={issueReportsISLoading}
+                                            data={issueReports}
+                                            columns={columns}
+                                            key={
+                                                Object.keys(
+                                                    Object.filter(
+                                                        columns,
+                                                        ([name, status]) =>
+                                                            status === true,
+                                                    ),
+                                                ).length * Math.random()
+                                            }
+                                        />
+                                    ) : (
+                                        <ItemBaseIssueReport
+                                            isLoading={issueReportsISLoading}
+                                            data={issueReports}
                                             columns={columns}
                                             key={
                                                 Object.keys(
@@ -586,7 +625,22 @@ const Report = () => {
                                             }
                                         />
                                     )
-                                }
+                                ) : (
+                                    <BothReport
+                                        isLoading={bothReportISLoading}
+                                        data={bothReport}
+                                        columns={columns}
+                                        key={
+                                            Object.keys(
+                                                Object.filter(
+                                                    columns,
+                                                    ([name, status]) =>
+                                                        status === true,
+                                                ),
+                                            ).length * Math.random()
+                                        }
+                                    />
+                                )}
                             </div>
                         </div>
                     </div>

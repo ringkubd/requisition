@@ -18,19 +18,19 @@ class WhatsAppNotification extends Notification
 
     public Component $body;
     public string $to;
-//    public QuickReplyButton $approve;
-//    public QuickReplyButton $reject;
+    public QuickReplyButton $approve;
+    public QuickReplyButton $reject;
     public UrlButton $viewButton;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Component $body, string $to, UrlButton $viewButton)
+    public function __construct(Component $body, string $to, UrlButton $viewButton, $approve, $reject)
     {
         $this->body = $body;
         $this->to = $to;
-//        $this->approve = $approve;
-//        $this->reject = $reject;
+        $this->approve = $approve;
+        $this->reject = $reject;
         $this->viewButton = $viewButton;
     }
 
@@ -51,10 +51,10 @@ class WhatsAppNotification extends Notification
     {
         return WhatsAppTemplate::create()
             ->language('en')
-            ->name('inventory_approval_notice_2')
+            ->name('inventory_approval_notice')
             ->body($this->body)
-//            ->buttons($this->approve)
-//            ->buttons($this->reject)
+            ->buttons($this->approve)
+            ->buttons($this->reject)
             ->buttons($this->viewButton)
             ->to($this->to);
     }

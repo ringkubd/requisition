@@ -421,7 +421,11 @@ class InitialRequisitionAPIController extends AppBaseController
                 $q->where('title', 'like', "%$s%");
             })
             ->when($request->category_id, function ($q, $v){
-                $q->where('category_id', $v);
+                if (is_array($v)){
+                    $q->whereIn('category_id', $v);
+                }else{
+                    $q->where('category_id', $v);
+                }
             })
             ->with('category')
             ->skip($start)
@@ -433,7 +437,11 @@ class InitialRequisitionAPIController extends AppBaseController
                     $q->where('title', 'like', "%$s%");
                 })
                 ->when($request->category_id, function ($q, $v){
-                    $q->where('category_id', $v);
+                    if (is_array($v)){
+                        $q->whereIn('category_id', $v);
+                    }else{
+                        $q->where('category_id', $v);
+                    }
                 })
                 ->count() - $start;
 
