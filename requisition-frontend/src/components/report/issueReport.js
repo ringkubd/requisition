@@ -37,12 +37,15 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
                         Item
                     </th>
-
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
-                        Variant
-                    </th>
+                    {
+                        columns.variant ? (
+                            <th
+                                scope="col"
+                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
+                                Variant
+                            </th>
+                        ) : null
+                    }
                     <th
                         scope="col"
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
@@ -132,7 +135,11 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                                     <td className={`border px-1 text-left`}>
                                         {item.product?.title}
                                     </td>
-                                    <td className={`text-left px-1`}>{item.variant?.option_value}</td>
+                                    {
+                                        columns.variant ? (
+                                            <td className={`text-left px-1`}>{item.variant?.option_value}</td>
+                                        ) : null
+                                    }
                                     <td className={`border p-0`}>
                                         {moment(
                                             item.use_date,
@@ -182,7 +189,7 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                         </>
                     ))}
                 <tr>
-                    <th colSpan={7+Object.keys(Object.filter(columns, ([name, status]) => status === true)).length} className={`text-right border`}>
+                    <th colSpan={6+Object.keys(Object.filter(columns, ([name, status]) => status === true)).length} className={`text-right border`}>
                         Total
                     </th>
                     <th className={`text-center border`}>

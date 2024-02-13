@@ -14,9 +14,11 @@ import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment";
 import PurchaseReport from "@/components/report/purchaseReport";
 import IssueReport from "@/components/report/issueReport";
-import { useIssuesReportMutation, usePurchaseReportMutation } from "@/store/service/report";
+import { useIssuesReportMutation, usePurchaseReportMutation, useBothReportMutation } from "@/store/service/report";
 import { useReactToPrint } from "react-to-print";
 import ItemBaseIssueReport from "@/components/report/itemBaseIssueReport";
+import ItemBasePurchaseReport from "@/components/report/itemBasePurchaseReport";
+import BothReport from "@/components/report/BothReport";
 
 Object.filter = (obj, predicate) => Object.fromEntries(Object.entries(obj).filter(predicate));
 const Report = () => {
@@ -29,6 +31,7 @@ const Report = () => {
     });
     const [submitIssueReport, {data: issueReports, isLoading:issueReportsISLoading, isError:issueReportsISError, isSuccess: issueReportsISSuccess}] = useIssuesReportMutation();
     const [submitPurchaseReport, {data: purchaseReport, isLoading: purchaseReportISLoading, isError:purchaseReportISError, isSuccess: purchaseReportISSuccess}] = usePurchaseReportMutation();
+    const [submitBothReport, {data: bothReport, isLoading: bothReportISLoading, isError:bothReportISError, isSuccess: bothReportISSuccess}] = useBothReportMutation();
 
     const printRef = useRef();
     const [reportType, setReportType] = useState('usage');
@@ -38,10 +41,11 @@ const Report = () => {
         issuer: true,
         department: true,
         avg: true,
-        use_date: true
+        use_date: true,
+        variant: true,
     });
 
-    const {start_date, end_date} = issueReports ?? purchaseReport ?? {};
+    const {start_date, end_date} = issueReports ?? purchaseReport ?? bothReport ?? {};
 
     const initialValues = {
         category: '',
@@ -56,8 +60,10 @@ const Report = () => {
     const submit = (values, formikHelper) => {
         if (values.report_type === "purchase"){
             submitPurchaseReport(values);
-        }else{
+        }else if (values.report_type === "usage"){
             submitIssueReport(values);
+        }else{
+            submitBothReport(values);
         }
 
     }
@@ -88,11 +94,17 @@ const Report = () => {
     });
 
     useEffect(() => {
-        if (reportType === "purchase"){
+        if (reportType === "purchase" && reportFormat === "category_base"){
             setColumns({
                 category: true,
                 supplier: true,
                 department: true,
+                variant: true,
+            })
+        }else if(reportType === "purchase" && reportFormat !== "category_base"){
+            setColumns({
+                category: true,
+                variant: true,
             })
         }else if(reportType === "usage"){
             setColumns({
@@ -100,10 +112,11 @@ const Report = () => {
                 issuer: true,
                 department: true,
                 avg: true,
-                use_date: true
+                use_date: true,
+                variant: true,
             });
         }
-    }, [reportType])
+    }, [reportType, reportFormat])
 
     return (
         <AppLayout
@@ -188,6 +201,30 @@ const Report = () => {
                                                     htmlFor="usage"
                                                     className={`font-bold`}>
                                                     Issue
+                                                </Label>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Radio
+                                                    id="both"
+                                                    name="report_type"
+                                                    value="both"
+                                                    defaultChecked={
+                                                        values.report_type ===
+                                                        'both'
+                                                    }
+                                                    onChange={e => {
+                                                        handleChange(e)
+                                                        if (e.target.checked) {
+                                                            setReportType(
+                                                                'both',
+                                                            )
+                                                        }
+                                                    }}
+                                                />
+                                                <Label
+                                                    htmlFor="both"
+                                                    className={`font-bold`}>
+                                                    Both
                                                 </Label>
                                             </div>
                                         </fieldset>
@@ -465,7 +502,7 @@ const Report = () => {
                                             Product{' '}
                                             {reportType === 'purchase'
                                                 ? 'Purchase'
-                                                : 'Issue'}{' '}
+                                                : reportType === 'usage' ? 'Issue' : 'Purchase and Issue'}{' '}
                                             Report
                                         </p>
                                     </div>
@@ -489,12 +526,20 @@ const Report = () => {
                                     </div>
                                 </div>
                                 {reportType === 'purchase' ? (
-                                    <PurchaseReport
-                                        data={purchaseReport}
-                                        columns={columns}
-                                        isLoading={purchaseReportISLoading}
-                                    />
-                                ) : reportFormat === 'category_base' ? (
+                                    reportFormat === 'category_base' ? (
+                                        <PurchaseReport
+                                            data={purchaseReport}
+                                            columns={columns}
+                                            isLoading={purchaseReportISLoading}
+                                        />
+                                    ) : (
+                                        <ItemBasePurchaseReport
+                                            data={purchaseReport}
+                                            columns={columns}
+                                            isLoading={purchaseReportISLoading}
+                                        />
+                                    )
+                                ) : reportType === 'usage' ?   reportFormat === 'category_base' ? (
                                     <IssueReport
                                         isLoading={issueReportsISLoading}
                                         data={issueReports}
@@ -509,20 +554,39 @@ const Report = () => {
                                             ).length * Math.random()
                                         }
                                     />
-                                ) : <ItemBaseIssueReport
-                                    isLoading={issueReportsISLoading}
-                                    data={issueReports}
-                                    columns={columns}
-                                    key={
-                                        Object.keys(
-                                            Object.filter(
-                                                columns,
-                                                ([name, status]) =>
-                                                    status === true,
-                                            ),
-                                        ).length * Math.random()
-                                    }
-                                />}
+                                ) : (
+                                    <ItemBaseIssueReport
+                                        isLoading={issueReportsISLoading}
+                                        data={issueReports}
+                                        columns={columns}
+                                        key={
+                                            Object.keys(
+                                                Object.filter(
+                                                    columns,
+                                                    ([name, status]) =>
+                                                        status === true,
+                                                ),
+                                            ).length * Math.random()
+                                        }
+                                    />
+                                )
+                                    : (
+                                        <BothReport
+                                            isLoading={bothReportISLoading}
+                                            data={bothReport}
+                                            columns={columns}
+                                            key={
+                                                Object.keys(
+                                                    Object.filter(
+                                                        columns,
+                                                        ([name, status]) =>
+                                                            status === true,
+                                                    ),
+                                                ).length * Math.random()
+                                            }
+                                        />
+                                    )
+                                }
                             </div>
                         </div>
                     </div>

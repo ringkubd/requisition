@@ -36,11 +36,15 @@ const PurchaseReport = forwardRef(({data,isLoading, columns}, ref) => {
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                         Item
                     </th>
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                        Variant
-                    </th>
+                    {
+                        columns.variant ? (
+                            <th
+                                scope="col"
+                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                                Variant
+                            </th>
+                        ) : null
+                    }
                     <th
                         scope="col"
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
@@ -92,7 +96,11 @@ const PurchaseReport = forwardRef(({data,isLoading, columns}, ref) => {
                                 ) : null
                             }
                             <td className={`border text-left p-1`}>{p.product_title}</td>
-                            <td className={`border`}>{p?.productOption?.title}</td>
+                            {
+                                columns.variant ? (
+                                    <td className={`border`}>{p?.productOption?.title}</td>
+                                ): null
+                            }
                             <td className={`border`}>{moment(p?.purchase_date).format("DD MMM Y")}</td>
                             {
                                 columns.supplier ? (
@@ -111,7 +119,7 @@ const PurchaseReport = forwardRef(({data,isLoading, columns}, ref) => {
                     ))
                 }
                 <tr>
-                    <td className={`border text-right p-2 font-bold`} colSpan={6+Object.keys(Object.filter(columns, ([name, status]) => status === true)).length}>Total Amount</td>
+                    <td className={`border text-right p-2 font-bold`} colSpan={5+Object.keys(Object.filter(columns, ([name, status]) => status === true)).length}>Total Amount</td>
                     <td className={`border p-1 font-bold`}>{
                         parseFloat(data?.purchase?.reduce((p,c) =>{
                             return c.total_price + p;

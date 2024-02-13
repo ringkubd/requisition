@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductIssueItemReportResource;
+use App\Http\Resources\ProductResource;
 use App\Http\Resources\PurchaseResource;
 use App\Models\Product;
 use App\Models\ProductIssueItems;
@@ -79,7 +80,7 @@ class ReportAPIController extends AppBaseController
                 });
             })
             ->when(!empty($request->product), function ($q) use ($products){
-                    $q->whereIn('product_id', $products);
+                $q->whereIn('product_id', $products);
             })
             ->when($request->department, function ($q, $v){
                 $q->whereHas('productIssue', function ($q) use ($v){
@@ -111,6 +112,7 @@ class ReportAPIController extends AppBaseController
         $products = explode(',',$request->product);
         $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
         $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
+        $report_format = $request->report_format;
 
         $purchase = PurchaseResource::collection(Purchase::query()
             ->when(!empty($request->category), function ($q) use ($categories){
@@ -130,7 +132,51 @@ class ReportAPIController extends AppBaseController
             ->latest()
             ->get());
         return response()->json([
-            'purchase' => $purchase,
+            'purchase' =>  $report_format === "category_base" ? $purchase : $purchase->collection->groupBy('product.title'),
+            'start_date' => $first,
+            'end_date' => $last
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+
+    public function bothReport(Request $request) : JsonResponse
+    {
+        $categories = explode(',',$request->category);
+        $products = explode(',',$request->product);
+        $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
+        $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
+        $report_format = $request->report_format;
+
+        $product_report = ProductResource::collection(Product::query()
+            ->when(!empty($request->category), function ($q) use ($categories){
+                $q->whereIn('category_id', $categories);
+            })
+            ->when(!empty($request->product), function ($q) use ($products){
+                $q->whereIn('id', $products);
+            })
+            ->where(function ($q) use ($first, $last){
+                $q
+                    ->whereHas('productOptions.purchaseHistory', function ($s) use ($first, $last){
+                        $s->whereBetween('purchase_date',  ["$first", "$last"]);
+                    })
+                    ->orWhereHas('productOptions.productIssue', function ($s) use ($first, $last){
+                        $s->whereBetween('use_date',  ["$first", "$last"]);
+                    })
+                ;
+            })
+            ->with(['productOptions.purchaseHistory' => function ($q) use ($first, $last) {
+                $q->whereBetween('purchase_date',  ["$first", "$last"]);
+            }])
+            ->with(['productOptions.productIssue' => function ($q) use ($first, $last) {
+                $q->whereBetween('use_date',  ["$first", "$last"]);
+            }])
+            ->get());
+        return response()->json([
+            'both' =>  $report_format === "category_base" ? $product_report->collection->groupBy('category.title') : $product_report->collection->groupBy('title'),
             'start_date' => $first,
             'end_date' => $last
         ]);
