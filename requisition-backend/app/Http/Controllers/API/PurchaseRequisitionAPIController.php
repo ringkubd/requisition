@@ -373,10 +373,16 @@ class PurchaseRequisitionAPIController extends AppBaseController
         );
     }
 
-    public function getInitialRequisition(){
+    public function getInitialRequisition(): JsonResponse
+    {
         $initialRequisition = InitialRequisition::query()
             ->whereDoesntHave('purchaseRequisitions')
             ->where('department_id', auth_department_id())
+            ->whereHas('approval_status', function ($q){
+                $q->where('department_status', '!=', 3)
+                    ->where('accounts_status', '!=', 3)
+                    ->where('ceo_status', '!=', 3);
+            })
             ->latest()
             ->get();
         return $this->sendResponse(
