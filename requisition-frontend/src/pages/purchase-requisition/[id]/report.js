@@ -151,12 +151,7 @@ const PurchaseRequisitionReport = () => {
                                                         }
                                                     </td>
                                                     <td className={`border`}>
-                                                        {row?.purchase?.reduce(
-                                                            (o, n) =>
-                                                                o +
-                                                                n.total_price,
-                                                            0,
-                                                        ).toLocaleString()}
+                                                        {row?.purchase?.reduce((o, n) => o + n?.total_price, 0).toLocaleString()}
                                                     </td>
                                                 </tr>
                                             ),
