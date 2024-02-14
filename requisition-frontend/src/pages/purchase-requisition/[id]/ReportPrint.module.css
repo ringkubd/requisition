@@ -1,0 +1,31 @@
+@media print {
+    .shadow-md, .shadow-sm, .shadow{
+        @apply shadow-none;
+    }
+    .shadow-lg{
+        @apply shadow-none;
+    }
+    .shadow-0{
+        @apply shadow-none;
+    }
+    .drop-shadow-md{
+        @apply shadow-none;
+    }
+}
+.shadow-md, .shadow-sm, .shadow{
+    @apply shadow-none;
+}
+.shadow-lg{
+    @apply shadow-none;
+}
+.shadow-0{
+    @apply shadow-none;
+}
+.drop-shadow-md{
+    @apply shadow-none;
+}
+
+@page {
+    margin-top: 50cm;
+    margin-bottom: 50cm;
+}

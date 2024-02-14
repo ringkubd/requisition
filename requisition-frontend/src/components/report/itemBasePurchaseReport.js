@@ -69,7 +69,7 @@ const ItemBasePurchaseReport = forwardRef(({data,isLoading, columns}, ref) => {
                             <td className={`border`}>{index + 1}</td>
                             {columns.category ? (
                                 <td className={`border text-left p-1`}>
-                                    {data?.purchase[p][0].product_category}
+                                    {data?.purchase[p][0]?.product_category}
                                 </td>
                             ) : null}
                             <td className={`border text-left p-1`}>

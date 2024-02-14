@@ -86,7 +86,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
                     $q->whereHas('product', function ($p) use ($v){
                         $p->where('title', 'like', "%$v%");
                     });
-                });
+                })
+                    ->orWhere('prf_no', 'like', "%$v%");
             })
             ->where('department_id', auth_department_id())
             ->where('branch_id', auth_branch_id())

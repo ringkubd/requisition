@@ -4,12 +4,14 @@ import Head from "next/head";
 import { Button, Card, Table } from "flowbite-react";
 import NavLink from "@/components/navLink";
 import DataTable from "react-data-table-component";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useEditPurchaseRequisitionQuery } from "@/store/service/requisitions/purchase";
+import { useReactToPrint } from "react-to-print";
 
 const View = (props) => {
     const router = useRouter();
     const [columns, setColumns] = useState([]);
+    const printPageRef = useRef();
 
     const {data, isLoading, isError} = useEditPurchaseRequisitionQuery(router.query.id, {
         skip: !router.query.id
@@ -68,6 +70,18 @@ const View = (props) => {
                     maxWidth: "140px",
                 },
                 {
+                    name: 'Actual Purchase',
+                    selector: row => row.actual_purchase,
+                    sortable: true,
+                    maxWidth: "140px",
+                },
+                {
+                    name: 'Purchase Amount',
+                    selector: row => row.purchase.reduce((o,n) => o + n.total_price,0),
+                    sortable: true,
+                    maxWidth: "140px",
+                },
+                {
                     name: 'Purpose ',
                     selector: row => row.purpose,
                     sortable: true,
@@ -76,6 +90,10 @@ const View = (props) => {
         }
     }, [isLoading, isError, requisition_products])
 
+    const handlePrint = useReactToPrint({
+        content: () => printPageRef.current,
+        onBeforePrint: (a) => console.log(a)
+    });
 
     return (
       <AppLayout
@@ -91,18 +109,15 @@ const View = (props) => {
               <Card className="min-h-screen">
                   <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
                       <Button onClick={() => router.back()}>Back</Button>
-                      <NavLink
-                        active={router.pathname === 'initial-requisition'}
-                        href={`/purchase-requisition/${router.query.id}/print_view`}>
-                          <Button
-                            gradientDuoTone="purpleToBlue"
-                            outline
-                          >
-                              Print
-                          </Button>
-                      </NavLink>
+                      <Button
+                        gradientDuoTone="purpleToBlue"
+                        outline
+                        onClick={() => handlePrint()}
+                      >
+                          Print
+                      </Button>
                   </div>
-                  <div className="flex flex-col space-y-6">
+                  <div className="flex flex-col space-y-6" ref={printPageRef}>
                       <div className={`w-full shadow-md  p-2`}>
                           <h2
                             className={`w-full border-b pb-2 font-bold`}>
@@ -113,6 +128,7 @@ const View = (props) => {
                                   !isLoading && !isError && data ? (
                                       <Table>
                                           <Table.Head>
+                                              <Table.HeadCell>P.R. No</Table.HeadCell>
                                               <Table.HeadCell>I.R.F. No</Table.HeadCell>
                                               <Table.HeadCell>Department</Table.HeadCell>
                                               <Table.HeadCell>Estimated Cost</Table.HeadCell>
@@ -123,6 +139,7 @@ const View = (props) => {
                                           </Table.Head>
                                           <Table.Body>
                                               <Table.Row>
+                                                  <Table.Cell>{data?.data?.prf_no}</Table.Cell>
                                                   <Table.Cell>{data?.data?.irf_no}</Table.Cell>
                                                   <Table.Cell>{data?.data?.department?.name}</Table.Cell>
                                                   <Table.Cell>{data?.data?.estimated_total_amount}</Table.Cell>

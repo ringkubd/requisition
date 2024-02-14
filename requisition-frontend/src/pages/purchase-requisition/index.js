@@ -17,6 +17,7 @@ import {
 import moment from "moment";
 import { AiOutlineSearch } from "react-icons/ai";
 import { InitialRequisitionApi } from "@/store/service/requisitions/initial";
+import Link from "next/link";
 
 const PurchaseRequisition = () => {
     const router = useRouter();
@@ -42,7 +43,7 @@ const PurchaseRequisition = () => {
                 },
                 {
                     name: 'P.R.F. NO.',
-                    selector: row =>  row.prf_no,
+                    selector: row => <Link href={`purchase-requisition/${row.id}/report`}>{row.prf_no}</Link>,
                     sortable: true,
                 },
                 {
