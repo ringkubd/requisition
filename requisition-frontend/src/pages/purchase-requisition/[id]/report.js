@@ -151,7 +151,7 @@ const PurchaseRequisitionReport = () => {
                                                         }
                                                     </td>
                                                     <td className={`border`}>
-                                                        {row.purchase?.reduce(
+                                                        {row?.purchase?.reduce(
                                                             (o, n) =>
                                                                 o +
                                                                 n.total_price,
