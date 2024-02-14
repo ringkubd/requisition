@@ -33,6 +33,13 @@ export const ReportAPI = createApi({
                 method: 'GET'
             })
         }),
+        productCurrentBalance: builder.mutation({
+            query: arg => ({
+                url: 'product-current-balance',
+                params: arg,
+                method: 'GET'
+            })
+        })
     })
 });
 
@@ -41,4 +48,5 @@ export const {
     usePurchaseReportMutation,
     useIssuesReportMutation,
     useBothReportMutation,
+    useProductCurrentBalanceMutation
 } = ReportAPI;

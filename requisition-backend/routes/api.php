@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\CategoryAPIController;
 use App\Http\Controllers\API\InitialRequisitionAPIController;
 use App\Http\Controllers\API\NavigationAPIController;
+use App\Http\Controllers\API\ProductAPIController;
 use App\Http\Controllers\API\PurchaseAPIController;
 use App\Http\Controllers\API\PurchaseRequisitionAPIController;
 use App\Http\Controllers\API\RoleAPIController;
@@ -70,6 +71,7 @@ Route::resource('initial-requisitions', App\Http\Controllers\API\InitialRequisit
 /**
  * Extra URL
  */
+Route::get('product-current-balance', [ProductAPIController::class, 'currentBalance']);
 Route::get('product-select', [InitialRequisitionAPIController::class, 'products']);
 Route::get('category-select', [InitialRequisitionAPIController::class, 'category']);
 Route::get('suppliers-select', [PurchaseAPIController::class, 'suppliers']);
@@ -163,7 +165,7 @@ Route::get('dashboard-cash-data', [\App\Http\Controllers\API\DashboardAPIControl
 Route::get('activity', [\App\Http\Controllers\API\ActivityController::class, 'index']);
 
 Route::prefix('report')->group(function (){
-    Route::get('product', [\App\Http\Controllers\API\ProductAPIController::class, 'report']);
+    Route::get('product', [ProductAPIController::class, 'report']);
     Route::get('daily', [\App\Http\Controllers\API\ReportAPIController::class, 'dailyReport']);
     Route::get('purchase', [\App\Http\Controllers\API\ReportAPIController::class, 'purchaseReport']);
     Route::get('issues', [\App\Http\Controllers\API\ReportAPIController::class, 'issueReport']);

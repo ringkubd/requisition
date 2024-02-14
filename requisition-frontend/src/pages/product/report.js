@@ -7,14 +7,18 @@ import Select from "react-select";
 import { useGetNavigationDepartmentQuery } from "@/store/service/navigation";
 import { useGetCategoryQuery } from "@/store/service/category";
 import React, { useEffect, useRef, useState } from "react";
-import { useGetProductQuery } from "@/store/service/product/product";
 import { ErrorMessage, Formik } from "formik";
 import * as Yup from 'yup';
 import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment";
 import PurchaseReport from "@/components/report/purchaseReport";
 import IssueReport from "@/components/report/issueReport";
-import { useIssuesReportMutation, usePurchaseReportMutation, useBothReportMutation } from "@/store/service/report";
+import {
+    useIssuesReportMutation,
+    usePurchaseReportMutation,
+    useBothReportMutation,
+    useProductCurrentBalanceMutation
+} from "@/store/service/report";
 import { useReactToPrint } from "react-to-print";
 import ItemBaseIssueReport from "@/components/report/itemBaseIssueReport";
 import ItemBasePurchaseReport from "@/components/report/itemBasePurchaseReport";
@@ -25,15 +29,13 @@ import { AsyncPaginate } from "react-select-async-paginate";
 Object.filter = (obj, predicate) => Object.fromEntries(Object.entries(obj).filter(predicate));
 const Report = () => {
     const router = useRouter();
-    const [selectedCategory, setSelectedCategory] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState("");
     const {data: departments, isLoading: departmentISLoading, isError: departmentISError} = useGetNavigationDepartmentQuery();
     const {data: categories, isLoading: categoryISLoading, isError: categoryISError} = useGetCategoryQuery();
-    const {data: products, isLoading: productISLoading, isError: productISError} = useGetProductQuery({category: selectedCategory}, {
-        skip: !selectedCategory
-    });
     const [submitIssueReport, {data: issueReports, isLoading:issueReportsISLoading, isError:issueReportsISError, isSuccess: issueReportsISSuccess}] = useIssuesReportMutation();
     const [submitPurchaseReport, {data: purchaseReport, isLoading: purchaseReportISLoading, isError:purchaseReportISError, isSuccess: purchaseReportISSuccess}] = usePurchaseReportMutation();
     const [submitBothReport, {data: bothReport, isLoading: bothReportISLoading, isError:bothReportISError, isSuccess: bothReportISSuccess}] = useBothReportMutation();
+    const [submitBalance, {data: balance, isLoading: balanceISLoading, isError:balanceISError, isSuccess: balanceISSuccess}] = useProductCurrentBalanceMutation();
 
     const printRef = useRef();
     const [reportType, setReportType] = useState('usage');
@@ -64,8 +66,10 @@ const Report = () => {
             submitPurchaseReport(values);
         }else if (values.report_type === "usage"){
             submitIssueReport(values);
-        }else{
+        }else if (values.report_type === "both"){
             submitBothReport(values);
+        }else{
+            submitBalance(values);
         }
 
     }
@@ -258,8 +262,32 @@ const Report = () => {
                                                     Both
                                                 </Label>
                                             </div>
+                                            <div className="flex items-center gap-2">
+                                                <Radio
+                                                    id="balance"
+                                                    name="report_type"
+                                                    value="balance"
+                                                    defaultChecked={
+                                                        values.report_type ===
+                                                        'balance'
+                                                    }
+                                                    onChange={e => {
+                                                        handleChange(e)
+                                                        if (e.target.checked) {
+                                                            setReportType(
+                                                                'balance',
+                                                            )
+                                                        }
+                                                    }}
+                                                />
+                                                <Label
+                                                    htmlFor="balance"
+                                                    className={`font-bold`}>
+                                                    Balance
+                                                </Label>
+                                            </div>
                                         </fieldset>
-                                        {reportType !== 'both' ? (
+                                        {reportType !== 'both' && reportType !== "balance" ? (
                                             <>
                                                 <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
                                                     <legend className="mb-4 font-bold">

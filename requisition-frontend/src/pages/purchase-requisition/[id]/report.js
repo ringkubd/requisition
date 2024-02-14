@@ -107,7 +107,7 @@ const PurchaseRequisitionReport = () => {
                                             </th>
                                             <th scope="col"
                                                 className={`border bg-white leading-3 p-1`}>
-                                                Price
+                                                Requisition Amount
                                             </th>
                                             <th scope="col"
                                                 className={`border bg-white leading-3 p-1`}>
@@ -126,7 +126,7 @@ const PurchaseRequisitionReport = () => {
                                                     <td className={`border`}>
                                                         {i + 1}
                                                     </td>
-                                                    <td className={`border`}>
+                                                    <td className={`border text-left`}>
                                                         {row.title} {row.product_option?.title}
                                                     </td>
                                                     <td className={`border`}>
@@ -151,12 +151,12 @@ const PurchaseRequisitionReport = () => {
                                                         }
                                                     </td>
                                                     <td className={`border`}>
-                                                        {row.purchase.reduce(
+                                                        {row.purchase?.reduce(
                                                             (o, n) =>
                                                                 o +
                                                                 n.total_price,
                                                             0,
-                                                        )}
+                                                        ).toLocaleString()}
                                                     </td>
                                                 </tr>
                                             ),
