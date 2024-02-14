@@ -43,7 +43,7 @@ const PurchaseRequisition = () => {
                 },
                 {
                     name: 'P.R.F. NO.',
-                    selector: row => <Link href={`purchase-requisition/${row.id}/report`}>{row.prf_no}</Link>,
+                    selector: row => <Link className={`text-black`} href={`purchase-requisition/${row.id}/report`}>{row.prf_no}</Link>,
                     sortable: true,
                 },
                 {
