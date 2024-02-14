@@ -77,7 +77,7 @@ const View = (props) => {
                 },
                 {
                     name: 'Purchase Amount',
-                    selector: row => row.purchase.reduce((o,n) => o + n.total_price,0),
+                    selector: row => row?.purchase?.reduce((o,n) => o + n.total_price,0),
                     sortable: true,
                     maxWidth: "140px",
                 },
