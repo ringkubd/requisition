@@ -127,7 +127,7 @@ const PurchaseRequisitionReport = () => {
                                                         {i + 1}
                                                     </td>
                                                     <td className={`border`}>
-                                                        {row.title}
+                                                        {row.title} {row.product_option?.title}
                                                     </td>
                                                     <td className={`border`}>
                                                         {row.product?.unit}
