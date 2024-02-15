@@ -99,7 +99,7 @@ const Status = ({ requisition, type, from='dashboard', changeStatus = undefined 
         <div>
             {
                 (currentStatus?.stage ===  "ceo" && currentStatus?.status === "Pending" && user?.designation_name === "CEO" && type !== "initial") ||
-                (currentStatus?.stage ===  "department" && currentStatus?.status === "Pending" && isDepartmentHead && (parseInt(requisition.department_id) === user?.current_department_head)) ||
+                (currentStatus?.stage ===  "department" && currentStatus?.status === "Pending" && isDepartmentHead && (parseInt(requisition.department_id) === user?.current_department_head) || user?.role_name?.includes("System Administrator")) ||
                 (currentStatus?.stage ===  "accounts" && currentStatus?.status === "Pending" && (isDepartmentHead || manualPermission) && user?.default_department_name === "Accounts"  && type !== "initial") ||
                 (parseInt(requisition.department_id) === parseInt(user?.default_department_id) && isDepartmentHead && (currentStatus?.stage ===  "department" || !currentStatus?.stage) && currentStatus?.status === "Pending")
                     ? (
