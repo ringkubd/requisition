@@ -13,7 +13,7 @@ import { PurchaseRequisitionApi } from "@/store/service/requisitions/purchase";
 const Status = ({ requisition, type, from='dashboard', changeStatus = undefined }) => {
     const { user } = useAuth()
     const [selectedDropdown, setSelectedDropdown] = useState('Status')
-    const isDepartmentHead = (user?.current_department_head === parseInt(user?.id)) || user?.role_name?.includes("System Administrator");
+    const isDepartmentHead = (user?.current_department_head === parseInt(user?.id)) || user?.role_names?.includes("System Administrator");
     const [currentStatus, setCurrentStatus] = useState(requisition.current_status);
     const [manualPermission, setManualPermission] = useState(false);
     const [updateInitial, {data: initialResponse, isSuccess: isSuccessInitialUpdate}] = useUpdateInitialStatusMutation();
@@ -99,7 +99,7 @@ const Status = ({ requisition, type, from='dashboard', changeStatus = undefined 
         <div>
             {
                 (currentStatus?.stage ===  "ceo" && currentStatus?.status === "Pending" && user?.designation_name === "CEO" && type !== "initial") ||
-                (currentStatus?.stage ===  "department" && currentStatus?.status === "Pending" && isDepartmentHead && (parseInt(requisition.department_id) === user?.current_department_head) || user?.role_name?.includes("System Administrator")) ||
+                (currentStatus?.stage ===  "department" && currentStatus?.status === "Pending" && isDepartmentHead && (parseInt(requisition.department_id) === user?.current_department_head) || user?.role_names?.includes("System Administrator")) ||
                 (currentStatus?.stage ===  "accounts" && currentStatus?.status === "Pending" && (isDepartmentHead || manualPermission) && user?.default_department_name === "Accounts"  && type !== "initial") ||
                 (parseInt(requisition.department_id) === parseInt(user?.default_department_id) && isDepartmentHead && (currentStatus?.stage ===  "department" || !currentStatus?.stage) && currentStatus?.status === "Pending")
                     ? (
