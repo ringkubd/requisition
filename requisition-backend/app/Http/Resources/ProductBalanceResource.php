@@ -22,7 +22,13 @@ class ProductBalanceResource extends JsonResource
             'category' => $this->category,
             'product_metas' => $this->productMetas,
             'product_options' => ProductOptionResource::collection($this->productOptions),
-            'product_current_balance' => $this->productOptions->sum('product_issue.balance_after_issue'),
+            'product_current_balance' => $this->productOptions->reduce(function ($o, $n){
+                return $n->productApprovedIssue->count() !== 0 ? $o + ($n->productApprovedIssue->first()?->balance_after_issue) : $n->total_stock;
+            }, 0),
+            'product_current' => $this->productOptions->map(function ($m){
+                return $m->currentBalance;
+            }),
+            'current_options' => $this->productOptions,
             'total_stock' => $this->productOptions->sum('stock'),
             'description' => $this->description,
             'status' => $this->status,

@@ -389,34 +389,4 @@ class ProductAPIController extends AppBaseController
 
         return $this->sendResponse($product,   __('messages.report', ['model' => __('models/products.singular')]));
     }
-
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function currentBalance(Request $request)
-    {
-        $categories = explode(',',$request->category);
-        $products = explode(',',$request->product);
-        $department = $request->department;
-        $report_type = $request->report_type;
-        $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
-        $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
-
-        $product = Product::query()
-            ->when($request->category, function ($q) use($categories){
-                $q->whereIn('category_id', $categories);
-            })
-            ->when($request->product, function ($q) use($products){
-                $q->whereIn('id', $products);
-            })
-            ->with(['productOptions.productIssue' => function ($r) use ($first){
-                    $r->whereHas('productIssue', function ($s) use ($first){
-                        $s->where('store_status', 1)->whereRaw("date(store_approved_at) <= '$first'");
-                    })->latest()->first();
-                }])
-            ->get();
-        return $this->sendResponse(ProductBalanceResource::collection($product),   __('messages.report', ['model' => __('models/products.singular')]));
-    }
-
 }

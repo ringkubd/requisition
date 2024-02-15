@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
- use Illuminate\Database\Eloquent\SoftDeletes; use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes; use Illuminate\Database\Eloquent\Factories\HasFactory;
 /**
  * @OA\Schema(
  *      schema="ProductOption",
@@ -57,9 +57,9 @@ use Illuminate\Database\Eloquent\Model;
  * )
  */class ProductOption extends BaseModel
 {
-     use SoftDeletes;
-     use HasFactory;
-     public $table = 'product_options';
+    use SoftDeletes;
+    use HasFactory;
+    public $table = 'product_options';
 
     protected $fillable = [
         'product_id',
@@ -109,13 +109,26 @@ use Illuminate\Database\Eloquent\Model;
 
     public function productApprovedIssue(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(ProductIssueItems::class)->with('productIssue')->whereHas('productIssue', function ($q){
-            $q->where('store_status', 1);
-        });
+        return $this->hasMany(ProductIssueItems::class)
+            ->with('productIssue')
+            ->whereHas('productIssue', function ($q){
+                $q->where('store_status', 1);
+            })->latest('product_issues.store_approved_at');
     }
 
     public function issuePurchaseLog(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(IssuePurchaseLog::class);
+    }
+
+    public function getCurrentBalanceAttribute()
+    {
+        /*
+         *  $this->productApprovedIssue()->latest()->first()?->balance_after_issue :
+            $this->purchaseHistory->first()?->old_balance + $this->purchaseHistory->first()?->qty;
+         */
+        return $this->productApprovedIssue->first()?->productIssue->store_approved_at > $this->purchaseHistory->first()?->purchase_date ?
+            $this->productApprovedIssue->first() :
+            $this->purchaseHistory->first();
     }
 }

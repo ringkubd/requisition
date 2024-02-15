@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
+use App\Http\Resources\ProductBalanceResource;
 use App\Http\Resources\ProductIssueItemReportResource;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\PurchaseResource;
@@ -177,6 +178,39 @@ class ReportAPIController extends AppBaseController
             ->get());
         return response()->json([
             'both' =>  $report_format === "category_base" ? $product_report->collection->groupBy('category.title') : $product_report->collection->groupBy('title'),
+            'start_date' => $first,
+            'end_date' => $last
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function currentBalance(Request $request): JsonResponse
+    {
+        $categories = explode(',',$request->category);
+        $products = explode(',',$request->product);
+        $department = $request->department;
+        $report_type = $request->report_type;
+        $first = $request->start_date ?? Carbon::now()->toDateString();
+        $last = $request->end_date ?? Carbon::now()->toDateString();
+
+        $product = Product::query()
+            ->when($request->category, function ($q) use($categories){
+                $q->whereIn('category_id', $categories);
+            })
+            ->when($request->product, function ($q) use($products){
+                $q->whereIn('id', $products);
+            })
+            ->with(['productOptions.productApprovedIssue' => function ($r) use ($first){
+                $r->whereHas('productIssue', function ($s) use ($first){
+                    $s->where('store_status', 1)->whereRaw("date(store_approved_at) <= '$first'");
+                })->latest()->first();
+            }])
+            ->get();
+        return response()->json([
+            'balance' =>  ProductBalanceResource::collection($product),
             'start_date' => $first,
             'end_date' => $last
         ]);

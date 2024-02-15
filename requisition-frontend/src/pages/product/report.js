@@ -25,6 +25,7 @@ import ItemBasePurchaseReport from "@/components/report/itemBasePurchaseReport";
 import BothReport from "@/components/report/BothReport";
 import axios from "@/lib/axios";
 import { AsyncPaginate } from "react-select-async-paginate";
+import ProductBalance from "@/components/report/productBalance";
 
 Object.filter = (obj, predicate) => Object.fromEntries(Object.entries(obj).filter(predicate));
 const Report = () => {
@@ -49,7 +50,7 @@ const Report = () => {
         variant: true,
     });
 
-    const {start_date, end_date} = issueReports ?? purchaseReport ?? bothReport ?? {};
+    const {start_date, end_date} = issueReports ?? purchaseReport ?? bothReport ?? balance ?? {};
 
     const initialValues = {
         category: '',
@@ -176,13 +177,13 @@ const Report = () => {
                             onSubmit={submit}
                             validationSchema={validationSchema}>
                             {({
-                                handleSubmit,
-                                handleChange,
-                                values,
-                                errors,
-                                isSubmitting,
-                                setFieldValue,
-                            }) => (
+                                  handleSubmit,
+                                  handleChange,
+                                  values,
+                                  errors,
+                                  isSubmitting,
+                                  setFieldValue,
+                              }) => (
                                 <div
                                     className={`flex flex-col w-full space-y-6`}>
                                     <div className="flex flex-col md:flex-row md:space-x-4">
@@ -304,7 +305,7 @@ const Report = () => {
                                                                     defaultChecked={
                                                                         columns[
                                                                             c
-                                                                        ]
+                                                                            ]
                                                                     }
                                                                     onChange={e => {
                                                                         handleChange(
@@ -312,7 +313,7 @@ const Report = () => {
                                                                         )
                                                                         columns[
                                                                             c
-                                                                        ] =
+                                                                            ] =
                                                                             e.target.checked
                                                                         setColumns(
                                                                             columns,
@@ -414,7 +415,7 @@ const Report = () => {
                                                 }}
                                                 value={{
                                                     startDate:
-                                                        values.start_date,
+                                                    values.start_date,
                                                     endDate: values.end_date,
                                                 }}
                                             />
@@ -481,7 +482,7 @@ const Report = () => {
                                                             options: [
                                                                 {
                                                                     label:
-                                                                        c.title,
+                                                                    c.title,
                                                                     value: c.id,
                                                                 },
                                                                 ...sub,
@@ -583,8 +584,8 @@ const Report = () => {
                                             {reportType === 'purchase'
                                                 ? 'Purchase'
                                                 : reportType === 'usage'
-                                                ? 'Issue'
-                                                : 'Purchase and Issue'}{' '}
+                                                    ? 'Issue'
+                                                    : 'Purchase and Issue'}{' '}
                                             Report
                                         </p>
                                     </div>
@@ -595,14 +596,14 @@ const Report = () => {
                                             Date:{' '}
                                             {start_date
                                                 ? moment(start_date).format(
-                                                      'DD MMM Y',
-                                                  )
+                                                    'DD MMM Y',
+                                                )
                                                 : ''}{' '}
                                             -{' '}
                                             {end_date
                                                 ? moment(end_date).format(
-                                                      'DD MMM Y',
-                                                  )
+                                                    'DD MMM Y',
+                                                )
                                                 : ''}
                                         </i>
                                     </div>
@@ -653,10 +654,25 @@ const Report = () => {
                                             }
                                         />
                                     )
-                                ) : (
+                                ) : reportType === "both" ? (
                                     <BothReport
                                         isLoading={bothReportISLoading}
                                         data={bothReport}
+                                        columns={columns}
+                                        key={
+                                            Object.keys(
+                                                Object.filter(
+                                                    columns,
+                                                    ([name, status]) =>
+                                                        status === true,
+                                                ),
+                                            ).length * Math.random()
+                                        }
+                                    />
+                                ) : (
+                                    <ProductBalance
+                                        isLoading={balanceISLoading}
+                                        data={balance}
                                         columns={columns}
                                         key={
                                             Object.keys(

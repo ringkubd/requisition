@@ -391,7 +391,12 @@ class PurchaseRequisitionAPIController extends AppBaseController
         );
     }
 
-    public function updateProductPrice(Request $request){
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updateProductPrice(Request $request): JsonResponse
+    {
         $purchase_requisition_id = $request->purchase_requisition_id;
         $purchase_requisition_product_id = $request->product_id;
         $price = $request->price;

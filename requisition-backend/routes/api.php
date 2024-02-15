@@ -71,7 +71,6 @@ Route::resource('initial-requisitions', App\Http\Controllers\API\InitialRequisit
 /**
  * Extra URL
  */
-Route::get('product-current-balance', [ProductAPIController::class, 'currentBalance']);
 Route::get('product-select', [InitialRequisitionAPIController::class, 'products']);
 Route::get('category-select', [InitialRequisitionAPIController::class, 'category']);
 Route::get('suppliers-select', [PurchaseAPIController::class, 'suppliers']);
@@ -170,6 +169,7 @@ Route::prefix('report')->group(function (){
     Route::get('purchase', [\App\Http\Controllers\API\ReportAPIController::class, 'purchaseReport']);
     Route::get('issues', [\App\Http\Controllers\API\ReportAPIController::class, 'issueReport']);
     Route::get('both', [\App\Http\Controllers\API\ReportAPIController::class, 'bothReport']);
+    Route::get('product-current-balance', [\App\Http\Controllers\API\ReportAPIController::class, 'currentBalance']);
 });
 
 Route::put('update_initial_status/{requisition}', [InitialRequisitionAPIController::class, 'changeStatusDepartment']);

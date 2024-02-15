@@ -13,7 +13,7 @@ import { PurchaseRequisitionApi } from "@/store/service/requisitions/purchase";
 const Status = ({ requisition, type, from='dashboard', changeStatus = undefined }) => {
     const { user } = useAuth()
     const [selectedDropdown, setSelectedDropdown] = useState('Status')
-    const isDepartmentHead = user?.current_department_head === parseInt(user?.id);
+    const isDepartmentHead = (user?.current_department_head === parseInt(user?.id)) || user?.role_name === "System Administrator";
     const [currentStatus, setCurrentStatus] = useState(requisition.current_status);
     const [manualPermission, setManualPermission] = useState(false);
     const [updateInitial, {data: initialResponse, isSuccess: isSuccessInitialUpdate}] = useUpdateInitialStatusMutation();
