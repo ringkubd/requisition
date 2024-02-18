@@ -36,7 +36,7 @@ const BothReport = forwardRef(({data,isLoading, columns}, ref) => {
                         <th
                             scope="col"
                             className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                            Prev. Balance
+                            Prev. Stock
                         </th>
                         <th
                             scope="col"
