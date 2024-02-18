@@ -166,7 +166,9 @@ class ReportAPIController extends AppBaseController
                         $s->whereBetween('purchase_date',  ["$first", "$last"]);
                     })
                     ->orWhereHas('productOptions.productApprovedIssue', function ($s) use ($first, $last){
-                        $s->whereBetween('use_date',  ["$first", "$last"])->latest();
+                        $s->whereHas('productIssue', function ($q) use ($first, $last) {
+                            $q->whereBetween('store_approved_at',  ["$first", "$last"]);
+                        })->latest();
                     })
                 ;
             })
