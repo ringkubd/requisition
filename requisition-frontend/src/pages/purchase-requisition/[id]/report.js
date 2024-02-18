@@ -133,22 +133,16 @@ const PurchaseRequisitionReport = () => {
                                                         {row.product?.unit}
                                                     </td>
                                                     <td className={`border`}>
-                                                        {
-                                                            row.required_quantity
-                                                        }
+                                                        {parseFloat(row.required_quantity).toLocaleString()}
                                                     </td>
                                                     <td className={`border`}>
-                                                        {
-                                                            row.quantity_to_be_purchase
-                                                        }
+                                                        {row.quantity_to_be_purchase.toLocaleString()}
                                                     </td>
                                                     <td className={`border`}>
                                                         {(row.unit_price * row.quantity_to_be_purchase).toLocaleString()}
                                                     </td>
                                                     <td className={`border`}>
-                                                        {
-                                                            row.actual_purchase
-                                                        }
+                                                        {(row.actual_purchase ?? 0).toLocaleString()}
                                                     </td>
                                                     <td className={`border`}>
                                                         {row?.purchase?.reduce((o, n) => o + n?.total_price, 0).toLocaleString()}
@@ -156,6 +150,18 @@ const PurchaseRequisitionReport = () => {
                                                 </tr>
                                             ),
                                         )}
+                                        <tr>
+                                            <th colSpan={7} className={`text-right border`}>Total</th>
+                                            <th className={`text-center border`}>
+                                                {
+                                                    requisition_products?.reduce((o, n) => {
+                                                        return n?.purchase?.reduce((a,b) => {
+                                                            return a + b.total_price;
+                                                        },o)
+                                                    },0).toLocaleString()
+                                                }
+                                            </th>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>

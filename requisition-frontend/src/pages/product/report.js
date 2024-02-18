@@ -585,7 +585,7 @@ const Report = () => {
                                                 ? 'Purchase'
                                                 : reportType === 'usage'
                                                     ? 'Issue'
-                                                    : 'Purchase and Issue'}{' '}
+                                                    : reportType === 'balance' ? 'Balance' : 'Purchase and Issue'}{' '}
                                             Report
                                         </p>
                                     </div>
@@ -594,17 +594,14 @@ const Report = () => {
                                         <i
                                             className={`px-4 w-fit font-extralight font-serif`}>
                                             Date:{' '}
-                                            {start_date
-                                                ? moment(start_date).format(
+                                            {
+                                                reportType === 'balance' ? (moment(start_date).format(
                                                     'DD MMM Y',
+                                                )) : (
+                                                    (start_date ? moment(start_date).format('DD MMM Y') : '') + " - " + (end_date ? moment(end_date).format('DD MMM Y',) : '')
                                                 )
-                                                : ''}{' '}
-                                            -{' '}
-                                            {end_date
-                                                ? moment(end_date).format(
-                                                    'DD MMM Y',
-                                                )
-                                                : ''}
+                                            }
+
                                         </i>
                                     </div>
                                 </div>

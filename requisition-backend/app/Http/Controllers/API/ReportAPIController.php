@@ -9,6 +9,7 @@ use App\Http\Resources\ProductResource;
 use App\Http\Resources\PurchaseResource;
 use App\Models\Product;
 use App\Models\ProductIssueItems;
+use App\Models\ProductOption;
 use App\Models\Purchase;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -196,23 +197,48 @@ class ReportAPIController extends AppBaseController
         $first = $request->start_date ?? Carbon::now()->toDateString();
         $last = $request->end_date ?? Carbon::now()->toDateString();
 
-        $product = Product::query()
+        $product_options = ProductOption::query()
             ->when($request->category, function ($q) use($categories){
-                $q->whereIn('category_id', $categories);
+                $q->whereHas('product', function ($b) use ($categories){
+                    $b->whereIn('category_id', $categories);
+                });
             })
             ->when($request->product, function ($q) use($products){
-                $q->whereIn('id', $products);
+                $q->whereHas('product', function ($b) use ($products){
+                    $b->whereIn('id', $products);
+                });
             })
-            ->with(['productOptions.productApprovedIssue' => function ($r) use ($first){
-                $r->whereHas('productIssue', function ($s) use ($first){
-                    $s->where('store_status', 1)->whereRaw("date(store_approved_at) <= '$first'");
-                })->latest()->first();
-            }])
+            ->whereHas('product')
             ->get();
+
+        $report = [];
+        foreach ($product_options as $po){
+            $lastPurchase = $po->purchaseHistory->where('purchase_date', '<=', $first)->first();
+            $lastIssue = $po->productApprovedIssue->filter(function ($q) use ($first){
+                return $q->productIssue?->store_approved_at && Carbon::parse($first)->greaterThanOrEqualTo($q->productIssue?->store_approved_at);
+            })->first();
+
+            if ($lastPurchase && !$lastIssue){
+                $stock = $lastPurchase->oldBalance + $lastPurchase->qty;
+            }elseif (!$lastPurchase && $lastIssue){
+                $stock = $lastIssue->balance_after_issue;
+            }elseif ($lastPurchase && $lastIssue){
+                $stock = $lastPurchase->purchase_date > $lastIssue->productIssue?->store_approved_at ? $lastPurchase->oldBalance + $lastPurchase->qty : $lastIssue->balance_after_issue;
+            }else{
+                $stock = $po->stock + $po->purchaseHistory->sum('qty') - $po->productApprovedIssue->filter(function ($q) use ($first){
+                        return $q->productIssue?->store_approved_at;
+                    })->sum('quantity');
+            }
+            $report[$po->product_id]['time_stock'] = array_key_exists($po->product_id, $report) &&  array_key_exists('time_stock',$report[$po->product_id])?  $stock + $report[$po->product_id]['time_stock'] : $stock;
+            $report[$po->product_id]['current_stock'] =  array_key_exists($po->product_id, $report) &&  array_key_exists('current_stock',$report[$po->product_id])?  $po->stock + $report[$po->product_id]['current_stock'] : $po->stock;;
+            $report[$po->product_id]['title'] =  $po->product?->title;
+            $report[$po->product_id]['unit'] =  $po->product?->unit;
+            $report[$po->product_id]['category'] =  $po->product?->category?->title;
+        }
         return response()->json([
-            'balance' =>  ProductBalanceResource::collection($product),
             'start_date' => $first,
-            'end_date' => $last
+            'end_date' => $last,
+            'report' => collect($report)->toArray()
         ]);
     }
 }

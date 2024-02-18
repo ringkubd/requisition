@@ -142,6 +142,16 @@ class Product extends BaseModel
         return $this->hasMany(Purchase::class);
     }
 
+    public function lastPurchase(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Purchase::class)->latest();
+    }
+
+    public function lastIssue(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ProductIssueItems::class)->latest();
+    }
+
     public function issues(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ProductIssueItems::class);
@@ -160,5 +170,11 @@ class Product extends BaseModel
         return $this->belongsTo(Branch::class);
     }
 
+    public function getLastIssueBYDateAttribute($date)
+    {
+        return $this->issues()->whereHas('productIssue', function ($q) use($date) {
+            return $q->whereRaw("date(store_approved_at) <= '$date'")->where('store_status', 1);
+        })->latest()->first();
+    }
 
 }

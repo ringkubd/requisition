@@ -113,7 +113,7 @@ use Illuminate\Database\Eloquent\SoftDeletes; use Illuminate\Database\Eloquent\F
             ->with('productIssue')
             ->whereHas('productIssue', function ($q){
                 $q->where('store_status', 1);
-            });
+            })->latest();
     }
 
     public function issuePurchaseLog(): \Illuminate\Database\Eloquent\Relations\HasMany
