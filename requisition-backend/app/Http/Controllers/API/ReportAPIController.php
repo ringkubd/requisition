@@ -219,7 +219,7 @@ class ReportAPIController extends AppBaseController
             })->first();
 
             if ($lastPurchase && !$lastIssue){
-                $stock = $lastPurchase->oldBalance + $lastPurchase->qty;
+                $stock = $lastPurchase->oldBalance + $lastPurchase->qty + 0.000001111;
             }elseif (!$lastPurchase && $lastIssue){
                 $stock = $lastIssue->balance_after_issue;
             }elseif ($lastPurchase && $lastIssue){
