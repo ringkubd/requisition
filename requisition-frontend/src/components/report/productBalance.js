@@ -21,13 +21,13 @@ const ProductBalance = forwardRef(({data,isLoading, columns}, ref) => {
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                         SL#
                     </th>
-                    {columns.category ? (
-                        <th
-                            scope="col"
-                            className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                            Category
-                        </th>
-                    ) : null}
+                    {/*{columns.category ? (*/}
+                    {/*    <th*/}
+                    {/*        scope="col"*/}
+                    {/*        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>*/}
+                    {/*        Category*/}
+                    {/*    </th>*/}
+                    {/*) : null}*/}
                     <th
                         scope="col"
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
@@ -50,11 +50,11 @@ const ProductBalance = forwardRef(({data,isLoading, columns}, ref) => {
                     Object.keys(data?.report ?? [])?.map((b,i) => (
                         <tr key={i} className={`border bg-white`}>
                             <td className={`border`}>{i + 1}</td>
-                            {columns.category ? (
-                                <td className={`border text-left p-1`}>
-                                    {data?.report[b]?.category}
-                                </td>
-                            ) : null}
+                            {/*{columns.category ? (*/}
+                            {/*    <td className={`border text-left p-1`}>*/}
+                            {/*        {data?.report[b]?.category}*/}
+                            {/*    </td>*/}
+                            {/*) : null}*/}
                             <td className={`border text-left  p-1`}>
                                 {data?.report[b]?.title}
                             </td>
