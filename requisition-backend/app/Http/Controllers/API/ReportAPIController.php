@@ -165,15 +165,15 @@ class ReportAPIController extends AppBaseController
                     ->whereHas('productOptions.purchaseHistory', function ($s) use ($first, $last){
                         $s->whereBetween('purchase_date',  ["$first", "$last"]);
                     })
-                    ->orWhereHas('productOptions.productIssue', function ($s) use ($first, $last){
-                        $s->whereBetween('use_date',  ["$first", "$last"]);
+                    ->orWhereHas('productOptions.productApprovedIssue', function ($s) use ($first, $last){
+                        $s->whereBetween('use_date',  ["$first", "$last"])->latest();
                     })
                 ;
             })
             ->with(['productOptions.purchaseHistory' => function ($q) use ($first, $last) {
                 $q->whereBetween('purchase_date',  ["$first", "$last"]);
             }])
-            ->with(['productOptions.productIssue' => function ($q) use ($first, $last) {
+            ->with(['productOptions.productApprovedIssue' => function ($q) use ($first, $last) {
                 $q->whereBetween('use_date',  ["$first", "$last"]);
             }])
             ->get());
