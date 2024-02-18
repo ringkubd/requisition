@@ -74,7 +74,7 @@ const BothReport = forwardRef(({data,isLoading, columns}, ref) => {
                                             return n.product_options.reduce(
                                                 (o, p) => {
                                                     return (
-                                                        o + p.purchase_history_qty + p.stock - p.issue_qty
+                                                        o - p.purchase_history_qty + p.stock + p.issue_qty
                                                     )
                                                 },
                                                 o,
