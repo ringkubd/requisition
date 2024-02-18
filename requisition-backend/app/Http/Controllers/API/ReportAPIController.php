@@ -217,7 +217,7 @@ class ReportAPIController extends AppBaseController
         foreach ($product_options as $po){
             $lastPurchase = $po->purchaseHistory->where('purchase_date', '<=', $first)->first();
             $lastIssue = $po->productApprovedIssue->filter(function ($q) use ($first){
-                return $q->productIssue?->store_approved_at && Carbon::parse($first)->greaterThanOrEqualTo($q->productIssue?->store_approved_at);
+                return $q->productIssue?->store_approved_at && Carbon::parse($first)->endOfDay()->greaterThanOrEqualTo($q->productIssue?->store_approved_at);
             })->first();
 
             if ($lastPurchase && !$lastIssue){
