@@ -224,7 +224,7 @@ class ReportAPIController extends AppBaseController
                 $stock = $lastIssue->balance_after_issue;
             }elseif ($lastPurchase && $lastIssue){
                 $stock = $lastPurchase->purchase_date > $lastIssue->productIssue?->store_approved_at ? $lastPurchase->oldBalance + $lastPurchase->qty + $lastPurchase->oldBalance : $lastIssue->balance_after_issue;
-                $report[$po->product_id]['old'] = $lastPurchase->oldBalance;
+                $report[$po->product_id]['old'] = $lastPurchase;
             }else{
                 $stock = $po->stock + $po->purchaseHistory->sum('qty') - $po->productApprovedIssue->filter(function ($q) use ($first){
                         return $q->productIssue?->store_approved_at;
