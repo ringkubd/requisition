@@ -234,7 +234,6 @@ class ReportAPIController extends AppBaseController
             $report[$po->product_id]['title'] =  $po->product?->title;
             $report[$po->product_id]['unit'] =  $po->product?->unit;
             $report[$po->product_id]['category'] =  $po->product?->category?->title;
-            $report[$po->product_id][$po->id] =  $po;
         }
         return response()->json([
             'start_date' => $first,
