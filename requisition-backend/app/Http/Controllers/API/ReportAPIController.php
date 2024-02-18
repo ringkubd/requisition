@@ -157,7 +157,7 @@ class ReportAPIController extends AppBaseController
             ->when(!empty($request->category), function ($q) use ($categories){
                 $q->whereIn('category_id', $categories);
             })
-            ->when(!empty($request->product), function ($q) use ($products){
+            ->when($request->product, function ($q) use ($products){
                 $q->whereIn('id', $products);
             })
             ->where(function ($q) use ($first, $last){
@@ -178,7 +178,7 @@ class ReportAPIController extends AppBaseController
             }])
             ->get());
         return response()->json([
-            'both' =>  $report_format === "category_base" ? $product_report->collection->groupBy('category.title') : $product_report->collection->groupBy('title'),
+            'both' => $product_report->collection->groupBy('title'),
             'start_date' => $first,
             'end_date' => $last
         ]);
