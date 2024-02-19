@@ -117,7 +117,7 @@ class WhatsAppWebhookController extends Controller
             $this->messages->metadata = $this->messages->message_value['metadata'] ?? [];
             $this->messages->contacts = $this->messages->message_value['contacts'] ?? [];
             $this->messages->messages = $this->messages->message_value['messages'] ?? [];
-            $this->messages->first_message = collect($this->messages->messages[0]) ?? [];
+            $this->messages->first_message = collect($this->messages->messages[0] ?? []) ?? [];
             $this->messages->message_type = $this->messages->first_message['type'] ?? '';
             $this->messages->context = $this->messages->first_message['context'] ?? "";
             $this->messages->from = $this->messages->first_message['from'] ?? "";
