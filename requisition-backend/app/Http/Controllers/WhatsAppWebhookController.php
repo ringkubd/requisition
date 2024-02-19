@@ -66,9 +66,7 @@ class WhatsAppWebhookController extends Controller
 
                 if ($update){
                     $notifiedUsers[] = $requisition->user;
-                    $notifiedUsers[] = User::whereHas('organizations', function ($q){
-                        $q->where('id', auth_organization_id());
-                    })
+                    $notifiedUsers[] = User::query()
                         ->whereHas('roles', function ($q){
                             $q->where('name', 'Store Manager');
                         })

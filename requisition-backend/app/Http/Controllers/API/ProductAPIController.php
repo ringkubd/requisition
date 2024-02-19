@@ -389,4 +389,45 @@ class ProductAPIController extends AppBaseController
 
         return $this->sendResponse($product,   __('messages.report', ['model' => __('models/products.singular')]));
     }
+
+    /**
+     * @OA\Get(
+     *      path="/product_issue_log/{id}",
+     *      summary="Product Issue Log",
+     *      tags={"Product"},
+     *      description="Product Issue Log",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="id of Product",
+     *           @OA\Schema(
+     *             type="integer"
+     *          ),
+     *          required=true,
+     *          in="path"
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  type="string"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function productIssueLog($id, Request $request)
+    {
+
+    }
 }
