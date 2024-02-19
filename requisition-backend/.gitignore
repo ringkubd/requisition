@@ -19,3 +19,7 @@ yarn-error.log
 /.vscode
 soketi-configuration.json
 soketi_supervisor.conf
+
+/caddy
+frankenphp
+frankenphp-worker.php

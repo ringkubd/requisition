@@ -48,13 +48,13 @@ const PurchaseRequisition = () => {
                 },
                 {
                     name: 'Category',
-                    selector: row => row.purchase_requisition_products[0]?.product?.category?.title,
+                    selector: row => row.category,
                     sortable: true,
                     maxWidth: "200px",
                 },
                 {
                     name: 'No. of Item',
-                    selector: row => row.purchase_requisition_products.length,
+                    selector: row => row.no_of_item,
                     sortable: true,
                 },
                 {

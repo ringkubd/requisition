@@ -45,12 +45,6 @@ const Dashboard = () => {
                     minWidth: "10px",
                     omit: isMobile
                 },
-                // {
-                //     name: 'I.R. NO.',
-                //     selector: row => <Link className={`underline text-blue-600`} href={`/initial-requisition/${row.id}/print_view`}>{row.irf_no}</Link>,
-                //     sortable: true,
-                //     maxWidth: "150px",
-                // },
                 {
                     name: 'P.R. NO.',
                     selector: row =>  row.purchase_requisitions ? <Link className={`underline text-blue-600`} href={`/purchase-requisition/${row.purchase_requisitions.id}/print_view`}>{row.purchase_requisitions?.prf_no}</Link> : null,
@@ -59,14 +53,14 @@ const Dashboard = () => {
                 },
                 {
                     name: 'Category',
-                    selector: row => row.requisition_products[0]?.product?.category?.title,
+                    selector: row => row.category,
                     sortable: true,
                     maxWidth: "200px",
                     omit: isMobile
                 },
                 {
                     name: 'Req. Item',
-                    selector: row => row.requisition_products?.length,
+                    selector: row => row.required_item,
                     sortable: true,
                     maxWidth: "105px",
                 },

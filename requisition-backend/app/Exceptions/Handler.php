@@ -94,7 +94,7 @@ class Handler extends ExceptionHandler
                 broadcast(new ExceptionEvent($exceptionData));
                 return response()->json([
                     'message' => $exception->getMessage()
-                ], $exception->getCode());
+                ], 500);
             }
         });
 

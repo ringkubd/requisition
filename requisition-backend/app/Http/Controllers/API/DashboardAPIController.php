@@ -4,11 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\CashRequisitionResource;
+use App\Http\Resources\DashboardRequisitionResource;
 use App\Http\Resources\InitialRequisitionResource;
 use App\Models\CashRequisition;
 use App\Models\InitialRequisition;
-use App\Models\User;
-use App\Notifications\PushNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -45,7 +44,7 @@ class DashboardAPIController extends AppBaseController
             })
             ->latest()
             ->paginate(\request()->per_page ?? 15);
-        $collections = InitialRequisitionResource::collection($initialRequisition);
+        $collections = DashboardRequisitionResource::collection($initialRequisition);
         return response()->json([
             'initial' =>  $collections,
             "number_of_rows" => $initialRequisition->total(),

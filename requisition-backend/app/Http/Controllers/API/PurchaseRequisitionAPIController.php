@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Events\RequisitionStatusEvent;
 use App\Http\Requests\API\UpdatePurchaseRequisitionAPIRequest;
 use App\Http\Resources\InitialRequisitionResource;
+use App\Http\Resources\PurchaseRequisitionIndexResource;
 use App\Models\Department;
 use App\Models\Designation;
 use App\Models\InitialRequisition;
@@ -95,7 +96,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
             ->paginate(\request()->per_page ?? 10);
 
         return response()->json([
-            'purchase' =>  PurchaseRequisitionResource::collection($purchaseRequisitions),
+            'purchase' =>  PurchaseRequisitionIndexResource::collection($purchaseRequisitions),
             'number_of_rows' => $purchaseRequisitions->total()
         ]);
     }

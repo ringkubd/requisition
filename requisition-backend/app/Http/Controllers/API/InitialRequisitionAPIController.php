@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Events\InitialRequisitionEvent;
 use App\Events\RequisitionStatusEvent;
 use App\Http\Resources\CategoryResource;
+use App\Http\Resources\InitialRequisitionIndexResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Category;
 use App\Models\Department;
@@ -95,7 +96,7 @@ class InitialRequisitionAPIController extends AppBaseController
             ->paginate(\request()->per_page ?? 10);;
 
         return response()->json([
-            'initial' =>  InitialRequisitionResource::collection($initialRequisitions),
+            'initial' =>  InitialRequisitionIndexResource::collection($initialRequisitions),
             'number_of_rows' => $initialRequisitions->total()
         ]);
     }
