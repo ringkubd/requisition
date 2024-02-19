@@ -87,7 +87,7 @@ const PurchaseReport = forwardRef(({data,isLoading, columns}, ref) => {
                 </thead>
                 <tbody className={`shadow-none text-gray-800`}>
                 {
-                    data && data?.purchase?.map((p, index) => (
+                    data?.purchase && data?.purchase?.map((p, index) => (
                         <tr key={p.id} className={`border bg-white`}>
                             <td className={`border`}>{index + 1}</td>
                             {

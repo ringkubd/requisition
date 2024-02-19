@@ -63,7 +63,7 @@ const ItemBasePurchaseReport = forwardRef(({data,isLoading, columns}, ref) => {
                 </tr>
                 </thead>
                 <tbody className={`shadow-none text-gray-800`}>
-                {data &&
+                {data?.purchase &&
                     Object.keys(data?.purchase)?.map((p, index) => (
                         <tr key={p.id} className={`border bg-white`}>
                             <td className={`border`}>{index + 1}</td>
@@ -73,7 +73,7 @@ const ItemBasePurchaseReport = forwardRef(({data,isLoading, columns}, ref) => {
                                 </td>
                             ) : null}
                             <td className={`border text-left p-1`}>
-                                {data?.purchase[p][0].product_title}
+                                {data?.purchase[p][0]?.product_title}
                             </td>
                             {columns.variant ? (
                                 <td className={`border`}>
@@ -87,20 +87,20 @@ const ItemBasePurchaseReport = forwardRef(({data,isLoading, columns}, ref) => {
                                 {data?.purchase[p].length}
                             </td>
                             <td className={`border text-center`}>
-                                {data?.purchase[p].reduce((o, n) => {
-                                    return o + n.qty;
-                                }, 0)}
-                                {data?.purchase[p][0].product?.unit}
+                                {/*{data?.purchase[p]?.reduce((o, n) => {*/}
+                                {/*    return o + n.qty;*/}
+                                {/*}, 0)}*/}
+                                {data?.purchase[p][0]?.product?.unit}
                             </td>
                             <td className={`border text-right px-2`}>
                                 {parseFloat(
-                                    data?.purchase[p].reduce((o, n) => {
+                                    data?.purchase[p]?.reduce((o, n) => {
                                         return o + n.unit_price;
                                     }, 0) / data?.purchase[p].length
                                 ).toLocaleString()}
                             </td>
                             <td className={`border text-right px-2`}>
-                                {data?.purchase[p].reduce((o, n) => {
+                                {data?.purchase[p]?.reduce((o, n) => {
                                     return o + n.total_price;
                                 }, 0).toLocaleString()}
                             </td>

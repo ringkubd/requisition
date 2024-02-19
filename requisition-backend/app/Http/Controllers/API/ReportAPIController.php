@@ -90,7 +90,7 @@ class ReportAPIController extends AppBaseController
                 });
             })
             ->whereHas('productIssue', function ($q) use($first, $last){
-                $q->whereRaw("date(issue_time) between '$first' and '$last'")
+                $q->whereRaw("date(store_approved_at) between '$first' and '$last'")
                     ->where('store_status', 1);
             })
 
