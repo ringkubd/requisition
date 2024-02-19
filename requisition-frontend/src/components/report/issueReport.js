@@ -49,7 +49,7 @@ const IssueReport = forwardRef(({data, isLoading, columns}, ref) => {
                     <th
                         scope="col"
                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`} rowSpan={2}>
-                        Issue Date
+                        Use Date
                     </th>
                     {
                         columns.issuer  ? (
