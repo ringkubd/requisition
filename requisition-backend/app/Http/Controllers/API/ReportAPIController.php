@@ -14,6 +14,7 @@ use App\Models\Purchase;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use function PHPUnit\Framework\isNull;
 
 class ReportAPIController extends AppBaseController
 {
@@ -220,15 +221,15 @@ class ReportAPIController extends AppBaseController
                 return $q->productIssue?->store_approved_at && Carbon::parse($first)->endOfDay()->greaterThanOrEqualTo($q->productIssue?->store_approved_at);
             })->first();
 
-            if ($lastPurchase && !$lastIssue){
+            if ($lastPurchase && isNull($lastIssue)){
                 $stock = $lastPurchase->oldBalance + $lastPurchase->qty;
-            }elseif (!$lastPurchase && $lastIssue){
+            }elseif (isNull($lastPurchase) && $lastIssue){
                 $stock = $lastIssue->balance_after_issue;
             }elseif ($lastPurchase && $lastIssue){
                 $stock = Carbon::parse($lastPurchase->purchase_date)->endOfDay()->greaterThanOrEqualTo($lastIssue->productIssue?->store_approved_at) ? $lastPurchase->old_balance + $lastPurchase->qty : $lastIssue->balance_after_issue;
             }else{
-                $stock = $po->stock + $po->purchaseHistory->sum('qty') - $po->productApprovedIssue->filter(function ($q) use ($first){
-                        return $q->productIssue?->store_approved_at;
+                $stock = $po->stock - $po->purchaseHistory->where('purchase_date', '>', $first)->sum('qty') + $po->productApprovedIssue->filter(function ($q) use ($first){
+                        return $q->productIssue?->store_approved_at && Carbon::parse($first)->endOfDay()->lessThan($q->productIssue?->store_approved_at);
                     })->sum('quantity');
             }
             $report[$po->product_id]['time_stock'] = array_key_exists($po->product_id, $report) &&  array_key_exists('time_stock',$report[$po->product_id])?  $stock + $report[$po->product_id]['time_stock'] : $stock;
@@ -236,7 +237,6 @@ class ReportAPIController extends AppBaseController
             $report[$po->product_id]['title'] =  $po->product?->title;
             $report[$po->product_id]['unit'] =  $po->product?->unit;
             $report[$po->product_id]['category'] =  $po->product?->category?->title;
-            $report[$po->product_id][$po->id] =  $po;
         }
         return response()->json([
             'start_date' => $first,
