@@ -228,9 +228,10 @@ class ReportAPIController extends AppBaseController
             }elseif ($lastPurchase && $lastIssue){
                 $stock = Carbon::parse($lastPurchase->purchase_date)->endOfDay()->greaterThanOrEqualTo($lastIssue->productIssue?->store_approved_at) ? $lastPurchase->old_balance + $lastPurchase->qty : $lastIssue->balance_after_issue;
             }else{
-                $stock = $po->stock - $po->purchaseHistory->where('purchase_date', '>', $first)->sum('qty') + $po->productApprovedIssue->filter(function ($q) use ($first){
+                $initStock = $po->stock - $po->purchaseHistory->where('purchase_date', '>', $first)->sum('qty') + $po->productApprovedIssue->filter(function ($q) use ($first){
                         return $q->productIssue?->store_approved_at && Carbon::parse($first)->endOfDay()->lessThan($q->productIssue?->store_approved_at);
                     })->sum('quantity');
+                $stock = max($initStock, 0);
             }
             $report[$po->product_id]['time_stock'] = array_key_exists($po->product_id, $report) &&  array_key_exists('time_stock',$report[$po->product_id])?  $stock + $report[$po->product_id]['time_stock'] : $stock;
             $report[$po->product_id]['current_stock'] =  array_key_exists($po->product_id, $report) &&  array_key_exists('current_stock',$report[$po->product_id])?  $po->stock + $report[$po->product_id]['current_stock'] : $po->stock;;

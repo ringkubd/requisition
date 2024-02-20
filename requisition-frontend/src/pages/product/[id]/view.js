@@ -212,6 +212,19 @@ const View = (props) => {
                                                             </>
                                                         ))
                                                     }
+                                                    <Table.Row>
+                                                        <Table.Cell colSpan={6} className={`border font-bold text-right`}>Total</Table.Cell>
+                                                        <Table.Cell className={`border font-bold`}>
+                                                            {
+                                                                product_options.reduce((o, n) => {
+                                                                    return n?.option_purchase_history?.reduce((a,b) => {
+                                                                        return a + b?.qty;
+                                                                    },o)
+                                                                },0)?.toFixed(2)
+                                                            }{data?.data?.unit}
+                                                        </Table.Cell>
+                                                        <Table.Cell colSpan={6}></Table.Cell>
+                                                    </Table.Row>
                                                 </Table.Body>
                                             </Table>
                                         </>
@@ -290,28 +303,30 @@ const View = (props) => {
                                                     }
                                                     {
                                                         product_options.reduce(function(o, n) {
-                                                            return 0 + n.issue_qty;
+                                                            return o + n.issue_qty;
                                                         },0) > 0 ? (
                                                             <Table.Row>
                                                                 <Table.Cell className={`border border-gray-300 text-right text-black font-bold`} colSpan={3}>Total</Table.Cell>
                                                                 <Table.Cell className={`border border-gray-300 text-black`}>{
                                                                     product_options.reduce(function(o, n) {
-                                                                        return 0 + n.issue_qty;
-                                                                    },0)
+                                                                        return o + n.issue_qty;
+                                                                    },0).toFixed(2)
                                                                 } {data?.data?.unit}</Table.Cell>
                                                                 <Table.Cell className={`border border-gray-300 text-black`}>{
-                                                                    product_options.reduce(function(o, n) {
+                                                                    (product_options.reduce(function(o, n) {
                                                                         return n.product_issue.reduce((old, nw) => {
-                                                                            return old + nw.average_rate;
-                                                                        }, o) / n.product_issue?.length
-                                                                    },0)
+                                                                            return old + nw.total_price;
+                                                                        }, o)
+                                                                    },0) / product_options.reduce(function(o, n) {
+                                                                        return o + n.issue_qty;
+                                                                    },0)).toFixed(2)
                                                                 }</Table.Cell>
                                                                 <Table.Cell className={`border border-gray-300 text-black`}>{
                                                                     product_options.reduce(function(o, n) {
                                                                         return n.product_issue.reduce((old, nw) => {
                                                                             return old + nw.total_price;
                                                                         }, o)
-                                                                    },0)
+                                                                    },0).toFixed(2)
                                                                 }</Table.Cell>
                                                             </Table.Row>
                                                         ) : null
