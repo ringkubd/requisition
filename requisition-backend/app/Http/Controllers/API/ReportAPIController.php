@@ -195,8 +195,75 @@ class ReportAPIController extends AppBaseController
     {
         $categories = explode(',',$request->category);
         $products = explode(',',$request->product);
-        $department = $request->department;
-        $report_type = $request->report_type;
+        $report_format = $request->report_format;
+        $first = $request->start_date ?? Carbon::now()->toDateString();
+        $last = $request->end_date ?? Carbon::now()->toDateString();
+
+        $product_options = ProductOption::query()
+            ->when($request->category, function ($q) use($categories){
+                $q->whereHas('product', function ($b) use ($categories){
+                    $b->whereIn('category_id', $categories);
+                });
+            })
+            ->when($request->product, function ($q) use($products){
+                $q->whereHas('product', function ($b) use ($products){
+                    $b->whereIn('id', $products);
+                });
+            })
+            ->whereHas('product')
+            ->get();
+
+        $report = [];
+
+        foreach ($product_options as $po){
+            $lastPurchase = $po->purchaseHistory->where('purchase_date', '<=', $first)->first();
+            $lastIssue = $po->productApprovedIssue->filter(function ($q) use ($first){
+                return $q->productIssue?->store_approved_at && Carbon::parse($first)->endOfDay()->greaterThanOrEqualTo($q->productIssue?->store_approved_at);
+            })->first();
+
+            if ($lastPurchase && isNull($lastIssue)){
+                $stock = $lastPurchase->oldBalance + $lastPurchase->qty;
+            }elseif (isNull($lastPurchase) && $lastIssue){
+                $stock = $lastIssue->balance_after_issue;
+            }elseif ($lastPurchase && $lastIssue){
+                $stock = Carbon::parse($lastPurchase->purchase_date)->endOfDay()->greaterThanOrEqualTo($lastIssue->productIssue?->store_approved_at) ? $lastPurchase->old_balance + $lastPurchase->qty : $lastIssue->balance_after_issue;
+            }else{
+                $initStock = $po->stock - $po->purchaseHistory->where('purchase_date', '>', $first)->sum('qty') + $po->productApprovedIssue->filter(function ($q) use ($first){
+                        return $q->productIssue?->store_approved_at && Carbon::parse($first)->endOfDay()->lessThan($q->productIssue?->store_approved_at);
+                    })->sum('quantity');
+                $stock = max($initStock, 0);
+            }
+            if ($report_format === "option_base"){
+                $report[$po->id]['time_stock'] = $stock;
+                $report[$po->id]['current_stock'] =  $po->stock;;
+                $report[$po->id]['title'] =  $po->product?->title  . ($po->option_value != "NA" ? " - " . $po->option_value : '');
+                $report[$po->id]['unit'] =  $po->product?->unit;
+                $report[$po->id]['category'] =  $po->product?->category?->title;
+                $report[$po->id]['option'] =  $po;
+            }else{
+                $report[$po->product_id]['time_stock'] = array_key_exists($po->product_id, $report) &&  array_key_exists('time_stock',$report[$po->product_id])?  $stock + $report[$po->product_id]['time_stock'] : $stock;
+                $report[$po->product_id]['current_stock'] =  array_key_exists($po->product_id, $report) &&  array_key_exists('current_stock',$report[$po->product_id])?  $po->stock + $report[$po->product_id]['current_stock'] : $po->stock;;
+                $report[$po->product_id]['title'] =  $po->product?->title;
+                $report[$po->product_id]['unit'] =  $po->product?->unit;
+                $report[$po->product_id]['category'] =  $po->product?->category?->title;
+            }
+
+        }
+        return response()->json([
+            'start_date' => $first,
+            'end_date' => $last,
+            'report' => collect($report)->toArray()
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function currentBalanceOptionBase(Request $request): JsonResponse
+    {
+        $categories = explode(',',$request->category);
+        $products = explode(',',$request->product);
         $first = $request->start_date ?? Carbon::now()->toDateString();
         $last = $request->end_date ?? Carbon::now()->toDateString();
 
@@ -233,12 +300,13 @@ class ReportAPIController extends AppBaseController
                     })->sum('quantity');
                 $stock = max($initStock, 0);
             }
-            $report[$po->product_id]['time_stock'] = array_key_exists($po->product_id, $report) &&  array_key_exists('time_stock',$report[$po->product_id])?  $stock + $report[$po->product_id]['time_stock'] : $stock;
-            $report[$po->product_id]['current_stock'] =  array_key_exists($po->product_id, $report) &&  array_key_exists('current_stock',$report[$po->product_id])?  $po->stock + $report[$po->product_id]['current_stock'] : $po->stock;;
-            $report[$po->product_id]['title'] =  $po->product?->title;
-            $report[$po->product_id]['unit'] =  $po->product?->unit;
-            $report[$po->product_id]['category'] =  $po->product?->category?->title;
+            $report[$po->id]['time_stock'] = $stock;
+            $report[$po->id]['current_stock'] =  $po->stock;;
+            $report[$po->id]['title'] =  $po->product?->title . " - " . $po->option->name . " " . $po->value;
+            $report[$po->id]['unit'] =  $po->product?->unit;
+            $report[$po->id]['category'] =  $po->product?->category?->title;
         }
+
         return response()->json([
             'start_date' => $first,
             'end_date' => $last,

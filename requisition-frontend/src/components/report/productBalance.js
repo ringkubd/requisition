@@ -50,18 +50,13 @@ const ProductBalance = forwardRef(({data,isLoading, columns}, ref) => {
                     Object.keys(data?.report ?? [])?.map((b,i) => (
                         <tr key={i} className={`border bg-white`}>
                             <td className={`border`}>{i + 1}</td>
-                            {/*{columns.category ? (*/}
-                            {/*    <td className={`border text-left p-1`}>*/}
-                            {/*        {data?.report[b]?.category}*/}
-                            {/*    </td>*/}
-                            {/*) : null}*/}
                             <td className={`border text-left  p-1`}>
                                 {data?.report[b]?.title}
                             </td>
                             <td className={`border`}>
-                                {data?.report[b]?.time_stock}  {data?.report[b]?.unit}
+                                {parseFloat(data?.report[b]?.time_stock).toFixed(2)}  {data?.report[b]?.unit}
                             </td>
-                            <td className={`border`}> {data?.report[b]?.current_stock}  {data?.report[b]?.unit}</td>
+                            <td className={`border`}> {parseFloat(data?.report[b]?.current_stock).toFixed(2)}  {data?.report[b]?.unit}</td>
                         </tr>
                     ))
                 }
