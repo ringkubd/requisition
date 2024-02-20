@@ -10,9 +10,9 @@ import { toast } from "react-toastify";
 import Actions from "@/components/actions";
 import DataTable from "react-data-table-component";
 import {
-  useGetCashProductQuery,
-  useGetSingleCashRequisitionQuery,
-  useUpdateCashRequisitionMutation
+    useGetCashProductQuery,
+    useGetSingleCashRequisitionQuery, useStoreCashProductMutation,
+    useUpdateCashRequisitionMutation
 } from "@/store/service/cash/Index";
 import CreatableSelect from "react-select/creatable";
 import { useGetUnitsQuery } from "@/store/service/units";
@@ -25,6 +25,7 @@ const Edit = (props) => {
   })
   const {data: cashProducts, isLoading: cashProductIsLoading, isError: cashProductIsError} = useGetCashProductQuery()
   const {data: units, isLoading: unitsISLoading, isError: unitsISError} = useGetUnitsQuery();
+  const [storeCashProduct, responseStoreCashProduct] = useStoreCashProductMutation();
 
   const selectRef = useRef();
 
