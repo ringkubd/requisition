@@ -236,7 +236,7 @@ class ReportAPIController extends AppBaseController
             if ($report_format === "option_base"){
                 $report[$po->id]['time_stock'] = $stock;
                 $report[$po->id]['current_stock'] =  $po->stock;;
-                $report[$po->id]['title'] =  $po->product?->title  . ($po->option_value != "NA" ? " - " . $po->option_value : '');
+                $report[$po->id]['title'] =  $po->product?->title  . ($po->option_value !== "NA" && $po->option_value !== "N/A" ? " - " . $po->option_value : '');
                 $report[$po->id]['unit'] =  $po->product?->unit;
                 $report[$po->id]['category'] =  $po->product?->category?->title;
                 $report[$po->id]['option'] =  $po;
