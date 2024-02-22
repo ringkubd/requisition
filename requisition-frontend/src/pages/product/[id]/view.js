@@ -30,52 +30,52 @@ const View = (props) => {
                     <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
                         <Button onClick={() => router.back()}>Back</Button>
                     </div>
-                    <div className="flex flex-col space-y-2 md:gap-2 md:space-x-4 md:flex-row">
+                    <div className="flex flex-col space-2 md:gap-2 md:space-x-4 md:flex-row">
                         <div
-                            className={`w-full gap-2 space-x-4 shadow p-2 overflow-scroll`}>
+                            className={`w-full p-2 overflow-scroll shadow-lg rounded`}>
                             <h2 className={`w-full border-b pb-2 font-bold`}>
                                 Basic Information
                             </h2>
                             {!isLoading && !isError && data ? (
                                 <Table className={`overflow-x-scroll`}>
                                     <Table.Body>
-                                        <Table.Row>
-                                            <Table.HeadCell>
+                                        <Table.Row className={`border`}>
+                                            <Table.HeadCell className={`border !p-1`}>
                                                 Title
                                             </Table.HeadCell>
-                                            <Table.Cell>
+                                            <Table.Cell className={`border !p-1`}>
                                                 {data?.data?.title}
                                             </Table.Cell>
                                         </Table.Row>
                                         <Table.Row>
-                                            <Table.HeadCell>
+                                            <Table.HeadCell className={`border !p-1`}>
                                                 Category
                                             </Table.HeadCell>
-                                            <Table.Cell>
+                                            <Table.Cell className={`border !p-1`}>
                                                 {data?.data?.category?.title}
                                             </Table.Cell>
                                         </Table.Row>
                                         <Table.Row>
-                                            <Table.HeadCell>
+                                            <Table.HeadCell className={`border !p-1`}>
                                                 Unit
                                             </Table.HeadCell>
-                                            <Table.Cell>
+                                            <Table.Cell className={`border !p-1`}>
                                                 {data?.data?.unit}
                                             </Table.Cell>
                                         </Table.Row>
                                         <Table.Row>
-                                            <Table.HeadCell>
+                                            <Table.HeadCell className={`border !p-1`}>
                                                 Description
                                             </Table.HeadCell>
-                                            <Table.Cell>
+                                            <Table.Cell className={`border !p-1`}>
                                                 {data?.data?.description}
                                             </Table.Cell>
                                         </Table.Row>
                                         <Table.Row>
-                                            <Table.HeadCell>
+                                            <Table.HeadCell className={`border !p-1`}>
                                                 Status
                                             </Table.HeadCell>
-                                            <Table.Cell>
+                                            <Table.Cell className={`border !p-1`}>
                                                 {data?.data?.status}
                                             </Table.Cell>
                                         </Table.Row>
@@ -86,7 +86,7 @@ const View = (props) => {
                             )}
                         </div>
                         <div
-                            className={`w-full gap-2 space-x-4 shadow p-2 overflow-scroll`}>
+                            className={`w-full p-2 overflow-scroll shadow-lg rounded`}>
                             <h2 className={`w-full border-b pb-2 font-bold`}>
                                 Variant Information
                             </h2>
@@ -113,22 +113,22 @@ const View = (props) => {
                                         <Table.Body>
                                             {product_options.map((p, index) => (
                                                 <Table.Row key={index}>
-                                                    <Table.Cell>
+                                                    <Table.Cell className={`border !p-0 text-center`}>
                                                         {index + 1}
                                                     </Table.Cell>
-                                                    <Table.Cell>
+                                                    <Table.Cell className={`border !p-0 text-center`}>
                                                         {p?.option?.name}
                                                     </Table.Cell>
-                                                    <Table.Cell>
+                                                    <Table.Cell className={`border !p-0 text-center`}>
                                                         {p.option_value}
                                                     </Table.Cell>
-                                                    <Table.Cell>
+                                                    <Table.Cell className={`border !p-0 text-center`}>
                                                         {p?.sku}
                                                     </Table.Cell>
-                                                    <Table.Cell>
+                                                    <Table.Cell className={`border !p-0 text-center`}>
                                                         {p.stock}
                                                     </Table.Cell>
-                                                    <Table.Cell>
+                                                    <Table.Cell className={`border !p-0 text-center`}>
                                                         {p?.notes}
                                                     </Table.Cell>
                                                 </Table.Row>
@@ -142,7 +142,7 @@ const View = (props) => {
                         </div>
                         {!isLoading && !isError && product_metas?.length ? (
                             <div
-                                className={`w-full gap-2 space-x-4 shadow p-2 overflow-scroll`}>
+                                className={`w-full shadow-lg rounded p-2 overflow-scroll`}>
                                 <h2
                                     className={`w-full border-b pb-2 font-bold`}>
                                     Meta Information
@@ -167,7 +167,7 @@ const View = (props) => {
                             ''
                         )}
                     </div>
-                    <div>
+                    <div className={` shadow-lg rounded p-2`}>
                         {/*   Product Purchase Log  */}
                         <h2 className={`w-full border-b pb-2 font-bold`}>
                             Purchase History
@@ -191,7 +191,7 @@ const View = (props) => {
                         )}
                     </div>
 
-                    <div>
+                    <div className={` shadow-lg rounded p-2`}>
                         <h2 className={`w-full border-b pb-2 font-bold`}>
                             Issue History
                         </h2>
