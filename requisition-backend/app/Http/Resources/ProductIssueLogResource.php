@@ -19,6 +19,7 @@ class ProductIssueLogResource extends JsonResource
             'product_issue_id' => $this->product_issue_id,
             'product_id' => $this->product_id,
             'product_title' => $this->product?->title,
+            'unit' => $this->product?->unit,
             'product_option_id' => $this->product_option_id,
             'department' => $this->productIssue?->issuerDepartment?->name,
             'variant_title' => $this->productOption?->option?->name,

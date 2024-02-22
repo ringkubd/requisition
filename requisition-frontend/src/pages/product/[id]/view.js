@@ -236,9 +236,21 @@ const View = (props) => {
                     </div>
 
                     <div>
-                    {/*    Product Issue Log */}
+                        <h2
+                            className={`w-full border-b pb-2 font-bold`}>
+                            Issue History
+                        </h2>
+                        <div className={`flex flex-row space-x-8 border-b`}>
+                            <h2 className={`font-bold`}>Total Issue Till Now - </h2>
+                            <div>{
+                                product_options?.reduce(function(o, n) {
+                                    return o + n.issue_qty;
+                                }, 0).toFixed(2)
+                            } {data?.data?.unit}</div>
+                        </div>
+                        {/*    Product Issue Log */}
                         {
-                            router.query.id &&  <IssueLog id={router.query.id} />
+                            router.query.id && <IssueLog id={router.query.id} />
                         }
 
                     </div>

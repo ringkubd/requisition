@@ -438,12 +438,12 @@ class ProductAPIController extends AppBaseController
                 $q->where('store_status', 1);
             })
             ->where('product_id', $id)
-            ->latest();
+            ->latest()
+            ->paginate();
 
         return response()->json([
-                'data' => ProductIssueLogResource::collection($issues->paginate(30)),
-                'total_quantity' => $issues->get()->sum('quantity'),
-                "number_of_rows" => $issues->paginate(30)->total(),
+                'data' => ProductIssueLogResource::collection($issues),
+                "number_of_rows" => $issues->total(),
                 "message" => __('messages.retrieved', ['model' => __('models/issue.plural')]),
             ]
         );
