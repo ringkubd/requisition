@@ -32,7 +32,7 @@ const View = (props) => {
                     </div>
                     <div className="flex flex-col space-2 md:gap-2 md:space-x-4 md:flex-row">
                         <div
-                            className={`w-full p-2 overflow-scroll shadow-lg rounded`}>
+                            className={`w-full p-2 overflow-scroll rounded`}>
                             <h2 className={`w-full border-b pb-2 font-bold`}>
                                 Basic Information
                             </h2>
@@ -86,7 +86,7 @@ const View = (props) => {
                             )}
                         </div>
                         <div
-                            className={`w-full p-2 overflow-scroll shadow-lg rounded`}>
+                            className={`w-full p-2 overflow-scroll rounded`}>
                             <h2 className={`w-full border-b pb-2 font-bold`}>
                                 Variant Information
                             </h2>
@@ -142,7 +142,7 @@ const View = (props) => {
                         </div>
                         {!isLoading && !isError && product_metas?.length ? (
                             <div
-                                className={`w-full shadow-lg rounded p-2 overflow-scroll`}>
+                                className={`w-full rounded p-2 overflow-scroll`}>
                                 <h2
                                     className={`w-full border-b pb-2 font-bold`}>
                                     Meta Information
@@ -167,7 +167,7 @@ const View = (props) => {
                             ''
                         )}
                     </div>
-                    <div className={` shadow-lg rounded p-2`}>
+                    <div className={`rounded p-2`}>
                         {/*   Product Purchase Log  */}
                         <h2 className={`w-full border-b pb-2 font-bold`}>
                             Purchase History
@@ -191,7 +191,7 @@ const View = (props) => {
                         )}
                     </div>
 
-                    <div className={` shadow-lg rounded p-2`}>
+                    <div className={`rounded p-2`}>
                         <h2 className={`w-full border-b pb-2 font-bold`}>
                             Issue History
                         </h2>
