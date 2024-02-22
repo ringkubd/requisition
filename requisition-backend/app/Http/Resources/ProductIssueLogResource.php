@@ -23,7 +23,7 @@ class ProductIssueLogResource extends JsonResource
             'product_option_id' => $this->product_option_id,
             'department' => $this->productIssue?->issuerDepartment?->name,
             'variant_title' => $this->productOption?->option?->name,
-            'category' => $this->use_in_category ? $this->use_in_category?->title : $this->category?->title,
+            'category' => $this->use_in_category ? $this->useInCategory?->title : $this->category?->title,
             'quantity' => $this->quantity,
             'average_rate' => max($this->rateLog->sum('unit_price'), 0) / max($this->rateLog->count(), 1),
             'total_price' =>  round($this->rateLog->sum('total_price')),
