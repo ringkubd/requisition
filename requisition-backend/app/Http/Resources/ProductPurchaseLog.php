@@ -21,7 +21,7 @@ class ProductPurchaseLog extends JsonResource
         'product_title' => $this->product?->title,
         'unit' => $this->product?->unit,
         'product_option_id' => $this->product_option_id,
-        'variant' => $this->productOption?->option?->name,
+        'variant' =>  $this->productOption?->option_value,
 //        'productOption' => new ProductOptionResource($this->productOption),
         'supplier_id' => $this->supplier_id,
         'supplier_name' => $this->supplier?->name,
