@@ -87,7 +87,7 @@ const IssueLog = ({id}) => {
                             <Pagination
                                 currentPage={pageNo}
                                 onPageChange={(page) => setPageNo(page)}
-                                totalPages={Math.round(issues?.number_of_rows / 15)}
+                                totalPages={Math.ceil(issues?.number_of_rows / 15)}
                             />
                         </>
                     )
