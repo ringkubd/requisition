@@ -119,6 +119,8 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                             {p?.product?.title}{' '}
                                             {!p?.variant?.option_value.includes(
                                                 'N/A',
+                                            ) && !p?.variant?.option_value?.includes(
+                                                'NA',
                                             )
                                                 ? '- ' +
                                                   p?.variant?.option_value

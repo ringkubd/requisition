@@ -20,7 +20,7 @@ const IssueView = () => {
             setColumns([
                 {
                     name: 'Product',
-                    selector: row => row.product?.title + ( !row.variant?.option_value.includes('N/A') ? " - "+row.variant?.option_value : ""),
+                    selector: row => row.product?.title + ( !row.variant?.option_value.includes('N/A') &&  !row.variant?.option?.name?.includes('NA') ? " - "+row.variant?.option_value : ""),
                     sortable: true,
                 },
                 {
