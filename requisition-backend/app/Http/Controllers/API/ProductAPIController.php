@@ -4,7 +4,12 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateProductAPIRequest;
 use App\Http\Resources\ProductBalanceResource;
+use App\Http\Resources\ProductIssueItemsResource;
+use App\Http\Resources\ProductIssueLogResource;
+use App\Http\Resources\ProductIssueResource;
 use App\Models\Product;
+use App\Models\ProductIssue;
+use App\Models\ProductIssueItems;
 use App\Repositories\ProductRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -394,7 +399,7 @@ class ProductAPIController extends AppBaseController
      * @OA\Get(
      *      path="/product_issue_log/{id}",
      *      summary="Product Issue Log",
-     *      tags={"Product"},
+     *      tags={"Product Issue"},
      *      description="Product Issue Log",
      *      @OA\Parameter(
      *          name="id",
@@ -426,8 +431,21 @@ class ProductAPIController extends AppBaseController
      *      )
      * )
      */
-    public function productIssueLog($id, Request $request)
+    public function productIssueLog($id, Request $request): JsonResponse
     {
+        $issues = ProductIssueItems::query()
+            ->whereHas('productIssue', function ($q) use ($id){
+                $q->where('store_status', 1);
+            })
+            ->where('product_id', $id)
+            ->latest();
 
+        return response()->json([
+                'data' => ProductIssueLogResource::collection($issues->paginate(30)),
+                'total_quantity' => $issues->get()->sum('quantity'),
+                "number_of_rows" => $issues->paginate(30)->total(),
+                "message" => __('messages.retrieved', ['model' => __('models/issue.plural')]),
+            ]
+        );
     }
 }

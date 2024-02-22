@@ -63,6 +63,8 @@ Route::get('designation-by-organization-branch', [App\Http\Controllers\API\Desig
 Route::resource('products', App\Http\Controllers\API\ProductAPIController::class)
     ->except(['create', 'edit']);
 
+Route::get('product_issue_log/{id}', [ProductAPIController::class, 'productIssueLog']);
+
 
 Route::resource('initial-requisitions', App\Http\Controllers\API\InitialRequisitionAPIController::class)
     ->except(['create', 'edit']);

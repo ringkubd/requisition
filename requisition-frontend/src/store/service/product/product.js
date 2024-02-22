@@ -5,7 +5,7 @@ import { onQueryStartedErrorToast } from "@/lib/clientHelper";
 export const ProductApiService = createApi({
     reducerPath: 'product',
     baseQuery: CustomBaseQuery,
-    tagTypes: ['product', 'editProduct'],
+    tagTypes: ['product', 'editProduct', 'productIssue'],
     endpoints: builder => ({
         getProduct: builder.query({
             query: (arg) => ({
@@ -60,6 +60,14 @@ export const ProductApiService = createApi({
                 params: arg
             }),
             onQueryStarted: onQueryStartedErrorToast
+        }),
+        productIssueLog: builder.query({
+            query: ({id, ...patch}) => ({
+                url: `product_issue_log/${id}`,
+                params: patch,
+            }),
+            providesTags: ['productIssue'],
+            onQueryStarted: onQueryStartedErrorToast,
         })
     }),
 })
@@ -72,6 +80,7 @@ export const {
     useDestroyProductMutation,
     useSingleProductQuery,
     useReportMutation,
+    useProductIssueLogQuery,
     util: { getRunningQueriesThunk },
 } = ProductApiService;
 
@@ -81,4 +90,5 @@ export const {
     updateProduct,
     storeProduct,
     destroyProduct,
+    productIssueLog,
 } = ProductApiService.endpoints;

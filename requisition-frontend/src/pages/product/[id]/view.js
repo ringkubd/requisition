@@ -5,6 +5,7 @@ import Head from "next/head";
 import { Button, Card, Table } from "flowbite-react";
 import Image from "next/image";
 import moment from "moment";
+import IssueLog from "@/components/product/IssueLog";
 
 const View = (props) => {
     const router = useRouter();
@@ -235,110 +236,11 @@ const View = (props) => {
                     </div>
 
                     <div>
-                        <div className={`w-full gap-2 space-x-4 shadow p-2 overflow-scroll`}>
-                            <h2
-                                className={`w-full border-b pb-2 font-bold`}>
-                                Issue History
-                            </h2>
-                            {
-                                !isLoading && !isError && product_options ? (
-                                        <>
-                                            <Table className={`border border-gray-300 overflow-x-scroll`} border={1}>
-                                                <Table.Head>
-                                                    <Table.HeadCell
-                                                        className={`border border-gray-300`}>Sl#</Table.HeadCell>
-                                                    <Table.HeadCell className={`border border-gray-300`}>
-                                                        Variant
-                                                    </Table.HeadCell>
-                                                    <Table.HeadCell className={`border border-gray-300`}>
-                                                        Department
-                                                    </Table.HeadCell>
-                                                    <Table.HeadCell
-                                                        className={`border border-gray-300`}>Qty</Table.HeadCell>
-                                                    <Table.HeadCell className={`border border-gray-300`}>Avg. Unit
-                                                        Price</Table.HeadCell>
-                                                    {/*<Table.HeadCell className={`border border-gray-300`}>Available*/}
-                                                    {/*    Qty.</Table.HeadCell>*/}
-                                                    <Table.HeadCell
-                                                        className={`border border-gray-300`}>Total</Table.HeadCell>
-                                                    <Table.HeadCell className={`border border-gray-300`}>Use
-                                                        Date</Table.HeadCell>
-                                                    <Table.HeadCell className={`border border-gray-300`}>Issue @</Table.HeadCell>
-                                                    {/*<Table.HeadCell className={`border border-gray-300`}>Expiry*/}
-                                                    {/*    Date</Table.HeadCell>*/}
-                                                </Table.Head>
-                                                <Table.Body className={`border border-gray-300`}>
-                                                    {
-                                                        product_options.map((p, index) => (
-                                                            <>
-                                                                <Table.Row className={`border border-gray-300`} key={index * Math.round(Math.random() * 444)}>
-                                                                    <Table.Cell className={`border border-gray-300`}
-                                                                                rowSpan={p?.product_issue?.length + 1}>{index + 1}</Table.Cell>
-                                                                    <Table.Cell className={`border border-gray-300`}
-                                                                                rowSpan={p?.product_issue?.length + 1}>{p?.title}</Table.Cell>
-                                                                </Table.Row>
-                                                                {
-                                                                    p?.product_issue?.map((pur, i) => (
-                                                                        <Table.Row className={`border border-gray-300`}
-                                                                                   key={i * Math.round(Math.random() * 555)}>
-                                                                            <Table.Cell
-                                                                                className={`border border-gray-300`}>{pur?.receiver_department?.name}</Table.Cell>
-                                                                            <Table.Cell
-                                                                                className={`border border-gray-300`}>{parseFloat(pur?.quantity).toLocaleString()} {data?.data?.unit}</Table.Cell>
-                                                                            <Table.Cell
-                                                                                className={`border border-gray-300`}>{parseFloat(pur?.average_rate).toLocaleString()}</Table.Cell>
-                                                                            {/*<Table.Cell*/}
-                                                                            {/*    className={`border border-gray-300`}>{parseFloat(pur?.available_qty).toLocaleString()}</Table.Cell>*/}
-                                                                            <Table.Cell
-                                                                                className={`border border-gray-300`}>{parseFloat(pur?.total_price).toLocaleString()}</Table.Cell>
-                                                                            <Table.Cell
-                                                                                className={`border border-gray-300`}>{pur?.use_date ? moment(pur?.use_date).format("DD MMM YYYY") : null}</Table.Cell>
-                                                                            <Table.Cell
-                                                                                className={`border border-gray-300`}>{pur.created_at ? moment(pur.created_at).format("DD MMM YYYY @ HH:mm:ss") : ''}</Table.Cell>
-                                                                        </Table.Row>
-                                                                    ))
-                                                                }
-                                                            </>
-                                                        ))
-                                                    }
-                                                    {
-                                                        product_options.reduce(function(o, n) {
-                                                            return o + n.issue_qty;
-                                                        },0) > 0 ? (
-                                                            <Table.Row>
-                                                                <Table.Cell className={`border border-gray-300 text-right text-black font-bold`} colSpan={3}>Total</Table.Cell>
-                                                                <Table.Cell className={`border border-gray-300 text-black`}>{
-                                                                    product_options.reduce(function(o, n) {
-                                                                        return o + n.issue_qty;
-                                                                    },0).toFixed(2)
-                                                                } {data?.data?.unit}</Table.Cell>
-                                                                <Table.Cell className={`border border-gray-300 text-black`}>{
-                                                                    (product_options.reduce(function(o, n) {
-                                                                        return n.product_issue.reduce((old, nw) => {
-                                                                            return old + nw.total_price;
-                                                                        }, o)
-                                                                    },0) / product_options.reduce(function(o, n) {
-                                                                        return o + n.issue_qty;
-                                                                    },0)).toFixed(2)
-                                                                }</Table.Cell>
-                                                                <Table.Cell className={`border border-gray-300 text-black`}>{
-                                                                    product_options.reduce(function(o, n) {
-                                                                        return n.product_issue.reduce((old, nw) => {
-                                                                            return old + nw.total_price;
-                                                                        }, o)
-                                                                    },0).toFixed(2)
-                                                                }</Table.Cell>
-                                                            </Table.Row>
-                                                        ) : null
-                                                    }
+                    {/*    Product Issue Log */}
+                        {
+                            router.query.id &&  <IssueLog id={router.query.id} />
+                        }
 
-                                                </Table.Body>
-                                            </Table>
-                                        </>
-                                    )
-                                    : <h2>No data found.</h2>
-                            }
-                        </div>
                     </div>
                 </Card>
             </div>
