@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateProductAPIRequest;
-use App\Http\Resources\ProductBalanceResource;
-use App\Http\Resources\ProductIssueItemsResource;
 use App\Http\Resources\ProductIssueLogResource;
-use App\Http\Resources\ProductIssueResource;
+use App\Http\Resources\ProductPurchaseLog;
 use App\Models\Product;
-use App\Models\ProductIssue;
 use App\Models\ProductIssueItems;
+use App\Models\Purchase;
 use App\Repositories\ProductRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -443,6 +441,57 @@ class ProductAPIController extends AppBaseController
 
         return response()->json([
                 'data' => ProductIssueLogResource::collection($issues),
+                "number_of_rows" => $issues->total(),
+                "message" => __('messages.retrieved', ['model' => __('models/issue.plural')]),
+            ]
+        );
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/product_purchase_log/{id}",
+     *      summary="Product Purchase Log",
+     *      tags={"Product Purchase"},
+     *      description="Product Purchase Log",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="id of Product",
+     *           @OA\Schema(
+     *             type="integer"
+     *          ),
+     *          required=true,
+     *          in="path"
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @OA\Property(
+     *                  property="data",
+     *                  type="string"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function productPurchaseLog($id, Request $request): JsonResponse
+    {
+        $issues = Purchase::query()
+            ->where('product_id', $id)
+            ->latest()
+            ->paginate();
+
+        return response()->json([
+                'data' => ProductPurchaseLog::collection($issues),
                 "number_of_rows" => $issues->total(),
                 "message" => __('messages.retrieved', ['model' => __('models/issue.plural')]),
             ]
