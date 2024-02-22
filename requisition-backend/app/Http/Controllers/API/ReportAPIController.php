@@ -302,7 +302,7 @@ class ReportAPIController extends AppBaseController
             }
             $report[$po->id]['time_stock'] = $stock;
             $report[$po->id]['current_stock'] =  $po->stock;;
-            $report[$po->id]['title'] =  $po->product?->title . " - " . $po->option->name . " " . $po->value;
+            $report[$po->id]['title'] =  $po->product?->title . ($po->option->name !== "N/A" ? " - " . $po->option->name . " " . $po->value : "");
             $report[$po->id]['unit'] =  $po->product?->unit;
             $report[$po->id]['category'] =  $po->product?->category?->title;
         }
