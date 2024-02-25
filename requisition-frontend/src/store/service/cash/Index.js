@@ -41,7 +41,7 @@ export const CashRequisitionAPIService = createApi({
                 url: `cash-requisitions/${id}`,
                 method: 'DELETE'
             }),
-            invalidatesTags: ['edit-cash-requisition', 'cash-requisition'],
+            invalidatesTags: ['edit-cash-requisition', 'cash-requisition', 'update-cash-product'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         storeCashRequisition: build.mutation({

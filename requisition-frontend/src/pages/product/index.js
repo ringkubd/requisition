@@ -136,7 +136,9 @@ const Product = () => {
                                     isSearchable
                                     placeholder={`Search by category`}
                                     isClearable
-                                    onChange={(newValue) => changeSearchParams('category_id', newValue?.value)}
+                                    onChange={(newValue) => {
+                                        changeSearchParams('category_id', newValue?.value);
+                                    }}
                                 />
                             </div>
                             <div className={`flex flex-row justify-center space-x-4 items-center`}>
@@ -152,8 +154,8 @@ const Product = () => {
                             responsive
                             progressPending={isLoading}
                             persistTableHead
-                            onChangePage={(page, totalRows) => dispatch(setProductSearch({...searchParams, 'page': page}))}
-                            onChangeRowsPerPage={(currentRowsPerPage, currentPage) => dispatch(setProductSearch({...searchParams, 'page': currentPage, per_page: currentRowsPerPage }))}
+                            onChangePage={(page, totalRows) => dispatch(setProductSearch({...productSearch, 'page': page}))}
+                            onChangeRowsPerPage={(currentRowsPerPage, currentPage) => dispatch(setProductSearch({...productSearch, 'page': currentPage, per_page: currentRowsPerPage }))}
                             paginationTotalRows={data?.number_of_rows}
                         />
                     </Card>

@@ -54,7 +54,8 @@ class CashProduct extends BaseModel
         'updated_at' => 'nullable'
     ];
 
-    public function last_purchase(){
+    public function last_purchase(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
         return $this->hasOne(CashRequisitionItem::class, 'item', 'title')->orderByDesc('created_at');
     }
 

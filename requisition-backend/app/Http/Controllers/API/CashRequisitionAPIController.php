@@ -319,9 +319,10 @@ class CashRequisitionAPIController extends AppBaseController
                 __('messages.not_found', ['model' => __('models/cashRequisitions.singular')])
             );
         }
-
-        $cashRequisition->delete();
-
+        DB::transaction(function () use ($cashRequisition){
+            $cashRequisition->cashRequisitionItems()->delete();
+            $cashRequisition->delete();
+        });
         return $this->sendResponse(
             $id,
             __('messages.deleted', ['model' => __('models/cashRequisitions.singular')])
