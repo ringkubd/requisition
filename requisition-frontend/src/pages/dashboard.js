@@ -33,7 +33,8 @@ const Dashboard = () => {
     useEffect(() => {
         if (isSuccess && data && user){
             const pending = data.initial.filter(d => {
-                return  d.purchase_current_status?.status === "Pending"
+                // return (d.current_status?.status === "Pending" || d.purchase_current_status?.status === "Pending")
+                return d.purchase_current_status?.status === "Pending"
             }).length;
             setInitialPending(pending);
             setInitialColumns([
