@@ -252,7 +252,10 @@ class ReportAPIController extends AppBaseController
         return response()->json([
             'start_date' => $first,
             'end_date' => $last,
-            'report' => collect($report)->toArray()
+            'report' => collect($report)->sortBy([
+                ['category', 'asc'],
+                ['title', 'asc'],
+            ])->values()->all()
         ]);
     }
 
