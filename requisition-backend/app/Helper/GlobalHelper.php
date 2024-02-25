@@ -49,7 +49,7 @@ if (!function_exists('auth_branches')){
 
 if (!function_exists('auth_branch_id')){
     function auth_branch_id(){
-        if (Cache::has('select_branch_'.\request()->user()->id)) {
+        if (Cache::has('select_branch_'.\request()->user()?->id)) {
             return Cache::get('select_branch_'.\request()->user()->id);
         }
         return auth()->user()->defaultBranch?->id; // login branch organization id
