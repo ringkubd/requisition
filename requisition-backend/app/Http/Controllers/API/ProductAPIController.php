@@ -76,6 +76,11 @@ class ProductAPIController extends AppBaseController
                 $q->where('title', 'like', "%$v%")
                     ->orWhereHas('category', function ($q) use($v){
                         $q->where('title', 'like', "%$v%");
+                    })->orWhereHas('productOptions', function ($q) use ($v){
+                        $q->where('option_value', 'like', "%$v%")
+                            ->orWhereHas('option', function ($q) use($v){
+                                $q->where('name', 'like', "%$v%");
+                            });
                     });
             })
             ->when($request->category, function ($q) use ($request){

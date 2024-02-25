@@ -51,6 +51,7 @@ import { UserOnlineSlice } from "@/store/slice/userOnlineSlice";
 import { DashboardAPI } from "@/store/service/dashboard";
 import { encryptTransform } from "redux-persist-transform-encrypt";
 import { FilterDateRange } from "@/store/slice/filterDateRange";
+import ProductSearchSlice from "@/store/slice/productSearchSlice";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -106,6 +107,7 @@ const combineReducer = combineReducers({
     dashboard: DashboardSlice.reducer,
     activity: ActivitySlice.reducer,
     active_users: UserOnlineSlice.reducer,
+    product_search: ProductSearchSlice.reducer,
     purchase_requisition_inputs: PurchaseRequisitionInputChangeSlice.reducer,
     [OrganizationApiService.reducerPath]: OrganizationApiService.reducer,
     [BranchApiService.reducerPath]: BranchApiService.reducer,

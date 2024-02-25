@@ -19,12 +19,16 @@ import Select from "react-select";
 import { useGetCategoryQuery } from "@/store/service/category";
 import { hasPermission } from "@/lib/helpers";
 import { useAuth } from "@/hooks/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { setProductSearch } from "@/store/slice/productSearchSlice";
 
 
 const Product = () => {
     const router = useRouter();
-    const [searchParams, setSearchParams] = useState({});
-    const {data, isLoading, isError} = useGetProductQuery(searchParams);
+    const dispatch = useDispatch();
+    const productSearch = useSelector(state => state.product_search);
+    const [searchParams, setSearchParams] = useState(productSearch);
+    const {data, isLoading, isError} = useGetProductQuery(productSearch);
     const [destroy, destroyResponse] = useDestroyProductMutation();
     const [columns, setColumns] = useState([]);
     const {data: category, isLoading: categoryISLoading} = useGetCategoryQuery();
@@ -80,7 +84,7 @@ const Product = () => {
     }, [isLoading, isError, data]);
 
     const changeSearchParams = (key, value) => {
-        setSearchParams({...searchParams , [key]: value, page: 1});
+        dispatch(setProductSearch({...searchParams , [key]: value, page: 1}));
     }
 
 
@@ -137,7 +141,7 @@ const Product = () => {
                             </div>
                             <div className={`flex flex-row justify-center space-x-4 items-center`}>
                                 <Label htmlFor={`search`} value={`Search`} />
-                                <TextInput onChange={(e) => e.target.value.length > 1 ? changeSearchParams('search',e.target.value) : ''} />
+                                <TextInput value={productSearch?.search ?? ""} onChange={(e) => changeSearchParams('search',e.target.value)} />
                             </div>
                         </div>
                         <DataTable
@@ -148,8 +152,8 @@ const Product = () => {
                             responsive
                             progressPending={isLoading}
                             persistTableHead
-                            onChangePage={(page, totalRows) => setSearchParams({...searchParams, 'page': page})}
-                            onChangeRowsPerPage={(currentRowsPerPage, currentPage) => setSearchParams({...searchParams, 'page': currentPage, per_page: currentRowsPerPage })}
+                            onChangePage={(page, totalRows) => dispatch(setProductSearch({...searchParams, 'page': page}))}
+                            onChangeRowsPerPage={(currentRowsPerPage, currentPage) => dispatch(setProductSearch({...searchParams, 'page': currentPage, per_page: currentRowsPerPage }))}
                             paginationTotalRows={data?.number_of_rows}
                         />
                     </Card>
