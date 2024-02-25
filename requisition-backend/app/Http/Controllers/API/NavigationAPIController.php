@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class NavigationAPIController extends AppBaseController
 {
     public function organization(){
-        $organizations = \request()->user()->organizations;
+        $organizations = \request()->user()?->organizations;
         return $this->sendResponse(
             $organizations,
             __('messages.retrieved', ['model' => __('models/organization.plural')])
