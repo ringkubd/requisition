@@ -542,6 +542,7 @@ const create = (props) => {
                                                         classNames={{
                                                             control: state => 'select'
                                                         }}
+                                                        isClearable
                                                     />
                                                     <ErrorMessage
                                                         name="description"
