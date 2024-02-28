@@ -1,11 +1,7 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import CustomBaseQuery from "@/store/service/branch";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const PurchaseApiService = createApi({
-    reducerPath: 'purchase',
-    baseQuery: CustomBaseQuery,
-    tagTypes: ['getPurchase', 'editPurchase'],
+export const PurchaseApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getPurchase: builder.query({
             query: (arg) => ({
@@ -57,6 +53,7 @@ export const PurchaseApiService = createApi({
                 url: `suppliers-select`,
                 params: arg
             }),
+            providesTags: ['select_suppliers'],
             onQueryStarted: onQueryStartedErrorToast,
         })
     }),

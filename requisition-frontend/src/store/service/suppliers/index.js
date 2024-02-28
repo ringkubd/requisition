@@ -1,11 +1,7 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import CustomBaseQuery from "@/store/service/branch";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const SuppliersApiService = createApi({
-    reducerPath: 'suppliers',
-    baseQuery: CustomBaseQuery,
-    tagTypes: ['getSuppliers', 'editSuppliers'],
+export const SuppliersApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getSuppliers: builder.query({
             query: (query) => ({
@@ -29,7 +25,7 @@ export const SuppliersApiService = createApi({
                 body: patch,
                 formData: true,
             }),
-            invalidatesTags: ['getSuppliers', 'editSuppliers'],
+            invalidatesTags: ['getSuppliers', 'editSuppliers', 'select_suppliers'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         storeSuppliers: builder.mutation({
@@ -41,7 +37,7 @@ export const SuppliersApiService = createApi({
                     body: arg,
                 }
             },
-            invalidatesTags: ['getSuppliers'],
+            invalidatesTags: ['getSuppliers', 'select_suppliers'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroySuppliers: builder.mutation({
@@ -49,7 +45,7 @@ export const SuppliersApiService = createApi({
                 url: `suppliers/${arg}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['getSuppliers'],
+            invalidatesTags: ['getSuppliers', 'select_suppliers'],
             onQueryStarted: onQueryStartedErrorToast,
         })
     }),

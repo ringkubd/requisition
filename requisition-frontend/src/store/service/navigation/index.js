@@ -1,15 +1,13 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import CustomBaseQuery from "@/store/service/branch";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const NavigationAPIService = createApi({
-    reducerPath: 'navigation_service',
-    baseQuery: CustomBaseQuery,
+export const NavigationAPIService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getNavigationOrganization: builder.query({
             query: (arg) => ({
                 url: 'navigation-organization'
             }),
+            invalidatesTags: ['navigation_branch', 'navigation_department'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         getNavigationBranch: builder.query({
@@ -17,6 +15,7 @@ export const NavigationAPIService = createApi({
                 url: 'navigation-branch',
                 params: arg
             }),
+            providesTags: ['navigation_branch'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         getNavigationDepartment: builder.query({
@@ -24,6 +23,7 @@ export const NavigationAPIService = createApi({
                 url: 'navigation-department',
                 params: arg
             }),
+            providesTags: ['navigation_department'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         subscribePushNotification: builder.mutation({
@@ -31,7 +31,8 @@ export const NavigationAPIService = createApi({
                 url: 'subscribe-push',
                 method: 'POST',
                 body: arg
-            })
+            }),
+            providesTags: ['navigation_push_notification'],
         })
     })
 });

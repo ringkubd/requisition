@@ -4,11 +4,7 @@ import { userSlice } from "@/store/service/user";
 import { OrganizationApiService } from "@/store/service/organization";
 import { createWrapper } from "next-redux-wrapper";
 import { BranchApiService } from "@/store/service/branch";
-import { CategoryApiService } from "@/store/service/category";
-import { OptionsApiService } from "@/store/service/options";
-import { DesignationApiService } from "@/store/service/designation";
 import { DepartmentApiService } from "@/store/service/deparment";
-import { ProductApiService } from "@/store/service/product/product";
 import { productMetaSlice } from "@/store/service/product/productMetaSlice";
 import {
     FLUSH,
@@ -31,16 +27,11 @@ import { ProductBasicFormSlice } from "@/store/service/product/product_basic_for
 import { UserManagementApi } from "@/store/service/user/management";
 import { ChangeOrganizationBranchApi } from "@/store/service/user/ChangeOrganizationBranch";
 import { PurchaseRequisitionInputChangeSlice } from "@/store/service/requisitions/purchase_requisition_input_change";
-import { SuppliersApiService } from "@/store/service/suppliers";
-import { PurchaseApiService } from "@/store/service/purchase";
 import { IssueApiService } from "@/store/service/issue";
-import { BrandsApiService } from "@/store/service/brands";
 import { CountryApiService } from "@/store/service/country";
-import { UnitsApiService } from "@/store/service/units";
 import { RolesApiService } from "@/store/service/roles";
 import { PermissionsApiService } from "@/store/service/permissions";
 import { errorSlice } from "@/store/slice/errorSlice";
-import { NavigationAPIService } from "@/store/service/navigation";
 import DashboardSlice from "@/store/slice/dashboardSlice";
 import ActivitySlice from "@/store/slice/activitySlice";
 import { ReportAPI } from "@/store/service/report";
@@ -51,27 +42,19 @@ import ProductSearchSlice from "@/store/slice/productSearchSlice";
 import { BaseAPI } from "@/store/service/vehicle/BaseAPI";
 import {BaseAPI as RequisitionBaseAPI} from "@/store/service/requisitions/BaseAPI";
 import SupplierSlice from "@/store/slice/supplierSlice";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
 const middlewares = [
     OrganizationApiService.middleware,
     BranchApiService.middleware,
-    CategoryApiService.middleware,
-    OptionsApiService.middleware,
-    DesignationApiService.middleware,
-    DepartmentApiService.middleware,
-    ProductApiService.middleware,
     ProductOptionApiService.middleware,
     UserManagementApi.middleware,
     ChangeOrganizationBranchApi.middleware,
-    SuppliersApiService.middleware,
-    PurchaseApiService.middleware,
+    GeneralBaseAPI.middleware,
     IssueApiService.middleware,
-    BrandsApiService.middleware,
     CountryApiService.middleware,
-    UnitsApiService.middleware,
     RolesApiService.middleware,
     PermissionsApiService.middleware,
-    NavigationAPIService.middleware,
     ReportAPI.middleware,
     BaseAPI.middleware,
     RequisitionBaseAPI.middleware,
@@ -108,11 +91,6 @@ const combineReducer = combineReducers({
     purchase_requisition_inputs: PurchaseRequisitionInputChangeSlice.reducer,
     [OrganizationApiService.reducerPath]: OrganizationApiService.reducer,
     [BranchApiService.reducerPath]: BranchApiService.reducer,
-    [CategoryApiService.reducerPath]: CategoryApiService.reducer,
-    [OptionsApiService.reducerPath]: OptionsApiService.reducer,
-    [DesignationApiService.reducerPath]: DesignationApiService.reducer,
-    [DepartmentApiService.reducerPath]: DepartmentApiService.reducer,
-    [ProductApiService.reducerPath]: ProductApiService.reducer,
     product_meta: productMetaSlice.reducer,
     product_option_local: optionSlice.reducer,
     product_active_form: ProductActiveFormSlice.reducer,
@@ -120,15 +98,11 @@ const combineReducer = combineReducers({
     [ProductOptionApiService.reducerPath]: ProductOptionApiService.reducer,
     [UserManagementApi.reducerPath]: UserManagementApi.reducer,
     [ChangeOrganizationBranchApi.reducerPath]: ChangeOrganizationBranchApi.reducer,
-    [SuppliersApiService.reducerPath]: SuppliersApiService.reducer,
-    [PurchaseApiService.reducerPath]: PurchaseApiService.reducer,
+    [GeneralBaseAPI.reducerPath]: GeneralBaseAPI.reducer,
     [IssueApiService.reducerPath]: IssueApiService.reducer,
-    [BrandsApiService.reducerPath]: BrandsApiService.reducer,
     [CountryApiService.reducerPath]: CountryApiService.reducer,
-    [UnitsApiService.reducerPath]: UnitsApiService.reducer,
     [RolesApiService.reducerPath]: RolesApiService.reducer,
     [PermissionsApiService.reducerPath]: PermissionsApiService.reducer,
-    [NavigationAPIService.reducerPath]: NavigationAPIService.reducer,
     [ReportAPI.reducerPath]: ReportAPI.reducer,
     supplier_search: SupplierSlice.reducer,
     filter_date_range: FilterDateRange.reducer,

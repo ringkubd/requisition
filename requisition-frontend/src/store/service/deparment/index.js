@@ -1,11 +1,7 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import CustomBaseQuery from "@/store/service/branch";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const DepartmentApiService = createApi({
-    reducerPath: 'department',
-    baseQuery: CustomBaseQuery,
-    tagTypes: ['getDepartment', 'editDepartment'],
+export const DepartmentApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getDepartment: builder.query({
             query: () => ({

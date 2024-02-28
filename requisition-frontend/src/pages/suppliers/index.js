@@ -6,7 +6,7 @@ import DataTable from 'react-data-table-component';
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import Actions from "@/components/actions";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 import {
     useDestroySuppliersMutation,
@@ -17,7 +17,6 @@ import {
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { setSupplierSearch } from "@/store/slice/supplierSlice";
-import { useSelectSuppliersQuery } from "@/store/service/purchase";
 
 const Suppliers = () => {
     const router = useRouter();
