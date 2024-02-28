@@ -13,9 +13,8 @@ import { setSingleActivity } from "@/store/slice/activitySlice";
 import { addNewOnline, removeOnline, setAllOnline } from "@/store/slice/userOnlineSlice";
 import { Badge, ListGroup, Tooltip } from "flowbite-react";
 import { DashboardAPI } from "@/store/service/dashboard";
-import { PurchaseRequisitionApi } from "@/store/service/requisitions/purchase";
 import { useSubscribePushNotificationMutation } from "@/store/service/navigation";
-import bg from "../../../public/noise.png";
+import { BaseAPI } from "@/store/service/requisitions/BaseAPI";
 
 const AppLayout = ({ header, children }) => {
     const router = useRouter();
@@ -83,8 +82,7 @@ const AppLayout = ({ header, children }) => {
             window.Echo.private(`requisition-status.${user?.id}`)
                 .listen('RequisitionStatusEvent', event => {
                     dispatch(updateSingleInitialRequisition(event.requisition));
-                    dispatch(DashboardAPI.util.invalidateTags(['general_requisition', 'cash_requisition']));
-                    dispatch(PurchaseRequisitionApi.util.invalidateTags(['edit-purchase-requisition']));
+                    dispatch(BaseAPI.util.invalidateTags(['general_requisition', 'cash_requisition', 'edit-purchase-requisition', 'dashboard_cash_requisition']));
                     toast.success(`Requisition Status Updated`)
                 })
         }

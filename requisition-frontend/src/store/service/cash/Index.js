@@ -1,16 +1,9 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import CustomBaseQuery from "@/store/service/branch";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
+import { BaseAPI } from "@/store/service/requisitions/BaseAPI";
 
-export const CashRequisitionAPIService = createApi({
-    reducerPath: 'cash_requisition_service',
-    baseQuery: CustomBaseQuery,
-    tagTypes: [
-        'cash-requisition',
-        'edit-cash-requisition',
-        'get-cash-product',
-        'update-cash-product',
-    ],
+export const CashRequisitionAPIService = BaseAPI.injectEndpoints({
     endpoints: build => ({
         getCashRequisition: build.query({
             query: params => ({
@@ -50,7 +43,7 @@ export const CashRequisitionAPIService = createApi({
                 method: 'POST',
                 body: params
             }),
-            invalidatesTags: ['edit-cash-requisition', 'cash-requisition'],
+            invalidatesTags: ['edit-cash-requisition', 'cash-requisition', 'dashboard_cash_requisition'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         getCashProduct: build.query({

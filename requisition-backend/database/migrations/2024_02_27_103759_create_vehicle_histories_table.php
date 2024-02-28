@@ -24,6 +24,7 @@ return new class extends Migration
             $table->double('rate');
             $table->string('bill_no')->nullable();
             $table->double('last_mileage');
+            $table->double('current_mileage');
             $table->foreignIdFor(Pump::class)->nullable()->references('id')->on('pumps');
             $table->foreignIdFor(User::class)->index()->references('id')->on('users');
             $table->softDeletes();

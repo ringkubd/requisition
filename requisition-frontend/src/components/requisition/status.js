@@ -3,13 +3,10 @@ import { Button, Tooltip } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { AiFillCheckSquare, AiFillDelete } from "react-icons/ai";
 import {
-    DashboardAPI,
     useUpdateCashStatusMutation,
     useUpdateInitialStatusMutation,
     useUpdatePurchaseStatusMutation
 } from "@/store/service/dashboard";
-import { dispatch } from "@/store";
-import { PurchaseRequisitionApi } from "@/store/service/requisitions/purchase";
 const Status = ({ requisition, type, from='dashboard', changeStatus = undefined }) => {
     const { user } = useAuth()
     const [selectedDropdown, setSelectedDropdown] = useState('Status')
@@ -42,15 +39,12 @@ const Status = ({ requisition, type, from='dashboard', changeStatus = undefined 
 
     useEffect(() => {
         if (isSuccessPurchaseUpdate){
-            dispatch(PurchaseRequisitionApi.util.invalidateTags(['edit-purchase-requisition']));
-            dispatch(DashboardAPI.util.invalidateTags(['general_requisition', 'cash_requisition']));
             setCurrentStatus(purchaseResponse?.data?.current_status)
             if (changeStatus){
                 changeStatus(purchaseResponse?.data);
             }
         }
         if (isSuccessCashUpdate || isSuccessInitialUpdate){
-            dispatch(DashboardAPI.util.invalidateTags(['general_requisition', 'cash_requisition']));
             if (isSuccessCashUpdate){
                 setCurrentStatus(cashResponse?.data?.current_status)
                 if (changeStatus){

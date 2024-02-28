@@ -2,42 +2,35 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Requests\API\UpdateSupplierAPIRequest;
-use App\Models\Supplier;
-use App\Repositories\SupplierRepository;
-use Carbon\Carbon;
+use App\Http\Requests\API\CreateVehicleAPIRequest;
+use App\Http\Requests\API\UpdateVehicleAPIRequest;
+use App\Models\Vehicle;
+use App\Repositories\VehicleRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
-use App\Http\Resources\SupplierResource;
-use OpenApi\Annotations as OA;
+use App\Http\Resources\VehicleResource;
 
 /**
- * Class SupplierController
+ * Class VehicleController
  */
 
-class SupplierAPIController extends AppBaseController
+class VehicleAPIController extends AppBaseController
 {
-    /** @var  SupplierRepository */
-    private $supplierRepository;
+    /** @var  VehicleRepository */
+    private $vehicleRepository;
 
-    public function __construct(SupplierRepository $supplierRepo)
+    public function __construct(VehicleRepository $vehicleRepo)
     {
-        $this->supplierRepository = $supplierRepo;
-
-        $this->middleware('auth:sanctum');
-//        $this->middleware('role_or_permission:Super Admin|view_suppliers', ['only' => ['index']]);
-//        $this->middleware('role_or_permission:Super Admin|update_suppliers', ['only' => ['show', 'update']]);
-//        $this->middleware('role_or_permission:Super Admin|create_suppliers', ['only' => ['store']]);
-//        $this->middleware('role_or_permission:Super Admin|delete_suppliers', ['only' => ['delete']]);
+        $this->vehicleRepository = $vehicleRepo;
     }
 
     /**
      * @OA\Get(
-     *      path="/suppliers",
-     *      summary="getSupplierList",
-     *      tags={"Supplier"},
-     *      description="Get all Suppliers",
+     *      path="/vehicles",
+     *      summary="getVehicleList",
+     *      tags={"Vehicle"},
+     *      description="Get all Vehicles",
      *      @OA\Response(
      *          response=200,
      *          description="successful operation",
@@ -50,7 +43,7 @@ class SupplierAPIController extends AppBaseController
      *              @OA\Property(
      *                  property="data",
      *                  type="array",
-     *                  @OA\Items(ref="#/components/schemas/Supplier")
+     *                  @OA\Items(ref="#/components/schemas/Vehicle")
      *              ),
      *              @OA\Property(
      *                  property="message",
@@ -62,29 +55,27 @@ class SupplierAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $suppliers = Supplier::query()
-            ->when($request->name, function ($q, $v){
-                $q->where('name', 'like', "%$v%")
-                    ->orWhere('address', 'like', "%$v%")
-                    ->orWhere('contact', 'like', "%$v%");
-            })->paginate();
+        $vehicles = $this->vehicleRepository->all(
+            $request->except(['skip', 'limit']),
+            $request->get('skip'),
+            $request->get('limit')
+        );
 
-        return response()->json([
-                'data' => SupplierResource::collection($suppliers),
-                "number_of_rows" => $suppliers->total(),
-                "message" => __('messages.retrieved', ['model' => __('models/products.plural')]),
-            ]);
+        return $this->sendResponse(
+            VehicleResource::collection($vehicles),
+            __('messages.retrieved', ['model' => __('models/vehicles.plural')])
+        );
     }
 
     /**
      * @OA\Post(
-     *      path="/suppliers",
-     *      summary="createSupplier",
-     *      tags={"Supplier"},
-     *      description="Create Supplier",
+     *      path="/vehicles",
+     *      summary="createVehicle",
+     *      tags={"Vehicle"},
+     *      description="Create Vehicle",
      *      @OA\RequestBody(
      *        required=true,
-     *        @OA\JsonContent(ref="#/components/schemas/Supplier")
+     *        @OA\JsonContent(ref="#/components/schemas/Vehicle")
      *      ),
      *      @OA\Response(
      *          response=200,
@@ -97,7 +88,7 @@ class SupplierAPIController extends AppBaseController
      *              ),
      *              @OA\Property(
      *                  property="data",
-     *                  ref="#/components/schemas/Supplier"
+     *                  ref="#/components/schemas/Vehicle"
      *              ),
      *              @OA\Property(
      *                  property="message",
@@ -107,34 +98,27 @@ class SupplierAPIController extends AppBaseController
      *      )
      * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(CreateVehicleAPIRequest $request): JsonResponse
     {
         $input = $request->all();
-        if($request->hasFile('logo')){
-            $logo = $request->file('logo');
-            $extension = $logo->getClientOriginalExtension();
-            $currentDateTime = Carbon::now()->format("Y-m-d_h_i");
-            $name = str_replace(" ", "",$request->name)."_".$currentDateTime.".".$extension;
-            $logo->move(public_path('supliers_logo'), "$name");
-            $input['logo'] = url("/supliers_logo/$name");
-        };
-        $supplier = $this->supplierRepository->create($input);
+
+        $vehicle = $this->vehicleRepository->create($input);
 
         return $this->sendResponse(
-            new SupplierResource($supplier),
-            __('messages.saved', ['model' => __('models/suppliers.singular')])
+            new VehicleResource($vehicle),
+            __('messages.saved', ['model' => __('models/vehicles.singular')])
         );
     }
 
     /**
      * @OA\Get(
-     *      path="/suppliers/{id}",
-     *      summary="getSupplierItem",
-     *      tags={"Supplier"},
-     *      description="Get Supplier",
+     *      path="/vehicles/{id}",
+     *      summary="getVehicleItem",
+     *      tags={"Vehicle"},
+     *      description="Get Vehicle",
      *      @OA\Parameter(
      *          name="id",
-     *          description="id of Supplier",
+     *          description="id of Vehicle",
      *           @OA\Schema(
      *             type="integer"
      *          ),
@@ -152,7 +136,7 @@ class SupplierAPIController extends AppBaseController
      *              ),
      *              @OA\Property(
      *                  property="data",
-     *                  ref="#/components/schemas/Supplier"
+     *                  ref="#/components/schemas/Vehicle"
      *              ),
      *              @OA\Property(
      *                  property="message",
@@ -164,30 +148,30 @@ class SupplierAPIController extends AppBaseController
      */
     public function show($id): JsonResponse
     {
-        /** @var Supplier $supplier */
-        $supplier = $this->supplierRepository->find($id);
+        /** @var Vehicle $vehicle */
+        $vehicle = $this->vehicleRepository->find($id);
 
-        if (empty($supplier)) {
+        if (empty($vehicle)) {
             return $this->sendError(
-                __('messages.not_found', ['model' => __('models/suppliers.singular')])
+                __('messages.not_found', ['model' => __('models/vehicles.singular')])
             );
         }
 
         return $this->sendResponse(
-            new SupplierResource($supplier),
-            __('messages.retrieved', ['model' => __('models/suppliers.singular')])
+            new VehicleResource($vehicle),
+            __('messages.retrieved', ['model' => __('models/vehicles.singular')])
         );
     }
 
     /**
      * @OA\Put(
-     *      path="/suppliers/{id}",
-     *      summary="updateSupplier",
-     *      tags={"Supplier"},
-     *      description="Update Supplier",
+     *      path="/vehicles/{id}",
+     *      summary="updateVehicle",
+     *      tags={"Vehicle"},
+     *      description="Update Vehicle",
      *      @OA\Parameter(
      *          name="id",
-     *          description="id of Supplier",
+     *          description="id of Vehicle",
      *           @OA\Schema(
      *             type="integer"
      *          ),
@@ -196,7 +180,7 @@ class SupplierAPIController extends AppBaseController
      *      ),
      *      @OA\RequestBody(
      *        required=true,
-     *        @OA\JsonContent(ref="#/components/schemas/Supplier")
+     *        @OA\JsonContent(ref="#/components/schemas/Vehicle")
      *      ),
      *      @OA\Response(
      *          response=200,
@@ -209,7 +193,7 @@ class SupplierAPIController extends AppBaseController
      *              ),
      *              @OA\Property(
      *                  property="data",
-     *                  ref="#/components/schemas/Supplier"
+     *                  ref="#/components/schemas/Vehicle"
      *              ),
      *              @OA\Property(
      *                  property="message",
@@ -219,36 +203,36 @@ class SupplierAPIController extends AppBaseController
      *      )
      * )
      */
-    public function update($id, UpdateSupplierAPIRequest $request): JsonResponse
+    public function update($id, UpdateVehicleAPIRequest $request): JsonResponse
     {
         $input = $request->all();
 
-        /** @var Supplier $supplier */
-        $supplier = $this->supplierRepository->find($id);
+        /** @var Vehicle $vehicle */
+        $vehicle = $this->vehicleRepository->find($id);
 
-        if (empty($supplier)) {
+        if (empty($vehicle)) {
             return $this->sendError(
-                __('messages.not_found', ['model' => __('models/suppliers.singular')])
+                __('messages.not_found', ['model' => __('models/vehicles.singular')])
             );
         }
 
-        $supplier = $this->supplierRepository->update($input, $id);
+        $vehicle = $this->vehicleRepository->update($input, $id);
 
         return $this->sendResponse(
-            new SupplierResource($supplier),
-            __('messages.updated', ['model' => __('models/suppliers.singular')])
+            new VehicleResource($vehicle),
+            __('messages.updated', ['model' => __('models/vehicles.singular')])
         );
     }
 
     /**
      * @OA\Delete(
-     *      path="/suppliers/{id}",
-     *      summary="deleteSupplier",
-     *      tags={"Supplier"},
-     *      description="Delete Supplier",
+     *      path="/vehicles/{id}",
+     *      summary="deleteVehicle",
+     *      tags={"Vehicle"},
+     *      description="Delete Vehicle",
      *      @OA\Parameter(
      *          name="id",
-     *          description="id of Supplier",
+     *          description="id of Vehicle",
      *           @OA\Schema(
      *             type="integer"
      *          ),
@@ -278,20 +262,20 @@ class SupplierAPIController extends AppBaseController
      */
     public function destroy($id): JsonResponse
     {
-        /** @var Supplier $supplier */
-        $supplier = $this->supplierRepository->find($id);
+        /** @var Vehicle $vehicle */
+        $vehicle = $this->vehicleRepository->find($id);
 
-        if (empty($supplier)) {
+        if (empty($vehicle)) {
             return $this->sendError(
-                __('messages.not_found', ['model' => __('models/suppliers.singular')])
+                __('messages.not_found', ['model' => __('models/vehicles.singular')])
             );
         }
 
-        $supplier->delete();
+        $vehicle->delete();
 
         return $this->sendResponse(
             $id,
-            __('messages.deleted', ['model' => __('models/suppliers.singular')])
+            __('messages.deleted', ['model' => __('models/vehicles.singular')])
         );
     }
 }

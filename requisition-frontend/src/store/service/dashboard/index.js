@@ -1,11 +1,6 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import CustomBaseQuery from "@/store/service/branch";
+import { BaseAPI } from "@/store/service/requisitions/BaseAPI";
 
-export const DashboardAPI = createApi({
-    reducerPath: 'dashboard_api_service',
-    baseQuery: CustomBaseQuery,
-    refetchOnMountOrArgChange: true,
-    tagTypes: ['general_requisition', 'cash_requisition'],
+export const DashboardAPI = BaseAPI.injectEndpoints({
     endpoints: builder => ({
         getDashboardData : builder.query({
             query: arg => ({
@@ -19,7 +14,7 @@ export const DashboardAPI = createApi({
                 url: 'dashboard-cash-data',
                 params: arg
             }),
-            providesTags: ['cash_requisition']
+            providesTags: ['dashboard_cash_requisition']
         }),
         updateInitialStatus: builder.mutation({
             query: ({id, ...arg}) => ({
@@ -35,7 +30,7 @@ export const DashboardAPI = createApi({
                 method: 'PUT',
                 body: arg
             }),
-            invalidatesTags: ['general_requisition']
+            invalidatesTags: ['general_requisition', 'edit-purchase-requisition', 'cash_requisition', 'dashboard_cash_requisition']
         }),
         updateCashStatus: builder.mutation({
             query: ({id, ...arg}) => ({
@@ -43,7 +38,7 @@ export const DashboardAPI = createApi({
                 method: 'PUT',
                 body: arg
             }),
-            invalidatesTags: ['cash_requisition']
+            invalidatesTags: ['dashboard_cash_requisition', 'general_requisition', 'dashboard_cash_requisition']
         })
     })
 })

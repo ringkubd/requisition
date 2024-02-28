@@ -28,10 +28,8 @@ import { optionSlice } from '@/store/service/options/optionSlice'
 import { ProductActiveFormSlice } from "@/store/service/product/product_active_form";
 import { ProductBasicFormSlice } from "@/store/service/product/product_basic_form";
 
-import { InitialRequisitionApi } from "@/store/service/requisitions/initial";
 import { UserManagementApi } from "@/store/service/user/management";
 import { ChangeOrganizationBranchApi } from "@/store/service/user/ChangeOrganizationBranch";
-import { PurchaseRequisitionApi } from "@/store/service/requisitions/purchase";
 import { PurchaseRequisitionInputChangeSlice } from "@/store/service/requisitions/purchase_requisition_input_change";
 import { SuppliersApiService } from "@/store/service/suppliers";
 import { PurchaseApiService } from "@/store/service/purchase";
@@ -43,15 +41,16 @@ import { RolesApiService } from "@/store/service/roles";
 import { PermissionsApiService } from "@/store/service/permissions";
 import { errorSlice } from "@/store/slice/errorSlice";
 import { NavigationAPIService } from "@/store/service/navigation";
-import { CashRequisitionAPIService } from "@/store/service/cash/Index";
 import DashboardSlice from "@/store/slice/dashboardSlice";
 import ActivitySlice from "@/store/slice/activitySlice";
 import { ReportAPI } from "@/store/service/report";
 import { UserOnlineSlice } from "@/store/slice/userOnlineSlice";
-import { DashboardAPI } from "@/store/service/dashboard";
 import { encryptTransform } from "redux-persist-transform-encrypt";
 import { FilterDateRange } from "@/store/slice/filterDateRange";
 import ProductSearchSlice from "@/store/slice/productSearchSlice";
+import { BaseAPI } from "@/store/service/vehicle/BaseAPI";
+import {BaseAPI as RequisitionBaseAPI} from "@/store/service/requisitions/BaseAPI";
+import SupplierSlice from "@/store/slice/supplierSlice";
 
 const middlewares = [
     OrganizationApiService.middleware,
@@ -62,10 +61,8 @@ const middlewares = [
     DepartmentApiService.middleware,
     ProductApiService.middleware,
     ProductOptionApiService.middleware,
-    InitialRequisitionApi.middleware,
     UserManagementApi.middleware,
     ChangeOrganizationBranchApi.middleware,
-    PurchaseRequisitionApi.middleware,
     SuppliersApiService.middleware,
     PurchaseApiService.middleware,
     IssueApiService.middleware,
@@ -75,9 +72,9 @@ const middlewares = [
     RolesApiService.middleware,
     PermissionsApiService.middleware,
     NavigationAPIService.middleware,
-    CashRequisitionAPIService.middleware,
     ReportAPI.middleware,
-    DashboardAPI.middleware,
+    BaseAPI.middleware,
+    RequisitionBaseAPI.middleware,
 ];
 
 let transforms = null;
@@ -121,10 +118,8 @@ const combineReducer = combineReducers({
     product_active_form: ProductActiveFormSlice.reducer,
     product_basic_form: ProductBasicFormSlice.reducer,
     [ProductOptionApiService.reducerPath]: ProductOptionApiService.reducer,
-    [InitialRequisitionApi.reducerPath]: InitialRequisitionApi.reducer,
     [UserManagementApi.reducerPath]: UserManagementApi.reducer,
     [ChangeOrganizationBranchApi.reducerPath]: ChangeOrganizationBranchApi.reducer,
-    [PurchaseRequisitionApi.reducerPath]: PurchaseRequisitionApi.reducer,
     [SuppliersApiService.reducerPath]: SuppliersApiService.reducer,
     [PurchaseApiService.reducerPath]: PurchaseApiService.reducer,
     [IssueApiService.reducerPath]: IssueApiService.reducer,
@@ -134,10 +129,11 @@ const combineReducer = combineReducers({
     [RolesApiService.reducerPath]: RolesApiService.reducer,
     [PermissionsApiService.reducerPath]: PermissionsApiService.reducer,
     [NavigationAPIService.reducerPath]: NavigationAPIService.reducer,
-    [CashRequisitionAPIService.reducerPath]: CashRequisitionAPIService.reducer,
     [ReportAPI.reducerPath]: ReportAPI.reducer,
-    [DashboardAPI.reducerPath]: DashboardAPI.reducer,
+    supplier_search: SupplierSlice.reducer,
     filter_date_range: FilterDateRange.reducer,
+    [BaseAPI.reducerPath]: BaseAPI.reducer,
+    [RequisitionBaseAPI.reducerPath]: RequisitionBaseAPI.reducer,
 });
 
 const _persistedReducer = persistReducer(persistConfig, combineReducer);

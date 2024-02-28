@@ -186,3 +186,13 @@ Route::post('one_time_login', [\App\Http\Controllers\API\UserAPIController::clas
 
 Route::resource('product-issue-items', App\Http\Controllers\API\ProductIssueItemsAPIController::class)
     ->except(['create', 'edit']);
+
+
+Route::resource('vehicles', App\Http\Controllers\API\VehicleAPIController::class)
+    ->except(['create', 'edit']);
+
+Route::resource('pumps', App\Http\Controllers\API\PumpAPIController::class)
+    ->except(['create', 'edit']);
+
+Route::resource('vehicle-histories', App\Http\Controllers\API\VehicleHistoryAPIController::class)
+    ->except(['create', 'edit']);

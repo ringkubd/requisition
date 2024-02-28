@@ -15,15 +15,15 @@ import {
     getSuppliers
 } from "@/store/service/suppliers";
 import Image from "next/image";
+import { useDispatch, useSelector } from "react-redux";
+import { setSupplierSearch } from "@/store/slice/supplierSlice";
 
 const Department = () => {
     const router = useRouter();
-    const [searchString, setSearchString] = useState("");
-    const {data, isLoading, isError} = useGetSuppliersQuery({
-        name: searchString
-    });
+    const dispatch = useDispatch();
+    const supplierSearch = useSelector(state => state.supplier_search);
+    const {data, isLoading, isError} = useGetSuppliersQuery(supplierSearch);
     const [destroy, destroyResponse] = useDestroySuppliersMutation();
-
 
     useEffect(() => {
         if (!destroyResponse.isLoading && destroyResponse.isSuccess){
@@ -93,24 +93,27 @@ const Department = () => {
                             <div>
                                 <TextInput
                                     type="text"
-                                    onBlur={(e) => {
-                                        setSearchString(e.target.value)
+                                    onChange={(e) => {
+                                        dispatch(setSupplierSearch({...supplierSearch, name: e.target.value}))
                                     }}
+                                    value={supplierSearch?.name ?? ""}
                                 />
                             </div>
                         </div>
-                        {
-                            !isLoading && !isError && data && (
-                                <DataTable
-                                    columns={columns}
-                                    data={data.data}
-                                    pagination
-                                    responsive
-                                    progressPending={isLoading}
-                                    persistTableHead
-                                />
-                            )
-                        }
+                        <DataTable
+                            columns={columns}
+                            data={data?.data}
+                            pagination
+                            paginationServer
+                            onChangePage={(page) => {
+                                dispatch(setSupplierSearch({...supplierSearch, page}))
+                            }}
+                            paginationTotalRows={data?.number_of_rows}
+                            paginationPerPage={15}
+                            responsive
+                            progressPending={isLoading}
+                            persistTableHead
+                        />
                     </Card>
                 </div>
             </AppLayout>

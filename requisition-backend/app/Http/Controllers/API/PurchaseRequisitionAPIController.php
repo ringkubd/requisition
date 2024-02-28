@@ -514,7 +514,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                         broadcast(new RequisitionStatusEvent(new PurchaseRequisitionResource($requisition), [$requisition->user, $requisition->initialRequisition->user]));
                     }
             }
-            if ( $requisition->initialRequisition->approval_status){
+            if ($requisition->initialRequisition->has('approval_status')){
                 $requisition->initialRequisition->approval_status()->update($data);
             }else{
                 $requisition->initialRequisition->approval_status()->updateOrCreate($data);

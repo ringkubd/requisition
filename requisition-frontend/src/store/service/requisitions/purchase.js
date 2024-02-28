@@ -1,11 +1,7 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import CustomBaseQuery from "@/store/service/branch";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
+import { BaseAPI } from "@/store/service/requisitions/BaseAPI";
 
-export const PurchaseRequisitionApi = createApi({
-    reducerPath: 'purchase-requisition',
-    baseQuery: CustomBaseQuery,
-    tagTypes: ['purchase-requisition', 'edit-purchase-requisition', 'get-initial-requisition-for-purchase'],
+export const PurchaseRequisitionApi = BaseAPI.injectEndpoints({
     endpoints: build => ({
         getPurchaseRequisition: build.query({
             query: (arg) => ({
@@ -48,14 +44,6 @@ export const PurchaseRequisitionApi = createApi({
             invalidatesTags: ['purchase-requisition', 'get-initial-requisition-for-purchase'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
-        lastPurchaseInformation: build.query({
-            query: (arg) => ({
-                url: 'last-purchase-information',
-                method: 'GET',
-                body: arg
-            }),
-            onQueryStarted: onQueryStartedErrorToast,
-        }),
         getInitialRequisitionForPurchase: build.query({
             query: () => ({
                 url: 'initial_requisition_for_initiate_purchase',
@@ -82,7 +70,6 @@ export const {
     useUpdatePurchaseRequisitionMutation,
     useStorePurchaseRequisitionMutation,
     useDestroyPurchaseRequisitionMutation,
-    useLastPurchaseInformationQuery,
     useGetInitialRequisitionForPurchaseQuery,
     useUpdatePurchaseRequisitionPriceMutation,
     util: { getRunningQueriesThunk },

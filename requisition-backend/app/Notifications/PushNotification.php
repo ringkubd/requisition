@@ -18,11 +18,11 @@ class PushNotification extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct($title, $body, $data)
+    public function __construct($title, $body)
     {
         $this->title = $title;
         $this->body = $body;
-        $this->data = $data;
+//        $this->data = $data;
     }
 
     /**
@@ -41,8 +41,10 @@ class PushNotification extends Notification
             ->title($this->title)
             ->icon('/logo.svg')
             ->body($this->body)
-            ->data($this->data)
-//            ->vibrate([200, 100, 200])
+//            ->data([
+//                'title' => $this->data?->title,
+//            ])
+            ->vibrate([200, 100, 200])
             ->requireInteraction(true)
             ->options(['TTL' => 1000]);
     }
