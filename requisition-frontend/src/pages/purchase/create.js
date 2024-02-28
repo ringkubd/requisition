@@ -7,7 +7,7 @@ import { ErrorMessage, Formik } from "formik";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import * as Yup from 'yup';
-import { useStorePurchaseMutation } from "@/store/service/purchase";
+import { useSelectSuppliersQuery, useStorePurchaseMutation } from "@/store/service/purchase";
 import moment from "moment/moment";
 import { useGetCountriesQuery } from "@/store/service/country";
 import axios from "@/lib/axios";
@@ -36,7 +36,7 @@ const create = (props) => {
     const {data: brands, isError: brandsISError, isSuccess: brandsISSUccess, isLoading: brandsISLoading} = useGetBrandsQuery();
     const [storeBrand, storeBrandResult] = useStoreBrandsMutation();
 
-    const {data: suppliers, isError: suppliersISError, isSuccess: suppliersISSUccess, isLoading: suppliersISLoading} = useGetSuppliersQuery();
+    const {data: suppliers, isError: suppliersISError, isSuccess: suppliersISSUccess, isLoading: suppliersISLoading} = useSelectSuppliersQuery();
     const [storeSupplier, storeSupplierResult] = useStoreSuppliersMutation();
 
     useEffect(() => {

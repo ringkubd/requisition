@@ -23,7 +23,7 @@ const Suppliers = () => {
     const router = useRouter();
     const dispatch = useDispatch();
     const supplierSearch = useSelector(state => state.supplier_search);
-    const {data, isLoading, isError} = useSelectSuppliersQuery(supplierSearch);
+    const {data, isLoading, isError} = useGetSuppliersQuery(supplierSearch);
     const [destroy, destroyResponse] = useDestroySuppliersMutation();
 
     useEffect(() => {
