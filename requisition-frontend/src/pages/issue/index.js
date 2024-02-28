@@ -22,6 +22,7 @@ import { useGetDepartmentByOrganizationBranchQuery } from '@/store/service/depar
 import { AiOutlineSearch } from 'react-icons/ai'
 import { useDispatch, useSelector } from "react-redux";
 import { setDateRange } from "@/store/slice/filterDateRange";
+import { hasPermission } from "@/lib/helpers";
 
 const ProductIssue = () => {
     const { user } = useAuth()
@@ -161,11 +162,15 @@ const ProductIssue = () => {
                 <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
                     <Card>
                         <div className="flex sm:flex-row flex-col space-x-4 space-y-4  shadow-lg py-4 px-4">
-                            <NavLink
-                                active={router.pathname === 'issue/create'}
-                                href={`issue/create`}>
-                                <Button>Create</Button>
-                            </NavLink>
+                            {
+                                hasPermission('create_product-issues', user) ? (
+                                    <NavLink
+                                        active={router.pathname === 'issue/create'}
+                                        href={`issue/create`}>
+                                        <Button>Create</Button>
+                                    </NavLink>
+                                ) : null
+                            }
                             <div className={`flex sm:flex-row flex-col`}>
                                 <Label
                                     htmlFor={`date_range`}

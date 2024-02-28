@@ -271,7 +271,6 @@ const Navigation = ({ user }) => {
 
                                             {
                                                 checkPermission([
-                                                    'view_products',
                                                     'create_products',
                                                     'update_products',
                                                     'delete_products',
