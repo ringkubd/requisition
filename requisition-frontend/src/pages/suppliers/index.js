@@ -17,12 +17,13 @@ import {
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { setSupplierSearch } from "@/store/slice/supplierSlice";
+import { useSelectSuppliersQuery } from "@/store/service/purchase";
 
-const Department = () => {
+const Suppliers = () => {
     const router = useRouter();
     const dispatch = useDispatch();
     const supplierSearch = useSelector(state => state.supplier_search);
-    const {data, isLoading, isError} = useGetSuppliersQuery(supplierSearch);
+    const {data, isLoading, isError} = useSelectSuppliersQuery(supplierSearch);
     const [destroy, destroyResponse] = useDestroySuppliersMutation();
 
     useEffect(() => {
@@ -130,4 +131,4 @@ export const getServerSideProps = wrapper.getServerSideProps((store) => async (c
     };
 })
 
-export default Department;
+export default Suppliers;

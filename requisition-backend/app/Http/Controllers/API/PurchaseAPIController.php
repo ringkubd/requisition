@@ -356,7 +356,8 @@ class PurchaseAPIController extends AppBaseController
      * @return JsonResponse
      */
 
-    public function suppliers(Request $request){
+    public function suppliers(Request $request): JsonResponse
+    {
         $start = ((int)$request->page - 1) * 10;
         $end = ((int)$request->page) * 10;
 

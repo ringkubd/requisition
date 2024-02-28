@@ -51,6 +51,13 @@ export const PurchaseApiService = createApi({
             }),
             invalidatesTags: ['getPurchase'],
             onQueryStarted: onQueryStartedErrorToast,
+        }),
+        selectSuppliers: builder.query({
+            query: (arg) => ({
+                url: `suppliers-select`,
+                params: arg
+            }),
+            onQueryStarted: onQueryStartedErrorToast,
         })
     }),
 })
@@ -62,6 +69,7 @@ export const {
     useUpdatePurchaseMutation,
     useStorePurchaseMutation,
     useDestroyPurchaseMutation,
+    useSelectSuppliersQuery,
     util: { getRunningQueriesThunk },
 } = PurchaseApiService;
 
