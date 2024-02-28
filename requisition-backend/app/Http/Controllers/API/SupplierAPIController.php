@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\UpdateSupplierAPIRequest;
+use App\Http\Resources\SupplierGeneralResource;
 use App\Models\Supplier;
 use App\Repositories\SupplierRepository;
 use Carbon\Carbon;
@@ -70,7 +71,7 @@ class SupplierAPIController extends AppBaseController
             })->paginate();
 
         return response()->json([
-                'data' => SupplierResource::collection($suppliers),
+                'data' => SupplierGeneralResource::collection($suppliers),
                 "number_of_rows" => $suppliers->total(),
                 "message" => __('messages.retrieved', ['model' => __('models/products.plural')]),
             ]);

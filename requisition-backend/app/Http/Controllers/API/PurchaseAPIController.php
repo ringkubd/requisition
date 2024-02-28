@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreatePurchaseAPIRequest;
 use App\Http\Requests\API\UpdatePurchaseAPIRequest;
 use App\Http\Resources\PurchaseRequisitionResource;
+use App\Http\Resources\SupplierGeneralResource;
 use App\Http\Resources\SupplierResource;
 use App\Models\ProductOption;
 use App\Models\Purchase;
@@ -361,10 +362,10 @@ class PurchaseAPIController extends AppBaseController
         $start = ((int)$request->page - 1) * 10;
         $end = ((int)$request->page) * 10;
 
-        $suppliers = SupplierResource::collection(Supplier::query()
+        $suppliers = SupplierGeneralResource::collection(Supplier::query()
             ->where('name', 'like', "%$request->search%")
-            ->skip($start)
-            ->limit($end)
+//            ->skip($start)
+//            ->limit($end)
             ->get());
 
         return $this->sendResponse(
