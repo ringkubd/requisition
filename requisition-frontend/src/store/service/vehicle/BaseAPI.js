@@ -10,6 +10,7 @@ export const BaseAPI = createApi({
         'single-pumps',
         'vehicles',
         'single-vehicles',
-        'vehicle-history'
+        'vehicle-history',
+        'single-vehicle-history',
     ]
 })

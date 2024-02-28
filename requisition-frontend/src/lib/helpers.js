@@ -43,8 +43,7 @@ function isCompositeTypeElement(element) {
 function hasPermission(permission, user){
     if (user && user.permissions){
         return user.permissions.map(p => p.name === permission).length ||
-            user.role_object?.map(r => r.name === "Super Admin").length ||
-            user.role_object?.permissions?.map(p => p.name === permission).length
+            user.role_object?.map(r => r.name === "Super Admin").length
     }
     return false;
 }
