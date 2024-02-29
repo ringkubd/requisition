@@ -1,10 +1,6 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import CustomBaseQuery from "@/store/service/branch";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const ChangeOrganizationBranchApi = createApi({
-    reducerPath: 'change_organization_branch',
-    baseQuery: CustomBaseQuery,
-    tagTypes: [],
+export const ChangeOrganizationBranchApi = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         setBranch: builder.mutation({
             query: arg => ({

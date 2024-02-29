@@ -1,11 +1,7 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import CustomBaseQuery from "@/store/service/branch";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const RolesApiService = createApi({
-    reducerPath: 'roles',
-    baseQuery: CustomBaseQuery,
-    tagTypes: ['getRoles', 'editRoles'],
+export const RolesApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getRoles: builder.query({
             query: () => ({

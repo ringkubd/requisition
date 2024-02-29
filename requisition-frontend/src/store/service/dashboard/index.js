@@ -1,6 +1,6 @@
-import { BaseAPI } from "@/store/service/requisitions/BaseAPI";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const DashboardAPI = BaseAPI.injectEndpoints({
+export const DashboardAPI = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getDashboardData : builder.query({
             query: arg => ({

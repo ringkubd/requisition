@@ -1,7 +1,7 @@
-import { BaseAPI } from "@/store/service/vehicle/BaseAPI";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const VehicleHistoryAPI = BaseAPI.injectEndpoints({
+export const VehicleHistoryAPI = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getVehicleHistory: builder.query({
             query: (params) => ({

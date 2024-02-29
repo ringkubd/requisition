@@ -1,9 +1,7 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import CustomBaseQuery from "@/store/service/branch";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { BaseAPI } from "@/store/service/requisitions/BaseAPI";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const CashRequisitionAPIService = BaseAPI.injectEndpoints({
+export const CashRequisitionAPIService = GeneralBaseAPI.injectEndpoints({
     endpoints: build => ({
         getCashRequisition: build.query({
             query: params => ({

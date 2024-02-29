@@ -1,10 +1,6 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import CustomBaseQuery from "@/store/service/branch";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const ReportAPI = createApi({
-    reducerPath: 'report',
-    baseQuery: CustomBaseQuery,
-    tagTypes: [],
+export const ReportAPI = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         daily: builder.query({
             query: arg => ({

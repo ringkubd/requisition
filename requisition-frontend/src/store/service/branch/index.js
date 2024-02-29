@@ -1,40 +1,7 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { fetchBaseQuery } from "@reduxjs/toolkit/dist/query/react";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-const CustomBaseQuery = fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,
-    prepareHeaders: (headers) => {
-        fetch(
-            process.env.NEXT_PUBLIC_BACKEND_URL + '/sanctum/csrf-cookie',
-            {
-                method: 'GET',
-                credentials: 'include',
-            },
-        )
-        if (document){
-            let cookieArray = document.cookie.split(";");
-            // this can probably be improved by using a regex.. but this works for now
-            for(var i = 0; i < cookieArray.length; i++) {
-                let cookiePair = cookieArray[i].split("=");
-
-                if (cookiePair[0].trim() == 'XSRF-TOKEN-PORTAL') {
-                    headers.set('X-XSRF-TOKEN-PORTAL', decodeURIComponent(cookiePair[1]))
-                }
-
-            }
-            headers.set('Accept', `application/json`)
-        }
-
-        return headers
-    },
-    credentials: 'include',
-})
-
-export const BranchApiService = createApi({
-    reducerPath: 'branch',
-    baseQuery: CustomBaseQuery,
-    tagTypes: ['getBranch', 'editBranch'],
+export const BranchApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getBranch: builder.query({
             query: () => ({

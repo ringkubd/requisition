@@ -1,6 +1,6 @@
-import { BaseAPI } from "@/store/service/vehicle/BaseAPI";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const PumpAPIService = BaseAPI.injectEndpoints({
+export const PumpAPIService = GeneralBaseAPI.injectEndpoints({
     endpoints: (builder) => ({
         getPump: builder.query({
             query: (params) => ({

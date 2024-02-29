@@ -1,11 +1,7 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import CustomBaseQuery from "@/store/service/branch";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const UserManagementApi = createApi({
-    reducerPath: 'user_management',
-    baseQuery: CustomBaseQuery,
-    tagTypes: ['getAllUsers'],
+export const UserManagementApi = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getUsers: builder.query({
             query: (arg) => ({

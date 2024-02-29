@@ -1,7 +1,7 @@
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { BaseAPI } from "@/store/service/requisitions/BaseAPI";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const PurchaseRequisitionApi = BaseAPI.injectEndpoints({
+export const PurchaseRequisitionApi = GeneralBaseAPI.injectEndpoints({
     endpoints: build => ({
         getPurchaseRequisition: build.query({
             query: (arg) => ({

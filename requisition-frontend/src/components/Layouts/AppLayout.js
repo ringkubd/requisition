@@ -14,7 +14,7 @@ import { addNewOnline, removeOnline, setAllOnline } from "@/store/slice/userOnli
 import { Badge, ListGroup, Tooltip } from "flowbite-react";
 import { DashboardAPI } from "@/store/service/dashboard";
 import { useSubscribePushNotificationMutation } from "@/store/service/navigation";
-import { BaseAPI } from "@/store/service/requisitions/BaseAPI";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
 const AppLayout = ({ header, children }) => {
     const router = useRouter();
@@ -82,7 +82,7 @@ const AppLayout = ({ header, children }) => {
             window.Echo.private(`requisition-status.${user?.id}`)
                 .listen('RequisitionStatusEvent', event => {
                     dispatch(updateSingleInitialRequisition(event.requisition));
-                    dispatch(BaseAPI.util.invalidateTags(['general_requisition', 'cash_requisition', 'edit-purchase-requisition', 'dashboard_cash_requisition']));
+                    dispatch(GeneralBaseAPI.util.invalidateTags(['general_requisition', 'cash_requisition', 'edit-purchase-requisition', 'dashboard_cash_requisition']));
                     toast.success(`Requisition Status Updated`)
                 })
         }

@@ -1,11 +1,7 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import CustomBaseQuery from "@/store/service/branch";
 import { onQueryStartedErrorToast } from "@/lib/clientHelper";
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
-export const PermissionsApiService = createApi({
-    reducerPath: 'permissions_api',
-    baseQuery: CustomBaseQuery,
-    tagTypes: ['getPermissions', 'editPermissions'],
+export const PermissionsApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getPermissions: builder.query({
             query: () => ({
