@@ -6,7 +6,6 @@ const BothReport = forwardRef(({data,isLoading, columns}, ref) => {
     if (isLoading){
         return <Loading />
     }
-
     return (
         <div
             className={`flex flex-col m-2 justify-center justify-items-center p-4 shadow-none`}
@@ -21,7 +20,7 @@ const BothReport = forwardRef(({data,isLoading, columns}, ref) => {
                             className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                             SL#
                         </th>
-                        {columns.category ? (
+                        {data?.categories?.length > 1 ? (
                             <th
                                 scope="col"
                                 className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
@@ -60,7 +59,7 @@ const BothReport = forwardRef(({data,isLoading, columns}, ref) => {
                         Object.keys(data?.both)?.map((p, index) => (
                             <tr key={p.id} className={`border bg-white`}>
                                 <td className={`border`}>{index + 1}</td>
-                                {columns.category ? (
+                                {data?.categories?.length > 1 ? (
                                     <td className={`border text-left p-1`}>
                                         {data?.both[p][0].category?.title}
                                     </td>

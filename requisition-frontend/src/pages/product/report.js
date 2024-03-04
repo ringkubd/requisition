@@ -17,7 +17,7 @@ import {
     useIssuesReportMutation,
     usePurchaseReportMutation,
     useBothReportMutation,
-    useProductCurrentBalanceMutation, useProductCurrentBalanceOptionMutation
+    useProductCurrentBalanceMutation
 } from "@/store/service/report";
 import { useReactToPrint } from "react-to-print";
 import ItemBaseIssueReport from "@/components/report/itemBaseIssueReport";
@@ -37,7 +37,8 @@ const Report = () => {
     const [submitPurchaseReport, {data: purchaseReport, isLoading: purchaseReportISLoading, isError:purchaseReportISError, isSuccess: purchaseReportISSuccess}] = usePurchaseReportMutation();
     const [submitBothReport, {data: bothReport, isLoading: bothReportISLoading, isError:bothReportISError, isSuccess: bothReportISSuccess}] = useBothReportMutation();
     const [submitBalance, {data: balance, isLoading: balanceISLoading, isError:balanceISError, isSuccess: balanceISSuccess}] = useProductCurrentBalanceMutation();
-    const [submitBalanceOption, {data: balanceOption, isLoading: balanceOptionISLoading, isError:balanceOptionISError, isSuccess: balanceOptionISSuccess}] = useProductCurrentBalanceOptionMutation();
+
+    const [selectedCategoriesName, setSelectedCategoriesName] = useState(["All"]);
 
     const printRef = useRef();
     const [reportType, setReportType] = useState('usage');
@@ -572,6 +573,9 @@ const Report = () => {
                                                             v => v.value,
                                                         ),
                                                     )
+                                                    setSelectedCategoriesName(newValue?.map(
+                                                        v => v.label,
+                                                    ) ?? false,)
                                                 }}
                                             />
                                             <ErrorMessage name={'category'} />
@@ -679,6 +683,9 @@ const Report = () => {
                                                         )
                                                       : '')}
                                         </i>
+                                    </div>
+                                    <div className={`flex justify-center items-center justify-items-center text-center`}>
+                                        <b>{selectedCategoriesName.length === 1 || !selectedCategoriesName.length ? "Category "+ (!selectedCategoriesName.length ? 'All' :selectedCategoriesName[0]) : ""}</b>
                                     </div>
                                 </div>
                                 {reportType === 'purchase' ? (

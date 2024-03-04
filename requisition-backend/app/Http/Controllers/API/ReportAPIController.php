@@ -152,7 +152,6 @@ class ReportAPIController extends AppBaseController
         $products = explode(',',$request->product);
         $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
         $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
-        $report_format = $request->report_format;
 
         $product_report = ProductResource::collection(Product::query()
             ->when(!empty($request->category), function ($q) use ($categories){
@@ -184,7 +183,8 @@ class ReportAPIController extends AppBaseController
         return response()->json([
             'both' => $product_report->collection->groupBy('title'),
             'start_date' => $first,
-            'end_date' => $last
+            'end_date' => $last,
+            'categories' => $categories
         ]);
     }
 
