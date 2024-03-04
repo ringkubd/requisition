@@ -289,8 +289,7 @@ const Report = () => {
                                                 </Label>
                                             </div>
                                         </fieldset>
-                                        {reportType !== 'both' &&
-                                        reportType !== 'balance' ? (
+                                        {reportType !== 'both' && reportType !== 'balance' ? (
                                             <>
                                                 <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
                                                     <legend className="mb-4 font-bold">
@@ -332,130 +331,133 @@ const Report = () => {
                                                     )}
                                                 </fieldset>
                                             </>
-                                        ) : reportType !== 'both' ? (
-                                            <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
-                                                <legend className="mb-4 font-bold">
-                                                    Report Format
-                                                </legend>
-                                                {reportType !== 'balance' ? (
-                                                    <>
-                                                        <div className="flex items-center gap-2">
-                                                            <Radio
-                                                                id="category_base"
-                                                                name="report_format"
-                                                                defaultChecked={
-                                                                    values.report_format ===
-                                                                    'category_base'
-                                                                }
-                                                                onChange={e => {
-                                                                    handleChange(
-                                                                        e,
-                                                                    )
-                                                                    if (
-                                                                        e.target
-                                                                            .checked
-                                                                    ) {
-                                                                        setReportFormat(
-                                                                            'category_base',
-                                                                        )
+                                        ) : ""}
+                                        {
+                                            reportType !== 'both' ? (
+                                                <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
+                                                    <legend className="mb-4 font-bold">
+                                                        Report Format
+                                                    </legend>
+                                                    {reportType !== 'balance' ? (
+                                                        <>
+                                                            <div className="flex items-center gap-2">
+                                                                <Radio
+                                                                    id="category_base"
+                                                                    name="report_format"
+                                                                    defaultChecked={
+                                                                        values.report_format ===
+                                                                        'category_base'
                                                                     }
-                                                                }}
-                                                            />
-                                                            <Label
-                                                                htmlFor="category_base"
-                                                                className={`font-bold`}>
-                                                                Category Base
-                                                            </Label>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <Radio
-                                                                id="item_base"
-                                                                name="report_format"
-                                                                defaultChecked={
-                                                                    values.report_format ===
-                                                                    'item_base'
-                                                                }
-                                                                onChange={e => {
-                                                                    handleChange(
-                                                                        e,
-                                                                    )
-                                                                    if (
-                                                                        e.target
-                                                                            .checked
-                                                                    ) {
-                                                                        setReportFormat(
-                                                                            'item_base',
+                                                                    onChange={e => {
+                                                                        handleChange(
+                                                                            e,
                                                                         )
+                                                                        if (
+                                                                            e.target
+                                                                                .checked
+                                                                        ) {
+                                                                            setReportFormat(
+                                                                                'category_base',
+                                                                            )
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                <Label
+                                                                    htmlFor="category_base"
+                                                                    className={`font-bold`}>
+                                                                    Category Base
+                                                                </Label>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <Radio
+                                                                    id="item_base"
+                                                                    name="report_format"
+                                                                    defaultChecked={
+                                                                        values.report_format ===
+                                                                        'item_base'
                                                                     }
-                                                                }}
-                                                            />
-                                                            <Label
-                                                                htmlFor="item_base"
-                                                                className={`font-bold`}>
-                                                                Item Base
-                                                            </Label>
-                                                        </div>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <div className="flex items-center gap-2">
-                                                            <Radio
-                                                                id="item_base"
-                                                                name="report_format"
-                                                                defaultChecked={
-                                                                    values.report_format ===
-                                                                    'item_base'
-                                                                }
-                                                                onChange={e => {
-                                                                    if (
-                                                                        e.target
-                                                                            .checked
-                                                                    ) {
-                                                                        setReportFormat(
-                                                                            'item_base',
+                                                                    onChange={e => {
+                                                                        handleChange(
+                                                                            e,
                                                                         )
-                                                                        setFieldValue('report_format', 'item_base');
+                                                                        if (
+                                                                            e.target
+                                                                                .checked
+                                                                        ) {
+                                                                            setReportFormat(
+                                                                                'item_base',
+                                                                            )
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                <Label
+                                                                    htmlFor="item_base"
+                                                                    className={`font-bold`}>
+                                                                    Item Base
+                                                                </Label>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <div className="flex items-center gap-2">
+                                                                <Radio
+                                                                    id="item_base"
+                                                                    name="report_format"
+                                                                    defaultChecked={
+                                                                        values.report_format ===
+                                                                        'item_base'
                                                                     }
-                                                                }}
-                                                            />
-                                                            <Label
-                                                                htmlFor="item_base"
-                                                                className={`font-bold`}>
-                                                                Item Base
-                                                            </Label>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <Radio
-                                                                id="option_base"
-                                                                name="report_format"
-                                                                defaultChecked={
-                                                                    values.report_format ===
-                                                                    'option_base'
-                                                                }
-                                                                onChange={e => {
-                                                                    if (
-                                                                        e.target
-                                                                            .checked
-                                                                    ) {
-                                                                        setReportFormat(
-                                                                            'option_base',
-                                                                        )
-                                                                        setFieldValue('report_format', 'option_base');
+                                                                    onChange={e => {
+                                                                        if (
+                                                                            e.target
+                                                                                .checked
+                                                                        ) {
+                                                                            setReportFormat(
+                                                                                'item_base',
+                                                                            )
+                                                                            setFieldValue('report_format', 'item_base');
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                <Label
+                                                                    htmlFor="item_base"
+                                                                    className={`font-bold`}>
+                                                                    Item Base
+                                                                </Label>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <Radio
+                                                                    id="option_base"
+                                                                    name="report_format"
+                                                                    defaultChecked={
+                                                                        values.report_format ===
+                                                                        'option_base'
                                                                     }
-                                                                }}
-                                                            />
-                                                            <Label
-                                                                htmlFor="option_base"
-                                                                className={`font-bold`}>
-                                                                Variant Base
-                                                            </Label>
-                                                        </div>
-                                                    </>
-                                                )}
-                                            </fieldset>
-                                        ) : (
-                                            ''
-                                        )}
+                                                                    onChange={e => {
+                                                                        if (
+                                                                            e.target
+                                                                                .checked
+                                                                        ) {
+                                                                            setReportFormat(
+                                                                                'option_base',
+                                                                            )
+                                                                            setFieldValue('report_format', 'option_base');
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                <Label
+                                                                    htmlFor="option_base"
+                                                                    className={`font-bold`}>
+                                                                    Variant Base
+                                                                </Label>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </fieldset>
+                                            ) : (
+                                                ''
+                                            )
+                                        }
                                     </div>
                                     <div
                                         className={`flex flex-col sm:flex-row w-full sm:space-x-4`}>
@@ -685,12 +687,14 @@ const Report = () => {
                                             data={purchaseReport}
                                             columns={columns}
                                             isLoading={purchaseReportISLoading}
+                                            key={reportFormat}
                                         />
                                     ) : (
                                         <ItemBasePurchaseReport
                                             data={purchaseReport}
                                             columns={columns}
                                             isLoading={purchaseReportISLoading}
+                                            key={reportFormat}
                                         />
                                     )
                                 ) : reportType === 'usage' ? (

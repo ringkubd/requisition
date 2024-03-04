@@ -3,8 +3,6 @@ import { useRouter } from "next/router";
 import { useEditProductQuery } from "@/store/service/product/product";
 import Head from "next/head";
 import { Button, Card, Table } from "flowbite-react";
-import Image from "next/image";
-import moment from "moment";
 import IssueLog from "@/components/product/IssueLog";
 import PurchaseLog from "@/components/product/PurchaseLog";
 

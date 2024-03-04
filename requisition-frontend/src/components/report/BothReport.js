@@ -33,11 +33,11 @@ const BothReport = forwardRef(({data,isLoading, columns}, ref) => {
                             className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                             Item
                         </th>
-                        <th
-                            scope="col"
-                            className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                            Prev. Stock
-                        </th>
+                        {/*<th*/}
+                        {/*    scope="col"*/}
+                        {/*    className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>*/}
+                        {/*    Prev. Stock*/}
+                        {/*</th>*/}
                         <th
                             scope="col"
                             className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
@@ -68,20 +68,20 @@ const BothReport = forwardRef(({data,isLoading, columns}, ref) => {
                                 <td className={`border text-left p-1`}>
                                     {data?.both[p][0].title}
                                 </td>
-                                <td className={`border text-center p-1`}>
-                                    {data?.both[p]
-                                        .reduce((o, n) => {
-                                            return n.product_options.reduce(
-                                                (o, p) => {
-                                                    return (
-                                                        o - p.purchase_history_qty + p.stock + p.issue_qty
-                                                    )
-                                                },
-                                                o,
-                                            )
-                                        }, 0)
-                                        .toFixed(2)} {data?.both[p][0]?.unit}
-                                </td>
+                                {/*<td className={`border text-center p-1`}>*/}
+                                {/*    {data?.both[p]*/}
+                                {/*        .reduce((o, n) => {*/}
+                                {/*            return n.product_options.reduce(*/}
+                                {/*                (o, p) => {*/}
+                                {/*                    return (*/}
+                                {/*                        o - p.purchase_history_qty + p.stock + p.issue_qty*/}
+                                {/*                    )*/}
+                                {/*                },*/}
+                                {/*                o,*/}
+                                {/*            )*/}
+                                {/*        }, 0)*/}
+                                {/*        .toFixed(2)} {data?.both[p][0]?.unit}*/}
+                                {/*</td>*/}
                                 <td className={`border text-center`}>
                                     {data?.both[p]
                                         .reduce((o, n) => {

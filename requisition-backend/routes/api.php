@@ -173,7 +173,7 @@ Route::prefix('report')->group(function (){
     Route::get('issues', [\App\Http\Controllers\API\ReportAPIController::class, 'issueReport']);
     Route::get('both', [\App\Http\Controllers\API\ReportAPIController::class, 'bothReport']);
     Route::get('product-current-balance', [\App\Http\Controllers\API\ReportAPIController::class, 'currentBalance']);
-    Route::get('product-current-balance-option', [\App\Http\Controllers\API\ReportAPIController::class, 'currentBalanceOptionBase']);
+//    Route::get('product-current-balance-option', [\App\Http\Controllers\API\ReportAPIController::class, 'currentBalanceOptionBase']);
 });
 
 Route::put('update_initial_status/{requisition}', [InitialRequisitionAPIController::class, 'changeStatusDepartment']);

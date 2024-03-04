@@ -93,7 +93,7 @@ const makeStore = () => configureStore({
 
 setupListeners(makeStore().dispatch);
 
-export const wrapper = createWrapper(makeStore, process.env.NODE_ENV === 'development' ? { debug: false }: {debug: false});
+export const wrapper = createWrapper(makeStore, process.env.NODE_ENV === 'development' ? { debug: true }: {debug: false});
 export const store = makeStore();
 export const perStore = persistStore(store);
 export const dispatch = store.dispatch;

@@ -87,9 +87,9 @@ const ItemBasePurchaseReport = forwardRef(({data,isLoading, columns}, ref) => {
                                 {data?.purchase[p].length}
                             </td>
                             <td className={`border text-center`}>
-                                {/*{data?.purchase[p]?.reduce((o, n) => {*/}
-                                {/*    return o + n.qty;*/}
-                                {/*}, 0)}*/}
+                                {data?.purchase[p]?.reduce((o, n) => {
+                                    return o + n.qty;
+                                }, 0)}
                                 {data?.purchase[p][0]?.product?.unit}
                             </td>
                             <td className={`border text-right px-2`}>
