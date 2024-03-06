@@ -187,12 +187,20 @@ const Navigation = ({ user }) => {
                                                     'update_purchases',
                                                     'delete_purchases',
                                                 ]) ? (
-                                                    <DropdownLink
-                                                        href="/product/report"
-                                                        active={router.pathname.includes('report').toString()}
-                                                    >
-                                                        Report
-                                                    </DropdownLink>
+                                                    <>
+                                                        <DropdownLink
+                                                            href="/product/report"
+                                                            active={router.pathname.includes('report').toString()}
+                                                        >
+                                                            Report
+                                                        </DropdownLink>
+                                                        <DropdownLink
+                                                            href="/vehicle/report"
+                                                            active={router.pathname.includes('vehicle').toString()}
+                                                        >
+                                                            Fuel
+                                                        </DropdownLink>
+                                                    </>
                                                 ) : null }
                                         </Dropdown>
                                     ) : null }

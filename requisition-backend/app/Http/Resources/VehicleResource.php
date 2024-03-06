@@ -22,6 +22,7 @@ class VehicleResource extends JsonResource
             'cash_product_id' => $this->cash_product_id,
             'cashProduct' => $this->cashProduct,
             'ownership' => $this->ownership,
+            'last_mileage' => $this->vehicleHistories()?->latest()?->first()?->current_mileage,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

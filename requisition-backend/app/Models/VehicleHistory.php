@@ -127,7 +127,6 @@ use Illuminate\Database\Eloquent\Model;
         'last_mileage' => 'required|numeric',
         'current_mileage' => 'required|numeric',
         'pump_id' => 'nullable',
-        'user_id' => 'required',
         'deleted_at' => 'nullable',
         'created_at' => 'nullable',
         'updated_at' => 'nullable'

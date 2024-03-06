@@ -113,4 +113,9 @@ use OpenApi\Annotations as OA;
     {
         return $this->belongsTo(\App\Models\CashRequisition::class, 'cash_requisition_id');
     }
+
+    public function item(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(CashProduct::class, 'item', 'title');
+    }
 }

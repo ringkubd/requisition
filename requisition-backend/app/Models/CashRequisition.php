@@ -116,4 +116,9 @@ use OpenApi\Annotations as OA;
     {
         return $this->morphOne(RequisitionStatus::class, 'requisition');
     }
+
+    public function refuelHistory(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(VehicleHistory::class);
+    }
 }

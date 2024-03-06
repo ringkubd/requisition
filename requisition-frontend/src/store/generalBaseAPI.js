@@ -88,6 +88,7 @@ export const GeneralBaseAPI = createApi({
         'editRoles',
         'getAllUsers',
         'getBranch',
-        'editBranch'
+        'editBranch',
+        'cash-requisition-select-vehicle'
     ]
 })

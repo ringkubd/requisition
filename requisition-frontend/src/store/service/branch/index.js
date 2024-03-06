@@ -72,5 +72,3 @@ export const {
     storeBranch,
     destroyBranch,
 } = BranchApiService.endpoints;
-
-export default CustomBaseQuery;

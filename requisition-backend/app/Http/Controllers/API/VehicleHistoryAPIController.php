@@ -4,12 +4,15 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateVehicleHistoryAPIRequest;
 use App\Http\Requests\API\UpdateVehicleHistoryAPIRequest;
+use App\Http\Resources\CashRequisitionResource;
+use App\Models\CashRequisition;
 use App\Models\VehicleHistory;
 use App\Repositories\VehicleHistoryRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\VehicleHistoryResource;
+use OpenApi\Annotations as OA;
 
 /**
  * Class VehicleHistoryController
@@ -55,16 +58,18 @@ class VehicleHistoryAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $vehicleHistories = $this->vehicleHistoryRepository->all(
+        $vehicleHistories = $this->vehicleHistoryRepository->allQuery(
             $request->except(['skip', 'limit']),
             $request->get('skip'),
             $request->get('limit')
-        );
-
-        return $this->sendResponse(
-            VehicleHistoryResource::collection($vehicleHistories),
-            __('messages.retrieved', ['model' => __('models/vehicleHistories.plural')])
-        );
+        )
+            ->latest()
+            ->paginate();
+        return response()->json([
+            'data' => VehicleHistoryResource::collection($vehicleHistories),
+            "number_of_rows" => $vehicleHistories->total(),
+            "message" => __('messages.retrieved', ['model' => __('models/vehicleHistories.plural')]),
+        ]);
     }
 
     /**
@@ -101,6 +106,7 @@ class VehicleHistoryAPIController extends AppBaseController
     public function store(CreateVehicleHistoryAPIRequest $request): JsonResponse
     {
         $input = $request->all();
+        $input['user_id'] = $request->user()->id;
 
         $vehicleHistory = $this->vehicleHistoryRepository->create($input);
 
@@ -276,6 +282,30 @@ class VehicleHistoryAPIController extends AppBaseController
         return $this->sendResponse(
             $id,
             __('messages.deleted', ['model' => __('models/vehicleHistories.singular')])
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function cashRequisitionSelect(Request $request): JsonResponse
+    {
+        $requisition = CashRequisition::query()
+            ->whereHas('cashRequisitionItems', function ($q) use($request){
+                $q->whereHas('item', function ($q) use($request){
+                    $q->where('id', $request->cash_item);
+                });
+            })
+            ->whereHas('approval_status', function ($q){
+                $q->where('ceo_status', 2);
+            })
+            ->doesntHave('refuelHistory')
+            ->latest()
+            ->get();
+        return $this->sendResponse(
+            CashRequisitionResource::collection($requisition),
+            __('messages.deleted', ['model' => __('models/cashRequisition.singular')])
         );
     }
 }

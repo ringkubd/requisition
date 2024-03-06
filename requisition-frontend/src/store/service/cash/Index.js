@@ -24,7 +24,7 @@ export const CashRequisitionAPIService = GeneralBaseAPI.injectEndpoints({
                 method: 'PUT',
                 body: params
             }),
-            invalidatesTags: ['edit-cash-requisition', 'cash-requisition'],
+            invalidatesTags: ['edit-cash-requisition', 'cash-requisition', 'cash-requisition-select-vehicle'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         deleteCashRequisition: build.mutation({
@@ -32,7 +32,7 @@ export const CashRequisitionAPIService = GeneralBaseAPI.injectEndpoints({
                 url: `cash-requisitions/${id}`,
                 method: 'DELETE'
             }),
-            invalidatesTags: ['edit-cash-requisition', 'cash-requisition', 'update-cash-product'],
+            invalidatesTags: ['edit-cash-requisition', 'cash-requisition', 'update-cash-product', 'cash-requisition-select-vehicle'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         storeCashRequisition: build.mutation({
@@ -41,7 +41,7 @@ export const CashRequisitionAPIService = GeneralBaseAPI.injectEndpoints({
                 method: 'POST',
                 body: params
             }),
-            invalidatesTags: ['edit-cash-requisition', 'cash-requisition', 'dashboard_cash_requisition'],
+            invalidatesTags: ['edit-cash-requisition', 'cash-requisition', 'dashboard_cash_requisition', 'cash-requisition-select-vehicle'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         getCashProduct: build.query({
@@ -56,14 +56,14 @@ export const CashRequisitionAPIService = GeneralBaseAPI.injectEndpoints({
                 method: 'POST',
                 body: params
             }),
-            invalidatesTags: ['update-cash-product']
+            invalidatesTags: ['update-cash-product', 'cash-requisition-select-vehicle']
         }),
         deleteCashProduct: build.mutation({
             query: id => ({
                 url: `cash-products/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['update-cash-product']
+            invalidatesTags: ['update-cash-product', 'cash-requisition-select-vehicle']
         }),
     }),
 })
