@@ -96,7 +96,7 @@ const Vehicle = () => {
                             >
                                 <Button>Create</Button>
                             </NavLink>
-                            <Button color={`dark`} onClick={() => router.back()}>Back</Button>
+                            <Button color={`dark`} onClick={() => router.push('/vehicle/report')}>Back</Button>
                         </div>
                         <DataTable
                             columns={columns}

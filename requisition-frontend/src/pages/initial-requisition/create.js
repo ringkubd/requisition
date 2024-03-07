@@ -70,13 +70,14 @@ const InitialRequisitionCreate = (props) => {
     }
     useEffect(() => {
         if (storeResult.isError){
-            formikForm.current.setErrors(storeResult.error.data.errors)
+            // console.log(storeResult.error)
+            formikForm.current.setErrors(storeResult?.error?.data?.errors)
         }
         if (storeResult.isError || storeResult.isSuccess){
             formikForm.current.setSubmitting(false)
         }
         if (!storeResult.isLoading && storeResult.isSuccess){
-            toast.success('Designation stored successfully.')
+            toast.success('Requisition Initialized successfully.')
             router.push('/initial-requisition')
         }
     }, [storeResult]);
@@ -267,7 +268,7 @@ const InitialRequisitionCreate = (props) => {
                                                 <div
                                                     className={`flex flex-row w-full justify-end justify-items-end items-end`}>
                                                     <Button
-                                                        isProcessing={isSubmitting}
+                                                        isProcessing={storeResult.isLoading}
                                                         onClick={submit}
                                                         type="submit"
                                                         color={`success`}>

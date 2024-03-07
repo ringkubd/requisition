@@ -598,7 +598,7 @@ const create = (props) => {
                                             </div>
                                             <div className="flex flex-row gap-4 justify-end">
                                                 <Button
-                                                    isProcessing={isSubmitting}
+                                                    isProcessing={storeResult.isLoading}
                                                     onClick={handleSubmit}
                                                     type='submit'
                                                     color={`success`}>Add</Button>

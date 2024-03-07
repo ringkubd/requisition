@@ -234,7 +234,10 @@ export default function create_purchase(props){
                             </div>
                             <div
                                 className={`flex mx-4 my-3 border-t-2 justify-items-end text-right items-end flex-row justify-end`}>
-                                <Button onClick={submit} gradientMonochrome="teal">Submit</Button>
+                                <Button
+                                    onClick={submit}
+                                    isProcessing={storeResult.isLoading}
+                                    gradientMonochrome="teal">Submit</Button>
                             </div>
                         </div>
                     </div>

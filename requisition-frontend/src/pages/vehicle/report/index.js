@@ -48,6 +48,11 @@ const Vehicle = () => {
                     sortable: true,
                 },
                 {
+                    name: 'P.R. No.',
+                    selector: row => row?.cashRequisition?.prf_no,
+                    sortable: true,
+                },
+                {
                     name: 'Bill No.',
                     selector: row => row.bill_no,
                     sortable: true,
