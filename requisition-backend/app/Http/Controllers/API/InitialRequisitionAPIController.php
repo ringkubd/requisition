@@ -373,8 +373,10 @@ class InitialRequisitionAPIController extends AppBaseController
                 __('messages.not_found', ['model' => __('models/initialRequisitions.singular')])
             );
         }
-
-        $initialRequisition->delete();
+        DB::transaction(function ()use ($initialRequisition){
+            $initialRequisition->initialRequisitionProducts()->delete();
+            $initialRequisition->delete();
+        });
 
         return $this->sendResponse(
             $id,
@@ -548,5 +550,71 @@ class InitialRequisitionAPIController extends AppBaseController
                 __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])
             );
         }
+    }
+    /**
+     * Copy Requisition
+     */
+    public function copy($id, Request $request): JsonResponse
+    {
+        $irf_no = $this->newIRFNO();
+        $baseRequisition = $this->initialRequisitionRepository->find($id);
+
+        $products = $baseRequisition->initialRequisitionProducts;
+
+        $initialRequisition = InitialRequisition::create([
+            'user_id' => $request->user()->id,
+            'department_id' => auth_department_id(),
+            'branch_id' => auth_branch_id(),
+            'irf_no' => $irf_no,
+            'ir_no' => 5,
+            'estimated_cost' => $baseRequisition->estimated_cost
+        ]);
+        $initialRequisition->irfNos()->create([
+            'irf_no' => $irf_no
+        ]);
+        $approval_status = $initialRequisition->approval_status()->create([
+            'department_id' => auth_department_id(),
+            'department_status' => 1,
+        ]);
+
+//        $allProduct = array_map(function($p){
+//            unset($p['estimated_cost']);
+//            if (array_key_exists('last_purchase_date', $p) && ($p['last_purchase_date'] == "" || $p['last_purchase_date'] == null)){
+//                $p['last_purchase_date'] = null;
+//            }
+//            if (!array_key_exists('last_purchase_date', $p)){
+//                $p['last_purchase_date'] = null;
+//            }
+//            return $p;
+//        }, $products);
+
+        $allProduct = $products->map(function ($p){
+            return [
+                'product_id' => $p->product_id,
+                'product_option_id' => $p->product_option_id,
+                'purpose' => $p->purpose,
+                'quantity_to_be_purchase' => $p->quantity_to_be_purchase,
+                'required_quantity' => $p->required_quantity,
+                'last_purchase_date' => $p->product_variant?->purchaseHistory?->first()?->purchase_date ?? null,
+            ];
+        });
+        $initialRequisition->initialRequisitionProducts()->createMany($allProduct);
+        broadcast(new InitialRequisitionEvent(new InitialRequisitionResource($initialRequisition)));
+
+        $user = $request->user();
+        $head_of_department = User::find($initialRequisition->department->head_of_department);
+        if (!empty($head_of_department)){
+            $head_of_department->notify(new PushNotification(
+                "An purchase requisition is initiated..",
+                "$user->name is generated an initial requisition I.R.F. No. $irf_no. Please approve or reject it.",
+                $initialRequisition
+            ));
+//            $head_of_department->notify(new RequisitionStatusNotification($initialRequisition));
+        }
+
+        return $this->sendResponse(
+           $initialRequisition,
+            __('messages.saved', ['model' => __('models/initialRequisitions.singular')])
+        );
     }
 }

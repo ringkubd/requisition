@@ -9,7 +9,7 @@ import Actions from "@/components/actions";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
-    getInitialRequisition, getRunningQueriesThunk,
+    getInitialRequisition, getRunningQueriesThunk, useCopyInitialRequisitionQuery,
     useDestroyInitialRequisitionMutation,
     useGetInitialRequisitionQuery
 } from "@/store/service/requisitions/initial";
@@ -23,8 +23,19 @@ const InitialRequisition = () => {
     const [searchParams, setSearchParams] = useState({});
     const [destroy, destroyResponse] = useDestroyInitialRequisitionMutation();
     const [columns, setColumns] = useState([]);
+    const [copyID, setCopyID] = useState(false);
 
     const {data, isLoading, isError, refetch} = useGetInitialRequisitionQuery(searchParams);
+    const {data: copy, isLoading: copyISProgressing, isSuccess: copyISSuccess} = useCopyInitialRequisitionQuery(copyID, {
+        skip: !copyID
+    });
+
+    useEffect(() => {
+        if (copyISSuccess && !copyISProgressing){
+            setCopyID(false);
+            router.reload()
+        }
+    },[copyISSuccess, copy, copyISProgressing])
 
     useEffect(() => {
         if (!destroyResponse.isLoading && destroyResponse.isSuccess){
@@ -69,6 +80,15 @@ const InitialRequisition = () => {
                     name: 'Created at',
                     selector: row => row.created_at,
                     sortable: true,
+                },
+                {
+                    name: 'Copy',
+                    selector: row => <Button onClick={() => {
+                        const cnrf= confirm('Are you aware that a new requisition is about to be initiated? Kindly confirm if you wish to proceed.');
+                        if (cnrf){
+                            setCopyID(row.id)
+                        }
+                    }}>Copy</Button>
                 },
                 {
                     name: 'Actions',

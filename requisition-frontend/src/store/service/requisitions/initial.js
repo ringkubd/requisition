@@ -51,6 +51,13 @@ export const InitialRequisitionApi = GeneralBaseAPI.injectEndpoints({
                 params: arg
             }),
             onQueryStarted: onQueryStartedErrorToast,
+        }),
+        copyInitialRequisition: build.query({
+            query: (id) => ({
+                url: `initial_requisition/${id}/copy`
+            }),
+            invalidatesTags: ['initial-requisition'],
+            onQueryStarted: onQueryStartedErrorToast,
         })
     }),
 })
@@ -62,6 +69,7 @@ export const {
     useStoreInitialRequisitionMutation,
     useDestroyInitialRequisitionMutation,
     useGetPurposeSuggestionQuery,
+    useCopyInitialRequisitionQuery,
     util: { getRunningQueriesThunk },
 } = InitialRequisitionApi;
 

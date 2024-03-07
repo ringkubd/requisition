@@ -180,6 +180,8 @@ Route::put('update_initial_status/{requisition}', [InitialRequisitionAPIControll
 Route::put('update_purchase_status/{requisition}', [PurchaseRequisitionAPIController::class, 'changeStatusDepartment']);
 Route::put('update_cash_status/{requisition}', [\App\Http\Controllers\API\CashRequisitionAPIController::class, 'changeStatusDepartment']);
 
+Route::get('initial_requisition/{id}/copy', [InitialRequisitionAPIController::class, 'copy']);
+
 Route::post('subscribe-push', [NavigationAPIController::class, 'subscribeWebPush']);
 Route::post('one_time_login', [\App\Http\Controllers\API\UserAPIController::class, 'oneTimeLogin']);
 
