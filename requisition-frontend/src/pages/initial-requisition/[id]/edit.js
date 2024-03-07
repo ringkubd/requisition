@@ -104,10 +104,7 @@ const Edit = (props) => {
             }
             return rd;
         })
-        // console.log(requisitionData, updated)
-        // console.log(values)
         setRequisitionData(updated);
-        // console.log(values)
     }
     const updateOtherItems = (label, value, row) => {
         const newRequisitionData = requisitionData.map((rd) => {

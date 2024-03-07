@@ -403,7 +403,15 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $price = $request->price;
         $requisition = PurchaseRequisition::find($purchase_requisition_id);
         $products = $requisition->purchaseRequisitionProducts()->find($purchase_requisition_product_id);
-        $products->update(['unit_price' => $price]);
+        if ($request->has('quantity_to_be_purchase')){
+            $products->update([
+                'unit_price' => $products->unit_price,
+                'quantity_to_be_purchase' => $request->quantity_to_be_purchase,
+                'required_quantity' => $request->required_quantity,
+            ]);
+        }else{
+            $products->update(['unit_price' => $price]);
+        }
 
         $totalPrice = $requisition->purchaseRequisitionProducts->map(function ($item) {
             $item->price = (float)$item->unit_price * (float)$item->quantity_to_be_purchase;
