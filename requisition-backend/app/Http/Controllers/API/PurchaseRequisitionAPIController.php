@@ -21,6 +21,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\PurchaseRequisitionResource;
+use Illuminate\Support\Facades\DB;
 use NotificationChannels\WhatsApp\Component;
 use OpenApi\Annotations as OA;
 
@@ -362,11 +363,13 @@ class PurchaseRequisitionAPIController extends AppBaseController
                 __('messages.not_found', ['model' => __('models/purchaseRequisitions.singular')])
             );
         }
-        $initialRequisition = InitialRequisition::find($purchaseRequisition->initial_requisition_id);
-        $initialRequisition->update(['is_purchase_requisition_generated' => 0]);
+        DB::transaction(function () use ($purchaseRequisition){
+            $initialRequisition = InitialRequisition::find($purchaseRequisition->initial_requisition_id);
+            $initialRequisition->update(['is_purchase_requisition_generated' => 0]);
 
-        $purchaseRequisition->purchaseRequisitionProducts()->delete();
-        $purchaseRequisition->delete();
+            $purchaseRequisition->purchaseRequisitionProducts()->delete();
+            $purchaseRequisition->delete();
+        });
 
         return $this->sendResponse(
             $id,

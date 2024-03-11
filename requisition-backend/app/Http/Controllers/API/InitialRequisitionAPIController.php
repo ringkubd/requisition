@@ -593,7 +593,7 @@ class InitialRequisitionAPIController extends AppBaseController
                 'product_id' => $p->product_id,
                 'product_option_id' => $p->product_option_id,
                 'purpose' => $p->purpose,
-                'quantity_to_be_purchase' => $p->product_variant->stock - $p->required_quantity,
+                'quantity_to_be_purchase' => max(($p->required_quantity - $p->product_variant->stock), 0),
                 'required_quantity' => $p->required_quantity,
                 'last_purchase_date' => $p->product_variant?->purchaseHistory?->first()?->purchase_date ?? null,
             ];
