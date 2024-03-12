@@ -24,7 +24,7 @@ export const VehicleHistoryAPI = GeneralBaseAPI.injectEndpoints({
                 method: 'POST',
                 body
             }),
-            invalidatesTags: ['vehicle-history'],
+            invalidatesTags: ['vehicle-history', 'cash-requisition-select-vehicle'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateVehicleHistory: builder.mutation({
@@ -33,7 +33,7 @@ export const VehicleHistoryAPI = GeneralBaseAPI.injectEndpoints({
                 method: 'PATCH',
                 body: patch
             }),
-            invalidatesTags: ['vehicle-history'],
+            invalidatesTags: ['vehicle-history','cash-requisition-select-vehicle'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyVehicleHistory: builder.mutation({
@@ -41,7 +41,7 @@ export const VehicleHistoryAPI = GeneralBaseAPI.injectEndpoints({
                 url: `vehicle-histories/${id}`,
                 method: 'delete',
             }),
-            invalidatesTags: ['vehicle-history'],
+            invalidatesTags: ['vehicle-history','cash-requisition-select-vehicle'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         getCashRequisitionSelect: builder.query({

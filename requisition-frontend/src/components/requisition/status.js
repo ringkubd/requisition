@@ -13,9 +13,9 @@ const Status = ({ requisition, type, from='dashboard', changeStatus = undefined 
     const isDepartmentHead = (user?.current_department_head === parseInt(user?.id)) || user?.role_names?.includes("System Administrator");
     const [currentStatus, setCurrentStatus] = useState(requisition.current_status);
     const [manualPermission, setManualPermission] = useState(false);
-    const [updateInitial, {data: initialResponse, isSuccess: isSuccessInitialUpdate}] = useUpdateInitialStatusMutation();
-    const [updatePurchase, {data: purchaseResponse, isSuccess: isSuccessPurchaseUpdate}] = useUpdatePurchaseStatusMutation();
-    const [updateCash, {data: cashResponse, isSuccess: isSuccessCashUpdate}] = useUpdateCashStatusMutation();
+    const [updateInitial, {data: initialResponse, isSuccess: isSuccessInitialUpdate, isLoading: initialISLoading}] = useUpdateInitialStatusMutation();
+    const [updatePurchase, {data: purchaseResponse, isSuccess: isSuccessPurchaseUpdate, isLoading: purchaseISLoading}] = useUpdatePurchaseStatusMutation();
+    const [updateCash, {data: cashResponse, isSuccess: isSuccessCashUpdate, isLoading: cashISLoading}] = useUpdateCashStatusMutation();
     const [rowID, setRowID] = useState(requisition.id);
 
     useEffect(() => {
@@ -107,6 +107,7 @@ const Status = ({ requisition, type, from='dashboard', changeStatus = undefined 
                                             notes: ''
                                         });
                                     }}
+                                    isProcessing={cashISLoading || initialISLoading || purchaseISLoading}
                                 >
                                     <AiFillCheckSquare />
                                     {from === "print_view" ? "Approve" : ''}
@@ -121,6 +122,7 @@ const Status = ({ requisition, type, from='dashboard', changeStatus = undefined 
                                             notes: ''
                                         });
                                     }}
+                                    isProcessing={cashISLoading || initialISLoading || purchaseISLoading}
                                 >
                                     <AiFillDelete />
                                     {from === "print_view" ? "Reject" : ''}

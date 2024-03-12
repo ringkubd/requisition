@@ -95,6 +95,7 @@ use Illuminate\Database\Eloquent\Model;
     public $fillable = [
         'vehicle_id',
         'cash_requisition_id',
+        'cash_requisition_item_id',
         'refuel_date',
         'unit',
         'quantity',
@@ -119,6 +120,7 @@ use Illuminate\Database\Eloquent\Model;
     public static array $rules = [
         'vehicle_id' => 'required',
         'cash_requisition_id' => 'required',
+        'cash_requisition_item_id' => 'required',
         'refuel_date' => 'required',
         'unit' => 'nullable|string|max:255',
         'quantity' => 'required|numeric',
@@ -150,5 +152,9 @@ use Illuminate\Database\Eloquent\Model;
     public function cashRequisition(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\CashRequisition::class, 'cash_requisition_id');
+    }
+
+    public function cashRequisitionItem(): \Illuminate\Database\Eloquent\Relations\BelongsTo{
+        return $this->belongsTo(CashRequisitionItem::class);
     }
 }

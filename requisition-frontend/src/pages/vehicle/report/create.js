@@ -31,6 +31,7 @@ const create = (props) => {
     const initValues = {
         vehicle_id: '',
         cash_requisition_id: '',
+        cash_requisition_item_id: '',
         refuel_date: moment().format('Y-MM-DD'),
         unit: 'Octane',
         quantity: '',
@@ -139,6 +140,7 @@ const create = (props) => {
                                                             vehicle.cash_item,
                                                         )
                                                         setFieldValue('last_mileage', vehicle.last_mileage);
+                                                        setFieldValue('cash_requisition_item_id', vehicle.cash_item);
                                                     }}
                                                 />
                                                 <ErrorMessage

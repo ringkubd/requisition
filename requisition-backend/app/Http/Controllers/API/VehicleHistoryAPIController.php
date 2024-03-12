@@ -6,6 +6,7 @@ use App\Http\Requests\API\CreateVehicleHistoryAPIRequest;
 use App\Http\Requests\API\UpdateVehicleHistoryAPIRequest;
 use App\Http\Resources\CashRequisitionResource;
 use App\Models\CashRequisition;
+use App\Models\CashRequisitionItem;
 use App\Models\VehicleHistory;
 use App\Repositories\VehicleHistoryRepository;
 use Illuminate\Http\JsonResponse;
@@ -107,6 +108,11 @@ class VehicleHistoryAPIController extends AppBaseController
     {
         $input = $request->all();
         $input['user_id'] = $request->user()->id;
+        $input['cash_requisition_item_id'] = CashRequisitionItem::query()
+            ->where('cash_requisition_id', $request->cash_requisition_id)
+            ->whereHas('item', function ($q) use ($request){
+                $q->where('id', $request->cash_requisition_item_id);
+            })->first()?->id;
 
         $vehicleHistory = $this->vehicleHistoryRepository->create($input);
 
@@ -295,12 +301,11 @@ class VehicleHistoryAPIController extends AppBaseController
             ->whereHas('cashRequisitionItems', function ($q) use($request){
                 $q->whereHas('item', function ($q) use($request){
                     $q->where('id', $request->cash_item);
-                });
+                })->doesntHave('vehicleHistory');
             })
             ->whereHas('approval_status', function ($q){
                 $q->where('ceo_status', 2);
             })
-            ->doesntHave('refuelHistory')
             ->latest()
             ->get();
         return $this->sendResponse(

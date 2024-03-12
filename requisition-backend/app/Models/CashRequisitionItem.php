@@ -118,4 +118,9 @@ use OpenApi\Annotations as OA;
     {
         return $this->belongsTo(CashProduct::class, 'item', 'title');
     }
+
+    public function vehicleHistory(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(VehicleHistory::class);
+    }
 }
