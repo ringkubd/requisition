@@ -34,8 +34,8 @@ const create = (props) => {
         cash_requisition_item_id: '',
         refuel_date: moment().format('Y-MM-DD'),
         unit: 'Octane',
-        quantity: '',
-        rate: '',
+        quantity: '0',
+        rate: '1',
         bill_no: '',
         last_mileage: '',
         current_mileage: '',
@@ -123,7 +123,8 @@ const create = (props) => {
                                                             value: data.id,
                                                             cash_item:
                                                                 data.cash_product_id,
-                                                            last_mileage: data.last_mileage
+                                                            last_mileage:
+                                                                data.last_mileage,
                                                         }),
                                                     )}
                                                     isLoading={vehicleISLoading}
@@ -139,8 +140,14 @@ const create = (props) => {
                                                         setCashItem(
                                                             vehicle.cash_item,
                                                         )
-                                                        setFieldValue('last_mileage', vehicle.last_mileage);
-                                                        setFieldValue('cash_requisition_item_id', vehicle.cash_item);
+                                                        setFieldValue(
+                                                            'last_mileage',
+                                                            vehicle.last_mileage,
+                                                        )
+                                                        setFieldValue(
+                                                            'cash_requisition_item_id',
+                                                            vehicle.cash_item,
+                                                        )
                                                     }}
                                                 />
                                                 <ErrorMessage
@@ -230,33 +237,8 @@ const create = (props) => {
                                             <div className="w-full">
                                                 <div className="mb-2 block">
                                                     <Label
-                                                        htmlFor="quantity"
-                                                        value="Quantity"
-                                                    />
-                                                </div>
-                                                <TextInput
-                                                    id="quantity"
-                                                    name="quantity"
-                                                    type="number"
-                                                    value={values.quantity}
-                                                    required
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                />
-                                                <ErrorMessage
-                                                    name="quantity"
-                                                    render={msg => (
-                                                        <span className="text-red-500">
-                                                            {msg}
-                                                        </span>
-                                                    )}
-                                                />
-                                            </div>
-                                            <div className="w-full">
-                                                <div className="mb-2 block">
-                                                    <Label
                                                         htmlFor="unit"
-                                                        value="Unit"
+                                                        value="Fuel Name"
                                                     />
                                                 </div>
                                                 <TextInput
@@ -280,6 +262,35 @@ const create = (props) => {
                                             <div className="w-full">
                                                 <div className="mb-2 block">
                                                     <Label
+                                                        htmlFor="quantity"
+                                                        value="Quantity"
+                                                    />
+                                                </div>
+                                                <TextInput
+                                                    id="quantity"
+                                                    name="quantity"
+                                                    type="number"
+                                                    value={values.quantity}
+                                                    required
+                                                    onChange={(e) => {
+                                                        handleChange(e)
+                                                        setFieldValue('bill_amount', e.target.value * values.rate);
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                />
+                                                <ErrorMessage
+                                                    name="quantity"
+                                                    render={msg => (
+                                                        <span className="text-red-500">
+                                                            {msg}
+                                                        </span>
+                                                    )}
+                                                />
+                                            </div>
+
+                                            <div className="w-full">
+                                                <div className="mb-2 block">
+                                                    <Label
                                                         htmlFor="rate"
                                                         value="Rate"
                                                     />
@@ -290,7 +301,10 @@ const create = (props) => {
                                                     type="text"
                                                     value={values.rate}
                                                     required
-                                                    onChange={handleChange}
+                                                    onChange={(e) => {
+                                                        handleChange(e)
+                                                        setFieldValue('bill_amount', e.target.value * values.quantity);
+                                                    }}
                                                     onBlur={handleBlur}
                                                 />
                                                 <ErrorMessage
@@ -302,6 +316,36 @@ const create = (props) => {
                                                     )}
                                                 />
                                             </div>
+                                            <div className="w-full">
+                                                <div className="mb-2 block">
+                                                    <Label
+                                                        htmlFor="bill_amount"
+                                                        value="Amount"
+                                                    />
+                                                </div>
+                                                <TextInput
+                                                    id="bill_amount"
+                                                    name="bill_amount"
+                                                    type="text"
+                                                    value={values.bill_amount}
+                                                    required
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        setFieldValue('quantity',e.target.value / values.rate);
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                />
+                                                <ErrorMessage
+                                                    name="bill_amount"
+                                                    render={msg => (
+                                                        <span className="text-red-500">
+                                                            {msg}
+                                                        </span>
+                                                    )}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-row gap-4">
                                             <div className="w-full">
                                                 <div className="mb-2 block">
                                                     <Label
@@ -327,8 +371,6 @@ const create = (props) => {
                                                     )}
                                                 />
                                             </div>
-                                        </div>
-                                        <div className="flex flex-row gap-4">
                                             <div className="w-full">
                                                 <div className="mb-2 block">
                                                     <Label

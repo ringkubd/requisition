@@ -58,7 +58,7 @@ const Vehicle = () => {
                     sortable: true,
                 },
                 {
-                    name: 'Unit',
+                    name: 'Fuel',
                     selector: row => row.unit,
                     sortable: true,
                 },
