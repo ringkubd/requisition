@@ -331,7 +331,7 @@ const create = (props) => {
                                                     required
                                                     onChange={(e) => {
                                                         handleChange(e);
-                                                        setFieldValue('quantity',e.target.value / values.rate);
+                                                        setFieldValue('quantity',parseFloat((e.target.value / values.rate)).toFixed(2));
                                                     }}
                                                     onBlur={handleBlur}
                                                 />
