@@ -324,7 +324,7 @@ class ProductIssueAPIController extends AppBaseController
 
                     $productOption = ProductOption::find($productIssue->product_option_id);
 
-                    if ($request->user()->hasRole('Store Manager') && $request->status == 1 && (double)$productIssue->quantity <= (double)$productOption->stock && $productIssues->department_status == 1){
+                    if ($request->user()->hasRole('Store Manager') && $request->status == 1 && (double)$productIssue->quantity <= (double)$productOption->stock && $productIssues->store_status == 0){
                         $productIssue->update([
                             'balance_before_issue' => $productOption->stock,
                             'balance_after_issue' => (double)$productOption->stock - (double)$productIssue->quantity
