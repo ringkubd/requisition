@@ -323,8 +323,14 @@ class ProductIssueAPIController extends AppBaseController
                 foreach ($productIssues->items as $productIssue) {
 
                     $productOption = ProductOption::find($productIssue->product_option_id);
+                    Log::info($productIssues->store_status);
 
                     if ($request->user()->hasRole('Store Manager') && $request->status == 1 && (double)$productIssue->quantity <= (double)$productOption->stock && $productIssues->store_status != 1){
+
+                        if ($productIssue->balance_before_issue != null && $productIssue->balance_after_issue != null){
+                            continue;
+                        }
+
                         $productIssue->update([
                             'balance_before_issue' => $productOption->stock,
                             'balance_after_issue' => (double)$productOption->stock - (double)$productIssue->quantity
@@ -368,10 +374,10 @@ class ProductIssueAPIController extends AppBaseController
                         $product_title = $productOption?->product?->title;
                         throw new \Exception("Kindly ensure that the product '$product_title' is updated. Current balance- $productOption->stock. Request Quantity- $productIssue->quantity", 413);
                     }
-                    $productIssues->update($input);
                 }
+                $productIssues->update($input);
             }catch (\PDOException $exception){
-                Log::error('product issue update error', $exception->getMessage());
+                Log::error('product issue update error', (array)$exception);
             }
         }, 2);
         return $this->sendResponse(
