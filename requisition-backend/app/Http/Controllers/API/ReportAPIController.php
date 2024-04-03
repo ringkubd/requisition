@@ -75,7 +75,7 @@ class ReportAPIController extends AppBaseController
         $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
         $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
         $report_format = $request->report_format;
-
+        $product_options = explode(',',$request->product_option_id);
         $issues = ProductIssueItemReportResource::collection(ProductIssueItems::query()
             ->when(!empty($request->category), function ($q) use ($categories){
                 $q->whereHas('product', function ($query) use ($categories){
@@ -93,6 +93,11 @@ class ReportAPIController extends AppBaseController
             ->whereHas('productIssue', function ($q) use($first, $last){
                 //->whereRaw("date(store_approved_at) between '$first' and '$last'")
                 $q->where('store_status', 1);
+            })
+            ->when($request->product_option_id, function ($q, $v) use($product_options){
+                $q->whereHas('productOption', function ($p) use ($product_options){
+                    $p->whereIn('id', $product_options);
+                });
             })
             ->whereRaw("date(use_date) between '$first' and '$last'")
             ->latest('updated_at')
@@ -116,6 +121,7 @@ class ReportAPIController extends AppBaseController
         $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
         $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
         $report_format = $request->report_format;
+        $product_options = explode(',',$request->product_option_id);
 
         $purchase = PurchaseResource::collection(Purchase::query()
             ->when(!empty($request->category), function ($q) use ($categories){
@@ -129,6 +135,11 @@ class ReportAPIController extends AppBaseController
             ->when($request->department, function ($q, $v){
                 $q->whereHas('purchaseRequisition', function ($q) use ($v){
                     $q->where('department_id', $v);
+                });
+            })
+            ->when($request->product_option_id, function ($q) use($product_options){
+                $q->whereHas('productOption', function ($p) use ($product_options){
+                    $p->whereIn('id', $product_options);
                 });
             })
             ->whereBetween('purchase_date', ["$first", "$last"])
@@ -152,6 +163,7 @@ class ReportAPIController extends AppBaseController
         $products = explode(',',$request->product);
         $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
         $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
+        $product_options = explode(',',$request->product_option_id);
 
         $product_report = ProductResource::collection(Product::query()
             ->when(!empty($request->category), function ($q) use ($categories){
@@ -172,6 +184,11 @@ class ReportAPIController extends AppBaseController
                         $s->whereBetween('use_date', ["$first", "$last"]);
                     })
                 ;
+            })
+            ->when($request->product_option_id, function ($q, $v) use($product_options){
+                $q->whereHas('productOptions', function ($p) use ($product_options){
+                    $p->whereIn('id', $product_options);
+                });
             })
             ->with(['productOptions.purchaseHistory' => function ($q) use ($first, $last) {
                 $q->whereBetween('purchase_date',  ["$first", "$last"]);
@@ -199,6 +216,7 @@ class ReportAPIController extends AppBaseController
         $report_format = $request->report_format;
         $first = $request->start_date ?? Carbon::now()->toDateString();
         $last = $request->end_date ?? Carbon::now()->toDateString();
+        $product_options_id = explode(',',$request->product_option_id);
 
         $product_options = ProductOption::query()
             ->when($request->category, function ($q) use($categories){
@@ -210,6 +228,9 @@ class ReportAPIController extends AppBaseController
                 $q->whereHas('product', function ($b) use ($products){
                     $b->whereIn('id', $products);
                 });
+            })
+            ->when($request->product_option_id, function ($q) use($product_options_id){
+                $q->whereIn('id', $product_options_id);
             })
             ->whereHas('product')
             ->get();

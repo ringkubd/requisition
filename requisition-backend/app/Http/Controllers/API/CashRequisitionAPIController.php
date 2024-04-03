@@ -445,4 +445,39 @@ class CashRequisitionAPIController extends AppBaseController
             );
         }
     }
+
+    public function copy($id, Request $request): JsonResponse
+    {
+        $prf_no = $this->newPRFNO();
+        $cashRequisition = $this->cashRequisitionRepository->find($id);
+
+        $cashRequisition = $this->cashRequisitionRepository->create([
+            'ir_no' => 5,
+            'prf_no' => $prf_no,
+            'total_cost' => $cashRequisition->total_cost,
+            'user_id' => $request->user()->id,
+            'branch_id' => auth_branch_id(),
+            'department_id' => auth_department_id()
+        ]);
+        $newItems = $cashRequisition->cashRequisitionItems->map(function ($items){
+            return [
+                'item' => $items->item,
+                'unit' => $items->unit,
+                'required_unit' => $items->required_unit,
+                'unit_price' => $items->unit_price,
+                'purpose' => $items->purpose,
+            ];
+        });
+        $cashRequisition->cashRequisitionItems()->createMany($newItems->toArray());
+        $cashRequisition->prfNOS()->create([
+            'prf_no' => $prf_no,
+            'total' => $cashRequisition->total_cost
+        ]);
+        $cashRequisition->approval_status()->create([
+            'department_id' => auth_department_id(),
+            'department_status' => 1,
+        ]);
+
+
+    }
 }
