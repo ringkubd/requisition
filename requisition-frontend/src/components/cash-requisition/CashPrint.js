@@ -322,7 +322,7 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                                         className={`form-checkbox mr-2`}
                                                     />
                                                     <label htmlFor="">
-                                                        None Store Item
+                                                        Non Store Item
                                                     </label>
                                                 </div>
                                             </div>

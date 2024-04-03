@@ -310,7 +310,7 @@ const RequisitionPrintWhatsApp = forwardRef(({mainData, requisition_products}, r
                                                     className={`form-checkbox mr-2`}
                                                 />
                                                 <label htmlFor="">
-                                                    None Store Item
+                                                    Non Store Item
                                                 </label>
                                             </div>
                                         </div>

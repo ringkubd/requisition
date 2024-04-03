@@ -39,6 +39,11 @@ const Report = () => {
     const [submitBalance, {data: balance, isLoading: balanceISLoading, isError:balanceISError, isSuccess: balanceISSuccess}] = useProductCurrentBalanceMutation();
 
     const [selectedCategoriesName, setSelectedCategoriesName] = useState(["All"]);
+    const [variant, setVariant] = useState([]);
+
+    useEffect(() => {
+        console.log(variant)
+    }, [variant]);
 
     const printRef = useRef();
     const [reportType, setReportType] = useState('usage');
@@ -61,7 +66,8 @@ const Report = () => {
         end_date: moment().format('Y-MM-DD'),
         product: '',
         report_type: 'usage',
-        report_format: 'category_base'
+        report_format: 'category_base',
+        product_option_id: ''
     };
 
     const submit = (values, formikHelper) => {
@@ -179,13 +185,13 @@ const Report = () => {
                             onSubmit={submit}
                             validationSchema={validationSchema}>
                             {({
-                                handleSubmit,
-                                handleChange,
-                                values,
-                                errors,
-                                isSubmitting,
-                                setFieldValue,
-                            }) => (
+                                  handleSubmit,
+                                  handleChange,
+                                  values,
+                                  errors,
+                                  isSubmitting,
+                                  setFieldValue,
+                              }) => (
                                 <div
                                     className={`flex flex-col w-full space-y-6`}>
                                     <div className="flex flex-col md:flex-row md:space-x-4">
@@ -307,7 +313,7 @@ const Report = () => {
                                                                     defaultChecked={
                                                                         columns[
                                                                             c
-                                                                        ]
+                                                                            ]
                                                                     }
                                                                     onChange={e => {
                                                                         handleChange(
@@ -315,7 +321,7 @@ const Report = () => {
                                                                         )
                                                                         columns[
                                                                             c
-                                                                        ] =
+                                                                            ] =
                                                                             e.target.checked
                                                                         setColumns(
                                                                             columns,
@@ -483,7 +489,7 @@ const Report = () => {
                                                 }}
                                                 value={{
                                                     startDate:
-                                                        values.start_date,
+                                                    values.start_date,
                                                     endDate: values.end_date,
                                                 }}
                                             />
@@ -550,7 +556,7 @@ const Report = () => {
                                                             options: [
                                                                 {
                                                                     label:
-                                                                        c.title,
+                                                                    c.title,
                                                                     value: c.id,
                                                                 },
                                                                 ...sub,
@@ -596,13 +602,20 @@ const Report = () => {
                                                     control: state => 'select',
                                                 }}
                                                 isMulti
-                                                onChange={newValue =>
+                                                onChange={newValue => {
                                                     setFieldValue(
                                                         'product',
                                                         newValue?.map(
                                                             v => v.value,
                                                         ),
                                                     )
+                                                    if (newValue.length === 1) {
+                                                        setVariant(newValue[0].product_options)
+                                                    }
+                                                    if (!newValue.length) {
+                                                        setVariant([]);
+                                                    }
+                                                }
                                                 }
                                                 additional={{
                                                     page: 1,
@@ -622,6 +635,42 @@ const Report = () => {
                                                 )}
                                             </ErrorMessage>
                                         </div>
+                                        {
+                                            variant.length ? (
+                                                <div className={`w-full`}>
+                                                    <Label
+                                                        htmlFor={`product_option_id`}
+                                                        value={"Variant"}
+                                                        className={`font-bold`}
+                                                    />
+                                                    <Select
+                                                        options={variant.map((v) => ({
+                                                            label: v.option.name + "(" + v.option_value + ")",
+                                                            value: v.id
+                                                        }))}
+                                                        className={`select`}
+                                                        classNames={{
+                                                            control: state => "select"
+                                                        }}
+                                                        onChange={(newValue) => {
+                                                            setFieldValue(
+                                                                'product_option_id',
+                                                                newValue?.map(
+                                                                    v => v.value,
+                                                                ),
+                                                            )
+                                                            console.log(newValue?.map(
+                                                                v => v.value,
+                                                            ),)
+                                                        }}
+                                                        id={`product_option_id`}
+                                                        name={`product_option_id`}
+                                                        isMulti
+                                                    />
+                                                </div>
+                                            ) : null
+                                        }
+
                                     </div>
                                     <div className={`flex justify-end`}>
                                         <Button onClick={handleSubmit}>
@@ -655,10 +704,10 @@ const Report = () => {
                                             {reportType === 'purchase'
                                                 ? 'Purchase'
                                                 : reportType === 'usage'
-                                                ? 'Issue'
-                                                : reportType === 'balance'
-                                                ? 'Balance'
-                                                : 'Purchase and Issue'}{' '}
+                                                    ? 'Issue'
+                                                    : reportType === 'balance'
+                                                        ? 'Balance'
+                                                        : 'Purchase and Issue'}{' '}
                                             Report
                                         </p>
                                     </div>
@@ -669,19 +718,19 @@ const Report = () => {
                                             Date:{' '}
                                             {reportType === 'balance'
                                                 ? moment(start_date).format(
-                                                      'DD MMM Y',
-                                                  )
+                                                    'DD MMM Y',
+                                                )
                                                 : (start_date
-                                                      ? moment(
-                                                            start_date,
-                                                        ).format('DD MMM Y')
-                                                      : '') +
-                                                  ' - ' +
-                                                  (end_date
-                                                      ? moment(end_date).format(
-                                                            'DD MMM Y',
-                                                        )
-                                                      : '')}
+                                                    ? moment(
+                                                        start_date,
+                                                    ).format('DD MMM Y')
+                                                    : '') +
+                                                ' - ' +
+                                                (end_date
+                                                    ? moment(end_date).format(
+                                                        'DD MMM Y',
+                                                    )
+                                                    : '')}
                                         </i>
                                     </div>
                                     <div className={`flex justify-center items-center justify-items-center text-center`}>
