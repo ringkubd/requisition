@@ -67,6 +67,18 @@ class VehicleHistoryAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
+            ->when($request->month, function ($q) use($request){
+                $q->when($request->month, function ($q) use ($request){
+                    $month = Carbon::parse('01-'.$request->month);
+                    $firstDayOfMonth = $month->firstOfMonth()->toDateString();
+                    $lastDayOfMonth = $month->lastOfMonth()->toDateString();
+                    $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
+                }, function ($q) {
+                    $firstDayOfMonth = Carbon::now()->firstOfMonth()->toDateString();
+                    $lastDayOfMonth = Carbon::now()->lastOfMonth()->toDateString();
+                    $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
+                });
+            })
             ->latest()
             ->paginate();
         return response()->json([
@@ -323,18 +335,6 @@ class VehicleHistoryAPIController extends AppBaseController
     public function monthlyReport(Request $request): JsonResponse
     {
         $vehicle_report = Vehicle::query()
-//            ->whereHas('vehicleHistories', function ($q) use($request){
-//                $q->when($request->month, function ($q) use ($request){
-//                    $month = Carbon::parse('01-'.$request->month);
-//                    $firstDayOfMonth = $month->firstOfMonth()->toDateString();
-//                    $lastDayOfMonth = $month->lastOfMonth()->toDateString();
-//                    $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
-//                }, function ($q) {
-//                    $firstDayOfMonth = Carbon::now()->firstOfMonth()->toDateString();
-//                    $lastDayOfMonth = Carbon::now()->lastOfMonth()->toDateString();
-//                    $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
-//                });
-//            })
             ->with(['vehicleHistories' => function ($q) use($request){
                 $q->when($request->month, function ($q) use ($request){
                     $month = Carbon::parse('01-'.$request->month);
