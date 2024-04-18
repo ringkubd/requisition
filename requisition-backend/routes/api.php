@@ -198,4 +198,5 @@ Route::resource('pumps', App\Http\Controllers\API\PumpAPIController::class)
 
 Route::resource('vehicle-histories', App\Http\Controllers\API\VehicleHistoryAPIController::class)
     ->except(['create', 'edit']);
+Route::get('vehicles_monthly_report', [\App\Http\Controllers\API\VehicleHistoryAPIController::class, 'monthlyReport']);
 Route::get('vehicle-cash-requisition-select', [\App\Http\Controllers\API\VehicleHistoryAPIController::class, 'cashRequisitionSelect']);

@@ -150,6 +150,12 @@ const Vehicle = () => {
                             >
                                 <Button color="purple">Pump</Button>
                             </NavLink>
+                            <NavLink
+                                active={router.pathname === 'pump'}
+                                href={`/vehicle/report/monthly`}
+                            >
+                                <Button color="indigo">Monthly Report</Button>
+                            </NavLink>
                         </div>
                         <DataTable
                             columns={columns}

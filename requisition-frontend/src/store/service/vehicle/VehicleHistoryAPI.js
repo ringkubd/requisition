@@ -51,6 +51,13 @@ export const VehicleHistoryAPI = GeneralBaseAPI.injectEndpoints({
                 params
             }),
             providesTags: ['cash-requisition-select-vehicle']
+        }),
+        getVehicleMonthlyReport: builder.query({
+            query: (params) => ({
+                url: 'vehicles_monthly_report',
+                method: 'GET',
+                params
+            })
         })
     })
 });
@@ -62,6 +69,7 @@ export const {
     useUpdateVehicleHistoryMutation,
     useGetCashRequisitionSelectQuery,
     useDestroyVehicleHistoryMutation,
+    useGetVehicleMonthlyReportQuery,
     util: { getRunningQueriesThunk },
 } = VehicleHistoryAPI;
 export const {

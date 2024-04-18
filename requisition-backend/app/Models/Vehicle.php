@@ -61,7 +61,8 @@ use Illuminate\Database\Eloquent\Model;
  *          format="date-time"
  *      )
  * )
- */class Vehicle extends Model
+ */
+class Vehicle extends Model
 {
      use SoftDeletes;    use HasFactory;    public $table = 'vehicles';
 

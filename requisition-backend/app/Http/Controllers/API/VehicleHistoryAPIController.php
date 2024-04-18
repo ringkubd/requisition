@@ -5,10 +5,13 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateVehicleHistoryAPIRequest;
 use App\Http\Requests\API\UpdateVehicleHistoryAPIRequest;
 use App\Http\Resources\CashRequisitionResource;
+use App\Http\Resources\VehicleReportResource;
 use App\Models\CashRequisition;
 use App\Models\CashRequisitionItem;
+use App\Models\Vehicle;
 use App\Models\VehicleHistory;
 use App\Repositories\VehicleHistoryRepository;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -22,7 +25,7 @@ use OpenApi\Annotations as OA;
 class VehicleHistoryAPIController extends AppBaseController
 {
     /** @var  VehicleHistoryRepository */
-    private $vehicleHistoryRepository;
+    private VehicleHistoryRepository $vehicleHistoryRepository;
 
     public function __construct(VehicleHistoryRepository $vehicleHistoryRepo)
     {
@@ -312,5 +315,31 @@ class VehicleHistoryAPIController extends AppBaseController
             CashRequisitionResource::collection($requisition),
             __('messages.deleted', ['model' => __('models/cashRequisition.singular')])
         );
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function monthlyReport(Request $request): JsonResponse
+    {
+        $vehicle_report = Vehicle::query()
+            ->whereHas('vehicleHistories', function ($q) use($request){
+                $q->when($request->month, function ($q) use ($request){
+                    $month = Carbon::parse('01-'.$request->month);
+                    $firstDayOfMonth = $month->firstOfMonth()->toDateString();
+                    $lastDayOfMonth = $month->lastOfMonth()->toDateString();
+                    $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
+                }, function ($q) {
+                    $firstDayOfMonth = Carbon::now()->firstOfMonth()->toDateString();
+                    $lastDayOfMonth = Carbon::now()->lastOfMonth()->toDateString();
+                    $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
+                });
+            })
+            ->with('vehicleHistories')
+            ->get();
+        return response()->json([
+            'data' => VehicleReportResource::collection($vehicle_report)->collection,
+            "message" => __('messages.retrieved', ['model' => __('models/vehicleHistories.plural')]),
+        ]);
     }
 }
