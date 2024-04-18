@@ -26,7 +26,7 @@ const FuelMonthlyReportPrint = forwardRef(({reports, month}, ref) => {
                     <div className={`flex flex-row w-full justify-start`}>
                         <i className={`pr-4`}>Month: </i>
                         <p className={`underline`}>
-                            {moment("01-"+month, "DD-MM-y").format('MMM Y')}
+                            {moment('01-' + month, 'DD-MM-y').format('MMM Y')}
                         </p>
                     </div>
                 </div>
@@ -65,6 +65,12 @@ const FuelMonthlyReportPrint = forwardRef(({reports, month}, ref) => {
                                         scope="col"
                                         rowSpan={2}
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Mileage
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        rowSpan={2}
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
                                         Cost
                                     </th>
                                     <th
@@ -95,10 +101,17 @@ const FuelMonthlyReportPrint = forwardRef(({reports, month}, ref) => {
                                             {row.fuel}
                                         </td>
                                         <td className={`border p-1`}>
-                                            {parseFloat(row.quantity).toFixed(2).toLocaleString()}
+                                            {parseFloat(row.quantity)
+                                                .toFixed(2)
+                                                .toLocaleString()}
                                         </td>
                                         <td className={`border p-1`}>
-                                            {parseFloat(row.cost).toLocaleString()}
+                                            {parseFloat(row.millage).toFixed(2)}
+                                        </td>
+                                        <td className={`border p-1`}>
+                                            {parseFloat(
+                                                row.cost,
+                                            ).toLocaleString()}
                                         </td>
                                         <td className={`border p-1`}>
                                             {row?.first_refuel_millage}
