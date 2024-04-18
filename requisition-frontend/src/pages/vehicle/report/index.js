@@ -47,6 +47,7 @@ const Vehicle = () => {
                         ' - ' +
                         row?.vehicle?.reg_no,
                     sortable: true,
+                    width: '350px'
                 },
                 {
                     name: 'Date',
