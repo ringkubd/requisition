@@ -323,7 +323,19 @@ class VehicleHistoryAPIController extends AppBaseController
     public function monthlyReport(Request $request): JsonResponse
     {
         $vehicle_report = Vehicle::query()
-            ->whereHas('vehicleHistories', function ($q) use($request){
+//            ->whereHas('vehicleHistories', function ($q) use($request){
+//                $q->when($request->month, function ($q) use ($request){
+//                    $month = Carbon::parse('01-'.$request->month);
+//                    $firstDayOfMonth = $month->firstOfMonth()->toDateString();
+//                    $lastDayOfMonth = $month->lastOfMonth()->toDateString();
+//                    $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
+//                }, function ($q) {
+//                    $firstDayOfMonth = Carbon::now()->firstOfMonth()->toDateString();
+//                    $lastDayOfMonth = Carbon::now()->lastOfMonth()->toDateString();
+//                    $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
+//                });
+//            })
+            ->with(['vehicleHistories' => function ($q) use($request){
                 $q->when($request->month, function ($q) use ($request){
                     $month = Carbon::parse('01-'.$request->month);
                     $firstDayOfMonth = $month->firstOfMonth()->toDateString();
@@ -334,8 +346,7 @@ class VehicleHistoryAPIController extends AppBaseController
                     $lastDayOfMonth = Carbon::now()->lastOfMonth()->toDateString();
                     $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
                 });
-            })
-            ->with('vehicleHistories')
+            }])
             ->get();
         return response()->json([
             'data' => VehicleReportResource::collection($vehicle_report)->collection,
