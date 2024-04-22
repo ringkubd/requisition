@@ -22,50 +22,11 @@ const Monthly = () => {
     const [page, setPage] = useState(1);
     const [month, setMonth] = useState(moment().format("MM-y"));
     const {data, isLoading, isError} = useGetVehicleMonthlyReportQuery({page, month});
-    // const [columns, setColumns] = useState([]);
-
     const handlePrint = useReactToPrint({
         content: () => printPageRef.current,
         onBeforePrint: (a) => console.log(a)
     });
 
-    // useEffect(() => {
-    //     if (!isLoading && !isError && data){
-    //         setColumns([
-    //             {
-    //                 name: 'Vehicle',
-    //                 selector: row => row?.vehicle,
-    //                 sortable: true,
-    //                 width: "350px"
-    //             },
-    //             {
-    //                 name: 'Fuel',
-    //                 selector: row => row.fuel,
-    //                 sortable: true,
-    //             },
-    //             {
-    //                 name: 'Quantity (ltr)',
-    //                 selector: row =>  parseFloat(row.quantity).toFixed(2).toLocaleString(),
-    //                 sortable: true,
-    //             },
-    //             {
-    //                 name: 'Cost',
-    //                 selector: row => parseFloat(row.cost).toLocaleString(),
-    //                 sortable: true,
-    //             },
-    //             {
-    //                 name: 'Start Mileage',
-    //                 selector: row => row?.first_refuel_millage,
-    //                 sortable: true,
-    //             },
-    //             {
-    //                 name: 'Last Mileage',
-    //                 selector: row => row?.last_refuel_millage,
-    //                 sortable: true,
-    //             },
-    //         ]);
-    //     }
-    // }, [isLoading, isError, data]);
 
     return (
         <>
@@ -108,18 +69,6 @@ const Monthly = () => {
                                 />
                             </div>
                         </div>
-                        {/*<DataTable*/}
-                        {/*    columns={columns}*/}
-                        {/*    data={data?.data}*/}
-                        {/*    responsive*/}
-                        {/*    progressPending={isLoading}*/}
-                        {/*    pagination*/}
-                        {/*    persistTableHead*/}
-                        {/*    paginationPerPage={15}*/}
-                        {/*    paginationServer*/}
-                        {/*    paginationTotalRows={data?.number_of_rows}*/}
-                        {/*    onChangePage={(page) => {}}*/}
-                        {/*/>*/}
                         <div className={`flex flex-col justify-center items-center`}>
                             <FuelMonthlyReportPrint
                                 reports={data?.data ?? []}

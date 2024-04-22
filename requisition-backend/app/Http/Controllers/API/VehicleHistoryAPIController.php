@@ -67,7 +67,7 @@ class VehicleHistoryAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
-            ->when($request->month, function ($q) use($request){
+            ->when($request->month && !$request->date, function ($q) use($request){
                 $q->when($request->month, function ($q) use ($request){
                     $month = Carbon::parse('01-'.$request->month);
                     $firstDayOfMonth = $month->firstOfMonth()->toDateString();
@@ -78,6 +78,9 @@ class VehicleHistoryAPIController extends AppBaseController
                     $lastDayOfMonth = Carbon::now()->lastOfMonth()->toDateString();
                     $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
                 });
+            })
+            ->when($request->date && !$request->month, function ($q) use ($request){
+                $q->whereRaw("date(refuel_date) = '$request->date'");
             })
             ->latest()
             ->paginate();

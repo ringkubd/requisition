@@ -6,29 +6,33 @@ import DataTable from 'react-data-table-component';
 import NavLink from "@/components/navLink";
 import { useRouter } from "next/router";
 import Actions from "@/components/actions";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import {
-    getVehicle,
-    getRunningQueriesThunk,
-    useGetVehicleQuery,
-    useDeleteVehicleMutation
-} from "@/store/service/vehicle/VehicleAPI";
 import {
     getVehicleHistory,
     useDestroyVehicleHistoryMutation,
-    useGetVehicleHistoryQuery
+    useGetVehicleHistoryQuery,
+    getRunningQueriesThunk
 } from "@/store/service/vehicle/VehicleHistoryAPI";
 import moment from "moment";
 import Select from "react-select";
+import { useReactToPrint } from "react-to-print";
+import Datepicker from "react-tailwindcss-datepicker";
 
 const Vehicle = () => {
     const router = useRouter()
     const [page, setPage] = useState(1)
-    const [month, setMonth] = useState(moment().format("MM-y"));;
-    const { data, isLoading, isError } = useGetVehicleHistoryQuery({ page, month })
+    const [month, setMonth] = useState("")
+    const [date, setDate] = useState("")
+    const dateRef = useRef();
+    const { data, isLoading, isError } = useGetVehicleHistoryQuery({
+        page,
+        month,
+        date
+    })
     const [destroy, destroyResponse] = useDestroyVehicleHistoryMutation()
     const [columns, setColumns] = useState([])
+    const dataRef = useRef(null)
 
     useEffect(() => {
         if (!destroyResponse.isLoading && destroyResponse.isSuccess) {
@@ -40,14 +44,9 @@ const Vehicle = () => {
             setColumns([
                 {
                     name: 'Vehicle',
-                    selector: row =>
-                        row?.vehicle?.brand +
-                        ' - ' +
-                        row?.vehicle?.model +
-                        ' - ' +
-                        row?.vehicle?.reg_no,
+                    selector: row => row?.vehicle,
                     sortable: true,
-                    width: '350px'
+                    width: '350px',
                 },
                 {
                     name: 'Date',
@@ -123,6 +122,11 @@ const Vehicle = () => {
         }
     }, [isLoading, isError, data])
 
+    const handlePrint = useReactToPrint({
+        content: () => dataRef.current,
+        onBeforePrint: a => console.log(a),
+    })
+
     return (
         <>
             <Head>
@@ -162,7 +166,12 @@ const Vehicle = () => {
                                 href={`/vehicle/report/monthly`}>
                                 <Button color="indigo">Monthly Report</Button>
                             </NavLink>
-
+                            <Button
+                                color="indigo"
+                                className={`m-3`}
+                                onClick={handlePrint}>
+                                Print
+                            </Button>
                             <div
                                 className={`flex flex-row justify-center items-center space-x-3 ml-4`}>
                                 <Label>Month</Label>
@@ -187,19 +196,38 @@ const Vehicle = () => {
                                     }}
                                 />
                             </div>
+                            <div
+                                className={`flex flex-row justify-center items-center space-x-3 ml-4`}>
+                                <Label>Date</Label>
+                                <Datepicker
+                                    ref={dateRef}
+                                    useRange={false}
+                                    asSingle={true}
+                                    onChange={(d) => setDate(d.startDate)}
+                                    value={{startDate: date, endDate: date}}
+                                />
+                            </div>
                         </div>
-                        <DataTable
-                            columns={columns}
-                            data={data?.data}
-                            responsive
-                            progressPending={isLoading}
-                            pagination
-                            persistTableHead
-                            paginationPerPage={15}
-                            paginationServer
-                            paginationTotalRows={data?.number_of_rows}
-                            onChangePage={page => setPage(page)}
-                        />
+                        {data && !isLoading ? (
+                            <div ref={dataRef}>
+                                <DataTable
+                                    loading={isLoading}
+                                    defaultSortField="id"
+                                    defaultSortAsc={false}
+                                    highlightOnHover
+                                    columns={columns}
+                                    data={data?.data}
+                                    responsive
+                                    progressPending={isLoading}
+                                    pagination
+                                    persistTableHead
+                                    paginationPerPage={15}
+                                    paginationServer
+                                    paginationTotalRows={data?.number_of_rows}
+                                    onChangePage={page => setPage(page)}
+                                />
+                            </div>
+                        ) : null}
                     </Card>
                 </div>
             </AppLayout>

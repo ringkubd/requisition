@@ -17,7 +17,7 @@ class VehicleHistoryResource extends JsonResource
         return [
             'id' => $this->id,
             'vehicle_id' => $this->vehicle_id,
-            'vehicle' => $this->vehicle,
+            'vehicle' => $this->vehicle->brand." - ".$this->vehicle->model." - ".$this->vehicle->reg_no,
             'cash_requisition_id' => $this->cash_requisition_id,
             'cashRequisition' => $this->cashRequisition,
             'refuel_date' => $this->refuel_date,
