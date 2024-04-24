@@ -28,7 +28,7 @@ class VehicleReportResource extends JsonResource
             'millage' => array_sum($this->vehicleHistories->where('refuel_date', '>', $this->vehicleHistories->first()?->refuel_date)?->map(function ($vh){
                 return round($vh->current_mileage - $vh->last_mileage);
             })->toArray()),
-            'first_refuel_millage' => $this->vehicleHistories->where('refuel_date', '>', $this->vehicleHistories->first()?->refuel_date)->sortBy('refuel_date')->first()?->last_mileage,
+            'first_refuel_millage' => $this->vehicleHistories->sortBy('refuel_date')->first()?->current_mileage,
             'last_refuel_millage' => $this->vehicleHistories->sortByDesc('refuel_date')->first()?->current_mileage,
             'first_refuel_date' => $this->vehicleHistories->where('refuel_date', '>', $this->vehicleHistories->first()?->refuel_date)->first()?->refuel_date,
             'last_refuel_date' => $this->vehicleHistories->sortByDesc('refuel_date')->first()?->refuel_date,
