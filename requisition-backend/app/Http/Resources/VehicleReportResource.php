@@ -25,12 +25,12 @@ class VehicleReportResource extends JsonResource
             'cost' => array_sum($this->vehicleHistories->sortBy('refuel_date')->where('refuel_date', '<', Carbon::parse($this->vehicleHistories->first()?->refuel_date)->addMonth(1)->firstOfMonth()->toDateString())?->map(function ($vh){
                 return round($vh->quantity * $vh->rate);
             })->toArray()),
-            'millage' => array_sum($this->vehicleHistories?->map(function ($vh){
+            'millage' => array_sum($this->vehicleHistories->where('refuel_date', '>', $this->vehicleHistories->first()?->refuel_date)?->map(function ($vh){
                 return round($vh->current_mileage - $vh->last_mileage);
             })->toArray()),
-            'first_refuel_millage' => $this->vehicleHistories->sortBy('refuel_date')->first()?->last_mileage,
+            'first_refuel_millage' => $this->vehicleHistories->where('refuel_date', '>', $this->vehicleHistories->first()?->refuel_date)->sortBy('refuel_date')->first()?->last_mileage,
             'last_refuel_millage' => $this->vehicleHistories->sortByDesc('refuel_date')->first()?->current_mileage,
-            'first_refuel_date' => $this->vehicleHistories->first()?->refuel_date,
+            'first_refuel_date' => $this->vehicleHistories->where('refuel_date', '>', $this->vehicleHistories->first()?->refuel_date)->first()?->refuel_date,
             'last_refuel_date' => $this->vehicleHistories->sortByDesc('refuel_date')->first()?->refuel_date,
         ];
     }
