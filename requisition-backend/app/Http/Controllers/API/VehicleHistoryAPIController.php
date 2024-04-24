@@ -343,14 +343,35 @@ class VehicleHistoryAPIController extends AppBaseController
                     $month = Carbon::parse('01-'.$request->month);
                     $firstDayOfMonth = $month->firstOfMonth()->toDateString();
                     $lastDayOfMonth = $month->lastOfMonth()->toDateString();
-                    $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
+                    $q->where(function ($q) use ($month, $firstDayOfMonth, $lastDayOfMonth){
+                        $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'")
+                            ->orWhereRaw("vehicle_histories.id = (
+            SELECT vh.id
+            FROM vehicle_histories vh
+            WHERE vh.vehicle_id = vehicle_histories.vehicle_id
+              AND vh.refuel_date >= DATE_ADD(LAST_DAY('$firstDayOfMonth'), INTERVAL 1 DAY)
+            ORDER BY vh.refuel_date
+            LIMIT 1
+        )");
+                    });
                 }, function ($q) {
                     $firstDayOfMonth = Carbon::now()->firstOfMonth()->toDateString();
                     $lastDayOfMonth = Carbon::now()->lastOfMonth()->toDateString();
-                    $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
+                    $q->where(function ($q) use ($firstDayOfMonth, $lastDayOfMonth){
+                        $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'")
+                            ->orWhereRaw("vehicle_histories.id = (
+            SELECT vh.id
+            FROM vehicle_histories vh
+            WHERE vh.vehicle_id = vehicle_histories.vehicle_id
+              AND vh.refuel_date >= DATE_ADD(LAST_DAY('$firstDayOfMonth'), INTERVAL 1 DAY)
+            ORDER BY vh.refuel_date
+            LIMIT 1
+        )");
+                    });
                 });
             }])
             ->get();
+
         return response()->json([
             'data' => VehicleReportResource::collection($vehicle_report)->collection,
             "message" => __('messages.retrieved', ['model' => __('models/vehicleHistories.plural')]),

@@ -30,6 +30,8 @@ class VehicleReportResource extends JsonResource
             })->toArray()),
             'first_refuel_millage' => $this->vehicleHistories->sortBy('refuel_date')->first()?->current_mileage,
             'last_refuel_millage' => $this->vehicleHistories->sortByDesc('refuel_date')->first()?->current_mileage,
+            'first_refuel_date' => $this->vehicleHistories->sortBy('refuel_date')->first()?->refuel_date,
+            'last_refuel_date' => $this->vehicleHistories->sortByDesc('refuel_date')->first()?->refuel_date,
         ];
     }
 }
