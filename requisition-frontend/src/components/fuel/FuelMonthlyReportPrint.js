@@ -1,5 +1,6 @@
 import React, { forwardRef, useRef } from "react";
 import moment from "moment/moment";
+import row from "@/components/ReactPDF/table/Row";
 
 const FuelMonthlyReportPrint = forwardRef(({reports, month}, ref) => {
     const accountsCopy = useRef();
@@ -39,51 +40,43 @@ const FuelMonthlyReportPrint = forwardRef(({reports, month}, ref) => {
                                 <tr>
                                     <th
                                         scope="col"
-                                        rowSpan={2}
                                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                                         Sl.#
                                     </th>
                                     <th
                                         scope="col"
-                                        rowSpan={2}
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
                                         Vehicle
                                     </th>
                                     <th
                                         scope="col"
-                                        rowSpan={2}
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
                                         Fuel
                                     </th>
                                     <th
                                         scope="col"
-                                        rowSpan={2}
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
-                                        Quantity (ltr)
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        rowSpan={2}
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
-                                        Mileage
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        rowSpan={2}
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
-                                        Cost
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        rowSpan={2}
                                         className={`border bg-white leading-3 py-0 px-2 normal-case`}>
                                         Start Mileage
                                     </th>
                                     <th
                                         scope="col"
-                                        colSpan={3}
                                         className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                                         Last Mileage
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Mileage
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Quantity (ltr)
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        Cost
                                     </th>
                                 </tr>
                             </thead>
@@ -101,26 +94,55 @@ const FuelMonthlyReportPrint = forwardRef(({reports, month}, ref) => {
                                             {row.fuel}
                                         </td>
                                         <td className={`border p-1`}>
-                                            {parseFloat(row.quantity)
-                                                .toFixed(2)
-                                                .toLocaleString()}
+                                            {parseFloat(row?.first_refuel_millage).toLocaleString()}
                                         </td>
                                         <td className={`border p-1`}>
-                                            {parseFloat(row.millage).toFixed(2)}
+                                            {parseFloat(row?.last_refuel_millage).toLocaleString()}
+                                        </td>
+                                        <td className={`border p-1`}>
+                                            {parseFloat(row.millage) .toLocaleString('en', {maximumFractionDigits: 2, minimumFractionDigits: 2})}
+                                        </td>
+                                        <td className={`border p-1`}>
+                                            {parseFloat(row.quantity)
+                                                .toLocaleString('en', {maximumFractionDigits: 2, minimumFractionDigits: 2})}
                                         </td>
                                         <td className={`border p-1`}>
                                             {parseFloat(
                                                 row.cost,
-                                            ).toLocaleString()}
-                                        </td>
-                                        <td className={`border p-1`}>
-                                            {row?.first_refuel_millage}
-                                        </td>
-                                        <td className={`border p-1`}>
-                                            {row?.last_refuel_millage}
+                                            ) .toLocaleString('en', {maximumFractionDigits: 2, minimumFractionDigits: 2})}
                                         </td>
                                     </tr>
                                 ))}
+                                <tr>
+                                    <td
+                                        colSpan={5}
+                                        className={`border p-1 text-right`}>
+                                        Total
+                                    </td>
+                                    <td className={`border p-1`}>
+                                        {reports
+                                            .reduce((o, n) => {
+                                                return o + parseFloat(n.millage)
+                                            }, 0)
+                                            .toLocaleString('en', {maximumFractionDigits: 2, minimumFractionDigits: 2})}
+                                    </td>
+                                    <td className={`border p-1`}>
+                                        {reports
+                                            .reduce((o, n) => {
+                                                return (
+                                                    o + parseFloat(n.quantity)
+                                                )
+                                            }, 0)
+                                            .toLocaleString('en', {maximumFractionDigits: 2, minimumFractionDigits: 2})}
+                                    </td>
+                                    <td className={`border p-1`}>
+                                        {reports
+                                            .reduce((o, n) => {
+                                                return o + parseFloat(n.cost)
+                                            }, 0)
+                                            .toLocaleString('en', {maximumFractionDigits: 2, minimumFractionDigits: 2})}
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
