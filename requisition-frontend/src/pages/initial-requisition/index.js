@@ -1,49 +1,57 @@
-import Head from "next/head";
-import AppLayout from "@/components/Layouts/AppLayout";
-import { wrapper } from "@/store";
-import { Button, Card, Datepicker, TextInput } from "flowbite-react";
-import DataTable from 'react-data-table-component';
-import NavLink from "@/components/navLink";
-import { useRouter } from "next/router";
-import Actions from "@/components/actions";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import Head from 'next/head'
+import AppLayout from '@/components/Layouts/AppLayout'
+import { wrapper } from '@/store'
+import { Button, Card, Datepicker, TextInput } from 'flowbite-react'
+import DataTable from 'react-data-table-component'
+import NavLink from '@/components/navLink'
+import { useRouter } from 'next/router'
+import Actions from '@/components/actions'
+import { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 import {
-    getInitialRequisition, getRunningQueriesThunk, useCopyInitialRequisitionQuery,
+    getInitialRequisition,
+    getRunningQueriesThunk,
+    useCopyInitialRequisitionQuery,
     useDestroyInitialRequisitionMutation,
-    useGetInitialRequisitionQuery
-} from "@/store/service/requisitions/initial";
-import {AiFillShopping, AiOutlineSearch} from 'react-icons/ai';
-import moment from "moment";
-import { useAuth } from "@/hooks/auth";
+    useGetInitialRequisitionQuery,
+} from '@/store/service/requisitions/initial'
+import { AiFillShopping, AiOutlineSearch } from 'react-icons/ai'
+import moment from 'moment'
+import { useAuth } from '@/hooks/auth'
 
 const InitialRequisition = () => {
     const { user } = useAuth()
-    const router = useRouter();
-    const [searchParams, setSearchParams] = useState({});
-    const [destroy, destroyResponse] = useDestroyInitialRequisitionMutation();
-    const [columns, setColumns] = useState([]);
-    const [copyID, setCopyID] = useState(false);
+    const router = useRouter()
+    const [searchParams, setSearchParams] = useState({})
+    const [destroy, destroyResponse] = useDestroyInitialRequisitionMutation()
+    const [columns, setColumns] = useState([])
+    const [copyID, setCopyID] = useState(false)
 
-    const {data, isLoading, isError, refetch} = useGetInitialRequisitionQuery(searchParams);
-    const {data: copy, isLoading: copyISProgressing, isSuccess: copyISSuccess} = useCopyInitialRequisitionQuery(copyID, {
-        skip: !copyID
-    });
+    const { data, isLoading, isError, refetch } = useGetInitialRequisitionQuery(
+        searchParams,
+    )
+    const {
+        data: copy,
+        isLoading: copyISProgressing,
+        isSuccess: copyISSuccess,
+    } = useCopyInitialRequisitionQuery(copyID, {
+        skip: !copyID,
+    })
 
     useEffect(() => {
-        if (copyISSuccess && !copyISProgressing){
-            setCopyID(false);
+        if (copyISSuccess && !copyISProgressing) {
+            setCopyID(false)
             router.reload()
         }
-    },[copyISSuccess, copy, copyISProgressing])
+    }, [copyISSuccess, copy, copyISProgressing])
 
     useEffect(() => {
-        if (!destroyResponse.isLoading && destroyResponse.isSuccess){
+        if (!destroyResponse.isLoading && destroyResponse.isSuccess) {
             toast.success('Requisition deleted.')
         }
     }, [destroyResponse])
     useEffect(() => {
-        if (!isLoading && !isError && data && user){
+        if (!isLoading && !isError && data && user) {
             setColumns([
                 {
                     name: 'I.R.F. No.',
@@ -54,7 +62,7 @@ const InitialRequisition = () => {
                     name: 'Category',
                     selector: row => row.category,
                     sortable: true,
-                    maxWidth: "200px",
+                    maxWidth: '200px',
                 },
                 {
                     name: 'No. of Item',
@@ -68,7 +76,10 @@ const InitialRequisition = () => {
                 },
                 {
                     name: 'Purchase Requisition',
-                    selector: row => row.is_purchase_requisition_generated ? 'Generated' : 'No',
+                    selector: row =>
+                        row.is_purchase_requisition_generated
+                            ? 'Generated'
+                            : 'No',
                     sortable: true,
                 },
                 {
@@ -83,44 +94,80 @@ const InitialRequisition = () => {
                 },
                 {
                     name: 'Copy',
-                    selector: row => <Button onClick={() => {
-                        const cnrf= confirm('Are you aware that a new requisition is about to be initiated? Kindly confirm if you wish to proceed.');
-                        if (cnrf){
-                            setCopyID(row.id)
-                        }
-                    }}>Copy</Button>
+                    selector: row => (
+                        <Button
+                            onClick={() => {
+                                const cnrf = confirm(
+                                    'Are you aware that a new requisition is about to be initiated? Kindly confirm if you wish to proceed.',
+                                )
+                                if (cnrf) {
+                                    setCopyID(row.id)
+                                }
+                            }}>
+                            Copy
+                        </Button>
+                    ),
                 },
                 {
                     name: 'Actions',
-                    cell: (row) => <Actions
-                        itemId={row.id}
-                        edit={!row.is_purchase_requisition_generated ? `/initial-requisition/${row.id}/edit`: false}
-                        print={`/initial-requisition/${row.id}/print_view`}
-                        destroy={!row.is_purchase_requisition_generated ? destroy : false}
-                        progressing={destroyResponse.isLoading}
-                        permissionModule={`initial-requisitions`}
-                        item={row}
-                        view={!row.is_purchase_requisition_generated && (parseInt(row.department_id) === parseInt(user?.default_department_id) || user.role_names.includes('Store Manager')) ? (
-                            <Button
-                                gradientDuoTone="greenToBlue"
-                                onClick={() => router.push(`/initial-requisition/${row.id}/create_purchase`)}>
-                                <AiFillShopping />
-                            </Button>
-                        ) : false}
-                    />,
+                    cell: row => (
+                        <Actions
+                            itemId={row.id}
+                            edit={
+                                !row.is_purchase_requisition_generated
+                                    ? `/initial-requisition/${row.id}/edit`
+                                    : false
+                            }
+                            print={`/initial-requisition/${row.id}/print_view`}
+                            destroy={
+                                !row.is_purchase_requisition_generated
+                                    ? destroy
+                                    : false
+                            }
+                            progressing={destroyResponse.isLoading}
+                            permissionModule={`initial-requisitions`}
+                            item={row}
+                            view={
+                                !row.is_purchase_requisition_generated &&
+                                (parseInt(row.department_id) ===
+                                    parseInt(user?.default_department_id) ||
+                                    user.role_names.includes(
+                                        'Store Manager',
+                                    )) ? (
+                                    <Button
+                                        gradientDuoTone="greenToBlue"
+                                        onClick={() =>
+                                            router.push(
+                                                `/initial-requisition/${row.id}/create_purchase`,
+                                            )
+                                        }>
+                                        <AiFillShopping />
+                                    </Button>
+                                ) : (
+                                    false
+                                )
+                            }
+                        />
+                    ),
                     ignoreRowClick: true,
-                }
-            ]);
+                },
+            ])
         }
-    }, [isLoading, isError, data, user]);
+    }, [isLoading, isError, data, user])
 
     const changeSearchParams = (key, value) => {
-        setSearchParams({...searchParams , [key]: value, page: 1});
+        setSearchParams({ ...searchParams, [key]: value, page: 1 })
     }
-    const conditionalRowStyles = [{
-        when: row => row?.current_status?.status == 'Rejected',
-        style: row => ({ backgroundColor:'#f5e6f1', boxShadow: '10px 10px red', textShadow: 'text-shadow: 2px 2px red' }),
-    }];
+    const conditionalRowStyles = [
+        {
+            when: row => row?.current_status?.status == 'Rejected',
+            style: row => ({
+                backgroundColor: '#f5e6f1',
+                boxShadow: '10px 10px red',
+                textShadow: 'text-shadow: 2px 2px red',
+            }),
+        },
+    ]
     return (
         <>
             <Head>
@@ -131,8 +178,7 @@ const InitialRequisition = () => {
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                         Initial Requisition.
                     </h2>
-                }
-            >
+                }>
                 <Head>
                     <title>Initial Requisition.</title>
                 </Head>
@@ -140,23 +186,32 @@ const InitialRequisition = () => {
                     <Card>
                         <div className="flex flex-row space-x-4 space-y-4 shadow-lg py-4 px-4">
                             <NavLink
-                                active={router.pathname === 'initial-requisition/create'}
-                                href={`initial-requisition/create`}
-                            >
+                                active={
+                                    router.pathname ===
+                                    'initial-requisition/create'
+                                }
+                                href={`initial-requisition/create`}>
                                 <Button>Create</Button>
                             </NavLink>
                             <div>
                                 <Datepicker
-                                    onSelectedDateChanged={(date) => setSearchParams({search: searchParams.search, date: moment(date).format('Y-MM-DD')})}
+                                    onSelectedDateChanged={date =>
+                                        setSearchParams({
+                                            search: searchParams.search,
+                                            date: moment(date).format(
+                                                'Y-MM-DD',
+                                            ),
+                                        })
+                                    }
                                 />
                             </div>
                             <div>
                                 <TextInput
                                     icon={AiOutlineSearch}
-                                    onBlur={(e) => {
+                                    onBlur={e => {
                                         setSearchParams({
                                             search: e.target.value,
-                                            date: searchParams.date
+                                            date: searchParams.date,
                                         })
                                     }}
                                 />
@@ -170,15 +225,22 @@ const InitialRequisition = () => {
                             progressPending={isLoading}
                             persistTableHead
                             paginationServer
-                            onChangePage={(page, totalRows) => setSearchParams({
-                                ...searchParams,
-                                'page': page
-                            })}
-                            onChangeRowsPerPage={(currentRowsPerPage, currentPage) => setSearchParams({
-                                ...searchParams,
-                                'page': currentPage,
-                                per_page: currentRowsPerPage
-                            })}
+                            onChangePage={(page, totalRows) =>
+                                setSearchParams({
+                                    ...searchParams,
+                                    page: page,
+                                })
+                            }
+                            onChangeRowsPerPage={(
+                                currentRowsPerPage,
+                                currentPage,
+                            ) =>
+                                setSearchParams({
+                                    ...searchParams,
+                                    page: currentPage,
+                                    per_page: currentRowsPerPage,
+                                })
+                            }
                             paginationTotalRows={data?.number_of_rows}
                             conditionalRowStyles={conditionalRowStyles}
                         />
@@ -189,13 +251,15 @@ const InitialRequisition = () => {
     )
 }
 
-export const getServerSideProps = wrapper.getServerSideProps((store) => async (context) => {
-    // const params = context.params
-    store.dispatch(getInitialRequisition.initiate())
-    await Promise.all(store.dispatch(getRunningQueriesThunk()));
-    return {
-        props: {},
-    };
-})
+export const getServerSideProps = wrapper.getServerSideProps(
+    store => async context => {
+        // const params = context.params
+        store.dispatch(getInitialRequisition.initiate())
+        await Promise.all(store.dispatch(getRunningQueriesThunk()))
+        return {
+            props: {},
+        }
+    },
+)
 
-export default InitialRequisition;
+export default InitialRequisition

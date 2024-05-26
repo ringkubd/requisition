@@ -1,10 +1,10 @@
-import { useSelector } from "react-redux";
-import { Button } from "flowbite-react";
-import { useRouter } from "next/router";
+import { useSelector } from 'react-redux'
+import { Button } from 'flowbite-react'
+import { useRouter } from 'next/router'
 
-const Exception413 = (props) => {
-    const {errors} = useSelector(state => state.errors);
-    const router = useRouter();
+const Exception413 = props => {
+    const { errors } = useSelector(state => state.errors)
+    const router = useRouter()
     return (
         <div className="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center sm:pt-0">
             <div className="max-w-xl mx-auto sm:px-6 lg:px-8">

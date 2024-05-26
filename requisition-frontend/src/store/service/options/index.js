@@ -1,5 +1,5 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const OptionsApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
@@ -11,17 +11,17 @@ export const OptionsApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editOptions: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `options/${id}`,
             }),
             providesTags: ['editOptions'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateOptions: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `options/${id}`,
                 method: 'PATCH',
-                body: patch
+                body: patch,
             }),
             invalidatesTags: ['getOptions', 'editOptions'],
             onQueryStarted: onQueryStartedErrorToast,
@@ -36,7 +36,7 @@ export const OptionsApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyOptions: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `options/${arg}`,
                 method: 'DELETE',
             }),
@@ -53,9 +53,6 @@ export const {
     useStoreOptionsMutation,
     useDestroyOptionsMutation,
     util: { getRunningQueriesThunk },
-} = OptionsApiService;
+} = OptionsApiService
 
-export const {
-    getOptions,
-    editOptions
-} = OptionsApiService.endpoints;
+export const { getOptions, editOptions } = OptionsApiService.endpoints

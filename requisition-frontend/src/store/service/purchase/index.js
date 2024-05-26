@@ -1,25 +1,25 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const PurchaseApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getPurchase: builder.query({
-            query: (arg) => ({
+            query: arg => ({
                 url: 'purchases',
-                params: arg
+                params: arg,
             }),
             providesTags: ['getPurchase'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editPurchase: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `purchases/${id}`,
             }),
             providesTags: ['editPurchase'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updatePurchase: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `purchases/${id}`,
                 method: 'PATCH',
                 body: patch,
@@ -41,7 +41,7 @@ export const PurchaseApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyPurchase: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `purchases/${arg}`,
                 method: 'DELETE',
             }),
@@ -49,13 +49,13 @@ export const PurchaseApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         selectSuppliers: builder.query({
-            query: (arg) => ({
+            query: arg => ({
                 url: `suppliers-select`,
-                params: arg
+                params: arg,
             }),
             providesTags: ['select_suppliers'],
             onQueryStarted: onQueryStartedErrorToast,
-        })
+        }),
     }),
 })
 
@@ -68,9 +68,6 @@ export const {
     useDestroyPurchaseMutation,
     useSelectSuppliersQuery,
     util: { getRunningQueriesThunk },
-} = PurchaseApiService;
+} = PurchaseApiService
 
-export const {
-    getPurchase,
-    editPurchase
-} = PurchaseApiService.endpoints;
+export const { getPurchase, editPurchase } = PurchaseApiService.endpoints

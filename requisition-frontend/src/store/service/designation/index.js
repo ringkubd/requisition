@@ -1,5 +1,5 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const DesignationApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
@@ -11,17 +11,17 @@ export const DesignationApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editDesignation: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `designations/${id}`,
             }),
             providesTags: ['editDesignation'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateDesignation: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `designations/${id}`,
                 method: 'PATCH',
-                body: patch
+                body: patch,
             }),
             invalidatesTags: ['getDesignation', 'editDesignation'],
             onQueryStarted: onQueryStartedErrorToast,
@@ -36,7 +36,7 @@ export const DesignationApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyDesignation: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `designations/${arg}`,
                 method: 'DELETE',
             }),
@@ -44,7 +44,7 @@ export const DesignationApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         getDesignationByOrganizationBranch: builder.query({
-            query : (arg) => ({
+            query: arg => ({
                 url: `designation-by-organization-branch`,
                 params: arg,
             }),
@@ -61,7 +61,7 @@ export const {
     useStoreDesignationMutation,
     useDestroyDesignationMutation,
     util: { getRunningQueriesThunk },
-} = DesignationApiService;
+} = DesignationApiService
 
 export const {
     getDesignation,
@@ -69,4 +69,4 @@ export const {
     updateDesignation,
     storeDesignation,
     destroyDesignation,
-} = DesignationApiService.endpoints;
+} = DesignationApiService.endpoints

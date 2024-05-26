@@ -1,66 +1,75 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const VehicleHistoryAPI = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getVehicleHistory: builder.query({
-            query: (params) => ({
+            query: params => ({
                 url: 'vehicle-histories',
-                params: params
+                params: params,
             }),
             providesTags: ['vehicle-history'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         getSingleVehicleHistory: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `vehicle-histories/${id}`,
             }),
             providesTags: ['single-vehicles'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         storeVehicleHistory: builder.mutation({
-            query: (body) => ({
+            query: body => ({
                 url: `vehicle-histories`,
                 method: 'POST',
-                body
+                body,
             }),
-            invalidatesTags: ['vehicle-history', 'cash-requisition-select-vehicle'],
+            invalidatesTags: [
+                'vehicle-history',
+                'cash-requisition-select-vehicle',
+            ],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateVehicleHistory: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `vehicle-histories/${id}`,
                 method: 'PATCH',
-                body: patch
+                body: patch,
             }),
-            invalidatesTags: ['vehicle-history','cash-requisition-select-vehicle'],
+            invalidatesTags: [
+                'vehicle-history',
+                'cash-requisition-select-vehicle',
+            ],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyVehicleHistory: builder.mutation({
-            query: (id) => ({
+            query: id => ({
                 url: `vehicle-histories/${id}`,
                 method: 'delete',
             }),
-            invalidatesTags: ['vehicle-history','cash-requisition-select-vehicle'],
+            invalidatesTags: [
+                'vehicle-history',
+                'cash-requisition-select-vehicle',
+            ],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         getCashRequisitionSelect: builder.query({
-            query: (params) => ({
+            query: params => ({
                 url: 'vehicle-cash-requisition-select',
                 method: 'GET',
-                params
+                params,
             }),
-            providesTags: ['cash-requisition-select-vehicle']
+            providesTags: ['cash-requisition-select-vehicle'],
         }),
         getVehicleMonthlyReport: builder.query({
-            query: (params) => ({
+            query: params => ({
                 url: 'vehicles_monthly_report',
                 method: 'GET',
-                params
-            })
-        })
-    })
-});
+                params,
+            }),
+        }),
+    }),
+})
 
 export const {
     useGetVehicleHistoryQuery,
@@ -71,7 +80,5 @@ export const {
     useDestroyVehicleHistoryMutation,
     useGetVehicleMonthlyReportQuery,
     util: { getRunningQueriesThunk },
-} = VehicleHistoryAPI;
-export const {
-    getVehicleHistory
-} = VehicleHistoryAPI.endpoints;
+} = VehicleHistoryAPI
+export const { getVehicleHistory } = VehicleHistoryAPI.endpoints

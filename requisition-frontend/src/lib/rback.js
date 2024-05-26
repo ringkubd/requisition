@@ -3,8 +3,8 @@ import { useRouter } from 'next/router'
 function hasRequiredPermissions(requiredPermissions) {
     // get userPermissions from the redux-store
     const userPermissions = ['users', 'groups', 'home']
-    return requiredPermissions.some((permission) =>
-        userPermissions.includes(permission)
+    return requiredPermissions.some(permission =>
+        userPermissions.includes(permission),
     )
 }
 

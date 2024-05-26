@@ -1,20 +1,20 @@
-const getCookie = (cookieName)=> {
-    const cookieArray = document.cookie.split(';');
+const getCookie = cookieName => {
+    const cookieArray = document.cookie.split(';')
 
     for (const cookie of cookieArray) {
-        let cookieString = cookie;
+        let cookieString = cookie
 
-        while (cookieString.charAt(0)==' ') {
-            cookieString = cookieString.substring(1,cookieString.length);
+        while (cookieString.charAt(0) == ' ') {
+            cookieString = cookieString.substring(1, cookieString.length)
         }
         if (cookieString.indexOf(cookieName + '=') == 0) {
-            return cookieString.substring(cookieName.length + 1,cookieString.length);
+            return cookieString.substring(
+                cookieName.length + 1,
+                cookieString.length,
+            )
         }
-
     }
 
-    return undefined;
+    return undefined
 }
-export {
-    getCookie
-}
+export { getCookie }

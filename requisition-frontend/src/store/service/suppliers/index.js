@@ -1,31 +1,35 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const SuppliersApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getSuppliers: builder.query({
-            query: (query) => ({
+            query: query => ({
                 url: 'suppliers',
-                params: query
+                params: query,
             }),
             providesTags: ['getSuppliers'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editSuppliers: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `suppliers/${id}`,
             }),
             providesTags: ['editSuppliers'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateSuppliers: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `suppliers/${id}`,
                 method: 'PATCH',
                 body: patch,
                 formData: true,
             }),
-            invalidatesTags: ['getSuppliers', 'editSuppliers', 'select_suppliers'],
+            invalidatesTags: [
+                'getSuppliers',
+                'editSuppliers',
+                'select_suppliers',
+            ],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         storeSuppliers: builder.mutation({
@@ -41,13 +45,13 @@ export const SuppliersApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroySuppliers: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `suppliers/${arg}`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['getSuppliers', 'select_suppliers'],
             onQueryStarted: onQueryStartedErrorToast,
-        })
+        }),
     }),
 })
 
@@ -59,9 +63,6 @@ export const {
     useStoreSuppliersMutation,
     useDestroySuppliersMutation,
     util: { getRunningQueriesThunk },
-} = SuppliersApiService;
+} = SuppliersApiService
 
-export const {
-    getSuppliers,
-    editSuppliers
-} = SuppliersApiService.endpoints;
+export const { getSuppliers, editSuppliers } = SuppliersApiService.endpoints

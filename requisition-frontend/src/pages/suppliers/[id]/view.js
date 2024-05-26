@@ -1,23 +1,26 @@
-import Head from "next/head";
-import React, { useEffect, useState } from "react";
-import AppLayout from "@/components/Layouts/AppLayout";
-import { useRouter } from "next/router";
-import { Button, Card, Table } from "flowbite-react";
-import Image from "next/image";
-import { useEditSuppliersQuery } from "@/store/service/suppliers";
-import DataTable from "react-data-table-component";
+import Head from 'next/head'
+import React, { useEffect, useState } from 'react'
+import AppLayout from '@/components/Layouts/AppLayout'
+import { useRouter } from 'next/router'
+import { Button, Card, Table } from 'flowbite-react'
+import Image from 'next/image'
+import { useEditSuppliersQuery } from '@/store/service/suppliers'
+import DataTable from 'react-data-table-component'
 
 const View = () => {
-    const router = useRouter();
-    const id = router?.query?.id;
-    const {data: item, isLoading, isSuccess, isError} = useEditSuppliersQuery(id, {
-        skip: !id
-    });
-    const {data} = item ?? {};
-    const [columns, setColumns] = useState([]);
+    const router = useRouter()
+    const id = router?.query?.id
+    const { data: item, isLoading, isSuccess, isError } = useEditSuppliersQuery(
+        id,
+        {
+            skip: !id,
+        },
+    )
+    const { data } = item ?? {}
+    const [columns, setColumns] = useState([])
 
     useEffect(() => {
-        if (isSuccess && data?.purchase){
+        if (isSuccess && data?.purchase) {
             setColumns([
                 {
                     name: 'SL',
@@ -30,9 +33,11 @@ const View = () => {
                 },
                 {
                     name: 'Product',
-                    selector: row => row?.product?.title + (row?.productOption?.title.includes('N/A')
-                        ? ''
-                        : ' - ' + row?.productOption?.title),
+                    selector: row =>
+                        row?.product?.title +
+                        (row?.productOption?.title.includes('N/A')
+                            ? ''
+                            : ' - ' + row?.productOption?.title),
                     sortable: true,
                 },
                 {
@@ -96,38 +101,53 @@ const View = () => {
                         <div className="flex flex-row space-x-4 space-y-4  shadow-lg py-4 px-4">
                             <Button onClick={() => router.back()}>Back</Button>
                         </div>
-                        {
-                            item && isSuccess ? (
-                                <>
-                                    <Table>
-                                        <Table.Head>
-                                            <Table.HeadCell>Logo</Table.HeadCell>
-                                            <Table.HeadCell>Name</Table.HeadCell>
-                                            <Table.HeadCell>Contact</Table.HeadCell>
-                                            <Table.HeadCell>Address</Table.HeadCell>
-                                        </Table.Head>
-                                        <Table.Body>
-                                            <Table.Row>
-                                                <Table.Cell>{data.logo ? <Image width={50} height={50} alt={data.name} src={data.logo} /> : ""}</Table.Cell>
-                                                <Table.Cell>{data.name}</Table.Cell>
-                                                <Table.Cell>{data.contact}</Table.Cell>
-                                                <Table.Cell>{data.address}</Table.Cell>
-                                            </Table.Row>
-                                        </Table.Body>
-                                    </Table>
-                                    <h2>Purchase History</h2>
-                                    <hr className={`border-2 border-black`}/>
-                                    <DataTable
-                                        columns={columns}
-                                        data={data?.purchase}
-                                    />
-                                </>
-                            ) : 'Data loading....'
-                        }
+                        {item && isSuccess ? (
+                            <>
+                                <Table>
+                                    <Table.Head>
+                                        <Table.HeadCell>Logo</Table.HeadCell>
+                                        <Table.HeadCell>Name</Table.HeadCell>
+                                        <Table.HeadCell>Contact</Table.HeadCell>
+                                        <Table.HeadCell>Address</Table.HeadCell>
+                                    </Table.Head>
+                                    <Table.Body>
+                                        <Table.Row>
+                                            <Table.Cell>
+                                                {data.logo ? (
+                                                    <Image
+                                                        width={50}
+                                                        height={50}
+                                                        alt={data.name}
+                                                        src={data.logo}
+                                                    />
+                                                ) : (
+                                                    ''
+                                                )}
+                                            </Table.Cell>
+                                            <Table.Cell>{data.name}</Table.Cell>
+                                            <Table.Cell>
+                                                {data.contact}
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                {data.address}
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    </Table.Body>
+                                </Table>
+                                <h2>Purchase History</h2>
+                                <hr className={`border-2 border-black`} />
+                                <DataTable
+                                    columns={columns}
+                                    data={data?.purchase}
+                                />
+                            </>
+                        ) : (
+                            'Data loading....'
+                        )}
                     </Card>
                 </div>
             </AppLayout>
         </>
     )
 }
-export default View;
+export default View

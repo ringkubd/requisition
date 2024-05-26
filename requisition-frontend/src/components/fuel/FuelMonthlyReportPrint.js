@@ -1,9 +1,9 @@
-import React, { forwardRef, useRef } from "react";
-import moment from "moment/moment";
-import row from "@/components/ReactPDF/table/Row";
+import React, { forwardRef, useRef } from 'react'
+import moment from 'moment/moment'
+import row from '@/components/ReactPDF/table/Row'
 
-const FuelMonthlyReportPrint = forwardRef(({reports, month}, ref) => {
-    const accountsCopy = useRef();
+const FuelMonthlyReportPrint = forwardRef(({ reports, month }, ref) => {
+    const accountsCopy = useRef()
     console.log(reports)
     return (
         <div
@@ -94,22 +94,38 @@ const FuelMonthlyReportPrint = forwardRef(({reports, month}, ref) => {
                                             {row.fuel}
                                         </td>
                                         <td className={`border p-1`}>
-                                            {parseFloat(row?.first_refuel_millage).toLocaleString()}
+                                            {parseFloat(
+                                                row?.first_refuel_millage,
+                                            ).toLocaleString()}
                                         </td>
                                         <td className={`border p-1`}>
-                                            {parseFloat(row?.last_refuel_millage).toLocaleString()}
+                                            {parseFloat(
+                                                row?.last_refuel_millage,
+                                            ).toLocaleString()}
                                         </td>
                                         <td className={`border p-1`}>
-                                            {parseFloat(row.millage) .toLocaleString('en', {maximumFractionDigits: 2, minimumFractionDigits: 2})}
+                                            {parseFloat(
+                                                row.millage,
+                                            ).toLocaleString('en', {
+                                                maximumFractionDigits: 2,
+                                                minimumFractionDigits: 2,
+                                            })}
                                         </td>
                                         <td className={`border p-1`}>
-                                            {parseFloat(row.quantity)
-                                                .toLocaleString('en', {maximumFractionDigits: 2, minimumFractionDigits: 2})}
+                                            {parseFloat(
+                                                row.quantity,
+                                            ).toLocaleString('en', {
+                                                maximumFractionDigits: 2,
+                                                minimumFractionDigits: 2,
+                                            })}
                                         </td>
                                         <td className={`border p-1`}>
                                             {parseFloat(
                                                 row.cost,
-                                            ) .toLocaleString('en', {maximumFractionDigits: 2, minimumFractionDigits: 2})}
+                                            ).toLocaleString('en', {
+                                                maximumFractionDigits: 2,
+                                                minimumFractionDigits: 2,
+                                            })}
                                         </td>
                                     </tr>
                                 ))}
@@ -124,7 +140,10 @@ const FuelMonthlyReportPrint = forwardRef(({reports, month}, ref) => {
                                             .reduce((o, n) => {
                                                 return o + parseFloat(n.millage)
                                             }, 0)
-                                            .toLocaleString('en', {maximumFractionDigits: 2, minimumFractionDigits: 2})}
+                                            .toLocaleString('en', {
+                                                maximumFractionDigits: 2,
+                                                minimumFractionDigits: 2,
+                                            })}
                                     </td>
                                     <td className={`border p-1`}>
                                         {reports
@@ -133,14 +152,20 @@ const FuelMonthlyReportPrint = forwardRef(({reports, month}, ref) => {
                                                     o + parseFloat(n.quantity)
                                                 )
                                             }, 0)
-                                            .toLocaleString('en', {maximumFractionDigits: 2, minimumFractionDigits: 2})}
+                                            .toLocaleString('en', {
+                                                maximumFractionDigits: 2,
+                                                minimumFractionDigits: 2,
+                                            })}
                                     </td>
                                     <td className={`border p-1`}>
                                         {reports
                                             .reduce((o, n) => {
                                                 return o + parseFloat(n.cost)
                                             }, 0)
-                                            .toLocaleString('en', {maximumFractionDigits: 2, minimumFractionDigits: 2})}
+                                            .toLocaleString('en', {
+                                                maximumFractionDigits: 2,
+                                                minimumFractionDigits: 2,
+                                            })}
                                     </td>
                                 </tr>
                             </tbody>
@@ -150,5 +175,5 @@ const FuelMonthlyReportPrint = forwardRef(({reports, month}, ref) => {
             </div>
         </div>
     )
-});
-export default FuelMonthlyReportPrint;
+})
+export default FuelMonthlyReportPrint

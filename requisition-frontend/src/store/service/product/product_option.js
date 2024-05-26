@@ -1,5 +1,5 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const ProductOptionApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
@@ -26,8 +26,6 @@ export const {
     useGetProductOptionsQuery,
     useUpdateProductOptionsMutation,
     util: { getRunningQueriesThunk },
-} = ProductOptionApiService;
+} = ProductOptionApiService
 
-export const {
-    getProductOptions
-} = ProductOptionApiService.endpoints;
+export const { getProductOptions } = ProductOptionApiService.endpoints

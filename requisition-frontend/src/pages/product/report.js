@@ -1,53 +1,96 @@
-import AppLayout from "@/components/Layouts/AppLayout";
-import Head from "next/head";
-import { Button, Card, Checkbox, Label, Radio } from "flowbite-react";
-import NavLink from "@/components/navLink";
-import { useRouter } from "next/router";
-import Select from "react-select";
-import { useGetNavigationDepartmentQuery } from "@/store/service/navigation";
-import { useGetCategoryQuery } from "@/store/service/category";
-import React, { useEffect, useRef, useState } from "react";
-import { ErrorMessage, Formik } from "formik";
-import * as Yup from 'yup';
-import Datepicker from "react-tailwindcss-datepicker";
-import moment from "moment";
-import PurchaseReport from "@/components/report/purchaseReport";
-import IssueReport from "@/components/report/issueReport";
+import AppLayout from '@/components/Layouts/AppLayout'
+import Head from 'next/head'
+import { Button, Card, Checkbox, Label, Radio } from 'flowbite-react'
+import NavLink from '@/components/navLink'
+import { useRouter } from 'next/router'
+import Select from 'react-select'
+import { useGetNavigationDepartmentQuery } from '@/store/service/navigation'
+import { useGetCategoryQuery } from '@/store/service/category'
+import React, { useEffect, useRef, useState } from 'react'
+import { ErrorMessage, Formik } from 'formik'
+import * as Yup from 'yup'
+import Datepicker from 'react-tailwindcss-datepicker'
+import moment from 'moment'
+import PurchaseReport from '@/components/report/purchaseReport'
+import IssueReport from '@/components/report/issueReport'
 import {
     useIssuesReportMutation,
     usePurchaseReportMutation,
     useBothReportMutation,
-    useProductCurrentBalanceMutation
-} from "@/store/service/report";
-import { useReactToPrint } from "react-to-print";
-import ItemBaseIssueReport from "@/components/report/itemBaseIssueReport";
-import ItemBasePurchaseReport from "@/components/report/itemBasePurchaseReport";
-import BothReport from "@/components/report/BothReport";
-import axios from "@/lib/axios";
-import { AsyncPaginate } from "react-select-async-paginate";
-import ProductBalance from "@/components/report/productBalance";
+    useProductCurrentBalanceMutation,
+} from '@/store/service/report'
+import { useReactToPrint } from 'react-to-print'
+import ItemBaseIssueReport from '@/components/report/itemBaseIssueReport'
+import ItemBasePurchaseReport from '@/components/report/itemBasePurchaseReport'
+import BothReport from '@/components/report/BothReport'
+import axios from '@/lib/axios'
+import { AsyncPaginate } from 'react-select-async-paginate'
+import ProductBalance from '@/components/report/productBalance'
 
-Object.filter = (obj, predicate) => Object.fromEntries(Object.entries(obj).filter(predicate));
+Object.filter = (obj, predicate) =>
+    Object.fromEntries(Object.entries(obj).filter(predicate))
 const Report = () => {
-    const router = useRouter();
-    const [selectedCategory, setSelectedCategory] = useState("");
-    const {data: departments, isLoading: departmentISLoading, isError: departmentISError} = useGetNavigationDepartmentQuery();
-    const {data: categories, isLoading: categoryISLoading, isError: categoryISError} = useGetCategoryQuery();
-    const [submitIssueReport, {data: issueReports, isLoading:issueReportsISLoading, isError:issueReportsISError, isSuccess: issueReportsISSuccess}] = useIssuesReportMutation();
-    const [submitPurchaseReport, {data: purchaseReport, isLoading: purchaseReportISLoading, isError:purchaseReportISError, isSuccess: purchaseReportISSuccess}] = usePurchaseReportMutation();
-    const [submitBothReport, {data: bothReport, isLoading: bothReportISLoading, isError:bothReportISError, isSuccess: bothReportISSuccess}] = useBothReportMutation();
-    const [submitBalance, {data: balance, isLoading: balanceISLoading, isError:balanceISError, isSuccess: balanceISSuccess}] = useProductCurrentBalanceMutation();
+    const router = useRouter()
+    const [selectedCategory, setSelectedCategory] = useState('')
+    const {
+        data: departments,
+        isLoading: departmentISLoading,
+        isError: departmentISError,
+    } = useGetNavigationDepartmentQuery()
+    const {
+        data: categories,
+        isLoading: categoryISLoading,
+        isError: categoryISError,
+    } = useGetCategoryQuery()
+    const [
+        submitIssueReport,
+        {
+            data: issueReports,
+            isLoading: issueReportsISLoading,
+            isError: issueReportsISError,
+            isSuccess: issueReportsISSuccess,
+        },
+    ] = useIssuesReportMutation()
+    const [
+        submitPurchaseReport,
+        {
+            data: purchaseReport,
+            isLoading: purchaseReportISLoading,
+            isError: purchaseReportISError,
+            isSuccess: purchaseReportISSuccess,
+        },
+    ] = usePurchaseReportMutation()
+    const [
+        submitBothReport,
+        {
+            data: bothReport,
+            isLoading: bothReportISLoading,
+            isError: bothReportISError,
+            isSuccess: bothReportISSuccess,
+        },
+    ] = useBothReportMutation()
+    const [
+        submitBalance,
+        {
+            data: balance,
+            isLoading: balanceISLoading,
+            isError: balanceISError,
+            isSuccess: balanceISSuccess,
+        },
+    ] = useProductCurrentBalanceMutation()
 
-    const [selectedCategoriesName, setSelectedCategoriesName] = useState(["All"]);
-    const [variant, setVariant] = useState([]);
+    const [selectedCategoriesName, setSelectedCategoriesName] = useState([
+        'All',
+    ])
+    const [variant, setVariant] = useState([])
 
     useEffect(() => {
         console.log(variant)
-    }, [variant]);
+    }, [variant])
 
-    const printRef = useRef();
-    const [reportType, setReportType] = useState('usage');
-    const [reportFormat, setReportFormat] = useState('category_base');
+    const printRef = useRef()
+    const [reportType, setReportType] = useState('usage')
+    const [reportFormat, setReportFormat] = useState('category_base')
     const [columns, setColumns] = useState({
         category: true,
         issuer: true,
@@ -55,9 +98,10 @@ const Report = () => {
         avg: true,
         use_date: true,
         variant: true,
-    });
+    })
 
-    const {start_date, end_date} = issueReports ?? purchaseReport ?? bothReport ?? balance ?? {};
+    const { start_date, end_date } =
+        issueReports ?? purchaseReport ?? bothReport ?? balance ?? {}
 
     const initialValues = {
         category: '',
@@ -67,22 +111,21 @@ const Report = () => {
         product: '',
         report_type: 'usage',
         report_format: 'category_base',
-        product_option_id: ''
-    };
+        product_option_id: '',
+    }
 
     const submit = (values, formikHelper) => {
-        if (values.report_type === "purchase"){
-            submitPurchaseReport(values);
-        }else if (values.report_type === "usage"){
-            submitIssueReport(values);
-        }else if (values.report_type === "both"){
-            submitBothReport(values);
-        }else{
-            submitBalance(values);
+        if (values.report_type === 'purchase') {
+            submitPurchaseReport(values)
+        } else if (values.report_type === 'usage') {
+            submitIssueReport(values)
+        } else if (values.report_type === 'both') {
+            submitBothReport(values)
+        } else {
+            submitBalance(values)
         }
-
     }
-    Yup.addMethod(Yup.mixed, 'atLeastOneOf', function(list, v) {
+    Yup.addMethod(Yup.mixed, 'atLeastOneOf', function (list, v) {
         return this.test({
             name: 'atLeastOneOf',
             message: 'At least one of these fields: ${keys} is required.',
@@ -90,38 +133,47 @@ const Report = () => {
             params: { keys: list.join(', ') },
             test: (value, context) => {
                 return list.some(f => !!context.parent[f])
-            }
+            },
         })
     })
 
     const validationSchema = Yup.object().shape({
         category: Yup.array().label('Category'),
-        department:  Yup.number(),
+        department: Yup.number(),
         start_date: Yup.date(),
         end_date: Yup.date(),
-        product: Yup.mixed().atLeastOneOf(['department', 'start_date', 'end_date', 'product', 'category']),
+        product: Yup.mixed().atLeastOneOf([
+            'department',
+            'start_date',
+            'end_date',
+            'product',
+            'category',
+        ]),
         report_type: Yup.string().required().label('Report Type'),
-    });
+    })
 
     const handlePrint = useReactToPrint({
         content: () => printRef.current,
-        onBeforePrint: (a) => console.log(a)
-    });
+        onBeforePrint: a => console.log(a),
+    })
 
     useEffect(() => {
-        if (reportType === "purchase" && reportFormat === "category_base"){
+        if (reportType === 'purchase' && reportFormat === 'category_base') {
             setColumns({
                 category: true,
                 supplier: true,
                 department: true,
                 variant: true,
             })
-        }else if(reportType === "purchase" && reportFormat !== "category_base"){
+        } else if (
+            reportType === 'purchase' &&
+            reportFormat !== 'category_base'
+        ) {
             setColumns({
                 category: true,
                 variant: true,
             })
-        }else if(reportType === "usage"  && reportFormat === "category_base"){
+        } else if (reportType === 'usage' && reportFormat === 'category_base') {
             setColumns({
                 category: true,
                 issuer: true,
@@ -129,12 +181,12 @@ const Report = () => {
                 avg: true,
                 use_date: true,
                 variant: true,
-            });
-        }else if(reportType === "usage" && reportFormat !== "category_base"){
+            })
+        } else if (reportType === 'usage' && reportFormat !== 'category_base') {
             setColumns({
                 category: true,
                 avg: true,
-            });
+            })
         }
     }, [reportType, reportFormat])
     async function loadOptions(search, loadedOptions, { page }) {
@@ -142,13 +194,13 @@ const Report = () => {
             params: {
                 search: search,
                 page: page,
-                category_id: selectedCategory
-            }
-        });
-        const responseJSON = response.data?.data;
+                category_id: selectedCategory,
+            },
+        })
+        const responseJSON = response.data?.data
 
         return {
-            options: responseJSON?.products.map((r,index) => {
+            options: responseJSON?.products.map((r, index) => {
                 return {
                     label: r.title,
                     value: r.id,
@@ -160,7 +212,7 @@ const Report = () => {
             additional: {
                 page: search ? 1 : page + 1,
             },
-        };
+        }
     }
     return (
         <AppLayout
@@ -185,13 +237,13 @@ const Report = () => {
                             onSubmit={submit}
                             validationSchema={validationSchema}>
                             {({
-                                  handleSubmit,
-                                  handleChange,
-                                  values,
-                                  errors,
-                                  isSubmitting,
-                                  setFieldValue,
-                              }) => (
+                                handleSubmit,
+                                handleChange,
+                                values,
+                                errors,
+                                isSubmitting,
+                                setFieldValue,
+                            }) => (
                                 <div
                                     className={`flex flex-col w-full space-y-6`}>
                                     <div className="flex flex-col md:flex-row md:space-x-4">
@@ -296,7 +348,8 @@ const Report = () => {
                                                 </Label>
                                             </div>
                                         </fieldset>
-                                        {reportType !== 'both' && reportType !== 'balance' ? (
+                                        {reportType !== 'both' &&
+                                        reportType !== 'balance' ? (
                                             <>
                                                 <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
                                                     <legend className="mb-4 font-bold">
@@ -313,7 +366,7 @@ const Report = () => {
                                                                     defaultChecked={
                                                                         columns[
                                                                             c
-                                                                            ]
+                                                                        ]
                                                                     }
                                                                     onChange={e => {
                                                                         handleChange(
@@ -321,7 +374,7 @@ const Report = () => {
                                                                         )
                                                                         columns[
                                                                             c
-                                                                            ] =
+                                                                        ] =
                                                                             e.target.checked
                                                                         setColumns(
                                                                             columns,
@@ -338,133 +391,139 @@ const Report = () => {
                                                     )}
                                                 </fieldset>
                                             </>
-                                        ) : ""}
-                                        {
-                                            reportType !== 'both' ? (
-                                                <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
-                                                    <legend className="mb-4 font-bold">
-                                                        Report Format
-                                                    </legend>
-                                                    {reportType !== 'balance' ? (
-                                                        <>
-                                                            <div className="flex items-center gap-2">
-                                                                <Radio
-                                                                    id="category_base"
-                                                                    name="report_format"
-                                                                    defaultChecked={
-                                                                        values.report_format ===
-                                                                        'category_base'
-                                                                    }
-                                                                    onChange={e => {
-                                                                        handleChange(
-                                                                            e,
+                                        ) : (
+                                            ''
+                                        )}
+                                        {reportType !== 'both' ? (
+                                            <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
+                                                <legend className="mb-4 font-bold">
+                                                    Report Format
+                                                </legend>
+                                                {reportType !== 'balance' ? (
+                                                    <>
+                                                        <div className="flex items-center gap-2">
+                                                            <Radio
+                                                                id="category_base"
+                                                                name="report_format"
+                                                                defaultChecked={
+                                                                    values.report_format ===
+                                                                    'category_base'
+                                                                }
+                                                                onChange={e => {
+                                                                    handleChange(
+                                                                        e,
+                                                                    )
+                                                                    if (
+                                                                        e.target
+                                                                            .checked
+                                                                    ) {
+                                                                        setReportFormat(
+                                                                            'category_base',
                                                                         )
-                                                                        if (
-                                                                            e.target
-                                                                                .checked
-                                                                        ) {
-                                                                            setReportFormat(
-                                                                                'category_base',
-                                                                            )
-                                                                        }
-                                                                    }}
-                                                                />
-                                                                <Label
-                                                                    htmlFor="category_base"
-                                                                    className={`font-bold`}>
-                                                                    Category Base
-                                                                </Label>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <Radio
-                                                                    id="item_base"
-                                                                    name="report_format"
-                                                                    defaultChecked={
-                                                                        values.report_format ===
-                                                                        'item_base'
                                                                     }
-                                                                    onChange={e => {
-                                                                        handleChange(
-                                                                            e,
+                                                                }}
+                                                            />
+                                                            <Label
+                                                                htmlFor="category_base"
+                                                                className={`font-bold`}>
+                                                                Category Base
+                                                            </Label>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <Radio
+                                                                id="item_base"
+                                                                name="report_format"
+                                                                defaultChecked={
+                                                                    values.report_format ===
+                                                                    'item_base'
+                                                                }
+                                                                onChange={e => {
+                                                                    handleChange(
+                                                                        e,
+                                                                    )
+                                                                    if (
+                                                                        e.target
+                                                                            .checked
+                                                                    ) {
+                                                                        setReportFormat(
+                                                                            'item_base',
                                                                         )
-                                                                        if (
-                                                                            e.target
-                                                                                .checked
-                                                                        ) {
-                                                                            setReportFormat(
-                                                                                'item_base',
-                                                                            )
-                                                                        }
-                                                                    }}
-                                                                />
-                                                                <Label
-                                                                    htmlFor="item_base"
-                                                                    className={`font-bold`}>
-                                                                    Item Base
-                                                                </Label>
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <div className="flex items-center gap-2">
-                                                                <Radio
-                                                                    id="item_base"
-                                                                    name="report_format"
-                                                                    defaultChecked={
-                                                                        values.report_format ===
-                                                                        'item_base'
                                                                     }
-                                                                    onChange={e => {
-                                                                        if (
-                                                                            e.target
-                                                                                .checked
-                                                                        ) {
-                                                                            setReportFormat(
-                                                                                'item_base',
-                                                                            )
-                                                                            setFieldValue('report_format', 'item_base');
-                                                                        }
-                                                                    }}
-                                                                />
-                                                                <Label
-                                                                    htmlFor="item_base"
-                                                                    className={`font-bold`}>
-                                                                    Item Base
-                                                                </Label>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <Radio
-                                                                    id="option_base"
-                                                                    name="report_format"
-                                                                    defaultChecked={
-                                                                        values.report_format ===
-                                                                        'option_base'
+                                                                }}
+                                                            />
+                                                            <Label
+                                                                htmlFor="item_base"
+                                                                className={`font-bold`}>
+                                                                Item Base
+                                                            </Label>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <div className="flex items-center gap-2">
+                                                            <Radio
+                                                                id="item_base"
+                                                                name="report_format"
+                                                                defaultChecked={
+                                                                    values.report_format ===
+                                                                    'item_base'
+                                                                }
+                                                                onChange={e => {
+                                                                    if (
+                                                                        e.target
+                                                                            .checked
+                                                                    ) {
+                                                                        setReportFormat(
+                                                                            'item_base',
+                                                                        )
+                                                                        setFieldValue(
+                                                                            'report_format',
+                                                                            'item_base',
+                                                                        )
                                                                     }
-                                                                    onChange={e => {
-                                                                        if (
-                                                                            e.target
-                                                                                .checked
-                                                                        ) {
-                                                                            setReportFormat(
-                                                                                'option_base',
-                                                                            )
-                                                                            setFieldValue('report_format', 'option_base');
-                                                                        }
-                                                                    }}
-                                                                />
-                                                                <Label
-                                                                    htmlFor="option_base"
-                                                                    className={`font-bold`}>
-                                                                    Variant Base
-                                                                </Label>
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                </fieldset>
-                                            ) : (
-                                                ''
-                                            )
-                                        }
+                                                                }}
+                                                            />
+                                                            <Label
+                                                                htmlFor="item_base"
+                                                                className={`font-bold`}>
+                                                                Item Base
+                                                            </Label>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <Radio
+                                                                id="option_base"
+                                                                name="report_format"
+                                                                defaultChecked={
+                                                                    values.report_format ===
+                                                                    'option_base'
+                                                                }
+                                                                onChange={e => {
+                                                                    if (
+                                                                        e.target
+                                                                            .checked
+                                                                    ) {
+                                                                        setReportFormat(
+                                                                            'option_base',
+                                                                        )
+                                                                        setFieldValue(
+                                                                            'report_format',
+                                                                            'option_base',
+                                                                        )
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <Label
+                                                                htmlFor="option_base"
+                                                                className={`font-bold`}>
+                                                                Variant Base
+                                                            </Label>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </fieldset>
+                                        ) : (
+                                            ''
+                                        )}
                                     </div>
                                     <div
                                         className={`flex flex-col sm:flex-row w-full sm:space-x-4`}>
@@ -489,7 +548,7 @@ const Report = () => {
                                                 }}
                                                 value={{
                                                     startDate:
-                                                    values.start_date,
+                                                        values.start_date,
                                                     endDate: values.end_date,
                                                 }}
                                             />
@@ -556,7 +615,7 @@ const Report = () => {
                                                             options: [
                                                                 {
                                                                     label:
-                                                                    c.title,
+                                                                        c.title,
                                                                     value: c.id,
                                                                 },
                                                                 ...sub,
@@ -579,9 +638,11 @@ const Report = () => {
                                                             v => v.value,
                                                         ),
                                                     )
-                                                    setSelectedCategoriesName(newValue?.map(
-                                                        v => v.label,
-                                                    ) ?? false,)
+                                                    setSelectedCategoriesName(
+                                                        newValue?.map(
+                                                            v => v.label,
+                                                        ) ?? false,
+                                                    )
                                                 }}
                                             />
                                             <ErrorMessage name={'category'} />
@@ -610,13 +671,15 @@ const Report = () => {
                                                         ),
                                                     )
                                                     if (newValue.length === 1) {
-                                                        setVariant(newValue[0].product_options)
+                                                        setVariant(
+                                                            newValue[0]
+                                                                .product_options,
+                                                        )
                                                     }
                                                     if (!newValue.length) {
-                                                        setVariant([]);
+                                                        setVariant([])
                                                     }
-                                                }
-                                                }
+                                                }}
                                                 additional={{
                                                     page: 1,
                                                 }}
@@ -635,42 +698,46 @@ const Report = () => {
                                                 )}
                                             </ErrorMessage>
                                         </div>
-                                        {
-                                            variant.length ? (
-                                                <div className={`w-full`}>
-                                                    <Label
-                                                        htmlFor={`product_option_id`}
-                                                        value={"Variant"}
-                                                        className={`font-bold`}
-                                                    />
-                                                    <Select
-                                                        options={variant.map((v) => ({
-                                                            label: v.option.name + "(" + v.option_value + ")",
-                                                            value: v.id
-                                                        }))}
-                                                        className={`select`}
-                                                        classNames={{
-                                                            control: state => "select"
-                                                        }}
-                                                        onChange={(newValue) => {
-                                                            setFieldValue(
-                                                                'product_option_id',
-                                                                newValue?.map(
-                                                                    v => v.value,
-                                                                ),
-                                                            )
-                                                            console.log(newValue?.map(
+                                        {variant.length ? (
+                                            <div className={`w-full`}>
+                                                <Label
+                                                    htmlFor={`product_option_id`}
+                                                    value={'Variant'}
+                                                    className={`font-bold`}
+                                                />
+                                                <Select
+                                                    options={variant.map(v => ({
+                                                        label:
+                                                            v.option.name +
+                                                            '(' +
+                                                            v.option_value +
+                                                            ')',
+                                                        value: v.id,
+                                                    }))}
+                                                    className={`select`}
+                                                    classNames={{
+                                                        control: state =>
+                                                            'select',
+                                                    }}
+                                                    onChange={newValue => {
+                                                        setFieldValue(
+                                                            'product_option_id',
+                                                            newValue?.map(
                                                                 v => v.value,
-                                                            ),)
-                                                        }}
-                                                        id={`product_option_id`}
-                                                        name={`product_option_id`}
-                                                        isMulti
-                                                    />
-                                                </div>
-                                            ) : null
-                                        }
-
+                                                            ),
+                                                        )
+                                                        console.log(
+                                                            newValue?.map(
+                                                                v => v.value,
+                                                            ),
+                                                        )
+                                                    }}
+                                                    id={`product_option_id`}
+                                                    name={`product_option_id`}
+                                                    isMulti
+                                                />
+                                            </div>
+                                        ) : null}
                                     </div>
                                     <div className={`flex justify-end`}>
                                         <Button onClick={handleSubmit}>
@@ -704,10 +771,10 @@ const Report = () => {
                                             {reportType === 'purchase'
                                                 ? 'Purchase'
                                                 : reportType === 'usage'
-                                                    ? 'Issue'
-                                                    : reportType === 'balance'
-                                                        ? 'Balance'
-                                                        : 'Purchase and Issue'}{' '}
+                                                ? 'Issue'
+                                                : reportType === 'balance'
+                                                ? 'Balance'
+                                                : 'Purchase and Issue'}{' '}
                                             Report
                                         </p>
                                     </div>
@@ -718,23 +785,33 @@ const Report = () => {
                                             Date:{' '}
                                             {reportType === 'balance'
                                                 ? moment(start_date).format(
-                                                    'DD MMM Y',
-                                                )
+                                                      'DD MMM Y',
+                                                  )
                                                 : (start_date
-                                                    ? moment(
-                                                        start_date,
-                                                    ).format('DD MMM Y')
-                                                    : '') +
-                                                ' - ' +
-                                                (end_date
-                                                    ? moment(end_date).format(
-                                                        'DD MMM Y',
-                                                    )
-                                                    : '')}
+                                                      ? moment(
+                                                            start_date,
+                                                        ).format('DD MMM Y')
+                                                      : '') +
+                                                  ' - ' +
+                                                  (end_date
+                                                      ? moment(end_date).format(
+                                                            'DD MMM Y',
+                                                        )
+                                                      : '')}
                                         </i>
                                     </div>
-                                    <div className={`flex justify-center items-center justify-items-center text-center`}>
-                                        <b>{selectedCategoriesName.length === 1 || !selectedCategoriesName.length ? "Category "+ (!selectedCategoriesName.length ? 'All' :selectedCategoriesName[0]) : ""}</b>
+                                    <div
+                                        className={`flex justify-center items-center justify-items-center text-center`}>
+                                        <b>
+                                            {selectedCategoriesName.length ===
+                                                1 ||
+                                            !selectedCategoriesName.length
+                                                ? 'Category ' +
+                                                  (!selectedCategoriesName.length
+                                                      ? 'All'
+                                                      : selectedCategoriesName[0])
+                                                : ''}
+                                        </b>
                                     </div>
                                 </div>
                                 {reportType === 'purchase' ? (
@@ -825,4 +902,4 @@ const Report = () => {
     )
 }
 
-export default Report;
+export default Report

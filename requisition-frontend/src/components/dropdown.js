@@ -25,7 +25,8 @@ const Dropdown = ({
             break
         case 'right':
         default:
-            alignmentClasses = 'origin-top-right sm:right-0 left-48 sm:left-0 overflow-hidden z-[99999999]'
+            alignmentClasses =
+                'origin-top-right sm:right-0 left-48 sm:left-0 overflow-hidden z-[99999999]'
             break
     }
 

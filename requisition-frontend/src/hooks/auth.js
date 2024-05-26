@@ -2,8 +2,8 @@ import useSWR from 'swr'
 import axios from '@/lib/axios'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { setUser } from "@/store/service/user";
-import { store, dispatch } from "@/store";
+import { setUser } from '@/store/service/user'
+import { store, dispatch } from '@/store'
 
 export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     const router = useRouter()
@@ -75,7 +75,10 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         setStatus(null)
 
         axios
-            .post('/api/reset-password', { token: router.query.token, ...props })
+            .post('/api/reset-password', {
+                token: router.query.token,
+                ...props,
+            })
             .then(response =>
                 router.push('/login?reset=' + btoa(response.data.status)),
             )
@@ -101,16 +104,16 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     }
 
     useEffect(() => {
-        if (middleware === 'guest' && redirectIfAuthenticated && user){
-            store.dispatch(setUser(user));
+        if (middleware === 'guest' && redirectIfAuthenticated && user) {
+            store.dispatch(setUser(user))
             router.push(redirectIfAuthenticated)
         }
 
         if (
             window.location.pathname === '/api/verify-email' &&
             user?.email_verified_at
-        ){
-            store.dispatch(setUser(user));
+        ) {
+            store.dispatch(setUser(user))
             router.push(redirectIfAuthenticated)
         }
 
@@ -124,8 +127,8 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         forgotPassword,
         resetPassword,
         resendEmailVerification,
-        logout
+        logout,
     }
 }
 
-export  const csrf = () => axios.get('/sanctum/csrf-cookie')
+export const csrf = () => axios.get('/sanctum/csrf-cookie')

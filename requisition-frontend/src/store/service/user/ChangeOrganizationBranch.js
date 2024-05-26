@@ -1,4 +1,4 @@
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const ChangeOrganizationBranchApi = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
@@ -9,7 +9,7 @@ export const ChangeOrganizationBranchApi = GeneralBaseAPI.injectEndpoints({
                 body: arg,
             }),
             transformResponse: (response, meta, arg) => {
-                return response;
+                return response
             },
         }),
         setOrganization: builder.mutation({
@@ -30,10 +30,8 @@ export const ChangeOrganizationBranchApi = GeneralBaseAPI.injectEndpoints({
 })
 
 export const {
-  useSetBranchMutation,
-  useSetOrganizationMutation,
-  useSetDepartmentMutation,
-  util: {
-    getRunningQueriesThunk
-  }
-} = ChangeOrganizationBranchApi;
+    useSetBranchMutation,
+    useSetOrganizationMutation,
+    useSetDepartmentMutation,
+    util: { getRunningQueriesThunk },
+} = ChangeOrganizationBranchApi

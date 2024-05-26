@@ -1,33 +1,33 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const ProductApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getProduct: builder.query({
-            query: (arg) => ({
+            query: arg => ({
                 url: 'products',
-                params: arg
+                params: arg,
             }),
             providesTags: ['product'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editProduct: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `products/${id}`,
             }),
             providesTags: ['editProduct'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         singleProduct: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `products/${id}`,
             }),
         }),
         updateProduct: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `products/${id}`,
                 method: 'PATCH',
-                body: patch
+                body: patch,
             }),
             invalidatesTags: ['product', 'editProduct'],
             onQueryStarted: onQueryStartedErrorToast,
@@ -42,7 +42,7 @@ export const ProductApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyProduct: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `products/${arg}`,
                 method: 'DELETE',
             }),
@@ -50,15 +50,15 @@ export const ProductApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         report: builder.mutation({
-            query: (arg) => ({
+            query: arg => ({
                 url: `report/product`,
                 method: 'GET',
-                params: arg
+                params: arg,
             }),
-            onQueryStarted: onQueryStartedErrorToast
+            onQueryStarted: onQueryStartedErrorToast,
         }),
         productIssueLog: builder.query({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `product_issue_log/${id}`,
                 params: patch,
             }),
@@ -66,13 +66,13 @@ export const ProductApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         productPurchaseLog: builder.query({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `product_purchase_log/${id}`,
                 params: patch,
             }),
             providesTags: ['productPurchase'],
             onQueryStarted: onQueryStartedErrorToast,
-        })
+        }),
     }),
 })
 
@@ -87,7 +87,7 @@ export const {
     useProductIssueLogQuery,
     useProductPurchaseLogQuery,
     util: { getRunningQueriesThunk },
-} = ProductApiService;
+} = ProductApiService
 
 export const {
     getProduct,
@@ -97,4 +97,4 @@ export const {
     destroyProduct,
     productIssueLog,
     productPurchaseLog,
-} = ProductApiService.endpoints;
+} = ProductApiService.endpoints

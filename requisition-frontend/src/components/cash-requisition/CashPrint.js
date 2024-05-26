@@ -1,35 +1,35 @@
-import React, { forwardRef, useEffect, useRef, useState } from "react";
-import moment from "moment/moment";
-import number2wordEnglish from "number2english_word";
-import './CashPrint.module.css';
-import Image from "next/image";
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
+import moment from 'moment/moment'
+import number2wordEnglish from 'number2english_word'
+import './CashPrint.module.css'
+import Image from 'next/image'
 
-const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
-    const accountsCopy = useRef();
-    const requisitorCopy = useRef();
-    const hrRef = useRef();
-    const [rejected, setRejected] = useState(false);
+const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
+    const accountsCopy = useRef()
+    const requisitorCopy = useRef()
+    const hrRef = useRef()
+    const [rejected, setRejected] = useState(false)
 
     useEffect(() => {
-        const accountsCopyHeight = accountsCopy.current.offsetHeight;
-        const requisitorCopyHeight = requisitorCopy.current.offsetHeight;
-        const totalHeight = accountsCopyHeight + requisitorCopyHeight;
+        const accountsCopyHeight = accountsCopy.current.offsetHeight
+        const requisitorCopyHeight = requisitorCopy.current.offsetHeight
+        const totalHeight = accountsCopyHeight + requisitorCopyHeight
 
-        if (totalHeight > 1000){
+        if (totalHeight > 1000) {
             accountsCopy.current.classList.add('break-after-page')
             requisitorCopy.current.classList.add('mt-4')
-            if(hrRef.current){
-                hrRef.current.style.display = 'none';
+            if (hrRef.current) {
+                hrRef.current.style.display = 'none'
             }
-        }else {
+        } else {
             accountsCopy.current.classList.remove('break-after-page')
         }
     })
     useEffect(() => {
-        if (mainData?.purchase_current_status?.status === "Rejected"){
+        if (mainData?.purchase_current_status?.status === 'Rejected') {
             setRejected(true)
         }
-        if (mainData?.current_status?.status === "Rejected"){
+        if (mainData?.current_status?.status === 'Rejected') {
             setRejected(true)
         }
     }, [mainData])
@@ -588,5 +588,5 @@ const CashPrint = forwardRef(({mainData, requisition_products}, ref) => {
             </div>
         </div>
     )
-});
-export default CashPrint;
+})
+export default CashPrint

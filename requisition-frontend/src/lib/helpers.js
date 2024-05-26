@@ -1,11 +1,12 @@
-import React from "react"
-import { useAuth } from "@/hooks/auth";
-const toBase64 = file => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-});
+import React from 'react'
+import { useAuth } from '@/hooks/auth'
+const toBase64 = file =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = () => resolve(reader.result)
+        reader.onerror = reject
+    })
 
 function isClassComponent(component) {
     return (
@@ -22,31 +23,30 @@ function isFunctionComponent(component) {
 }
 
 function isReactComponent(component) {
-    return (
-        isClassComponent(component) ||
-        isFunctionComponent(component)
-    )
+    return isClassComponent(component) || isFunctionComponent(component)
 }
 
 function isElement(element) {
-    return React.isValidElement(element);
+    return React.isValidElement(element)
 }
 
 function isDOMTypeElement(element) {
-    return isElement(element) && typeof element.type === 'string';
+    return isElement(element) && typeof element.type === 'string'
 }
 
 function isCompositeTypeElement(element) {
-    return isElement(element) && typeof element.type === 'function';
+    return isElement(element) && typeof element.type === 'function'
 }
 
-function hasPermission(permission, user){
-    if (user && user.permissions){
-        return user.permissions.filter(p => p.name === permission).length || user.role_object?.filter(r => r.name === "Super Admin").length
+function hasPermission(permission, user) {
+    if (user && user.permissions) {
+        return (
+            user.permissions.filter(p => p.name === permission).length ||
+            user.role_object?.filter(r => r.name === 'Super Admin').length
+        )
     }
-    return false;
+    return false
 }
-
 
 export {
     toBase64,

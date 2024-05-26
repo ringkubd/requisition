@@ -1,9 +1,9 @@
-import { forwardRef } from "react";
-import './Print.module.css';
-import Loading from "@/components/loading";
+import { forwardRef } from 'react'
+import './Print.module.css'
+import Loading from '@/components/loading'
 
-const ProductBalance = forwardRef(({data,isLoading, columns}, ref) => {
-    if (isLoading){
+const ProductBalance = forwardRef(({ data, isLoading, columns }, ref) => {
+    if (isLoading) {
         return <Loading />
     }
 
@@ -15,56 +15,62 @@ const ProductBalance = forwardRef(({data,isLoading, columns}, ref) => {
                 className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
                 <thead
                     className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
-                <tr>
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                        SL#
-                    </th>
-                    {/*{columns.category ? (*/}
-                    {/*    <th*/}
-                    {/*        scope="col"*/}
-                    {/*        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>*/}
-                    {/*        Category*/}
-                    {/*    </th>*/}
-                    {/*) : null}*/}
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                        Item
-                    </th>
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                        Stock
-                    </th>
-                    <th
-                        scope="col"
-                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
-                        Current Stock
-                    </th>
-                </tr>
+                    <tr>
+                        <th
+                            scope="col"
+                            className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                            SL#
+                        </th>
+                        {/*{columns.category ? (*/}
+                        {/*    <th*/}
+                        {/*        scope="col"*/}
+                        {/*        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>*/}
+                        {/*        Category*/}
+                        {/*    </th>*/}
+                        {/*) : null}*/}
+                        <th
+                            scope="col"
+                            className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                            Item
+                        </th>
+                        <th
+                            scope="col"
+                            className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                            Stock
+                        </th>
+                        <th
+                            scope="col"
+                            className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                            Current Stock
+                        </th>
+                    </tr>
                 </thead>
                 <tbody className={`shadow-none text-gray-800 text-center`}>
-                {
-                    Object.keys(data?.report ?? [])?.map((b,i) => (
+                    {Object.keys(data?.report ?? [])?.map((b, i) => (
                         <tr key={i} className={`border bg-white`}>
                             <td className={`border`}>{i + 1}</td>
                             <td className={`border text-left  p-1`}>
                                 {data?.report[b]?.title}
                             </td>
                             <td className={`border`}>
-                                {parseFloat(data?.report[b]?.time_stock).toFixed(2)}  {data?.report[b]?.unit}
+                                {parseFloat(
+                                    data?.report[b]?.time_stock,
+                                ).toFixed(2)}{' '}
+                                {data?.report[b]?.unit}
                             </td>
-                            <td className={`border`}> {parseFloat(data?.report[b]?.current_stock).toFixed(2)}  {data?.report[b]?.unit}</td>
+                            <td className={`border`}>
+                                {' '}
+                                {parseFloat(
+                                    data?.report[b]?.current_stock,
+                                ).toFixed(2)}{' '}
+                                {data?.report[b]?.unit}
+                            </td>
                         </tr>
-                    ))
-                }
-
+                    ))}
                 </tbody>
             </table>
         </div>
     )
-});
+})
 
-export default ProductBalance;
+export default ProductBalance

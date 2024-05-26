@@ -1,32 +1,47 @@
-import Head from "next/head";
-import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, Textarea, TextInput } from "flowbite-react";
-import { useRouter } from "next/router";
-import { ErrorMessage, Formik } from "formik";
-import * as Yup from 'yup';
-import { useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
+import Head from 'next/head'
+import AppLayout from '@/components/Layouts/AppLayout'
+import { Button, Card, Label, Textarea, TextInput } from 'flowbite-react'
+import { useRouter } from 'next/router'
+import { ErrorMessage, Formik } from 'formik'
+import * as Yup from 'yup'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'react-toastify'
 import {
     useGetCashRequisitionSelectQuery,
-    useStoreVehicleHistoryMutation
-} from "@/store/service/vehicle/VehicleHistoryAPI";
-import { useGetVehicleQuery } from "@/store/service/vehicle/VehicleAPI";
-import Select from "react-select";
-import { useGetPumpQuery } from "@/store/service/vehicle/PumpAPI";
-import moment from "moment";
+    useStoreVehicleHistoryMutation,
+} from '@/store/service/vehicle/VehicleHistoryAPI'
+import { useGetVehicleQuery } from '@/store/service/vehicle/VehicleAPI'
+import Select from 'react-select'
+import { useGetPumpQuery } from '@/store/service/vehicle/PumpAPI'
+import moment from 'moment'
 
-const create = (props) => {
-    const router = useRouter();
-    const [storeReport, storeResult] = useStoreVehicleHistoryMutation();
-    const {data: vehicles, isLoading: vehicleISLoading, isError: vehicleISError} = useGetVehicleQuery();
-    const [cashItem, setCashItem] = useState(null);
-    const {data: requisition, isLoading: requisitionISLoading, isError: requisitionISError} = useGetCashRequisitionSelectQuery({
-        cash_item: cashItem
-    },{
-        skip: !cashItem
-    })
-    const {data: pumps, isLoading: pumpsISLoading, isError: pumpsISError} = useGetPumpQuery();
-    let formikForm = useRef();
+const create = props => {
+    const router = useRouter()
+    const [storeReport, storeResult] = useStoreVehicleHistoryMutation()
+    const {
+        data: vehicles,
+        isLoading: vehicleISLoading,
+        isError: vehicleISError,
+    } = useGetVehicleQuery()
+    const [cashItem, setCashItem] = useState(null)
+    const {
+        data: requisition,
+        isLoading: requisitionISLoading,
+        isError: requisitionISError,
+    } = useGetCashRequisitionSelectQuery(
+        {
+            cash_item: cashItem,
+        },
+        {
+            skip: !cashItem,
+        },
+    )
+    const {
+        data: pumps,
+        isLoading: pumpsISLoading,
+        isError: pumpsISError,
+    } = useGetPumpQuery()
+    let formikForm = useRef()
 
     const initValues = {
         vehicle_id: '',
@@ -42,24 +57,26 @@ const create = (props) => {
         pump_id: '',
     }
     useEffect(() => {
-        if (storeResult.isError){
+        if (storeResult.isError) {
             formikForm.current.setErrors(storeResult.error.data.errors)
         }
-        if (storeResult.isError || storeResult.isSuccess){
+        if (storeResult.isError || storeResult.isSuccess) {
             formikForm.current.setSubmitting(false)
         }
-        if (!storeResult.isLoading && storeResult.isSuccess){
+        if (!storeResult.isLoading && storeResult.isSuccess) {
             toast.success('Vehicle report stored successfully.')
             router.push('/vehicle/report')
         }
-    }, [storeResult]);
+    }, [storeResult])
     const submit = (values, pageProps) => {
         storeReport(values)
     }
 
     const validationSchema = Yup.object().shape({
         vehicle_id: Yup.number().label('Vehicle'),
-        cash_requisition_id: Yup.number().required().label('Related Requisition'),
+        cash_requisition_id: Yup.number()
+            .required()
+            .label('Related Requisition'),
         refuel_date: Yup.date().required().label('Refuel Date'),
         quantity: Yup.number().required().label('Quantity'),
         rate: Yup.number().required().label('Rate'),
@@ -272,9 +289,13 @@ const create = (props) => {
                                                     type="number"
                                                     value={values.quantity}
                                                     required
-                                                    onChange={(e) => {
+                                                    onChange={e => {
                                                         handleChange(e)
-                                                        setFieldValue('bill_amount', e.target.value * values.rate);
+                                                        setFieldValue(
+                                                            'bill_amount',
+                                                            e.target.value *
+                                                                values.rate,
+                                                        )
                                                     }}
                                                     onBlur={handleBlur}
                                                 />
@@ -301,9 +322,13 @@ const create = (props) => {
                                                     type="text"
                                                     value={values.rate}
                                                     required
-                                                    onChange={(e) => {
+                                                    onChange={e => {
                                                         handleChange(e)
-                                                        setFieldValue('bill_amount', e.target.value * values.quantity);
+                                                        setFieldValue(
+                                                            'bill_amount',
+                                                            e.target.value *
+                                                                values.quantity,
+                                                        )
                                                     }}
                                                     onBlur={handleBlur}
                                                 />
@@ -329,9 +354,15 @@ const create = (props) => {
                                                     type="text"
                                                     value={values.bill_amount}
                                                     required
-                                                    onChange={(e) => {
-                                                        handleChange(e);
-                                                        setFieldValue('quantity',parseFloat((e.target.value / values.rate)).toFixed(2));
+                                                    onChange={e => {
+                                                        handleChange(e)
+                                                        setFieldValue(
+                                                            'quantity',
+                                                            parseFloat(
+                                                                e.target.value /
+                                                                    values.rate,
+                                                            ).toFixed(2),
+                                                        )
                                                     }}
                                                     onBlur={handleBlur}
                                                 />
@@ -483,4 +514,4 @@ const create = (props) => {
         </>
     )
 }
-export default create;
+export default create

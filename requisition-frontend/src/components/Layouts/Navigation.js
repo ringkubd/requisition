@@ -9,7 +9,11 @@ import DropdownLink, { DropdownButton } from '@/components/dropdownLink'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { AiOutlineClose, AiOutlineMenu, AiOutlineCaretDown } from "react-icons/ai";
+import {
+    AiOutlineClose,
+    AiOutlineMenu,
+    AiOutlineCaretDown,
+} from 'react-icons/ai'
 
 const Navigation = ({ user }) => {
     const router = useRouter()
@@ -18,28 +22,29 @@ const Navigation = ({ user }) => {
 
     const [open, setOpen] = useState(false)
 
-    function checkPermission(permission){
-        if (user){
+    function checkPermission(permission) {
+        if (user) {
             const roles = user.role_object
-            const permissions = user.permissions;
-            if (roles.filter(r => r.name === "Super Admin").length){
-                return true;
-            }else{
-                return permissions.filter((p) => {
-                    if (permission instanceof Object){
+            const permissions = user.permissions
+            if (roles.filter(r => r.name === 'Super Admin').length) {
+                return true
+            } else {
+                return permissions.filter(p => {
+                    if (permission instanceof Object) {
                         return permission.indexOf(p.name) !== -1 ? p.name : null
-                    }else{
-                        return permission === p.name ? p.name: null;
+                    } else {
+                        return permission === p.name ? p.name : null
                     }
                 }).length
             }
         }
-        return false;
+        return false
     }
 
     return (
         <nav className="bg-white border-b border-gray-100 shadow-lg">
-            <div className={`before:content-[''] before:bg-noise relative before:w-full before:h-full before:block  before:opacity-10`}>
+            <div
+                className={`before:content-[''] before:bg-noise relative before:w-full before:h-full before:block  before:opacity-10`}>
                 {/* Primary Navigation Menu */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
@@ -58,259 +63,269 @@ const Navigation = ({ user }) => {
                                     active={router.pathname === '/dashboard'}>
                                     Dashboard
                                 </NavLink>
-                                {
-                                    checkPermission([
-                                        'view_initial-requisitions',
-                                        'create_initial-requisitions',
-                                        'update_initial-requisitions',
-                                        'delete_initial-requisitions',
-                                        'view_purchase-requisitions',
-                                        'create_purchase-requisitions',
-                                        'update_purchase-requisitions',
-                                        'delete_purchase-requisitions',
-                                    ]) ? (
-                                        <Dropdown
-                                            align="right"
-                                            width="48"
-                                            trigger={
-                                                <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
-                                                    <div>Requisition</div>
-                                                    <div className="ml-1">
-                                                        <AiOutlineCaretDown />
-                                                    </div>
-                                                </button>
-                                            }>
-                                            {
-                                                checkPermission([
-                                                    'view_initial-requisitions',
-                                                    'create_initial-requisitions',
-                                                    'update_initial-requisitions',
-                                                    'delete_initial-requisitions',
-                                                ]) ?(
-                                                    <DropdownLink
-                                                        href="/initial-requisition"
-                                                        active={router.pathname.includes('initial-requisition').toString()}
-                                                    >
-                                                        Initial
-                                                    </DropdownLink>
-                                                ) : "" }
-                                            {
-                                                checkPermission([
-                                                    'view_purchase-requisitions',
-                                                    'create_purchase-requisitions',
-                                                    'update_purchase-requisitions',
-                                                    'delete_purchase-requisitions',
-                                                ]) ?(
-                                                    <DropdownLink
-                                                        href="/purchase-requisition"
-                                                        active={router.pathname.includes('purchase-requisition').toString()}
-                                                    >
-                                                        Purchase
-                                                    </DropdownLink>
-                                                ): ""
-                                            }
-                                            {
-                                                checkPermission([
-                                                    'view_cash-requisitions',
-                                                    'create_cash-requisitions',
-                                                    'update_cash-requisitions',
-                                                    'delete_cash-requisitions',
-                                                ]) ?(
-                                                    <DropdownLink
-                                                        href="/cash-requisition"
-                                                        active={router.pathname.includes('cash-requisition').toString()}
-                                                    >
-                                                        Cash
-                                                    </DropdownLink>
-                                                ) : ""
-                                            }
-                                        </Dropdown>
-                                    ): ""
-                                }
+                                {checkPermission([
+                                    'view_initial-requisitions',
+                                    'create_initial-requisitions',
+                                    'update_initial-requisitions',
+                                    'delete_initial-requisitions',
+                                    'view_purchase-requisitions',
+                                    'create_purchase-requisitions',
+                                    'update_purchase-requisitions',
+                                    'delete_purchase-requisitions',
+                                ]) ? (
+                                    <Dropdown
+                                        align="right"
+                                        width="48"
+                                        trigger={
+                                            <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
+                                                <div>Requisition</div>
+                                                <div className="ml-1">
+                                                    <AiOutlineCaretDown />
+                                                </div>
+                                            </button>
+                                        }>
+                                        {checkPermission([
+                                            'view_initial-requisitions',
+                                            'create_initial-requisitions',
+                                            'update_initial-requisitions',
+                                            'delete_initial-requisitions',
+                                        ]) ? (
+                                            <DropdownLink
+                                                href="/initial-requisition"
+                                                active={router.pathname
+                                                    .includes(
+                                                        'initial-requisition',
+                                                    )
+                                                    .toString()}>
+                                                Initial
+                                            </DropdownLink>
+                                        ) : (
+                                            ''
+                                        )}
+                                        {checkPermission([
+                                            'view_purchase-requisitions',
+                                            'create_purchase-requisitions',
+                                            'update_purchase-requisitions',
+                                            'delete_purchase-requisitions',
+                                        ]) ? (
+                                            <DropdownLink
+                                                href="/purchase-requisition"
+                                                active={router.pathname
+                                                    .includes(
+                                                        'purchase-requisition',
+                                                    )
+                                                    .toString()}>
+                                                Purchase
+                                            </DropdownLink>
+                                        ) : (
+                                            ''
+                                        )}
+                                        {checkPermission([
+                                            'view_cash-requisitions',
+                                            'create_cash-requisitions',
+                                            'update_cash-requisitions',
+                                            'delete_cash-requisitions',
+                                        ]) ? (
+                                            <DropdownLink
+                                                href="/cash-requisition"
+                                                active={router.pathname
+                                                    .includes(
+                                                        'cash-requisition',
+                                                    )
+                                                    .toString()}>
+                                                Cash
+                                            </DropdownLink>
+                                        ) : (
+                                            ''
+                                        )}
+                                    </Dropdown>
+                                ) : (
+                                    ''
+                                )}
                                 {/* Inventory */}
-                                {
-                                    checkPermission([
-                                        'view_purchases',
-                                        'create_purchases',
-                                        'update_purchases',
-                                        'delete_purchases',
-                                        'view_product-issues',
-                                        'create_product-issues',
-                                        'update_product-issues',
-                                        'delete_product-issues',
-                                    ]) ? (
-                                        <Dropdown
-                                            align="left"
-                                            width="48"
-                                            contentClasses={`px-1 py-0 bg-gray-200`}
-                                            trigger={
-                                                <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
-                                                    <div>Inventory</div>
-                                                    <div className="ml-1">
-                                                        <AiOutlineCaretDown />
-                                                    </div>
-                                                </button>
-                                            }
-                                        >
-                                            {
-                                                checkPermission([
-                                                    'view_purchases',
-                                                    'create_purchases',
-                                                    'update_purchases',
-                                                    'delete_purchases',
-                                                ]) ? (
-                                                    <DropdownLink
-                                                        href="/purchase"
-                                                        active={router.pathname.includes('purchase').toString()}
-                                                    >
-                                                        Receive
-                                                    </DropdownLink>
-                                                ) : null }
-                                            {
-                                                checkPermission([
-                                                    'view_product-issues',
-                                                    'create_product-issues',
-                                                    'update_product-issues',
-                                                    'delete_product-issues',
-                                                ]) ? (
-                                                    <DropdownLink
-                                                        href="/issue"
-                                                        active={router.pathname.includes('issue').toString()}
-                                                    >
-                                                        Issue
-                                                    </DropdownLink>
-                                                ) : null }
-                                            {
-                                                checkPermission([
-                                                    'view_purchases',
-                                                    'create_purchases',
-                                                    'update_purchases',
-                                                    'delete_purchases',
-                                                ]) ? (
-                                                    <>
-                                                        <DropdownLink
-                                                            href="/product/report"
-                                                            active={router.pathname.includes('report').toString()}
-                                                        >
-                                                            Report
-                                                        </DropdownLink>
-                                                        <DropdownLink
-                                                            href="/vehicle/report"
-                                                            active={router.pathname.includes('vehicle').toString()}
-                                                        >
-                                                            Fuel
-                                                        </DropdownLink>
-                                                    </>
-                                                ) : null }
-                                        </Dropdown>
-                                    ) : null }
-                                {
-                                    checkPermission([
-                                        'view_products',
-                                        'create_products',
-                                        'update_products',
-                                        'delete_products',
-                                        'view_options',
-                                        'create_options',
-                                        'update_options',
-                                        'delete_options',
-                                        'view_categories',
-                                        'create_categories',
-                                        'update_categories',
-                                        'delete_categories',
-                                    ]) ? (
-                                        <Dropdown
-                                            align="left"
-                                            width="48"
-                                            contentClasses={`px-1 py-0 bg-gray-200`}
-                                            trigger={
-                                                <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
-                                                    <div>Product Management</div>
-                                                    <div className="ml-1">
-                                                        <AiOutlineCaretDown />
-                                                    </div>
-                                                </button>
-                                            }
-                                        >
-                                            {
-                                                checkPermission([
-                                                    'view_products',
-                                                    'create_products',
-                                                    'update_products',
-                                                    'delete_products',
-                                                ]) ? (
-                                                    <DropdownLink
-                                                        href="/product"
-                                                        active={router.pathname.includes('product').toString()}
-                                                    >
-                                                        Product
-                                                    </DropdownLink>
-                                                ) : null
-                                            }
+                                {checkPermission([
+                                    'view_purchases',
+                                    'create_purchases',
+                                    'update_purchases',
+                                    'delete_purchases',
+                                    'view_product-issues',
+                                    'create_product-issues',
+                                    'update_product-issues',
+                                    'delete_product-issues',
+                                ]) ? (
+                                    <Dropdown
+                                        align="left"
+                                        width="48"
+                                        contentClasses={`px-1 py-0 bg-gray-200`}
+                                        trigger={
+                                            <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
+                                                <div>Inventory</div>
+                                                <div className="ml-1">
+                                                    <AiOutlineCaretDown />
+                                                </div>
+                                            </button>
+                                        }>
+                                        {checkPermission([
+                                            'view_purchases',
+                                            'create_purchases',
+                                            'update_purchases',
+                                            'delete_purchases',
+                                        ]) ? (
+                                            <DropdownLink
+                                                href="/purchase"
+                                                active={router.pathname
+                                                    .includes('purchase')
+                                                    .toString()}>
+                                                Receive
+                                            </DropdownLink>
+                                        ) : null}
+                                        {checkPermission([
+                                            'view_product-issues',
+                                            'create_product-issues',
+                                            'update_product-issues',
+                                            'delete_product-issues',
+                                        ]) ? (
+                                            <DropdownLink
+                                                href="/issue"
+                                                active={router.pathname
+                                                    .includes('issue')
+                                                    .toString()}>
+                                                Issue
+                                            </DropdownLink>
+                                        ) : null}
+                                        {checkPermission([
+                                            'view_purchases',
+                                            'create_purchases',
+                                            'update_purchases',
+                                            'delete_purchases',
+                                        ]) ? (
+                                            <>
+                                                <DropdownLink
+                                                    href="/product/report"
+                                                    active={router.pathname
+                                                        .includes('report')
+                                                        .toString()}>
+                                                    Report
+                                                </DropdownLink>
+                                                <DropdownLink
+                                                    href="/vehicle/report"
+                                                    active={router.pathname
+                                                        .includes('vehicle')
+                                                        .toString()}>
+                                                    Fuel
+                                                </DropdownLink>
+                                            </>
+                                        ) : null}
+                                    </Dropdown>
+                                ) : null}
+                                {checkPermission([
+                                    'view_products',
+                                    'create_products',
+                                    'update_products',
+                                    'delete_products',
+                                    'view_options',
+                                    'create_options',
+                                    'update_options',
+                                    'delete_options',
+                                    'view_categories',
+                                    'create_categories',
+                                    'update_categories',
+                                    'delete_categories',
+                                ]) ? (
+                                    <Dropdown
+                                        align="left"
+                                        width="48"
+                                        contentClasses={`px-1 py-0 bg-gray-200`}
+                                        trigger={
+                                            <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
+                                                <div>Product Management</div>
+                                                <div className="ml-1">
+                                                    <AiOutlineCaretDown />
+                                                </div>
+                                            </button>
+                                        }>
+                                        {checkPermission([
+                                            'view_products',
+                                            'create_products',
+                                            'update_products',
+                                            'delete_products',
+                                        ]) ? (
+                                            <DropdownLink
+                                                href="/product"
+                                                active={router.pathname
+                                                    .includes('product')
+                                                    .toString()}>
+                                                Product
+                                            </DropdownLink>
+                                        ) : null}
 
-                                            {
-                                                checkPermission([
-                                                    'view_categories',
-                                                    'create_categories',
-                                                    'update_categories',
-                                                    'delete_categories',
-                                                ]) ? (
-                                                    <DropdownLink
-                                                        href="/category"
-                                                        active={router.pathname.includes('category').toString()}
-                                                    >
-                                                        Category
-                                                    </DropdownLink>
-                                                ) : null }
-                                            {
-                                                checkPermission([
-                                                    'view_options',
-                                                    'create_options',
-                                                    'update_options',
-                                                    'delete_options',
-                                                ]) ? (
-                                                    <DropdownLink
-                                                        href="/options"
-                                                        active={router.pathname.includes('options').toString()}
-                                                    >
-                                                        Variant
-                                                    </DropdownLink>
-                                                ) : null }
+                                        {checkPermission([
+                                            'view_categories',
+                                            'create_categories',
+                                            'update_categories',
+                                            'delete_categories',
+                                        ]) ? (
+                                            <DropdownLink
+                                                href="/category"
+                                                active={router.pathname
+                                                    .includes('category')
+                                                    .toString()}>
+                                                Category
+                                            </DropdownLink>
+                                        ) : null}
+                                        {checkPermission([
+                                            'view_options',
+                                            'create_options',
+                                            'update_options',
+                                            'delete_options',
+                                        ]) ? (
+                                            <DropdownLink
+                                                href="/options"
+                                                active={router.pathname
+                                                    .includes('options')
+                                                    .toString()}>
+                                                Variant
+                                            </DropdownLink>
+                                        ) : null}
 
-                                            {
-                                                checkPermission([
-                                                    'create_products',
-                                                    'update_products',
-                                                    'delete_products',
-                                                ]) ? (
-                                                    <>
-                                                        <DropdownLink
-                                                            href="/suppliers"
-                                                            active={router.pathname.includes('suppliers').toString()}
-                                                        >
-                                                            Supplier
-                                                        </DropdownLink>
-                                                        <DropdownLink
-                                                            href="/brands"
-                                                            active={router.pathname.includes('brands').toString()}
-                                                        >
-                                                            Brands
-                                                        </DropdownLink>
-                                                        <DropdownLink
-                                                            href="/units"
-                                                            active={router.pathname.includes('units').toString()}
-                                                        >
-                                                            Units
-                                                        </DropdownLink>
-                                                    </>
-                                                ) : null }
-                                        </Dropdown>
-                                    ) : null }
-                                { checkPermission('Super Admin') ? (
+                                        {checkPermission([
+                                            'create_products',
+                                            'update_products',
+                                            'delete_products',
+                                        ]) ? (
+                                            <>
+                                                <DropdownLink
+                                                    href="/suppliers"
+                                                    active={router.pathname
+                                                        .includes('suppliers')
+                                                        .toString()}>
+                                                    Supplier
+                                                </DropdownLink>
+                                                <DropdownLink
+                                                    href="/brands"
+                                                    active={router.pathname
+                                                        .includes('brands')
+                                                        .toString()}>
+                                                    Brands
+                                                </DropdownLink>
+                                                <DropdownLink
+                                                    href="/units"
+                                                    active={router.pathname
+                                                        .includes('units')
+                                                        .toString()}>
+                                                    Units
+                                                </DropdownLink>
+                                            </>
+                                        ) : null}
+                                    </Dropdown>
+                                ) : null}
+                                {checkPermission('Super Admin') ? (
                                     <>
                                         <NavLink
                                             href="/activity"
-                                            active={router.pathname === '/activity'}>
+                                            active={
+                                                router.pathname === '/activity'
+                                            }>
                                             Activity
                                         </NavLink>
                                         <Dropdown
@@ -324,48 +339,54 @@ const Navigation = ({ user }) => {
                                                         <AiOutlineCaretDown />
                                                     </div>
                                                 </button>
-                                            }
-                                        >
+                                            }>
                                             <DropdownLink
                                                 href="/organization"
-                                                active={router.pathname.includes('organization').toString()}
-                                            >
+                                                active={router.pathname
+                                                    .includes('organization')
+                                                    .toString()}>
                                                 Organization
                                             </DropdownLink>
                                             <DropdownLink
                                                 href="/branch"
-                                                active={router.pathname.includes('branch').toString()}
-                                            >
+                                                active={router.pathname
+                                                    .includes('branch')
+                                                    .toString()}>
                                                 Branch
                                             </DropdownLink>
                                             <DropdownLink
                                                 href="/department"
-                                                active={router.pathname.includes('department').toString()}
-                                            >
+                                                active={router.pathname
+                                                    .includes('department')
+                                                    .toString()}>
                                                 Department
                                             </DropdownLink>
                                             <DropdownLink
                                                 href="/designation"
-                                                active={router.pathname.includes('designation').toString()}
-                                            >
+                                                active={router.pathname
+                                                    .includes('designation')
+                                                    .toString()}>
                                                 Designation
                                             </DropdownLink>
                                             <DropdownLink
                                                 href="/employees"
-                                                active={router.pathname.includes('employees').toString()}
-                                            >
+                                                active={router.pathname
+                                                    .includes('employees')
+                                                    .toString()}>
                                                 Employees
                                             </DropdownLink>
                                             <DropdownLink
                                                 href="/roles"
-                                                active={router.pathname.includes('roles').toString()}
-                                            >
+                                                active={router.pathname
+                                                    .includes('roles')
+                                                    .toString()}>
                                                 Roles
                                             </DropdownLink>
                                             <DropdownLink
                                                 href="/permissions"
-                                                active={router.pathname.includes('permissions').toString()}
-                                            >
+                                                active={router.pathname
+                                                    .includes('permissions')
+                                                    .toString()}>
                                                 Permissions
                                             </DropdownLink>
                                         </Dropdown>
@@ -389,7 +410,12 @@ const Navigation = ({ user }) => {
                                     </button>
                                 }>
                                 {/* Authentication */}
-                                <DropdownButton onClick={() => router.push(`/employees/${user?.id}/profile`)}>
+                                <DropdownButton
+                                    onClick={() =>
+                                        router.push(
+                                            `/employees/${user?.id}/profile`,
+                                        )
+                                    }>
                                     Edit Profile
                                 </DropdownButton>
                                 <DropdownButton onClick={logout}>
@@ -429,44 +455,50 @@ const Navigation = ({ user }) => {
                                     <button className="pl-3 pr-4 py-2 border-l-4 text-base font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 flex flex-row">
                                         <div>Organization</div>
                                         <div className="ml-1">
-                                            <AiOutlineCaretDown  className="fill-current h-4 w-4" />
+                                            <AiOutlineCaretDown className="fill-current h-4 w-4" />
                                         </div>
                                     </button>
                                 }>
                                 <DropdownLink
                                     href="/organization"
-                                    active={router.pathname.includes('organization').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('organization')
+                                        .toString()}>
                                     Organization
                                 </DropdownLink>
                                 <DropdownLink
                                     href="/branch"
-                                    active={router.pathname.includes('branch').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('branch')
+                                        .toString()}>
                                     Branch
                                 </DropdownLink>
                                 <DropdownLink
                                     href="/department"
-                                    active={router.pathname.includes('department').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('department')
+                                        .toString()}>
                                     Department
                                 </DropdownLink>
                                 <DropdownLink
                                     href="/designation"
-                                    active={router.pathname.includes('designation').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('designation')
+                                        .toString()}>
                                     Designation
                                 </DropdownLink>
                                 <DropdownLink
                                     href="/employees"
-                                    active={router.pathname.includes('employees').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('employees')
+                                        .toString()}>
                                     Employees
                                 </DropdownLink>
                                 <DropdownLink
                                     href="/roles"
-                                    active={router.pathname.includes('roles').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('roles')
+                                        .toString()}>
                                     Roles
                                 </DropdownLink>
                             </Dropdown>
@@ -477,26 +509,29 @@ const Navigation = ({ user }) => {
                                     <button className="pl-3 pr-4 py-2 border-l-4 text-base font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 flex flex-row">
                                         <div>Products</div>
                                         <div className="ml-1">
-                                            <AiOutlineCaretDown  className="fill-current h-4 w-4" />
+                                            <AiOutlineCaretDown className="fill-current h-4 w-4" />
                                         </div>
                                     </button>
                                 }>
                                 <DropdownLink
                                     href="/product"
-                                    active={router.pathname.includes('product').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('product')
+                                        .toString()}>
                                     Product
                                 </DropdownLink>
                                 <DropdownLink
                                     href="/category"
-                                    active={router.pathname.includes('category').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('category')
+                                        .toString()}>
                                     Category
                                 </DropdownLink>
                                 <DropdownLink
                                     href="/options"
-                                    active={router.pathname.includes('options').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('options')
+                                        .toString()}>
                                     Options
                                 </DropdownLink>
                             </Dropdown>
@@ -505,36 +540,39 @@ const Navigation = ({ user }) => {
                                 width="48"
                                 contentClasses={`px-1 py-0 bg-gray-200`}
                                 trigger={
-                                    <button  className="pl-3 pr-4 py-2 border-l-4 text-base font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 flex flex-row">
+                                    <button className="pl-3 pr-4 py-2 border-l-4 text-base font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 flex flex-row">
                                         <div>Store</div>
                                         <div className="ml-1">
                                             <AiOutlineCaretDown />
                                         </div>
                                     </button>
-                                }
-                            >
+                                }>
                                 <DropdownLink
                                     href="/purchase"
-                                    active={router.pathname.includes('purchase').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('purchase')
+                                        .toString()}>
                                     Purchase
                                 </DropdownLink>
                                 <DropdownLink
                                     href="/issue"
-                                    active={router.pathname.includes('issue').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('issue')
+                                        .toString()}>
                                     Issue
                                 </DropdownLink>
                                 <DropdownLink
                                     href="/brands"
-                                    active={router.pathname.includes('brands').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('brands')
+                                        .toString()}>
                                     Brands
                                 </DropdownLink>
                                 <DropdownLink
                                     href="/units"
-                                    active={router.pathname.includes('units').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('units')
+                                        .toString()}>
                                     Units
                                 </DropdownLink>
                             </Dropdown>
@@ -545,20 +583,22 @@ const Navigation = ({ user }) => {
                                     <button className="pl-3 pr-4 py-2 border-l-4 text-base font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 flex flex-row">
                                         <div>Requisition</div>
                                         <div className="ml-1">
-                                            <AiOutlineCaretDown  className="fill-current h-4 w-4" />
+                                            <AiOutlineCaretDown className="fill-current h-4 w-4" />
                                         </div>
                                     </button>
                                 }>
                                 <DropdownLink
                                     href="/initial-requisition"
-                                    active={router.pathname.includes('initial-requisition').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('initial-requisition')
+                                        .toString()}>
                                     Initial
                                 </DropdownLink>
                                 <DropdownLink
                                     href="/purchase-requisition"
-                                    active={router.pathname.includes('purchase-requisition').toString()}
-                                >
+                                    active={router.pathname
+                                        .includes('purchase-requisition')
+                                        .toString()}>
                                     Purchase
                                 </DropdownLink>
                             </Dropdown>
@@ -573,7 +613,7 @@ const Navigation = ({ user }) => {
                         <div className="pt-4 pb-1 border-t border-gray-200">
                             <div className="flex items-center px-4">
                                 <div className="flex-shrink-0">
-                                    <AiOutlineCaretDown  className="fill-current h-4 w-4" />
+                                    <AiOutlineCaretDown className="fill-current h-4 w-4" />
                                 </div>
 
                                 <div className="ml-3">

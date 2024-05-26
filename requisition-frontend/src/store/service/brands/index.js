@@ -1,5 +1,5 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const BrandsApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
@@ -11,14 +11,14 @@ export const BrandsApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editBrands: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `brands/${id}`,
             }),
             providesTags: ['editBrands'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateBrands: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `brands/${id}`,
                 method: 'PATCH',
                 body: patch,
@@ -40,13 +40,13 @@ export const BrandsApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyBrands: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `brands/${arg}`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['getBrands'],
             onQueryStarted: onQueryStartedErrorToast,
-        })
+        }),
     }),
 })
 
@@ -58,9 +58,6 @@ export const {
     useStoreBrandsMutation,
     useDestroyBrandsMutation,
     util: { getRunningQueriesThunk },
-} = BrandsApiService;
+} = BrandsApiService
 
-export const {
-    getBrands,
-    editBrands
-} = BrandsApiService.endpoints;
+export const { getBrands, editBrands } = BrandsApiService.endpoints

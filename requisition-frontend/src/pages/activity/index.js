@@ -1,32 +1,33 @@
 import AppLayout from '@/components/Layouts/AppLayout'
 import Head from 'next/head'
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import axios from "@/lib/axios";
-import { Card } from "flowbite-react";
-import DataTable from "react-data-table-component";
-import { setActivity } from "@/store/slice/activitySlice";
-import moment from "moment";
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import axios from '@/lib/axios'
+import { Card } from 'flowbite-react'
+import DataTable from 'react-data-table-component'
+import { setActivity } from '@/store/slice/activitySlice'
+import moment from 'moment'
 
 const Activity = () => {
-    const dispatch = useDispatch();
-    const activity = useSelector(state => state.activity);
-    const [initialColumns, setInitialColumns] = useState([]);
+    const dispatch = useDispatch()
+    const activity = useSelector(state => state.activity)
+    const [initialColumns, setInitialColumns] = useState([])
 
-    function data(){
-        axios.get('/api/activity')
-            .then(({data}) => {
+    function data() {
+        axios
+            .get('/api/activity')
+            .then(({ data }) => {
                 dispatch(setActivity(data?.data))
             })
             .catch(e => console.log(e))
     }
 
     useEffect(() => {
-        data();
+        data()
     }, [])
 
     useEffect(() => {
-        if (activity && activity?.activity){
+        if (activity && activity?.activity) {
             setInitialColumns([
                 {
                     name: 'User',
@@ -55,17 +56,22 @@ const Activity = () => {
                 },
                 {
                     name: 'Old',
-                    selector: row => <pre>{JSON.stringify(row.properties?.old, null, 2)}</pre>,
+                    selector: row => (
+                        <pre>
+                            {JSON.stringify(row.properties?.old, null, 2)}
+                        </pre>
+                    ),
                     sortable: true,
                 },
                 {
                     name: 'Created at',
-                    selector: row => moment(row.created_at).format('hh:mm DD-MMM-Y'),
+                    selector: row =>
+                        moment(row.created_at).format('hh:mm DD-MMM-Y'),
                     sortable: true,
                 },
             ])
         }
-    }, [activity]);
+    }, [activity])
 
     return (
         <AppLayout
@@ -82,19 +88,17 @@ const Activity = () => {
                 <div className="max-w-screen mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 bg-white border-b border-gray-200">
-                            {
-                                activity?.activity && (
-                                    <Card>
-                                        <h2>Latest Activity</h2>
-                                        <DataTable
-                                            columns={initialColumns}
-                                            data={activity?.activity}
-                                            pagination
-                                            responsive
-                                        />
-                                    </Card>
-                                )
-                            }
+                            {activity?.activity && (
+                                <Card>
+                                    <h2>Latest Activity</h2>
+                                    <DataTable
+                                        columns={initialColumns}
+                                        data={activity?.activity}
+                                        pagination
+                                        responsive
+                                    />
+                                </Card>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -103,4 +107,4 @@ const Activity = () => {
     )
 }
 
-export default Activity;
+export default Activity

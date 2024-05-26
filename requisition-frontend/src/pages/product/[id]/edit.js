@@ -3,54 +3,63 @@ import AppLayout from '@/components/Layouts/AppLayout'
 import { Button, Card } from 'flowbite-react'
 import NavLink from '@/components/navLink'
 import { useRouter } from 'next/router'
-import VariantForm from "@/components/product/VariantForm";
-import MetaForm from "@/components/product/MetaForm";
-import BasicForm from "@/components/product/BasicForm";
-import { useDispatch, useSelector } from "react-redux";
-import { setActiveForm } from "@/store/service/product/product_active_form";
+import VariantForm from '@/components/product/VariantForm'
+import MetaForm from '@/components/product/MetaForm'
+import BasicForm from '@/components/product/BasicForm'
+import { useDispatch, useSelector } from 'react-redux'
+import { setActiveForm } from '@/store/service/product/product_active_form'
 import {
     useEditProductQuery,
-    useUpdateProductMutation
-} from "@/store/service/product/product";
-import { useEffect } from "react";
-import { toast } from "react-toastify";
-import { resetProductBasicInfo, setProductBasicInfo } from "@/store/service/product/product_basic_form";
-import { resetProductMeta, setEditProductMeta } from "@/store/service/product/productMetaSlice";
-import { resetProductOptionsLocal, setEditProductOptionsLocal } from "@/store/service/options/optionSlice";
+    useUpdateProductMutation,
+} from '@/store/service/product/product'
+import { useEffect } from 'react'
+import { toast } from 'react-toastify'
+import {
+    resetProductBasicInfo,
+    setProductBasicInfo,
+} from '@/store/service/product/product_basic_form'
+import {
+    resetProductMeta,
+    setEditProductMeta,
+} from '@/store/service/product/productMetaSlice'
+import {
+    resetProductOptionsLocal,
+    setEditProductOptionsLocal,
+} from '@/store/service/options/optionSlice'
 
 const edit = props => {
-    const router = useRouter();
-    const dispatch = useDispatch();
+    const router = useRouter()
+    const dispatch = useDispatch()
     const [updateProduct, storeResult] = useUpdateProductMutation()
-    const {activeForm} = useSelector(state => state.product_active_form);
+    const { activeForm } = useSelector(state => state.product_active_form)
 
-    const {data, isLoading, isError} = useEditProductQuery(router.query.id, {
-        skip: !router.query.id
-    });
-    const { productOptions } = useSelector((state) => state.product_option_local);
-    const { metas } = useSelector((state) => state.product_meta);
+    const { data, isLoading, isError } = useEditProductQuery(router.query.id, {
+        skip: !router.query.id,
+    })
+    const { productOptions } = useSelector(state => state.product_option_local)
+    const { metas } = useSelector(state => state.product_meta)
     const { basic } = useSelector(state => state.product_basic_form)
-    function setCurrentForm (formId) {
-        dispatch(setActiveForm(formId));
+    function setCurrentForm(formId) {
+        dispatch(setActiveForm(formId))
     }
     function currentForm() {
-        switch (activeForm){
+        switch (activeForm) {
             case 1:
                 return <BasicForm basic={data?.data} />
             case 2:
                 return <VariantForm />
             case 3:
-                return  <MetaForm submit={submitForm} />
+                return <MetaForm submit={submitForm} />
             default:
                 return <BasicForm />
         }
     }
 
     useEffect(() => {
-        if (!isError && !isLoading && data){
-            dispatch(setProductBasicInfo(data?.data));
-            dispatch(setEditProductOptionsLocal(data?.data?.product_options));
-            dispatch(setEditProductMeta(data?.data?.product_metas));
+        if (!isError && !isLoading && data) {
+            dispatch(setProductBasicInfo(data?.data))
+            dispatch(setEditProductOptionsLocal(data?.data?.product_options))
+            dispatch(setEditProductMeta(data?.data?.product_metas))
         }
     }, [isLoading, isError, data])
 
@@ -61,21 +70,25 @@ const edit = props => {
         }
     }, [storeResult])
 
-    function submitForm(){
+    function submitForm() {
         updateProduct({
             id: data.data.id,
             basic,
             metas,
-            productOptions
+            productOptions,
         })
     }
 
     useEffect(() => {
-        if (!storeResult.isLoading && !storeResult.isError && storeResult.isSuccess){
-            dispatch(resetProductBasicInfo());
-            dispatch(resetProductMeta());
-            dispatch(resetProductOptionsLocal());
-            dispatch(setActiveForm(1));
+        if (
+            !storeResult.isLoading &&
+            !storeResult.isError &&
+            storeResult.isSuccess
+        ) {
+            dispatch(resetProductBasicInfo())
+            dispatch(resetProductMeta())
+            dispatch(resetProductOptionsLocal())
+            dispatch(setActiveForm(1))
         }
     }, [storeResult])
 
@@ -104,22 +117,57 @@ const edit = props => {
                             <ol className="flex justify-center justify-items-center items-center w-full mb-4 sm:mb-5">
                                 <li
                                     onClick={() => setCurrentForm(1)}
-                                    className={`flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b  after:border-4 after:inline-block  cursor-pointer ${activeForm === 1 ? 'text-blue-600 dark:text-blue-500 after:border-blue-100 dark:after:border-blue-800': 'dark:after:border-gray-700 after:border-gray-100'}`}>
-                                    <div className={`flex items-center justify-center w-10 h-10 rounded-full shadow-lg ring-amber-100 border-2 border-blue-300 lg:h-12 lg:w-24 shrink-0 ${activeForm === 1 ? 'bg-blue-200 dark:bg-blue-800 shadow-inner' : 'bg-gray-200 dark:bg-gray-800'}`}>
+                                    className={`flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b  after:border-4 after:inline-block  cursor-pointer ${
+                                        activeForm === 1
+                                            ? 'text-blue-600 dark:text-blue-500 after:border-blue-100 dark:after:border-blue-800'
+                                            : 'dark:after:border-gray-700 after:border-gray-100'
+                                    }`}>
+                                    <div
+                                        className={`flex items-center justify-center w-10 h-10 rounded-full shadow-lg ring-amber-100 border-2 border-blue-300 lg:h-12 lg:w-24 shrink-0 ${
+                                            activeForm === 1
+                                                ? 'bg-blue-200 dark:bg-blue-800 shadow-inner'
+                                                : 'bg-gray-200 dark:bg-gray-800'
+                                        }`}>
                                         Basic
                                     </div>
                                 </li>
                                 <li
-                                    onClick={() => Object.values(basic).length ? setCurrentForm(2): ''}
-                                    className={`flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block cursor-pointer ${activeForm === 2 ? 'text-blue-600 dark:text-blue-500 after:border-blue-100 dark:after:border-blue-800': 'dark:after:border-gray-700 after:border-gray-100'}`}>
-                                    <div className={`flex items-center justify-center w-10 h-10 shadow-lg ring-amber-100 border-2 border-blue-300 rounded-full lg:h-12 lg:w-24 shrink-0 ${activeForm === 2 ? 'bg-blue-200 dark:bg-blue-800 shadow-inner' : 'bg-gray-200 dark:bg-gray-800'}`}>
+                                    onClick={() =>
+                                        Object.values(basic).length
+                                            ? setCurrentForm(2)
+                                            : ''
+                                    }
+                                    className={`flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block cursor-pointer ${
+                                        activeForm === 2
+                                            ? 'text-blue-600 dark:text-blue-500 after:border-blue-100 dark:after:border-blue-800'
+                                            : 'dark:after:border-gray-700 after:border-gray-100'
+                                    }`}>
+                                    <div
+                                        className={`flex items-center justify-center w-10 h-10 shadow-lg ring-amber-100 border-2 border-blue-300 rounded-full lg:h-12 lg:w-24 shrink-0 ${
+                                            activeForm === 2
+                                                ? 'bg-blue-200 dark:bg-blue-800 shadow-inner'
+                                                : 'bg-gray-200 dark:bg-gray-800'
+                                        }`}>
                                         Variant
                                     </div>
                                 </li>
                                 <li
-                                    onClick={() => Object.values(productOptions).length ? setCurrentForm(3) : "" }
-                                    className={`flex items-center w-full after:content-[''] after:w-full after:h-1 after:border-b  after:border-4 after:inline-block  cursor-pointer ${activeForm === 3 ? 'text-blue-600 dark:text-blue-500 after:border-blue-100 dark:after:border-blue-800': 'dark:after:border-gray-700 after:border-gray-100'}`}>
-                                    <div className={`flex items-center justify-center w-16 h-10 rounded-full shadow-lg ring-amber-100 border-2 border-blue-300 lg:h-12 lg:w-24 shrink-0 ${activeForm === 3 ? 'bg-blue-200 dark:bg-blue-800 shadow-inner' : 'bg-gray-200 dark:bg-gray-800'}`}>
+                                    onClick={() =>
+                                        Object.values(productOptions).length
+                                            ? setCurrentForm(3)
+                                            : ''
+                                    }
+                                    className={`flex items-center w-full after:content-[''] after:w-full after:h-1 after:border-b  after:border-4 after:inline-block  cursor-pointer ${
+                                        activeForm === 3
+                                            ? 'text-blue-600 dark:text-blue-500 after:border-blue-100 dark:after:border-blue-800'
+                                            : 'dark:after:border-gray-700 after:border-gray-100'
+                                    }`}>
+                                    <div
+                                        className={`flex items-center justify-center w-16 h-10 rounded-full shadow-lg ring-amber-100 border-2 border-blue-300 lg:h-12 lg:w-24 shrink-0 ${
+                                            activeForm === 3
+                                                ? 'bg-blue-200 dark:bg-blue-800 shadow-inner'
+                                                : 'bg-gray-200 dark:bg-gray-800'
+                                        }`}>
                                         Other
                                     </div>
                                 </li>
@@ -127,7 +175,11 @@ const edit = props => {
                             <div
                                 className={`flex flex-col md:flex-row w-full md:space-x-4`}>
                                 <div className="flex flex-col gap-4 w-full border rounded p-2 shadow">
-                                    { !isLoading && !isError ? currentForm() : isLoading ? 'Loading....' : 'error'}
+                                    {!isLoading && !isError
+                                        ? currentForm()
+                                        : isLoading
+                                        ? 'Loading....'
+                                        : 'error'}
                                 </div>
                             </div>
                         </div>
@@ -137,4 +189,4 @@ const edit = props => {
         </>
     )
 }
-export default edit;
+export default edit

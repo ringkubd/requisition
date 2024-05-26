@@ -1,34 +1,33 @@
-import Head from "next/head";
-import AppLayout from "@/components/Layouts/AppLayout";
-import { wrapper } from "@/store";
-import { Button, Card } from "flowbite-react";
-import DataTable from 'react-data-table-component';
-import NavLink from "@/components/navLink";
-import { useRouter } from "next/router";
-import Actions from "@/components/actions";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import Head from 'next/head'
+import AppLayout from '@/components/Layouts/AppLayout'
+import { wrapper } from '@/store'
+import { Button, Card } from 'flowbite-react'
+import DataTable from 'react-data-table-component'
+import NavLink from '@/components/navLink'
+import { useRouter } from 'next/router'
+import Actions from '@/components/actions'
+import { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 import {
     getCategory,
     getRunningQueriesThunk,
     useDestroyCategoryMutation,
-    useGetCategoryQuery
-} from "@/store/service/category";
+    useGetCategoryQuery,
+} from '@/store/service/category'
 
 const Branch = () => {
-    const router = useRouter();
-    const {data, isLoading, isError} = useGetCategoryQuery();
-    const [destroy, destroyResponse] = useDestroyCategoryMutation();
-    const [columns, setColumns] = useState([]);
-
+    const router = useRouter()
+    const { data, isLoading, isError } = useGetCategoryQuery()
+    const [destroy, destroyResponse] = useDestroyCategoryMutation()
+    const [columns, setColumns] = useState([])
 
     useEffect(() => {
-        if (!destroyResponse.isLoading && destroyResponse.isSuccess){
+        if (!destroyResponse.isLoading && destroyResponse.isSuccess) {
             toast.success('Category deleted.')
         }
     }, [destroyResponse])
     useEffect(() => {
-        if (!isLoading && !isError && data){
+        if (!isLoading && !isError && data) {
             setColumns([
                 {
                     name: 'Title',
@@ -52,21 +51,22 @@ const Branch = () => {
                 },
                 {
                     name: 'Actions',
-                    cell: (row) => <Actions
-                        itemId={row.id}
-                        edit={`/category/${row.id}/edit`}
-                        // view={`/category/${row.id}/view`}
-                        destroy={destroy}
-                        progressing={destroyResponse.isLoading}
-                        permissionModule={`categories`}
-                    />,
+                    cell: row => (
+                        <Actions
+                            itemId={row.id}
+                            edit={`/category/${row.id}/edit`}
+                            // view={`/category/${row.id}/view`}
+                            destroy={destroy}
+                            progressing={destroyResponse.isLoading}
+                            permissionModule={`categories`}
+                        />
+                    ),
                     ignoreRowClick: true,
-                }
-            ]);
+                },
+            ])
         }
         console.log(isLoading)
-    }, [isLoading, isError, data]);
-
+    }, [isLoading, isError, data])
 
     return (
         <>
@@ -78,8 +78,7 @@ const Branch = () => {
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                         Category Management.
                     </h2>
-                }
-            >
+                }>
                 <Head>
                     <title>Category Management.</title>
                 </Head>
@@ -88,8 +87,7 @@ const Branch = () => {
                         <div className="flex flex-row space-x-4 space-y-4 shadow-lg py-4 px-4">
                             <NavLink
                                 active={router.pathname === 'category/create'}
-                                href={`category/create`}
-                            >
+                                href={`category/create`}>
                                 <Button>Create</Button>
                             </NavLink>
                         </div>
@@ -110,13 +108,15 @@ const Branch = () => {
     )
 }
 
-export const getServerSideProps = wrapper.getServerSideProps((store) => async (context) => {
-    // const params = context.params
-    store.dispatch(getCategory.initiate())
-    await Promise.all(store.dispatch(getRunningQueriesThunk()));
-    return {
-        props: {},
-    };
-})
+export const getServerSideProps = wrapper.getServerSideProps(
+    store => async context => {
+        // const params = context.params
+        store.dispatch(getCategory.initiate())
+        await Promise.all(store.dispatch(getRunningQueriesThunk()))
+        return {
+            props: {},
+        }
+    },
+)
 
-export default Branch;
+export default Branch

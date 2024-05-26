@@ -1,8 +1,8 @@
-import React, { forwardRef, useRef } from "react";
-import moment from "moment/moment";
+import React, { forwardRef, useRef } from 'react'
+import moment from 'moment/moment'
 
-const IssuePrint = forwardRef(({products}, ref) => {
-    const accountsCopy = useRef();
+const IssuePrint = forwardRef(({ products }, ref) => {
+    const accountsCopy = useRef()
     return (
         <div
             className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none`}
@@ -119,7 +119,8 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                             {p?.product?.title}{' '}
                                             {!p?.variant?.option_value.includes(
                                                 'N/A',
-                                            ) && !p?.variant?.option_value?.includes(
+                                            ) &&
+                                            !p?.variant?.option_value?.includes(
                                                 'NA',
                                             )
                                                 ? '- ' +
@@ -127,7 +128,9 @@ const IssuePrint = forwardRef(({products}, ref) => {
                                                 : ''}
                                         </td>
                                         <td className={`border p-1`}>
-                                            {moment(p?.use_date).format('DD MMM Y')}
+                                            {moment(p?.use_date).format(
+                                                'DD MMM Y',
+                                            )}
                                         </td>
                                         <td className={`border p-1`}>
                                             {p?.purpose}
@@ -237,5 +240,5 @@ const IssuePrint = forwardRef(({products}, ref) => {
             </div>
         </div>
     )
-});
-export default IssuePrint;
+})
+export default IssuePrint

@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { TextInput } from "flowbite-react";
-import moment from "moment";
-import { useUpdatePurchaseRequisitionMutation } from "@/store/service/requisitions/purchase";
+import React, { useEffect, useState } from 'react'
+import { TextInput } from 'flowbite-react'
+import moment from 'moment'
+import { useUpdatePurchaseRequisitionMutation } from '@/store/service/requisitions/purchase'
 
-const UpdatePno = ({value, requisition_id, created}) =>{
-    const [updatePo, result] =  useUpdatePurchaseRequisitionMutation();
-    const [inputValue, setInputValue] = useState(value);
-    console.log(value);
+const UpdatePno = ({ value, requisition_id, created }) => {
+    const [updatePo, result] = useUpdatePurchaseRequisitionMutation()
+    const [inputValue, setInputValue] = useState(value)
+    console.log(value)
     useEffect(() => {
         console.log(result)
     }, [result])
-    const update = (e) => {
-        updatePo({id: requisition_id, po_no: e.target.value})
+    const update = e => {
+        updatePo({ id: requisition_id, po_no: e.target.value })
     }
 
     return (
@@ -21,11 +21,11 @@ const UpdatePno = ({value, requisition_id, created}) =>{
                     value={inputValue}
                     onBlur={update}
                     className={`max-w-sm`}
-                    onChange={(e) => setInputValue(e.target.value)}
+                    onChange={e => setInputValue(e.target.value)}
                 />
             </div>
             <div>/{moment(created).format('YY')}</div>
         </div>
     )
 }
-export default UpdatePno;
+export default UpdatePno

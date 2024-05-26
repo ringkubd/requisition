@@ -1,9 +1,9 @@
 import 'tailwindcss/tailwind.css'
-import { perStore, wrapper } from "@/store";
-import { Provider } from "react-redux";
-import { PersistGate } from 'reduxjs-toolkit-persist/integration/react';
-import '../../styles/globals.css';
-import Loading from "@/components/loading";
+import { perStore, wrapper } from '@/store'
+import { Provider } from 'react-redux'
+import { PersistGate } from 'reduxjs-toolkit-persist/integration/react'
+import '../../styles/globals.css'
+import Loading from '@/components/loading'
 import { Iceland } from 'next/font/google'
 const roboto = Iceland({
     weight: ['400'],
@@ -12,8 +12,8 @@ const roboto = Iceland({
     display: 'swap',
 })
 const App = ({ Component, ...rest }) => {
-    const {store, props} = wrapper.useWrappedStore(rest);
-    const {pageProps} = props;
+    const { store, props } = wrapper.useWrappedStore(rest)
+    const { pageProps } = props
 
     return (
         <Provider store={store}>
@@ -26,4 +26,4 @@ const App = ({ Component, ...rest }) => {
     )
 }
 
-export default App;
+export default App

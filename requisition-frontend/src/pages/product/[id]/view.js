@@ -1,18 +1,18 @@
-import AppLayout from "@/components/Layouts/AppLayout";
-import { useRouter } from "next/router";
-import { useEditProductQuery } from "@/store/service/product/product";
-import Head from "next/head";
-import { Button, Card, Table } from "flowbite-react";
-import IssueLog from "@/components/product/IssueLog";
-import PurchaseLog from "@/components/product/PurchaseLog";
+import AppLayout from '@/components/Layouts/AppLayout'
+import { useRouter } from 'next/router'
+import { useEditProductQuery } from '@/store/service/product/product'
+import Head from 'next/head'
+import { Button, Card, Table } from 'flowbite-react'
+import IssueLog from '@/components/product/IssueLog'
+import PurchaseLog from '@/components/product/PurchaseLog'
 
-const View = (props) => {
-    const router = useRouter();
-    const {data, isLoading, isError} = useEditProductQuery(router.query.id, {
-        skip: !router.query.id
-    });
+const View = props => {
+    const router = useRouter()
+    const { data, isLoading, isError } = useEditProductQuery(router.query.id, {
+        skip: !router.query.id,
+    })
 
-    const {product_metas, product_options} = data?.data ?? {};
+    const { product_metas, product_options } = data?.data ?? {}
     return (
         <AppLayout
             header={
@@ -29,8 +29,7 @@ const View = (props) => {
                         <Button onClick={() => router.back()}>Back</Button>
                     </div>
                     <div className="flex flex-col space-2 md:gap-2 md:space-x-4 md:flex-row">
-                        <div
-                            className={`w-full p-2 overflow-scroll rounded`}>
+                        <div className={`w-full p-2 overflow-scroll rounded`}>
                             <h2 className={`w-full border-b pb-2 font-bold`}>
                                 Basic Information
                             </h2>
@@ -38,42 +37,52 @@ const View = (props) => {
                                 <Table className={`overflow-x-scroll`}>
                                     <Table.Body>
                                         <Table.Row className={`border`}>
-                                            <Table.HeadCell className={`border !p-1`}>
+                                            <Table.HeadCell
+                                                className={`border !p-1`}>
                                                 Title
                                             </Table.HeadCell>
-                                            <Table.Cell className={`border !p-1`}>
+                                            <Table.Cell
+                                                className={`border !p-1`}>
                                                 {data?.data?.title}
                                             </Table.Cell>
                                         </Table.Row>
                                         <Table.Row>
-                                            <Table.HeadCell className={`border !p-1`}>
+                                            <Table.HeadCell
+                                                className={`border !p-1`}>
                                                 Category
                                             </Table.HeadCell>
-                                            <Table.Cell className={`border !p-1`}>
+                                            <Table.Cell
+                                                className={`border !p-1`}>
                                                 {data?.data?.category?.title}
                                             </Table.Cell>
                                         </Table.Row>
                                         <Table.Row>
-                                            <Table.HeadCell className={`border !p-1`}>
+                                            <Table.HeadCell
+                                                className={`border !p-1`}>
                                                 Unit
                                             </Table.HeadCell>
-                                            <Table.Cell className={`border !p-1`}>
+                                            <Table.Cell
+                                                className={`border !p-1`}>
                                                 {data?.data?.unit}
                                             </Table.Cell>
                                         </Table.Row>
                                         <Table.Row>
-                                            <Table.HeadCell className={`border !p-1`}>
+                                            <Table.HeadCell
+                                                className={`border !p-1`}>
                                                 Description
                                             </Table.HeadCell>
-                                            <Table.Cell className={`border !p-1`}>
+                                            <Table.Cell
+                                                className={`border !p-1`}>
                                                 {data?.data?.description}
                                             </Table.Cell>
                                         </Table.Row>
                                         <Table.Row>
-                                            <Table.HeadCell className={`border !p-1`}>
+                                            <Table.HeadCell
+                                                className={`border !p-1`}>
                                                 Status
                                             </Table.HeadCell>
-                                            <Table.Cell className={`border !p-1`}>
+                                            <Table.Cell
+                                                className={`border !p-1`}>
                                                 {data?.data?.status}
                                             </Table.Cell>
                                         </Table.Row>
@@ -83,8 +92,7 @@ const View = (props) => {
                                 <h2>Data loading or error.</h2>
                             )}
                         </div>
-                        <div
-                            className={`w-full p-2 overflow-scroll rounded`}>
+                        <div className={`w-full p-2 overflow-scroll rounded`}>
                             <h2 className={`w-full border-b pb-2 font-bold`}>
                                 Variant Information
                             </h2>
@@ -111,22 +119,28 @@ const View = (props) => {
                                         <Table.Body>
                                             {product_options.map((p, index) => (
                                                 <Table.Row key={index}>
-                                                    <Table.Cell className={`border !p-0 text-center`}>
+                                                    <Table.Cell
+                                                        className={`border !p-0 text-center`}>
                                                         {index + 1}
                                                     </Table.Cell>
-                                                    <Table.Cell className={`border !p-0 text-center`}>
+                                                    <Table.Cell
+                                                        className={`border !p-0 text-center`}>
                                                         {p?.option?.name}
                                                     </Table.Cell>
-                                                    <Table.Cell className={`border !p-0 text-center`}>
+                                                    <Table.Cell
+                                                        className={`border !p-0 text-center`}>
                                                         {p.option_value}
                                                     </Table.Cell>
-                                                    <Table.Cell className={`border !p-0 text-center`}>
+                                                    <Table.Cell
+                                                        className={`border !p-0 text-center`}>
                                                         {p?.sku}
                                                     </Table.Cell>
-                                                    <Table.Cell className={`border !p-0 text-center`}>
+                                                    <Table.Cell
+                                                        className={`border !p-0 text-center`}>
                                                         {p.stock}
                                                     </Table.Cell>
-                                                    <Table.Cell className={`border !p-0 text-center`}>
+                                                    <Table.Cell
+                                                        className={`border !p-0 text-center`}>
                                                         {p?.notes}
                                                     </Table.Cell>
                                                 </Table.Row>
@@ -171,17 +185,19 @@ const View = (props) => {
                             Purchase History
                         </h2>
                         <div className={`flex flex-row space-x-8 border-b`}>
-                            <h2>
-                                Total Purchase Till Now -{' '}
-                            </h2>
+                            <h2>Total Purchase Till Now - </h2>
                             <div>
-                                {
-                                    product_options?.reduce((o, n) => {
-                                        return n?.option_purchase_history?.reduce((a,b) => {
-                                            return a + b?.qty;
-                                        },o)
-                                    },0)?.toFixed(2)
-                                }{data?.data?.unit}
+                                {product_options
+                                    ?.reduce((o, n) => {
+                                        return n?.option_purchase_history?.reduce(
+                                            (a, b) => {
+                                                return a + b?.qty
+                                            },
+                                            o,
+                                        )
+                                    }, 0)
+                                    ?.toFixed(2)}
+                                {data?.data?.unit}
                             </div>
                         </div>
                         {router.query.id && (
@@ -194,9 +210,7 @@ const View = (props) => {
                             Issue History
                         </h2>
                         <div className={`flex flex-row space-x-8 border-b`}>
-                            <h2>
-                                Total Issue Till Now -{' '}
-                            </h2>
+                            <h2>Total Issue Till Now - </h2>
                             <div>
                                 {product_options
                                     ?.reduce(function (o, n) {
@@ -214,4 +228,4 @@ const View = (props) => {
         </AppLayout>
     )
 }
-export default View;
+export default View

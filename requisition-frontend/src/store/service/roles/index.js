@@ -1,5 +1,5 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const RolesApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
@@ -11,14 +11,14 @@ export const RolesApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editRoles: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `roles/${id}`,
             }),
             providesTags: ['editRoles'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateRoles: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `roles/${id}`,
                 method: 'PATCH',
                 body: patch,
@@ -40,7 +40,7 @@ export const RolesApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyRoles: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `roles/${arg}`,
                 method: 'DELETE',
             }),
@@ -48,20 +48,20 @@ export const RolesApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         getPermissionsForRole: builder.query({
-            query: (arg) => ({
-                url: 'permission_for_role'
+            query: arg => ({
+                url: 'permission_for_role',
             }),
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateRolePermission: builder.mutation({
-            query: ({id, ...params}) => ({
+            query: ({ id, ...params }) => ({
                 url: `role_permission_update/${id}`,
                 method: 'POST',
                 body: {
                     ...params,
-                    id
-                }
-            })
+                    id,
+                },
+            }),
         }),
         onQueryStarted: onQueryStartedErrorToast,
     }),
@@ -76,9 +76,6 @@ export const {
     useGetPermissionsForRoleQuery,
     useUpdateRolePermissionMutation,
     util: { getRunningQueriesThunk },
-} = RolesApiService;
+} = RolesApiService
 
-export const {
-    getRoles,
-    editRoles
-} = RolesApiService.endpoints;
+export const { getRoles, editRoles } = RolesApiService.endpoints

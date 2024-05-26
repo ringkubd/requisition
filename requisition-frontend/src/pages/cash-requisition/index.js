@@ -1,37 +1,39 @@
-import AppLayout from "@/components/Layouts/AppLayout";
-import Head from "next/head";
-import { Button, Card, Datepicker, TextInput } from "flowbite-react";
-import NavLink from "@/components/navLink";
-import moment from "moment/moment";
-import { AiOutlineSearch } from "react-icons/ai";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import AppLayout from '@/components/Layouts/AppLayout'
+import Head from 'next/head'
+import { Button, Card, Datepicker, TextInput } from 'flowbite-react'
+import NavLink from '@/components/navLink'
+import moment from 'moment/moment'
+import { AiOutlineSearch } from 'react-icons/ai'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import {
     useDeleteCashRequisitionMutation,
-    useGetCashRequisitionQuery
-} from "@/store/service/cash/Index";
-import { toast } from "react-toastify";
-import Actions from "@/components/actions";
-import DataTable from "react-data-table-component";
-import { useAuth } from "@/hooks/auth";
+    useGetCashRequisitionQuery,
+} from '@/store/service/cash/Index'
+import { toast } from 'react-toastify'
+import Actions from '@/components/actions'
+import DataTable from 'react-data-table-component'
+import { useAuth } from '@/hooks/auth'
 
 const CashRequisition = () => {
-    const router = useRouter();
-    const [destroy, destroyResponse] = useDeleteCashRequisitionMutation();
-    const [columns, setColumns] = useState([]);
-    const { user } = useAuth({ middleware: 'auth' });
+    const router = useRouter()
+    const [destroy, destroyResponse] = useDeleteCashRequisitionMutation()
+    const [columns, setColumns] = useState([])
+    const { user } = useAuth({ middleware: 'auth' })
 
-    const [search, setSearch] = useState({});
-    const {data, isLoading, isError, refetch} = useGetCashRequisitionQuery(search);
+    const [search, setSearch] = useState({})
+    const { data, isLoading, isError, refetch } = useGetCashRequisitionQuery(
+        search,
+    )
 
     useEffect(() => {
-        if (!destroyResponse.isLoading && destroyResponse.isSuccess){
+        if (!destroyResponse.isLoading && destroyResponse.isSuccess) {
             toast.success('Requisition deleted.')
         }
     }, [destroyResponse])
 
     useEffect(() => {
-        if (!isLoading && !isError && data){
+        if (!isLoading && !isError && data) {
             setColumns([
                 {
                     name: 'P.R.F. NO.',
@@ -40,7 +42,8 @@ const CashRequisition = () => {
                 },
                 {
                     name: 'Total Cost',
-                    selector: row => parseFloat(row.total_cost).toLocaleString('bd'),
+                    selector: row =>
+                        parseFloat(row.total_cost).toLocaleString('bd'),
                     sortable: true,
                 },
                 {
@@ -55,44 +58,59 @@ const CashRequisition = () => {
                 },
                 {
                     name: 'Created at',
-                    selector: row => moment(row.created_at).format("Y-MM-DD mm:ss"),
+                    selector: row =>
+                        moment(row.created_at).format('Y-MM-DD mm:ss'),
                     sortable: true,
                 },
                 {
                     name: 'Actions',
-                    cell: (row) => <Actions
-                        itemId={row.id}
-                        edit={!row.approval_status?.departmentApprovedBy && row.user_id === user?.id ? `/cash-requisition/${row.id}/edit`: false}
-                        print={`/cash-requisition/${row.id}/print_view`}
-                        destroy={!row.approval_status?.departmentApprovedBy && row.user_id === user?.id ? destroy : false}
-                        progressing={destroyResponse.isLoading}
-                        permissionModule={`cash-requisitions`}
-                        item={row}
-                    />,
+                    cell: row => (
+                        <Actions
+                            itemId={row.id}
+                            edit={
+                                !row.approval_status?.departmentApprovedBy &&
+                                row.user_id === user?.id
+                                    ? `/cash-requisition/${row.id}/edit`
+                                    : false
+                            }
+                            print={`/cash-requisition/${row.id}/print_view`}
+                            destroy={
+                                !row.approval_status?.departmentApprovedBy &&
+                                row.user_id === user?.id
+                                    ? destroy
+                                    : false
+                            }
+                            progressing={destroyResponse.isLoading}
+                            permissionModule={`cash-requisitions`}
+                            item={row}
+                        />
+                    ),
                     ignoreRowClick: true,
-                }
-            ]);
+                },
+            ])
         }
-    }, [isLoading, isError, data]);
+    }, [isLoading, isError, data])
 
-    const changeSearchInput = (e) => {
-        setSearch({search: e.target.value})
-        if (e.target.value){
-            refetch();
+    const changeSearchInput = e => {
+        setSearch({ search: e.target.value })
+        if (e.target.value) {
+            refetch()
         }
     }
 
     useEffect(() => {
-        if (search.length){
-            refetch();
+        if (search.length) {
+            refetch()
         }
-    }, [search]);
+    }, [search])
 
     return (
         <AppLayout
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                Cash Requisition.
-            </h2>}>
+            header={
+                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    Cash Requisition.
+                </h2>
+            }>
             <Head>
                 <title>Cash Requisitions</title>
             </Head>
@@ -100,15 +118,23 @@ const CashRequisition = () => {
                 <Card>
                     <div className="flex flex-row space-x-4 shadow-lg py-4 px-4">
                         <NavLink
-                            active={router.pathname === 'cash-requisition/create'}
-                            href={`cash-requisition/create`}
-                        >
+                            active={
+                                router.pathname === 'cash-requisition/create'
+                            }
+                            href={`cash-requisition/create`}>
                             <Button>Create</Button>
                         </NavLink>
                         <div className={`flex flex-row px-1 leading-5`}>
                             <div>
                                 <Datepicker
-                                    onSelectedDateChanged={(date) => setSearch({...search, date: moment(date).format('Y-MM-DD')})}
+                                    onSelectedDateChanged={date =>
+                                        setSearch({
+                                            ...search,
+                                            date: moment(date).format(
+                                                'Y-MM-DD',
+                                            ),
+                                        })
+                                    }
                                     datepicker-format="mm-yyyy"
                                 />
                             </div>
@@ -134,4 +160,4 @@ const CashRequisition = () => {
     )
 }
 
-export default CashRequisition;
+export default CashRequisition

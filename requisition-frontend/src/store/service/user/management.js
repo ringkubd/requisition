@@ -1,12 +1,12 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const UserManagementApi = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getUsers: builder.query({
-            query: (arg) => ({
+            query: arg => ({
                 url: 'users',
-                params: arg
+                params: arg,
             }),
             providesTags: ['getAllUsers'],
             onQueryStarted: onQueryStartedErrorToast,
@@ -15,28 +15,28 @@ export const UserManagementApi = GeneralBaseAPI.injectEndpoints({
             query: arg => ({
                 url: 'users',
                 method: 'POST',
-                body: arg
+                body: arg,
             }),
             invalidatesTags: ['getAllUsers'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editUser: builder.query({
             query: arg => ({
-                url: `users/${arg}`
+                url: `users/${arg}`,
             }),
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateUser: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `users/${id}`,
                 method: 'PATCH',
-                body: patch
+                body: patch,
             }),
             invalidatesTags: ['getAllUsers'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyUser: builder.mutation({
-            query: (arg) => ({
+            query: arg => ({
                 url: `users/${arg}`,
                 method: 'DELETE',
             }),
@@ -47,13 +47,13 @@ export const UserManagementApi = GeneralBaseAPI.injectEndpoints({
             query: arg => ({
                 url: 'one_time_login',
                 method: 'POST',
-                body: arg
-            })
-        })
+                body: arg,
+            }),
+        }),
     }),
 })
 
-export  const {
+export const {
     useGetUsersQuery,
     useEditUserQuery,
     useUpdateUserMutation,
@@ -61,8 +61,6 @@ export  const {
     useStoreUserMutation,
     useOneTimeLoginMutation,
     util: { getRunningQueriesThunk },
-} = UserManagementApi;
+} = UserManagementApi
 
-export const {
-    getUsers
-} = UserManagementApi.endpoints;
+export const { getUsers } = UserManagementApi.endpoints

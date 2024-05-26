@@ -1,25 +1,25 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const IssueApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
         getIssue: builder.query({
-            query: (arg) => ({
+            query: arg => ({
                 url: 'product-issues',
-                params: arg
+                params: arg,
             }),
             providesTags: ['issue'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editIssue: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `product-issues/${id}`,
             }),
             providesTags: ['editIssue'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateIssue: builder.mutation({
-            query: ({uuid, ...patch}) => ({
+            query: ({ uuid, ...patch }) => ({
                 url: `product-issues/${uuid}`,
                 method: 'PATCH',
                 body: patch,
@@ -40,7 +40,7 @@ export const IssueApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyIssue: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `product-issues/${arg}`,
                 method: 'DELETE',
             }),
@@ -48,14 +48,14 @@ export const IssueApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateIssueQuantity: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `product-issues-quantity-update/${id}`,
                 method: 'PUT',
-                body: patch
+                body: patch,
             }),
             invalidatesTags: ['issue', 'editIssue'],
             onQueryStarted: onQueryStartedErrorToast,
-        })
+        }),
     }),
 })
 
@@ -68,9 +68,6 @@ export const {
     useDestroyIssueMutation,
     useUpdateIssueQuantityMutation,
     util: { getRunningQueriesThunk },
-} = IssueApiService;
+} = IssueApiService
 
-export const {
-    getIssue,
-    editIssue
-} = IssueApiService.endpoints;
+export const { getIssue, editIssue } = IssueApiService.endpoints

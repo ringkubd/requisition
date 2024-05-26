@@ -1,35 +1,34 @@
-import React, { forwardRef, useImperativeHandle, useState } from "react";
-import { useDispatch } from "react-redux";
-import { updatePurchaseRequisitionData } from "@/store/service/requisitions/purchase_requisition_input_change";
+import React, { forwardRef, useImperativeHandle, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { updatePurchaseRequisitionData } from '@/store/service/requisitions/purchase_requisition_input_change'
 
-const PurchaseInput = forwardRef(({ row, price, unit_price,...rest }, ref) => {
-
-    const dispatch = useDispatch();
-    const [unitPrice, setUnitPrice] = useState(price??unit_price);
-    const [updateRow, setUpdateRow] = useState(row);
+const PurchaseInput = forwardRef(({ row, price, unit_price, ...rest }, ref) => {
+    const dispatch = useDispatch()
+    const [unitPrice, setUnitPrice] = useState(price ?? unit_price)
+    const [updateRow, setUpdateRow] = useState(row)
     const onInputChange = async e => {
-      const {name, value} = e.target;
+        const { name, value } = e.target
         let newRow
         if (unit_price) {
             newRow = { ...row, unit_price: value }
         } else {
             newRow = { ...row, price: value }
         }
-      setUnitPrice(value);
-      setUpdateRow(newRow);
-      dispatch(updatePurchaseRequisitionData(newRow))
-      return newRow;
+        setUnitPrice(value)
+        setUpdateRow(newRow)
+        dispatch(updatePurchaseRequisitionData(newRow))
+        return newRow
     }
 
     const getUpdatedData = () => {
-      return updateRow;
+        return updateRow
     }
 
     useImperativeHandle(ref, () => ({
-      onInputChange,
-      unitPrice,
-      updateRow,
-      getUpdatedData,
+        onInputChange,
+        unitPrice,
+        updateRow,
+        getUpdatedData,
     }))
 
     return (
@@ -45,6 +44,6 @@ const PurchaseInput = forwardRef(({ row, price, unit_price,...rest }, ref) => {
             />
         </div>
     )
-  });
+})
 
-export default PurchaseInput;
+export default PurchaseInput

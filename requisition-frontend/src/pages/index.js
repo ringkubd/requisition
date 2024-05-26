@@ -1,18 +1,18 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/auth'
-import ApplicationLogo from "@/components/applicationLogo";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
+import ApplicationLogo from '@/components/applicationLogo'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 export default function Home() {
     const { user } = useAuth({ middleware: 'guest' })
-    const router = useRouter();
+    const router = useRouter()
 
     useEffect(() => {
-        if (user){
+        if (user) {
             router.push('/dashboard')
-        }else {
+        } else {
             router.push('/login')
         }
     }, [user])
@@ -50,7 +50,7 @@ export default function Home() {
 
                 <div className="max-w-6xl mx-auto flex flex-col justify-center align-middle justify-items-center sm:px-6 lg:px-8">
                     <div className="flex justify-center pt-8 sm:justify-start sm:pt-0 border">
-                       <ApplicationLogo />
+                        <ApplicationLogo />
                     </div>
                     <div className="flex justify-center items-center justify-items-center mt-4 sm:items-center sm:justify-between border text-center">
                         <div className="text-center text-sm text-gray-500 sm:text-right sm:ml-0">

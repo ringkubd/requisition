@@ -1,9 +1,9 @@
-import { forwardRef } from "react";
-import './Print.module.css';
-import Loading from "@/components/loading";
+import { forwardRef } from 'react'
+import './Print.module.css'
+import Loading from '@/components/loading'
 
-const BothReport = forwardRef(({data,isLoading, columns}, ref) => {
-    if (isLoading){
+const BothReport = forwardRef(({ data, isLoading, columns }, ref) => {
+    if (isLoading) {
         return <Loading />
     }
     return (
@@ -124,6 +124,6 @@ const BothReport = forwardRef(({data,isLoading, columns}, ref) => {
             </table>
         </div>
     )
-});
+})
 
-export default BothReport;
+export default BothReport

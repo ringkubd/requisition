@@ -1,60 +1,64 @@
-import Head from "next/head";
-import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, TextInput } from "flowbite-react";
-import NavLink from "@/components/navLink";
-import { useRouter } from "next/router";
-import { ErrorMessage, Formik } from "formik";
-import * as Yup from 'yup';
-import { useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
+import Head from 'next/head'
+import AppLayout from '@/components/Layouts/AppLayout'
+import { Button, Card, Label, TextInput } from 'flowbite-react'
+import NavLink from '@/components/navLink'
+import { useRouter } from 'next/router'
+import { ErrorMessage, Formik } from 'formik'
+import * as Yup from 'yup'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'react-toastify'
 import {
     useGetPurposeSuggestionQuery,
-    useStoreInitialRequisitionMutation
-} from "@/store/service/requisitions/initial";
-import DataTable from "react-data-table-component";
-import Actions from "@/components/actions";
-import moment from "moment";
-import { CSSTransition, SwitchTransition } from "react-transition-group";
-import { AsyncPaginate } from 'react-select-async-paginate';
-import axios from "@/lib/axios";
-import Select from "react-select";
+    useStoreInitialRequisitionMutation,
+} from '@/store/service/requisitions/initial'
+import DataTable from 'react-data-table-component'
+import Actions from '@/components/actions'
+import moment from 'moment'
+import { CSSTransition, SwitchTransition } from 'react-transition-group'
+import { AsyncPaginate } from 'react-select-async-paginate'
+import axios from '@/lib/axios'
+import Select from 'react-select'
 
+const InitialRequisitionCreate = props => {
+    const router = useRouter()
+    const [
+        storeInitialRequisition,
+        storeResult,
+    ] = useStoreInitialRequisitionMutation()
+    const [products, setProducts] = useState([])
+    const selectRef = useRef()
+    const [selectedProduct, setSelectedProduct] = useState(null)
+    const [selectedProductOption, setSelectedProductOption] = useState(null)
+    const [productOptions, setProductOptions] = useState([])
+    const [productUnit, setProductUnit] = useState('')
+    const [selectedCategory, setSelectedCategory] = useState('')
 
-const InitialRequisitionCreate = (props) => {
-    const router = useRouter();
-    const [storeInitialRequisition, storeResult] = useStoreInitialRequisitionMutation();
-    const [products, setProducts] = useState([]);
-    const selectRef = useRef();
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [selectedProductOption, setSelectedProductOption] = useState(null);
-    const [productOptions, setProductOptions] = useState([]);
-    const [productUnit, setProductUnit] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("")
+    const suggestionQuery = useGetPurposeSuggestionQuery(
+        {
+            product_id: selectedProduct,
+            product_option_id: selectedProductOption,
+        },
+        {
+            skip: !selectedProduct || !selectedProductOption,
+        },
+    )
 
-    const suggestionQuery = useGetPurposeSuggestionQuery({
-        product_id: selectedProduct,
-        product_option_id: selectedProductOption
-    }, {
-        skip: !selectedProduct || !selectedProductOption
-    })
+    const [requisitionData, setRequisitionData] = useState([])
+    const [submitRemoveProcessing, setSubmitRemoveProcessing] = useState(false)
 
-    const [requisitionData, setRequisitionData] = useState([]);
-    const [submitRemoveProcessing, setSubmitRemoveProcessing] = useState(false);
-
-    const [suggestState, setSuggestState] = useState(false);
-    const nodeRef= useRef();
-    const suggestRef = useRef(false);
-    const purposRef = useRef(false);
-    let formikForm = useRef();
+    const [suggestState, setSuggestState] = useState(false)
+    const nodeRef = useRef()
+    const suggestRef = useRef(false)
+    const purposRef = useRef(false)
+    let formikForm = useRef()
 
     useEffect(() => {
-        if (suggestRef.current){
-            suggestRef.current.addEventListener("click", (e) => {
-                formikForm.current.setFieldValue('purpose',e.target.innerText)
+        if (suggestRef.current) {
+            suggestRef.current.addEventListener('click', e => {
+                formikForm.current.setFieldValue('purpose', e.target.innerText)
             })
         }
-
-    }, [suggestRef.current]);
+    }, [suggestRef.current])
 
     const initValues = {
         product_id: '',
@@ -69,39 +73,48 @@ const InitialRequisitionCreate = (props) => {
         estimated_cost: 0,
     }
     useEffect(() => {
-        if (storeResult.isError){
+        if (storeResult.isError) {
             // console.log(storeResult.error)
             formikForm.current.setErrors(storeResult?.error?.data?.errors)
         }
-        if (storeResult.isError || storeResult.isSuccess){
+        if (storeResult.isError || storeResult.isSuccess) {
             formikForm.current.setSubmitting(false)
         }
-        if (!storeResult.isLoading && storeResult.isSuccess){
+        if (!storeResult.isLoading && storeResult.isSuccess) {
             toast.success('Requisition Initialized successfully.')
             router.push('/initial-requisition')
         }
-    }, [storeResult]);
+    }, [storeResult])
     const submit = () => {
-        if (requisitionData.length){
-            storeInitialRequisition(requisitionData.map((i) => ({
-                product_id: i.product_id,
-                product_option_id: i.product_option_id,
-                last_purchase_date:  i.last_purchase_date,
-                required_quantity:  i.required_quantity,
-                available_quantity:  i.available_quantity,
-                quantity_to_be_purchase:  i.quantity_to_be_purchase,
-                purpose:  i.purpose,
-                estimated_cost:  i.estimated_cost,
-            })))
-        }else {
-            toast.warn("Perhaps you forgot to add the item.");
+        if (requisitionData.length) {
+            storeInitialRequisition(
+                requisitionData.map(i => ({
+                    product_id: i.product_id,
+                    product_option_id: i.product_option_id,
+                    last_purchase_date: i.last_purchase_date,
+                    required_quantity: i.required_quantity,
+                    available_quantity: i.available_quantity,
+                    quantity_to_be_purchase: i.quantity_to_be_purchase,
+                    purpose: i.purpose,
+                    estimated_cost: i.estimated_cost,
+                })),
+            )
+        } else {
+            toast.warn('Perhaps you forgot to add the item.')
         }
     }
     const addItems = (values, pageProps) => {
-        values.estimated_cost = parseFloat(products.filter(p => p.id == values.product_id)[0]?.product_options.filter(o => o.id == values.product_option_id)[0].unit_price) * parseFloat(values.quantity_to_be_purchase);
+        values.estimated_cost =
+            parseFloat(
+                products
+                    .filter(p => p.id == values.product_id)[0]
+                    ?.product_options.filter(
+                        o => o.id == values.product_option_id,
+                    )[0].unit_price,
+            ) * parseFloat(values.quantity_to_be_purchase)
         setRequisitionData([...requisitionData, values])
-        pageProps.setSubmitting(false);
-        pageProps.resetForm();
+        pageProps.setSubmitting(false)
+        pageProps.resetForm()
         selectRef.current.clearValue()
         selectRef.current.removeValue()
     }
@@ -111,14 +124,22 @@ const InitialRequisitionCreate = (props) => {
         product_option_id: Yup.number().required().label('Variant'),
         required_quantity: Yup.number().required().label('Required Quantity'),
         available_quantity: Yup.number().required().label('Available Quantity'),
-        quantity_to_be_purchase: Yup.number().required().label('Quantity to be purchase'),
+        quantity_to_be_purchase: Yup.number()
+            .required()
+            .label('Quantity to be purchase'),
         purpose: Yup.string().required().label('Purpose'),
     })
-    const removeItem = (item) => {
+    const removeItem = item => {
         setSubmitRemoveProcessing(true)
-        setRequisitionData(requisitionData.filter(r => item.product_id !== r.product_id && item.product_option_id !== r.product_option_id));
-        setSubmitRemoveProcessing(false);
-        selectRef.current?.clearValue();
+        setRequisitionData(
+            requisitionData.filter(
+                r =>
+                    item.product_id !== r.product_id &&
+                    item.product_option_id !== r.product_option_id,
+            ),
+        )
+        setSubmitRemoveProcessing(false)
+        selectRef.current?.clearValue()
         selectRef.current?.removeValue()
     }
 
@@ -130,7 +151,7 @@ const InitialRequisitionCreate = (props) => {
         },
         {
             name: 'Variant',
-            selector: row =>  row.product_option_name,
+            selector: row => row.product_option_name,
             sortable: true,
         },
         {
@@ -160,28 +181,30 @@ const InitialRequisitionCreate = (props) => {
         },
         {
             name: 'Actions',
-            cell: (row) => <Actions
-                itemId={row.id}
-                destroy={() => removeItem(row)}
-                permissionModule={`add`}
-                progressing={submitRemoveProcessing}
-            />,
+            cell: row => (
+                <Actions
+                    itemId={row.id}
+                    destroy={() => removeItem(row)}
+                    permissionModule={`add`}
+                    progressing={submitRemoveProcessing}
+                />
+            ),
             ignoreRowClick: true,
-        }
-    ];
+        },
+    ]
 
     async function loadOptions(search, loadedOptions, { page }) {
         const response = await axios.get(`/api/product-select`, {
             params: {
                 search: search,
                 page: page,
-                category_id: selectedCategory
-            }
-        });
-        const responseJSON = response.data;
+                category_id: selectedCategory,
+            },
+        })
+        const responseJSON = response.data
 
         return {
-            options: responseJSON.data?.products?.map((r,) => {
+            options: responseJSON.data?.products?.map(r => {
                 return {
                     label: r.title,
                     value: r.id,
@@ -193,28 +216,28 @@ const InitialRequisitionCreate = (props) => {
             additional: {
                 page: search ? 1 : page + 1,
             },
-        };
+        }
     }
     async function loadCategory(search, loadedOptions, { page }) {
         const response = await axios.get(`/api/category-select`, {
             params: {
                 search: search,
-                page: page
-            }
-        });
-        const responseJSON = response.data;
+                page: page,
+            },
+        })
+        const responseJSON = response.data
         return {
-            options: responseJSON.data?.categories?.map((r,) => {
+            options: responseJSON.data?.categories?.map(r => {
                 return {
                     label: r.title,
-                    value: r.id
+                    value: r.id,
                 }
             }),
             hasMore: responseJSON.data.count > 20,
             additional: {
                 page: search ? 1 : page + 1,
             },
-        };
+        }
     }
     return (
         <>
@@ -262,21 +285,22 @@ const InitialRequisitionCreate = (props) => {
                                     isSubmitting,
                                     setErrors,
                                 }) => (
-                                    <div className={`flex flex-col w-full m-auto`}>
-                                        {
-                                            requisitionData.length ? (
-                                                <div
-                                                    className={`flex flex-row w-full justify-end justify-items-end items-end`}>
-                                                    <Button
-                                                        isProcessing={storeResult.isLoading}
-                                                        onClick={submit}
-                                                        type="submit"
-                                                        color={`success`}>
-                                                        Submit
-                                                    </Button>
-                                                </div>
-                                            ) : null
-                                        }
+                                    <div
+                                        className={`flex flex-col w-full m-auto`}>
+                                        {requisitionData.length ? (
+                                            <div
+                                                className={`flex flex-row w-full justify-end justify-items-end items-end`}>
+                                                <Button
+                                                    isProcessing={
+                                                        storeResult.isLoading
+                                                    }
+                                                    onClick={submit}
+                                                    type="submit"
+                                                    color={`success`}>
+                                                    Submit
+                                                </Button>
+                                            </div>
+                                        ) : null}
 
                                         <div className="flex flex-col xl:flex-row gap-4 w-full justify-center shadow-md py-6 px-4">
                                             <div className="flex flex-row w-full gap-4">
@@ -382,7 +406,15 @@ const InitialRequisitionCreate = (props) => {
                                                     </div>
                                                     <Select
                                                         value={productOptions
-                                                            ?.filter(po => parseInt(po.id) === parseInt(values.product_option_id))
+                                                            ?.filter(
+                                                                po =>
+                                                                    parseInt(
+                                                                        po.id,
+                                                                    ) ===
+                                                                    parseInt(
+                                                                        values.product_option_id,
+                                                                    ),
+                                                            )
                                                             ?.map(po => ({
                                                                 label:
                                                                     po.option_value,
@@ -404,7 +436,13 @@ const InitialRequisitionCreate = (props) => {
                                                             )
                                                             setFieldValue(
                                                                 'last_purchase_date',
-                                                                newValue.last_purchase_date ? moment(newValue.last_purchase_date,)?.format('Y-MM-DD') : null,
+                                                                newValue.last_purchase_date
+                                                                    ? moment(
+                                                                          newValue.last_purchase_date,
+                                                                      )?.format(
+                                                                          'Y-MM-DD',
+                                                                      )
+                                                                    : null,
                                                             )
                                                         }}
                                                         id="product_option_id"
@@ -415,7 +453,10 @@ const InitialRequisitionCreate = (props) => {
                                                                     o.option_value,
                                                                 value: o.id,
                                                                 stock: o.stock,
-                                                                last_purchase_date: o.option_purchase_history[0]?.purchase_date
+                                                                last_purchase_date:
+                                                                    o
+                                                                        .option_purchase_history[0]
+                                                                        ?.purchase_date,
                                                             }),
                                                         )}
                                                         className={`select`}
@@ -685,4 +726,4 @@ const InitialRequisitionCreate = (props) => {
         </>
     )
 }
-export default InitialRequisitionCreate;
+export default InitialRequisitionCreate

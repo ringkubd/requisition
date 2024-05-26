@@ -1,5 +1,5 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const OrganizationApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
@@ -11,17 +11,17 @@ export const OrganizationApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editOrganization: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `organization/${id}`,
             }),
             providesTags: ['editOrganization'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateOrganization: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `organization/${id}`,
                 method: 'PATCH',
-                body: patch
+                body: patch,
             }),
             invalidatesTags: ['getOrganization', 'editOrganization'],
             onQueryStarted: onQueryStartedErrorToast,
@@ -36,7 +36,7 @@ export const OrganizationApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyOrganization: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `organization/${arg}`,
                 method: 'DELETE',
             }),
@@ -53,7 +53,7 @@ export const {
     useStoreOrganizationMutation,
     useDestroyOrganizationMutation,
     util: { getRunningQueriesThunk },
-} = OrganizationApiService;
+} = OrganizationApiService
 
 export const {
     getOrganization,
@@ -61,4 +61,4 @@ export const {
     updateOrganization,
     storeOrganization,
     destroyOrganization,
-} = OrganizationApiService.endpoints;
+} = OrganizationApiService.endpoints

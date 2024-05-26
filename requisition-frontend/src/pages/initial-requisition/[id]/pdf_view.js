@@ -1,29 +1,31 @@
-import AppLayout from "@/components/Layouts/AppLayout";
-import { useRouter } from "next/router";
-import Head from "next/head";
-import { Button, Card } from "flowbite-react";
-import { useEditInitialRequisitionQuery } from "@/store/service/requisitions/initial";
-import React, { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
-import { PDFViewer } from "@react-pdf/renderer";
-import InitialPDF from "@/components/initial-requisition/initialPDF";
+import AppLayout from '@/components/Layouts/AppLayout'
+import { useRouter } from 'next/router'
+import Head from 'next/head'
+import { Button, Card } from 'flowbite-react'
+import { useEditInitialRequisitionQuery } from '@/store/service/requisitions/initial'
+import React, { useRef } from 'react'
+import { useReactToPrint } from 'react-to-print'
+import { PDFViewer } from '@react-pdf/renderer'
+import InitialPDF from '@/components/initial-requisition/initialPDF'
 
-const PDFView = (props) => {
-    const router = useRouter();
-    const {data, isLoading, isError} = useEditInitialRequisitionQuery(router.query.id, {
-        skip: !router.query.id
-    });
+const PDFView = props => {
+    const router = useRouter()
+    const { data, isLoading, isError } = useEditInitialRequisitionQuery(
+        router.query.id,
+        {
+            skip: !router.query.id,
+        },
+    )
 
-    const printPageRef = useRef();
+    const printPageRef = useRef()
 
-    const requisition_products = data?.data?.requisition_products;
-    const mainData = data?.data;
-
+    const requisition_products = data?.data?.requisition_products
+    const mainData = data?.data
 
     const handlePrint = useReactToPrint({
         content: () => printPageRef.current,
-        onBeforePrint: (a) => console.log(a)
-    });
+        onBeforePrint: a => console.log(a),
+    })
 
     return (
         <AppLayout
@@ -43,24 +45,27 @@ const PDFView = (props) => {
                             <Button
                                 onClick={handlePrint}
                                 gradientDuoTone="purpleToBlue"
-                                outline
-                            >Print</Button>
+                                outline>
+                                Print
+                            </Button>
                         </div>
                     </div>
 
                     <div className={`mx-auto shadow-none w-full h-full`}>
-                        {
-                            !isLoading && !isError && data ? (
-                                    <PDFViewer className={`w-full h-screen`}>
-                                        <InitialPDF mainData={mainData} requisition_products={requisition_products}  />
-                                    </PDFViewer>
-                                )
-                                : <h2>Data loading or error.</h2>
-                        }
+                        {!isLoading && !isError && data ? (
+                            <PDFViewer className={`w-full h-screen`}>
+                                <InitialPDF
+                                    mainData={mainData}
+                                    requisition_products={requisition_products}
+                                />
+                            </PDFViewer>
+                        ) : (
+                            <h2>Data loading or error.</h2>
+                        )}
                     </div>
                 </Card>
             </div>
         </AppLayout>
     )
 }
-export default PDFView;
+export default PDFView

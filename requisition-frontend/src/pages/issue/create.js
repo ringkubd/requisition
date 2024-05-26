@@ -1,45 +1,46 @@
-import Head from "next/head";
-import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card, Label, Textarea, TextInput } from "flowbite-react";
-import NavLink from "@/components/navLink";
-import { useRouter } from "next/router";
-import { ErrorMessage, Formik } from "formik";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
-import * as Yup from 'yup';
-import { useGetUsersQuery } from "@/store/service/user/management";
-import { useStoreIssueMutation } from "@/store/service/issue";
-import moment from "moment";
-import Select from "react-select";
-import DataTable from "react-data-table-component";
-import Actions from "@/components/actions";
-import axios from "@/lib/axios";
-import { AsyncPaginate } from "react-select-async-paginate";
-import { useAuth } from "@/hooks/auth";
-const create = (props) => {
-    const router = useRouter();
+import Head from 'next/head'
+import AppLayout from '@/components/Layouts/AppLayout'
+import { Button, Card, Label, Textarea, TextInput } from 'flowbite-react'
+import NavLink from '@/components/navLink'
+import { useRouter } from 'next/router'
+import { ErrorMessage, Formik } from 'formik'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'react-toastify'
+import * as Yup from 'yup'
+import { useGetUsersQuery } from '@/store/service/user/management'
+import { useStoreIssueMutation } from '@/store/service/issue'
+import moment from 'moment'
+import Select from 'react-select'
+import DataTable from 'react-data-table-component'
+import Actions from '@/components/actions'
+import axios from '@/lib/axios'
+import { AsyncPaginate } from 'react-select-async-paginate'
+import { useAuth } from '@/hooks/auth'
+const create = props => {
+    const router = useRouter()
     const { user } = useAuth()
-    const [storeProductIssue, storeResult] = useStoreIssueMutation();
-    let formikForm = useRef();
-    const selectRef = useRef();
-    const [selectedCategory, setSelectedCategory] = useState("")
-    const {data: users , isLoading: userIsLoading} = useGetUsersQuery({
+    const [storeProductIssue, storeResult] = useStoreIssueMutation()
+    let formikForm = useRef()
+    const selectRef = useRef()
+    const [selectedCategory, setSelectedCategory] = useState('')
+    const { data: users, isLoading: userIsLoading } = useGetUsersQuery({
         branch_id: user?.selected_branch,
-        department_id: user?.selected_department
-    });
-    const [productOptions, setProductOptions] = useState([]);
-    const [stock, setStock] = useState(0);
-    const [items, setItems] = useState([]);
-    const [columns, setColumns] = useState([]);
-    const [unit, setUnit] = useState("");
-    const [useINCategory, setUseINCategory] = useState({});
+        department_id: user?.selected_department,
+    })
+    const [productOptions, setProductOptions] = useState([])
+    const [stock, setStock] = useState(0)
+    const [items, setItems] = useState([])
+    const [columns, setColumns] = useState([])
+    const [unit, setUnit] = useState('')
+    const [useINCategory, setUseINCategory] = useState({})
 
     useEffect(() => {
-        if (items.length){
+        if (items.length) {
             setColumns([
                 {
                     name: 'Product',
-                    selector: row => row.product_title + " - " + row.product_option_name,
+                    selector: row =>
+                        row.product_title + ' - ' + row.product_option_name,
                     sortable: true,
                 },
                 {
@@ -74,19 +75,21 @@ const create = (props) => {
                 },
                 {
                     name: 'Actions',
-                    cell: (row) => <Actions
-                        itemId={row.id}
-                        // edit={`/purchase/${row.id}/edit`}
-                        // view={`/purchase/${row.id}/view`}
-                        destroy={() => removeItem(row)}
-                        // progressing={destroyResponse.isLoading}
-                        permissionModule={`add`}
-                    />,
+                    cell: row => (
+                        <Actions
+                            itemId={row.id}
+                            // edit={`/purchase/${row.id}/edit`}
+                            // view={`/purchase/${row.id}/view`}
+                            destroy={() => removeItem(row)}
+                            // progressing={destroyResponse.isLoading}
+                            permissionModule={`add`}
+                        />
+                    ),
                     ignoreRowClick: true,
-                }
-            ]);
+                },
+            ])
         }
-    }, [items]);
+    }, [items])
 
     const initValues = {
         product_id: '',
@@ -103,39 +106,44 @@ const create = (props) => {
         issue_time: moment().format('Y-MM-DDThh:mm'),
     }
     useEffect(() => {
-        if (storeResult.isError){
+        if (storeResult.isError) {
             formikForm.current.setErrors(storeResult.error.data.errors)
-            formikForm.current.setSubmitting(false);
-        }
-        if (storeResult.isError || storeResult.isSuccess){
             formikForm.current.setSubmitting(false)
-            formikForm.current.setSubmitting(false);
         }
-        if (!storeResult.isLoading && storeResult.isSuccess){
+        if (storeResult.isError || storeResult.isSuccess) {
+            formikForm.current.setSubmitting(false)
+            formikForm.current.setSubmitting(false)
+        }
+        if (!storeResult.isLoading && storeResult.isSuccess) {
             toast.success('Purchase stored successfully.')
-            formikForm.current.setSubmitting(false);
+            formikForm.current.setSubmitting(false)
             router.push('/issue')
         }
-    }, [storeResult]);
+    }, [storeResult])
     const submit = async (values, pageProps) => {
         console.log(values)
-        setItems([...items, values]);
+        setItems([...items, values])
     }
 
-    const removeItem = (row) => {
-        setItems(items.filter(i => i.product_option_id !== row.product_option_id));
+    const removeItem = row => {
+        setItems(
+            items.filter(i => i.product_option_id !== row.product_option_id),
+        )
     }
     const validationSchema = Yup.object().shape({
         product_option_id: Yup.number().required().label('Product Variant'),
-        quantity: Yup.number().when('product_option_id', {
-            is: stock,
-            then : Yup.number().required().max(stock),
-        }).max(stock).label('Quantity'),
+        quantity: Yup.number()
+            .when('product_option_id', {
+                is: stock,
+                then: Yup.number().required().max(stock),
+            })
+            .max(stock)
+            .label('Quantity'),
         receiver_id: Yup.number().required().label('Receiver'),
     })
 
     const finalSubmit = () => {
-        const newItems = items.map((i) => ({
+        const newItems = items.map(i => ({
             product_id: i.product_id,
             product_option_id: i.product_option_id,
             quantity: i.quantity,
@@ -154,15 +162,15 @@ const create = (props) => {
             params: {
                 search: search,
                 page: page,
-                category_id: selectedCategory
-            }
-        });
-        const responseJSON = response.data?.data;
+                category_id: selectedCategory,
+            },
+        })
+        const responseJSON = response.data?.data
 
         return {
-            options: responseJSON?.products.map((r,) => {
+            options: responseJSON?.products.map(r => {
                 return {
-                    label: r.category?.code + " => " + r.title,
+                    label: r.category?.code + ' => ' + r.title,
                     value: r.id,
                     product: r,
                     product_options: r.product_options,
@@ -172,29 +180,29 @@ const create = (props) => {
             additional: {
                 page: search ? 1 : page + 1,
             },
-        };
+        }
     }
 
     async function loadCategory(search, loadedOptions, { page }) {
         const response = await axios.get(`/api/category-select`, {
             params: {
                 search: search,
-                page: page
-            }
-        });
-        const responseJSON = response.data;
+                page: page,
+            },
+        })
+        const responseJSON = response.data
         return {
-            options: responseJSON.data?.categories?.map((r,) => {
+            options: responseJSON.data?.categories?.map(r => {
                 return {
                     label: r.title,
-                    value: r.id
+                    value: r.id,
                 }
             }),
             hasMore: responseJSON.data.count > 20,
             additional: {
                 page: search ? 1 : page + 1,
             },
-        };
+        }
     }
     return (
         <>
@@ -267,7 +275,9 @@ const create = (props) => {
                                                             setSelectedCategory(
                                                                 newValue?.value,
                                                             )
-                                                            setUseINCategory(newValue)
+                                                            setUseINCategory(
+                                                                newValue,
+                                                            )
                                                         }}
                                                         additional={{
                                                             page: 1,
@@ -282,8 +292,8 @@ const create = (props) => {
                                                         name="category_id"
                                                         render={msg => (
                                                             <span className="text-red-500">
-                                                                    {msg}
-                                                                </span>
+                                                                {msg}
+                                                            </span>
                                                         )}
                                                     />
                                                 </div>
@@ -330,7 +340,10 @@ const create = (props) => {
                                                             'product_option_id',
                                                             '',
                                                         )
-                                                        setUnit(newValue?.product?.unit)
+                                                        setUnit(
+                                                            newValue?.product
+                                                                ?.unit,
+                                                        )
                                                         setStock(0)
                                                     }}
                                                     additional={{
@@ -363,7 +376,8 @@ const create = (props) => {
                                                     options={productOptions?.map(
                                                         p => ({
                                                             value: p.id,
-                                                            label: p.option_value,
+                                                            label:
+                                                                p.option_value,
                                                             other: p,
                                                         }),
                                                     )}
@@ -397,7 +411,9 @@ const create = (props) => {
                                                         </span>
                                                     )}
                                                 />
-                                                <span>{stock} {unit} available</span>
+                                                <span>
+                                                    {stock} {unit} available
+                                                </span>
                                             </div>
                                         </div>
                                         <div className="flex flex-col sm:flex-row gap-4">
@@ -428,8 +444,7 @@ const create = (props) => {
                                                         </span>
                                                     )}
                                                 />
-                                            </div>
-                                            {' '}
+                                            </div>{' '}
                                             {/*Quantity*/}
                                             <div className="w-full">
                                                 <div className="mb-2 block">
@@ -441,9 +456,9 @@ const create = (props) => {
                                                 <Select
                                                     value={{
                                                         label:
-                                                        values.receiver_name,
+                                                            values.receiver_name,
                                                         value:
-                                                        values.receiver_id,
+                                                            values.receiver_id,
                                                     }}
                                                     onChange={newValue => {
                                                         setFieldValue(
@@ -467,13 +482,13 @@ const create = (props) => {
                                                         !userIsLoading &&
                                                         users.data
                                                             ? users.data.map(
-                                                                u => ({
-                                                                    value:
-                                                                    u.id,
-                                                                    label:
-                                                                    u.name,
-                                                                }),
-                                                            )
+                                                                  u => ({
+                                                                      value:
+                                                                          u.id,
+                                                                      label:
+                                                                          u.name,
+                                                                  }),
+                                                              )
                                                             : []
                                                     }
                                                 />
@@ -485,11 +500,9 @@ const create = (props) => {
                                                         </span>
                                                     )}
                                                 />
-                                            </div>
-                                            {' '}
+                                            </div>{' '}
                                             {/*Variant*/}
-                                        </div>
-                                        {' '}
+                                        </div>{' '}
                                         {/*Product, variant*/}
                                         <div className="flex flex-col sm:flex-row gap-4">
                                             <div className="w-full">
@@ -517,11 +530,9 @@ const create = (props) => {
                                                         </span>
                                                     )}
                                                 />
-                                            </div>
-                                            {' '}
+                                            </div>{' '}
                                             {/*uses_area*/}
-                                        </div>
-                                        {' '}
+                                        </div>{' '}
                                         {/*Quantity, receiver*/}
                                         <div className="flex flex-col sm:flex-row gap-4">
                                             {' '}
@@ -551,8 +562,7 @@ const create = (props) => {
                                                         </span>
                                                     )}
                                                 />
-                                            </div>
-                                            {' '}
+                                            </div>{' '}
                                             {/*Purpose*/}
                                             <div className="w-full">
                                                 <div className="mb-2 block">
@@ -579,8 +589,7 @@ const create = (props) => {
                                                         </span>
                                                     )}
                                                 />
-                                            </div>
-                                            {' '}
+                                            </div>{' '}
                                             {/*Date Time*/}
                                         </div>
                                         <div className="flex flex-col sm:flex-row gap-4">
@@ -602,8 +611,13 @@ const create = (props) => {
                                                                 'select',
                                                         }}
                                                         onChange={newValue => {
-                                                            setFieldValue('use_in_category',newValue?.value)
-                                                            setUseINCategory(newValue)
+                                                            setFieldValue(
+                                                                'use_in_category',
+                                                                newValue?.value,
+                                                            )
+                                                            setUseINCategory(
+                                                                newValue,
+                                                            )
                                                         }}
                                                         additional={{
                                                             page: 1,
@@ -618,8 +632,8 @@ const create = (props) => {
                                                         name="category_id"
                                                         render={msg => (
                                                             <span className="text-red-500">
-                                                                    {msg}
-                                                                </span>
+                                                                {msg}
+                                                            </span>
                                                         )}
                                                     />
                                                 </div>
@@ -651,11 +665,9 @@ const create = (props) => {
                                                         </span>
                                                     )}
                                                 />
-                                            </div>
-                                            {' '}
+                                            </div>{' '}
                                             {/*note*/}
-                                        </div>
-                                        {' '}
+                                        </div>{' '}
                                         {/*Note*/}
                                         <div className="flex flex-row gap-4 justify-end">
                                             <Button
@@ -676,4 +688,4 @@ const create = (props) => {
         </>
     )
 }
-export default create;
+export default create

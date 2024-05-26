@@ -1,44 +1,44 @@
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const VehicleAPIService = GeneralBaseAPI.injectEndpoints({
-    endpoints: (builder) => ({
+    endpoints: builder => ({
         getVehicle: builder.query({
-            query: (params) => ({
+            query: params => ({
                 url: 'vehicles',
-                params: params
+                params: params,
             }),
-            providesTags: ['vehicles']
+            providesTags: ['vehicles'],
         }),
         singleVehicle: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `vehicles/${id}`,
             }),
-            providesTags: ['single-vehicles']
+            providesTags: ['single-vehicles'],
         }),
         updateVehicle: builder.mutation({
-            query: ({id, ...body}) => ({
+            query: ({ id, ...body }) => ({
                 url: `vehicles/${id}`,
                 body,
                 method: 'PUT',
             }),
-            invalidatesTags: ['single-vehicles', 'vehicles']
+            invalidatesTags: ['single-vehicles', 'vehicles'],
         }),
         deleteVehicle: builder.mutation({
-            query: (id) => ({
+            query: id => ({
                 url: `vehicles/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['vehicles']
+            invalidatesTags: ['vehicles'],
         }),
         storeVehicle: builder.mutation({
-            query: (body) => ({
+            query: body => ({
                 url: `vehicles`,
                 method: 'POST',
-                body
+                body,
             }),
-            invalidatesTags: ['single-vehicles', 'vehicles']
-        })
-    })
+            invalidatesTags: ['single-vehicles', 'vehicles'],
+        }),
+    }),
 })
 export const {
     useGetVehicleQuery,
@@ -47,8 +47,6 @@ export const {
     useDeleteVehicleMutation,
     useStoreVehicleMutation,
     util: { getRunningQueriesThunk },
-} = VehicleAPIService;
+} = VehicleAPIService
 
-export const {
-    getVehicle
-} = VehicleAPIService.endpoints;
+export const { getVehicle } = VehicleAPIService.endpoints

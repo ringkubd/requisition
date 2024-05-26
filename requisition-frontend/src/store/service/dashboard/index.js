@@ -1,46 +1,55 @@
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const DashboardAPI = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
-        getDashboardData : builder.query({
+        getDashboardData: builder.query({
             query: arg => ({
                 url: 'dashboard-data',
-                params: arg
+                params: arg,
             }),
-            providesTags: ['general_requisition']
+            providesTags: ['general_requisition'],
         }),
-        getDashboardCashData : builder.query({
+        getDashboardCashData: builder.query({
             query: arg => ({
                 url: 'dashboard-cash-data',
-                params: arg
+                params: arg,
             }),
-            providesTags: ['dashboard_cash_requisition']
+            providesTags: ['dashboard_cash_requisition'],
         }),
         updateInitialStatus: builder.mutation({
-            query: ({id, ...arg}) => ({
+            query: ({ id, ...arg }) => ({
                 url: `update_initial_status/${id}`,
                 method: 'PUT',
-                body: arg
+                body: arg,
             }),
-            invalidatesTags: ['general_requisition']
+            invalidatesTags: ['general_requisition'],
         }),
         updatePurchaseStatus: builder.mutation({
-            query: ({id, ...arg}) => ({
+            query: ({ id, ...arg }) => ({
                 url: `update_purchase_status/${id}`,
                 method: 'PUT',
-                body: arg
+                body: arg,
             }),
-            invalidatesTags: ['general_requisition', 'edit-purchase-requisition', 'cash_requisition', 'dashboard_cash_requisition']
+            invalidatesTags: [
+                'general_requisition',
+                'edit-purchase-requisition',
+                'cash_requisition',
+                'dashboard_cash_requisition',
+            ],
         }),
         updateCashStatus: builder.mutation({
-            query: ({id, ...arg}) => ({
+            query: ({ id, ...arg }) => ({
                 url: `update_cash_status/${id}`,
                 method: 'PUT',
-                body: arg
+                body: arg,
             }),
-            invalidatesTags: ['dashboard_cash_requisition', 'general_requisition', 'dashboard_cash_requisition']
-        })
-    })
+            invalidatesTags: [
+                'dashboard_cash_requisition',
+                'general_requisition',
+                'dashboard_cash_requisition',
+            ],
+        }),
+    }),
 })
 
 export const {
@@ -50,9 +59,6 @@ export const {
     useUpdatePurchaseStatusMutation,
     useUpdateCashStatusMutation,
     util: { getRunningQueriesThunk },
-} = DashboardAPI;
+} = DashboardAPI
 
-export const {
-    getDashboardCashData,
-    getDashboardData,
-} = DashboardAPI.endpoints;
+export const { getDashboardCashData, getDashboardData } = DashboardAPI.endpoints

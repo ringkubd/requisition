@@ -6,7 +6,7 @@ import DataTable from 'react-data-table-component'
 import NavLink from '@/components/navLink'
 import { useRouter } from 'next/router'
 import Actions from '@/components/actions'
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import {
     useGetIssueQuery,
@@ -20,15 +20,15 @@ import { useAuth } from '@/hooks/auth'
 import Datepicker from 'react-tailwindcss-datepicker'
 import { useGetDepartmentByOrganizationBranchQuery } from '@/store/service/deparment'
 import { AiOutlineSearch } from 'react-icons/ai'
-import { useDispatch, useSelector } from "react-redux";
-import { setDateRange } from "@/store/slice/filterDateRange";
-import { hasPermission } from "@/lib/helpers";
+import { useDispatch, useSelector } from 'react-redux'
+import { setDateRange } from '@/store/slice/filterDateRange'
+import { hasPermission } from '@/lib/helpers'
 
 const ProductIssue = () => {
     const { user } = useAuth()
     const router = useRouter()
-    const dispatch = useDispatch();
-    const dateRange = useSelector(state => state.filter_date_range);
+    const dispatch = useDispatch()
+    const dateRange = useSelector(state => state.filter_date_range)
     const [searchParams, setSearchParams] = useState({})
     const { data, isLoading, isError } = useGetIssueQuery(searchParams)
     const {
@@ -44,7 +44,6 @@ const ProductIssue = () => {
         ).length,
     )
     const [dataTableData, setDataTableData] = useState([])
-
 
     useEffect(() => {
         if (user) {
@@ -69,7 +68,8 @@ const ProductIssue = () => {
             setColumns([
                 {
                     name: 'SL.',
-                    selector: (row, index) =>  row.receiver_department?.name+'/'+row.id,
+                    selector: (row, index) =>
+                        row.receiver_department?.name + '/' + row.id,
                     sortable: true,
                 },
                 {
@@ -162,15 +162,13 @@ const ProductIssue = () => {
                 <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
                     <Card>
                         <div className="flex sm:flex-row flex-col space-x-4 space-y-4  shadow-lg py-4 px-4">
-                            {
-                                hasPermission('create_product-issues', user) ? (
-                                    <NavLink
-                                        active={router.pathname === 'issue/create'}
-                                        href={`issue/create`}>
-                                        <Button>Create</Button>
-                                    </NavLink>
-                                ) : null
-                            }
+                            {hasPermission('create_product-issues', user) ? (
+                                <NavLink
+                                    active={router.pathname === 'issue/create'}
+                                    href={`issue/create`}>
+                                    <Button>Create</Button>
+                                </NavLink>
+                            ) : null}
                             <div className={`flex sm:flex-row flex-col`}>
                                 <Label
                                     htmlFor={`date_range`}
@@ -181,7 +179,7 @@ const ProductIssue = () => {
                                     inputId={`date_range`}
                                     inputName={`date_range`}
                                     onChange={d => {
-                                        dispatch(setDateRange(d));
+                                        dispatch(setDateRange(d))
                                     }}
                                     value={dateRange}
                                 />

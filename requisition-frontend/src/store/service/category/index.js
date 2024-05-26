@@ -1,5 +1,5 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const CategoryApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
@@ -11,17 +11,17 @@ export const CategoryApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editCategory: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `categories/${id}`,
             }),
             providesTags: ['editCategory'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateCategory: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `categories/${id}`,
                 method: 'PATCH',
-                body: patch
+                body: patch,
             }),
             invalidatesTags: ['getCategory', 'editCategory'],
             onQueryStarted: onQueryStartedErrorToast,
@@ -36,7 +36,7 @@ export const CategoryApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyCategory: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `categories/${arg}`,
                 method: 'DELETE',
             }),
@@ -44,13 +44,13 @@ export const CategoryApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         getSubCategory: builder.query({
-            query: (parentId) => ({
+            query: parentId => ({
                 url: `sub-category/${parentId}`,
-                method: 'GET'
+                method: 'GET',
             }),
             providesTags: ['sub-category'],
             onQueryStarted: onQueryStartedErrorToast,
-        })
+        }),
     }),
 })
 
@@ -62,9 +62,6 @@ export const {
     useDestroyCategoryMutation,
     useGetSubCategoryQuery,
     util: { getRunningQueriesThunk },
-} = CategoryApiService;
+} = CategoryApiService
 
-export const {
-    getCategory,
-    editCategory
-} = CategoryApiService.endpoints;
+export const { getCategory, editCategory } = CategoryApiService.endpoints

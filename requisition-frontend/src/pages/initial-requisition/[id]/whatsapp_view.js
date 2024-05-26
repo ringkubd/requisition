@@ -1,32 +1,40 @@
-import React, { useEffect, useRef, useState } from "react";
-import AppLayout from "@/components/Layouts/AppLayout";
-import { useRouter } from "next/router";
-import Head from "next/head";
-import { Button, Card } from "flowbite-react";
-import { useReactToPrint } from "react-to-print";
-import Status from "@/components/requisition/status";
-import { useOneTimeLoginMutation } from "@/store/service/user/management";
-import GuestLayout from "@/components/Layouts/GuestLayout";
-import { useEditInitialRequisitionQuery } from "@/store/service/requisitions/initial";
-import InitialPrint from "@/components/initial-requisition/initialPrint";
+import React, { useEffect, useRef, useState } from 'react'
+import AppLayout from '@/components/Layouts/AppLayout'
+import { useRouter } from 'next/router'
+import Head from 'next/head'
+import { Button, Card } from 'flowbite-react'
+import { useReactToPrint } from 'react-to-print'
+import Status from '@/components/requisition/status'
+import { useOneTimeLoginMutation } from '@/store/service/user/management'
+import GuestLayout from '@/components/Layouts/GuestLayout'
+import { useEditInitialRequisitionQuery } from '@/store/service/requisitions/initial'
+import InitialPrint from '@/components/initial-requisition/initialPrint'
 
 export default function WhatsappView(props) {
-    const printPageRef = useRef();
-    const router = useRouter();
-    const [loggedIn, setLoggedIn] = useState(false);
-    const [onetimeLogin, {data: LoginData, isSuccess: loginSuccess}] = useOneTimeLoginMutation();
-    const {data, isLoading, isError} = useEditInitialRequisitionQuery(router.query.id, {
-        skip: !router.query.id || !loggedIn
-    });
-    const [statusKey, setStatusKey] = useState(Math.round(Math.random() * 100000))
+    const printPageRef = useRef()
+    const router = useRouter()
+    const [loggedIn, setLoggedIn] = useState(false)
+    const [
+        onetimeLogin,
+        { data: LoginData, isSuccess: loginSuccess },
+    ] = useOneTimeLoginMutation()
+    const { data, isLoading, isError } = useEditInitialRequisitionQuery(
+        router.query.id,
+        {
+            skip: !router.query.id || !loggedIn,
+        },
+    )
+    const [statusKey, setStatusKey] = useState(
+        Math.round(Math.random() * 100000),
+    )
 
     useEffect(() => {
-        if (router?.query?.auth_key){
+        if (router?.query?.auth_key) {
             onetimeLogin({
-                'auth_key' : router?.query?.auth_key
-            });
+                auth_key: router?.query?.auth_key,
+            })
         }
-    }, [router?.query?.auth_key]);
+    }, [router?.query?.auth_key])
 
     useEffect(() => {
         if (loginSuccess) {
@@ -34,16 +42,16 @@ export default function WhatsappView(props) {
         }
     }, [loginSuccess])
 
-    const requisition_products = data?.data?.requisition_products;
-    const mainData = data?.data;
+    const requisition_products = data?.data?.requisition_products
+    const mainData = data?.data
 
     const handlePrint = useReactToPrint({
         content: () => printPageRef.current,
-        onBeforePrint: (a) => console.log(a)
-    });
+        onBeforePrint: a => console.log(a),
+    })
 
-    if (!loggedIn){
-        return  (
+    if (!loggedIn) {
+        return (
             <GuestLayout>
                 <title>Logged in</title>
             </GuestLayout>
@@ -68,36 +76,41 @@ export default function WhatsappView(props) {
                             <Button
                                 onClick={handlePrint}
                                 gradientDuoTone="purpleToBlue"
-                                outline
-                            >Print</Button>
+                                outline>
+                                Print
+                            </Button>
                         </div>
                         <div className={`flex flex-row items-center`}>
-                            {
-                                mainData ? <Status key={statusKey} type={`purchase`} changeStatus={(a) => {
-                                    refetch();
-                                    setStatusKey(Math.round(Math.random() * 100000))
-                                    router.reload()
-                                }} requisition={mainData} from={`print_view`} /> : null
-                            }
+                            {mainData ? (
+                                <Status
+                                    key={statusKey}
+                                    type={`purchase`}
+                                    changeStatus={a => {
+                                        refetch()
+                                        setStatusKey(
+                                            Math.round(Math.random() * 100000),
+                                        )
+                                        router.reload()
+                                    }}
+                                    requisition={mainData}
+                                    from={`print_view`}
+                                />
+                            ) : null}
                         </div>
-
-
                     </div>
                     <div className={`mx-auto shadow-none`}>
-                        {
-                            !isLoading && !isError && data ? (
-                                    <InitialPrint
-                                        mainData={mainData}
-                                        requisition_products={requisition_products}
-                                        ref={printPageRef}
-                                    />
-                                )
-                                : <h2>Data loading or error.</h2>
-                        }
+                        {!isLoading && !isError && data ? (
+                            <InitialPrint
+                                mainData={mainData}
+                                requisition_products={requisition_products}
+                                ref={printPageRef}
+                            />
+                        ) : (
+                            <h2>Data loading or error.</h2>
+                        )}
                     </div>
                 </Card>
             </div>
-
         </AppLayout>
     )
 }

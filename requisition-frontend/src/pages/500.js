@@ -1,11 +1,11 @@
-import { useSelector } from "react-redux";
-import AppLayout from "@/components/Layouts/AppLayout";
-import { Button } from "flowbite-react";
-import { useRouter } from "next/router";
+import { useSelector } from 'react-redux'
+import AppLayout from '@/components/Layouts/AppLayout'
+import { Button } from 'flowbite-react'
+import { useRouter } from 'next/router'
 
-const ServerErrorPage = (props) => {
-    const {errors} = useSelector(state => state.errors);
-    const router = useRouter();
+const ServerErrorPage = props => {
+    const { errors } = useSelector(state => state.errors)
+    const router = useRouter()
     return (
         <AppLayout>
             <div className="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center sm:pt-0">
@@ -15,9 +15,9 @@ const ServerErrorPage = (props) => {
                             {errors.status}
                         </div>
 
-                        <div
-                            className="ml-4 text-lg text-gray-500 uppercase tracking-wider flex flex-col justify-center">
-                            {errors?.message ?? 'System error. If error persist contact with IT Dept.'}
+                        <div className="ml-4 text-lg text-gray-500 uppercase tracking-wider flex flex-col justify-center">
+                            {errors?.message ??
+                                'System error. If error persist contact with IT Dept.'}
                             <Button onClick={() => router.back()}>Back</Button>
                         </div>
                     </div>

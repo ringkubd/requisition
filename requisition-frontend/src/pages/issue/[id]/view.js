@@ -1,26 +1,36 @@
-import AppLayout from "@/components/Layouts/AppLayout";
-import Head from "next/head";
-import { Button, Card, Table } from "flowbite-react";
-import NavLink from "@/components/navLink";
-import { useRouter } from "next/router";
-import { useEditIssueQuery } from "@/store/service/issue";
-import React, { useEffect, useState } from "react";
-import moment from "moment";
-import DataTable from "react-data-table-component";
-import Status from "@/components/issue/Status";
+import AppLayout from '@/components/Layouts/AppLayout'
+import Head from 'next/head'
+import { Button, Card, Table } from 'flowbite-react'
+import NavLink from '@/components/navLink'
+import { useRouter } from 'next/router'
+import { useEditIssueQuery } from '@/store/service/issue'
+import React, { useEffect, useState } from 'react'
+import moment from 'moment'
+import DataTable from 'react-data-table-component'
+import Status from '@/components/issue/Status'
 
 const IssueView = () => {
-    const router = useRouter();
-    const {data: issue, isLoading: issueISLoading, isSuccess: issueISSuccess, isError: issueISError} = useEditIssueQuery(router.query?.id, {
-        skip: !router.query?.id
+    const router = useRouter()
+    const {
+        data: issue,
+        isLoading: issueISLoading,
+        isSuccess: issueISSuccess,
+        isError: issueISError,
+    } = useEditIssueQuery(router.query?.id, {
+        skip: !router.query?.id,
     })
-    const [columns, setColumns] = useState([]);
+    const [columns, setColumns] = useState([])
     useEffect(() => {
         if (!issueISLoading && !issueISError && issue) {
             setColumns([
                 {
                     name: 'Product',
-                    selector: row => row.product?.title + ( !row.variant?.option_value.includes('N/A') &&  !row.variant?.option?.name?.includes('NA') ? " - "+row.variant?.option_value : ""),
+                    selector: row =>
+                        row.product?.title +
+                        (!row.variant?.option_value.includes('N/A') &&
+                        !row.variant?.option?.name?.includes('NA')
+                            ? ' - ' + row.variant?.option_value
+                            : ''),
                     sortable: true,
                 },
                 {
@@ -182,4 +192,4 @@ const IssueView = () => {
     )
 }
 
-export default IssueView;
+export default IssueView

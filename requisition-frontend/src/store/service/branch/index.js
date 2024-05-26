@@ -1,5 +1,5 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const BranchApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
@@ -63,7 +63,7 @@ export const {
     useStoreBranchMutation,
     useDestroyBranchMutation,
     util: { getRunningQueriesThunk },
-} = BranchApiService;
+} = BranchApiService
 
 export const {
     getBranch,
@@ -71,4 +71,4 @@ export const {
     updateBranch,
     storeBranch,
     destroyBranch,
-} = BranchApiService.endpoints;
+} = BranchApiService.endpoints

@@ -1,34 +1,34 @@
-import Head from "next/head";
-import AppLayout from "@/components/Layouts/AppLayout";
-import { wrapper } from "@/store";
-import { Button, Card, Label } from "flowbite-react";
-import DataTable from 'react-data-table-component';
-import NavLink from "@/components/navLink";
-import { useRouter } from "next/router";
-import Actions from "@/components/actions";
-import React, { useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
+import Head from 'next/head'
+import AppLayout from '@/components/Layouts/AppLayout'
+import { wrapper } from '@/store'
+import { Button, Card, Label } from 'flowbite-react'
+import DataTable from 'react-data-table-component'
+import NavLink from '@/components/navLink'
+import { useRouter } from 'next/router'
+import Actions from '@/components/actions'
+import React, { useEffect, useRef, useState } from 'react'
+import { toast } from 'react-toastify'
 import {
     getVehicleHistory,
     useDestroyVehicleHistoryMutation,
     useGetVehicleHistoryQuery,
-    getRunningQueriesThunk
-} from "@/store/service/vehicle/VehicleHistoryAPI";
-import moment from "moment";
-import Select from "react-select";
-import { useReactToPrint } from "react-to-print";
-import Datepicker from "react-tailwindcss-datepicker";
+    getRunningQueriesThunk,
+} from '@/store/service/vehicle/VehicleHistoryAPI'
+import moment from 'moment'
+import Select from 'react-select'
+import { useReactToPrint } from 'react-to-print'
+import Datepicker from 'react-tailwindcss-datepicker'
 
 const Vehicle = () => {
     const router = useRouter()
     const [page, setPage] = useState(1)
-    const [month, setMonth] = useState("")
-    const [date, setDate] = useState("")
-    const dateRef = useRef();
+    const [month, setMonth] = useState('')
+    const [date, setDate] = useState('')
+    const dateRef = useRef()
     const { data, isLoading, isError } = useGetVehicleHistoryQuery({
         page,
         month,
-        date
+        date,
     })
     const [destroy, destroyResponse] = useDestroyVehicleHistoryMutation()
     const [columns, setColumns] = useState([])
@@ -203,8 +203,8 @@ const Vehicle = () => {
                                     ref={dateRef}
                                     useRange={false}
                                     asSingle={true}
-                                    onChange={(d) => setDate(d.startDate)}
-                                    value={{startDate: date, endDate: date}}
+                                    onChange={d => setDate(d.startDate)}
+                                    value={{ startDate: date, endDate: date }}
                                 />
                             </div>
                         </div>
@@ -246,4 +246,4 @@ export const getServerSideProps = wrapper.getServerSideProps(
     },
 )
 
-export default Vehicle;
+export default Vehicle

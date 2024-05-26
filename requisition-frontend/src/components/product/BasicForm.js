@@ -1,22 +1,27 @@
-import { ErrorMessage, Formik } from "formik";
-import { Button, Label, Textarea, TextInput } from "flowbite-react";
-import { useEffect, useRef, useState } from "react";
-import * as Yup from "yup";
-import { useGetCategoryQuery } from "@/store/service/category";
-import { useDispatch, useSelector } from "react-redux";
-import { setProductBasicInfo } from "@/store/service/product/product_basic_form";
-import { setActiveForm } from "@/store/service/product/product_active_form";
-import { useGetUnitsQuery } from "@/store/service/units";
-import Select from "react-select";
+import { ErrorMessage, Formik } from 'formik'
+import { Button, Label, Textarea, TextInput } from 'flowbite-react'
+import { useEffect, useRef, useState } from 'react'
+import * as Yup from 'yup'
+import { useGetCategoryQuery } from '@/store/service/category'
+import { useDispatch, useSelector } from 'react-redux'
+import { setProductBasicInfo } from '@/store/service/product/product_basic_form'
+import { setActiveForm } from '@/store/service/product/product_active_form'
+import { useGetUnitsQuery } from '@/store/service/units'
+import Select from 'react-select'
 
-export default function BasicForm(props){
+export default function BasicForm(props) {
     const category = useGetCategoryQuery()
-    const [categoryOptions, setCategoryOptions] = useState([]);
-    const dispatch = useDispatch();
+    const [categoryOptions, setCategoryOptions] = useState([])
+    const dispatch = useDispatch()
     const { basic } = useSelector(state => state.product_basic_form)
-    const formikRef = useRef();
-    const {basic: basicData} = props;
-    const {data: units, isLoading: unitLoading, isSuccess: unitIsSuccess, isError: unitIsError} = useGetUnitsQuery();
+    const formikRef = useRef()
+    const { basic: basicData } = props
+    const {
+        data: units,
+        isLoading: unitLoading,
+        isSuccess: unitIsSuccess,
+        isError: unitIsError,
+    } = useGetUnitsQuery()
 
     useEffect(() => {
         if (!category.isError && !category.isLoading) {
@@ -29,10 +34,10 @@ export default function BasicForm(props){
     }, [category])
 
     const initValues = {
-        title: basic?.title ?? basicData?.title ?? "",
-        unit: basic?.unit ?? basicData?.unit ?? "",
-        category_id: basic?.category_id ?? basicData?.category_id ?? "",
-        description: basic?.description ?? basicData?.description ?? "",
+        title: basic?.title ?? basicData?.title ?? '',
+        unit: basic?.unit ?? basicData?.unit ?? '',
+        category_id: basic?.category_id ?? basicData?.category_id ?? '',
+        description: basic?.description ?? basicData?.description ?? '',
     }
     const validationSchema = Yup.object().shape({
         title: Yup.string().required().label('Title'),
@@ -42,22 +47,21 @@ export default function BasicForm(props){
     })
     const submit = (values, pageProps) => {
         dispatch(setProductBasicInfo(values))
-        dispatch(setActiveForm(2));
-        pageProps.setSubmitting(false);
+        dispatch(setActiveForm(2))
+        pageProps.setSubmitting(false)
     }
     useEffect(() => {
         formikRef.current.setValues({
-            title: basic?.title ?? "",
-            unit: basic?.unit ?? "",
-            category_id: basic?.category_id ?? "",
-            description: basic?.description ?? "",
+            title: basic?.title ?? '',
+            unit: basic?.unit ?? '',
+            category_id: basic?.category_id ?? '',
+            description: basic?.description ?? '',
         })
-    }, [basic]);
+    }, [basic])
 
     return (
         <>
-            <h2
-                className={`w-full border-b pb-2 font-bold`}>
+            <h2 className={`w-full border-b pb-2 font-bold`}>
                 Basic Information
             </h2>
             <Formik
@@ -66,21 +70,18 @@ export default function BasicForm(props){
                 onSubmit={submit}
                 validationSchema={validationSchema}>
                 {({
-                      handleBlur,
-                      handleChange,
-                      handleSubmit,
-                      setFieldValue,
-                      values,
-                      isSubmitting,
-                  }) => (
+                    handleBlur,
+                    handleChange,
+                    handleSubmit,
+                    setFieldValue,
+                    values,
+                    isSubmitting,
+                }) => (
                     <>
                         <div className="flex flex-row gap-4">
                             <div className="w-full">
                                 <div className="mb-2 block">
-                                    <Label
-                                        htmlFor="title"
-                                        value="Title"
-                                    />
+                                    <Label htmlFor="title" value="Title" />
                                 </div>
                                 <TextInput
                                     id="title"
@@ -88,9 +89,7 @@ export default function BasicForm(props){
                                     placeholder="Product Name"
                                     type="text"
                                     required
-                                    onChange={
-                                        handleChange
-                                    }
+                                    onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={values.title}
                                 />
@@ -98,8 +97,8 @@ export default function BasicForm(props){
                                     name="title"
                                     render={msg => (
                                         <span className="text-red-500">
-                                                                    {msg}
-                                                                </span>
+                                            {msg}
+                                        </span>
                                     )}
                                 />
                             </div>
@@ -116,23 +115,30 @@ export default function BasicForm(props){
                                 <Select
                                     name={`category_id`}
                                     id={`category_id`}
-                                    onChange={(newValue) => {
-                                        setFieldValue('category_id', newValue?.value)
+                                    onChange={newValue => {
+                                        setFieldValue(
+                                            'category_id',
+                                            newValue?.value,
+                                        )
                                     }}
                                     onBlur={handleBlur}
                                     options={categoryOptions}
-                                    value={categoryOptions.filter(c => c.value === values.category_id)[0]}
+                                    value={
+                                        categoryOptions.filter(
+                                            c => c.value === values.category_id,
+                                        )[0]
+                                    }
                                     data-placeholder="Select options..."
                                     className={`select`}
-                                    classNames={{control: state => `select`}}
+                                    classNames={{ control: state => `select` }}
                                 />
 
                                 <ErrorMessage
                                     name="category_id"
                                     render={msg => (
                                         <span className="text-red-500">
-                                                                    {msg}
-                                                                </span>
+                                            {msg}
+                                        </span>
                                     )}
                                 />
                             </div>
@@ -140,26 +146,43 @@ export default function BasicForm(props){
                         <div className="flex flex-row gap-4">
                             <div className="w-full">
                                 <div className="mb-2 block">
-                                    <Label
-                                        htmlFor="unit"
-                                        value="Unit"
-                                    />
+                                    <Label htmlFor="unit" value="Unit" />
                                 </div>
                                 <Select
                                     name={`unit`}
                                     id={`unit`}
-                                    options={units?.data?.map((u) => ({label: u.unit_code + ` (${u.unit_name})`, value: u.unit_code}) )}
-                                    value={units?.data?.filter(u => u.unit_code === values.unit)?.map((u) => ({label: u.unit_code + ` (${u.unit_name})`, value: u.unit_code}))[0]}
-                                    onChange={(newValue) => {
+                                    options={units?.data?.map(u => ({
+                                        label:
+                                            u.unit_code + ` (${u.unit_name})`,
+                                        value: u.unit_code,
+                                    }))}
+                                    value={
+                                        units?.data
+                                            ?.filter(
+                                                u =>
+                                                    u.unit_code === values.unit,
+                                            )
+                                            ?.map(u => ({
+                                                label:
+                                                    u.unit_code +
+                                                    ` (${u.unit_name})`,
+                                                value: u.unit_code,
+                                            }))[0]
+                                    }
+                                    onChange={newValue => {
                                         setFieldValue('unit', newValue?.value)
                                     }}
                                     data-placeholder="Select options..."
                                     className={`select`}
-                                    classNames={{control: state => `select`}}
+                                    classNames={{ control: state => `select` }}
                                 />
                                 <ErrorMessage
                                     name="unit"
-                                    render={msg => (<span className="text-red-500">{msg}</span>)}
+                                    render={msg => (
+                                        <span className="text-red-500">
+                                            {msg}
+                                        </span>
+                                    )}
                                 />
                             </div>
                         </div>
@@ -183,17 +206,15 @@ export default function BasicForm(props){
                                     name="description"
                                     render={msg => (
                                         <span className="text-red-500">
-                                                                    {msg}
-                                                                </span>
+                                            {msg}
+                                        </span>
                                     )}
                                 />
                             </div>
                         </div>
                         <div className="flex flex-row gap-4 justify-end">
                             <Button
-                                isProcessing={
-                                    isSubmitting
-                                }
+                                isProcessing={isSubmitting}
                                 onClick={handleSubmit}
                                 type="submit"
                                 color={`success`}>

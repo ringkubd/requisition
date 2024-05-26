@@ -1,31 +1,37 @@
-import AppLayout from "@/components/Layouts/AppLayout";
-import { useRouter } from "next/router";
-import Head from "next/head";
-import { Button, Card } from "flowbite-react";
-import React, { useRef, useState } from "react";
+import AppLayout from '@/components/Layouts/AppLayout'
+import { useRouter } from 'next/router'
+import Head from 'next/head'
+import { Button, Card } from 'flowbite-react'
+import React, { useRef, useState } from 'react'
 
-import { useReactToPrint } from "react-to-print";
-import { useGetSingleCashRequisitionQuery } from "@/store/service/cash/Index";
-import CashPrint from "@/components/cash-requisition/CashPrint";
-import Status from "@/components/requisition/status";
+import { useReactToPrint } from 'react-to-print'
+import { useGetSingleCashRequisitionQuery } from '@/store/service/cash/Index'
+import CashPrint from '@/components/cash-requisition/CashPrint'
+import Status from '@/components/requisition/status'
 
-const PrintView = (props) => {
-    const router = useRouter();
-    const [statusKey, setStatusKey] = useState(Math.round(Math.random() * 100000))
-    const {data, isLoading, isError, refetch} = useGetSingleCashRequisitionQuery(router.query.id, {
-        skip: !router.query.id
-    });
+const PrintView = props => {
+    const router = useRouter()
+    const [statusKey, setStatusKey] = useState(
+        Math.round(Math.random() * 100000),
+    )
+    const {
+        data,
+        isLoading,
+        isError,
+        refetch,
+    } = useGetSingleCashRequisitionQuery(router.query.id, {
+        skip: !router.query.id,
+    })
 
-    const printPageRef = useRef();
+    const printPageRef = useRef()
 
-    const requisition_products = data?.data?.items;
-    const mainData = data?.data;
-
+    const requisition_products = data?.data?.items
+    const mainData = data?.data
 
     const handlePrint = useReactToPrint({
         content: () => printPageRef.current,
-        onBeforePrint: (a) => console.log(a)
-    });
+        onBeforePrint: a => console.log(a),
+    })
 
     return (
         <AppLayout
@@ -60,9 +66,11 @@ const PrintView = (props) => {
                                     requisition={mainData}
                                     from={`print_view`}
                                     key={statusKey}
-                                    changeStatus={(a) => {
-                                        setStatusKey(Math.round(Math.random() * 100000))
-                                        refetch();
+                                    changeStatus={a => {
+                                        setStatusKey(
+                                            Math.round(Math.random() * 100000),
+                                        )
+                                        refetch()
                                         router.reload()
                                     }}
                                 />
@@ -86,4 +94,4 @@ const PrintView = (props) => {
         </AppLayout>
     )
 }
-export default PrintView;
+export default PrintView

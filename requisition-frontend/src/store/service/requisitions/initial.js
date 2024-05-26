@@ -1,10 +1,10 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const InitialRequisitionApi = GeneralBaseAPI.injectEndpoints({
     endpoints: build => ({
         getInitialRequisition: build.query({
-            query: (params) => ({
+            query: params => ({
                 url: 'initial-requisitions',
                 params,
             }),
@@ -12,19 +12,22 @@ export const InitialRequisitionApi = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editInitialRequisition: build.query({
-            query: (id) => ({
-                url: `initial-requisitions/${id}`
+            query: id => ({
+                url: `initial-requisitions/${id}`,
             }),
             providesTags: ['edit-initial-requisition'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateInitialRequisition: build.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `initial-requisitions/${id}`,
                 method: 'PATCH',
-                body: patch
+                body: patch,
             }),
-            invalidatesTags: ['initial-requisition', 'edit-initial-requisition'],
+            invalidatesTags: [
+                'initial-requisition',
+                'edit-initial-requisition',
+            ],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         storeInitialRequisition: build.mutation({
@@ -37,7 +40,7 @@ export const InitialRequisitionApi = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyInitialRequisition: build.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `initial-requisitions/${arg}`,
                 method: 'DELETE',
             }),
@@ -45,20 +48,20 @@ export const InitialRequisitionApi = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         getPurposeSuggestion: build.query({
-            query: (arg) => ({
+            query: arg => ({
                 url: 'initial_requisition_product_suggestions',
                 method: 'GET',
-                params: arg
+                params: arg,
             }),
             onQueryStarted: onQueryStartedErrorToast,
         }),
         copyInitialRequisition: build.query({
-            query: (id) => ({
-                url: `initial_requisition/${id}/copy`
+            query: id => ({
+                url: `initial_requisition/${id}/copy`,
             }),
             invalidatesTags: ['initial-requisition'],
             onQueryStarted: onQueryStartedErrorToast,
-        })
+        }),
     }),
 })
 
@@ -71,9 +74,9 @@ export const {
     useGetPurposeSuggestionQuery,
     useCopyInitialRequisitionQuery,
     util: { getRunningQueriesThunk },
-} = InitialRequisitionApi;
+} = InitialRequisitionApi
 
 export const {
     getInitialRequisition,
-    editInitialRequisition
-} = InitialRequisitionApi.endpoints;
+    editInitialRequisition,
+} = InitialRequisitionApi.endpoints

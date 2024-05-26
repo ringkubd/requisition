@@ -1,44 +1,44 @@
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const PumpAPIService = GeneralBaseAPI.injectEndpoints({
-    endpoints: (builder) => ({
+    endpoints: builder => ({
         getPump: builder.query({
-            query: (params) => ({
+            query: params => ({
                 url: 'pumps',
-                params: params
+                params: params,
             }),
-            providesTags: ['pumps']
+            providesTags: ['pumps'],
         }),
         singlePump: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `pumps/${id}`,
             }),
-            providesTags: ['single-pumps']
+            providesTags: ['single-pumps'],
         }),
         updatePump: builder.mutation({
-            query: ({id, ...body}) => ({
+            query: ({ id, ...body }) => ({
                 url: `pumps/${id}`,
                 method: 'PUT',
-                body
+                body,
             }),
-            invalidatesTags: ['single-pumps']
+            invalidatesTags: ['single-pumps'],
         }),
         deletePump: builder.mutation({
-            query: (id) => ({
+            query: id => ({
                 url: `pumps/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['single-pumps', 'pumps']
+            invalidatesTags: ['single-pumps', 'pumps'],
         }),
         storePump: builder.mutation({
-            query: (body) => ({
+            query: body => ({
                 url: `pumps`,
                 method: 'POST',
-                body
+                body,
             }),
-            invalidatesTags: ['pumps']
-        })
-    })
+            invalidatesTags: ['pumps'],
+        }),
+    }),
 })
 export const {
     useGetPumpQuery,
@@ -47,8 +47,6 @@ export const {
     useDeletePumpMutation,
     useStorePumpMutation,
     util: { getRunningQueriesThunk },
-} = PumpAPIService;
+} = PumpAPIService
 
-export const {
-    getPump
-} = PumpAPIService.endpoints;
+export const { getPump } = PumpAPIService.endpoints

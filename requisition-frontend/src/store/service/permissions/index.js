@@ -1,5 +1,5 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const PermissionsApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
@@ -11,14 +11,14 @@ export const PermissionsApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editPermissions: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `permissions/${id}`,
             }),
             providesTags: ['editPermissions'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updatePermissions: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `permissions/${id}`,
                 method: 'PATCH',
                 body: patch,
@@ -40,13 +40,13 @@ export const PermissionsApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyPermissions: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `permissions/${arg}`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['getPermissions'],
             onQueryStarted: onQueryStartedErrorToast,
-        })
+        }),
     }),
 })
 
@@ -57,9 +57,9 @@ export const {
     useStorePermissionsMutation,
     useDestroyPermissionsMutation,
     util: { getRunningQueriesThunk },
-} = PermissionsApiService;
+} = PermissionsApiService
 
 export const {
     getPermissions,
-    editPermissions
-} = PermissionsApiService.endpoints;
+    editPermissions,
+} = PermissionsApiService.endpoints

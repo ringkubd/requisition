@@ -1,34 +1,34 @@
-import React, { forwardRef, useEffect, useRef, useState } from "react";
-import moment from "moment";
-import Image from "next/image";
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
+import moment from 'moment'
+import Image from 'next/image'
 
-const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
-    const accountsCopy = useRef();
-    const requisitorCopy = useRef();
-    const hrRef = useRef();
-    const [rejected, setRejected] = useState(false);
+const InitialPrint = forwardRef(({ mainData, requisition_products }, ref) => {
+    const accountsCopy = useRef()
+    const requisitorCopy = useRef()
+    const hrRef = useRef()
+    const [rejected, setRejected] = useState(false)
 
     useEffect(() => {
-        const accountsCopyHeight = accountsCopy.current.offsetHeight;
-        const requisitorCopyHeight = requisitorCopy.current.offsetHeight;
-        const totalHeight = accountsCopyHeight + requisitorCopyHeight;
+        const accountsCopyHeight = accountsCopy.current.offsetHeight
+        const requisitorCopyHeight = requisitorCopy.current.offsetHeight
+        const totalHeight = accountsCopyHeight + requisitorCopyHeight
 
-        if (totalHeight > 1000){
+        if (totalHeight > 1000) {
             accountsCopy.current.classList.add('break-after-page')
             requisitorCopy.current.classList.add('mt-4')
-            if(hrRef.current){
-                hrRef.current.style.display = 'none';
+            if (hrRef.current) {
+                hrRef.current.style.display = 'none'
             }
-        }else {
+        } else {
             accountsCopy.current.classList.remove('break-after-page')
         }
     })
 
     useEffect(() => {
-        if (mainData?.purchase_current_status?.status === "Rejected"){
+        if (mainData?.purchase_current_status?.status === 'Rejected') {
             setRejected(true)
         }
-        if (mainData?.current_status?.status === "Rejected"){
+        if (mainData?.current_status?.status === 'Rejected') {
             setRejected(true)
         }
     }, [mainData])
@@ -38,15 +38,15 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
             className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none print:m-5`}
             ref={ref}>
             {/*Header*/}
-            {
-                rejected ? (
-                    <Image
-                        src={require('../../../public/rejected.png')}
-                        alt={`rejected`}
-                        className={`absolute opacity-5 top-[50%] left-[35%]`}
-                    />
-                ) : ""
-            }
+            {rejected ? (
+                <Image
+                    src={require('../../../public/rejected.png')}
+                    alt={`rejected`}
+                    className={`absolute opacity-5 top-[50%] left-[35%]`}
+                />
+            ) : (
+                ''
+            )}
             <div
                 className={`flex flex-col shadow-none min-h-[450px]`}
                 ref={accountsCopy}>
@@ -152,10 +152,12 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             {rp.title}{' '}
                                             {rp?.product_option?.option_name?.includes(
                                                 'N/A',
-                                            ) || rp?.product_option?.option_value?.includes(
+                                            ) ||
+                                            rp?.product_option?.option_value?.includes(
                                                 'NA',
                                             )
-                                                ? null :  `- ${rp?.product_option?.option_value}`}
+                                                ? null
+                                                : `- ${rp?.product_option?.option_value}`}
                                         </td>
                                         <td className={`border p-0`}>
                                             {rp.last_purchase_date
@@ -176,7 +178,8 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         <td className={`border p-0`}>
                                             {rp.quantity_to_be_purchase}
                                         </td>
-                                        <td className={`border p-1 text-justify text-xs leading-none`}>
+                                        <td
+                                            className={`border p-1 text-justify text-xs leading-none`}>
                                             {rp.purpose}
                                         </td>
                                     </tr>
@@ -248,8 +251,9 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                         </div>
                         <div
                             className={`flex flex-col min-h-[20px] justify-end`}>
-                            {mainData.approval_status?.ceo_approved_at
-                                ? <span>Neaz Khan</span> : null }
+                            {mainData.approval_status?.ceo_approved_at ? (
+                                <span>Neaz Khan</span>
+                            ) : null}
                             <small>
                                 <i>
                                     {mainData.approval_status?.ceo_approved_at
@@ -380,10 +384,12 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                             {rp.title}{' '}
                                             {rp?.product_option?.option_name?.includes(
                                                 'N/A',
-                                            ) || rp?.product_option?.option_value?.includes(
+                                            ) ||
+                                            rp?.product_option?.option_value?.includes(
                                                 'NA',
                                             )
-                                                ? null :  `- ${rp?.product_option?.option_value}`}
+                                                ? null
+                                                : `- ${rp?.product_option?.option_value}`}
                                         </td>
                                         <td className={`border p-0`}>
                                             {rp.last_purchase_date
@@ -404,7 +410,8 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                                         <td className={`border p-0`}>
                                             {rp.quantity_to_be_purchase}
                                         </td>
-                                        <td className={`border p-0 text-justify text-xs leading-none`}>
+                                        <td
+                                            className={`border p-0 text-justify text-xs leading-none`}>
                                             {rp.purpose}
                                         </td>
                                     </tr>
@@ -475,8 +482,9 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
                         </div>
                         <div
                             className={`flex flex-col min-h-[20px] justify-end`}>
-                            {mainData.approval_status?.ceo_approved_at
-                                ? <span>Neaz Khan</span> : null }
+                            {mainData.approval_status?.ceo_approved_at ? (
+                                <span>Neaz Khan</span>
+                            ) : null}
                             <small>
                                 <i>
                                     {mainData.approval_status?.ceo_approved_at
@@ -498,4 +506,4 @@ const InitialPrint = forwardRef(({mainData, requisition_products}, ref) => {
     )
 })
 
-export default InitialPrint;
+export default InitialPrint

@@ -1,8 +1,8 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
     initial: [],
     purchase: [],
-    cash: []
+    cash: [],
 }
 
 const DashboardSlice = createSlice({
@@ -10,23 +10,23 @@ const DashboardSlice = createSlice({
     initialState,
     reducers: {
         getInitialRequisition: (state, action) => {
-            return state.initial;
+            return state.initial
         },
         setInitialRequisition: (state, action) => {
-            state.initial = action.payload;
+            state.initial = action.payload
         },
         setSingleInitialRequisition: (state, action) => {
             state.initial = [action.payload, ...state.initial]
         },
         updateSingleInitialRequisition: (state, action) => {
             state.initial = state.initial.map(il => {
-                if (il.id === action.payload.id){
-                    return action.payload;
+                if (il.id === action.payload.id) {
+                    return action.payload
                 }
-                return il;
+                return il
             })
-        }
-    }
+        },
+    },
 })
 
 export const {
@@ -34,5 +34,5 @@ export const {
     setInitialRequisition,
     setSingleInitialRequisition,
     updateSingleInitialRequisition,
-} = DashboardSlice.actions;
-export default DashboardSlice;
+} = DashboardSlice.actions
+export default DashboardSlice

@@ -1,13 +1,12 @@
-import Head from "next/head";
-import AppLayout from "@/components/Layouts/AppLayout";
-import { Button, Card } from "flowbite-react";
-import { useRouter } from "next/router";
-import React, { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
-import { useEditPurchaseRequisitionQuery } from "@/store/service/requisitions/purchase";
-import moment from "moment";
-import './ReportPrint.module.css';
-
+import Head from 'next/head'
+import AppLayout from '@/components/Layouts/AppLayout'
+import { Button, Card } from 'flowbite-react'
+import { useRouter } from 'next/router'
+import React, { useRef } from 'react'
+import { useReactToPrint } from 'react-to-print'
+import { useEditPurchaseRequisitionQuery } from '@/store/service/requisitions/purchase'
+import moment from 'moment'
+import './ReportPrint.module.css'
 
 const PurchaseRequisitionReport = () => {
     const router = useRouter()
@@ -24,7 +23,8 @@ const PurchaseRequisitionReport = () => {
     } = useEditPurchaseRequisitionQuery(router.query.id, {
         skip: !router.query.id,
     })
-    const requisition_products = requisition?.data?.purchase_requisition_products;
+    const requisition_products =
+        requisition?.data?.purchase_requisition_products
     return (
         <>
             <Head>
@@ -46,8 +46,7 @@ const PurchaseRequisitionReport = () => {
                             <Button
                                 gradientDuoTone="purpleToBlue"
                                 outline
-                                onClick={() => handlePrint()}
-                            >
+                                onClick={() => handlePrint()}>
                                 Print
                             </Button>
                         </div>
@@ -83,85 +82,134 @@ const PurchaseRequisitionReport = () => {
                                         className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
                                         <thead
                                             className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
-                                        <tr>
-                                            <th
-                                                scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6`}>
-                                                Sl#
-                                            </th>
-                                            <th scope="col"
-                                                className={`border bg-white leading-3 p-1`}>
-                                                Name of the Item
-                                            </th>
-                                            <th scope="col"
-                                                className={`border bg-white leading-3 p-1`}>
-                                                Unit
-                                            </th>
-                                            <th scope="col"
-                                                className={`border bg-white leading-3 p-1`}>
-                                                Req. Qty
-                                            </th>
-                                            <th scope="col"
-                                                className={`border bg-white leading-3 p-1`}>
-                                                Qty to purchase
-                                            </th>
-                                            <th scope="col"
-                                                className={`border bg-white leading-3 p-1`}>
-                                                Requisition Amount
-                                            </th>
-                                            <th scope="col"
-                                                className={`border bg-white leading-3 p-1`}>
-                                                Actual Purchase
-                                            </th>
-                                            <th scope="col"
-                                                className={`border bg-white leading-3 p-1`}>
-                                                Purchase Amount
-                                            </th>
-                                        </tr>
+                                            <tr>
+                                                <th
+                                                    scope="col"
+                                                    className={`border bg-white leading-3 p-1 w-6`}>
+                                                    Sl#
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    className={`border bg-white leading-3 p-1`}>
+                                                    Name of the Item
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    className={`border bg-white leading-3 p-1`}>
+                                                    Unit
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    className={`border bg-white leading-3 p-1`}>
+                                                    Req. Qty
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    className={`border bg-white leading-3 p-1`}>
+                                                    Qty to purchase
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    className={`border bg-white leading-3 p-1`}>
+                                                    Requisition Amount
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    className={`border bg-white leading-3 p-1`}>
+                                                    Actual Purchase
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    className={`border bg-white leading-3 p-1`}>
+                                                    Purchase Amount
+                                                </th>
+                                            </tr>
                                         </thead>
-                                        <tbody className={`shadow-none text-gray-800`}>
-                                        {requisition_products?.map(
-                                            (row, i) => (
-                                                <tr className={`border text-center bg-white`} key={i + 1}>
-                                                    <td className={`border`}>
-                                                        {i + 1}
-                                                    </td>
-                                                    <td className={`border text-left`}>
-                                                        {row.title} {row.product_option?.title}
-                                                    </td>
-                                                    <td className={`border`}>
-                                                        {row.product?.unit}
-                                                    </td>
-                                                    <td className={`border`}>
-                                                        {parseFloat(row.required_quantity).toLocaleString()}
-                                                    </td>
-                                                    <td className={`border`}>
-                                                        {row.quantity_to_be_purchase.toLocaleString()}
-                                                    </td>
-                                                    <td className={`border`}>
-                                                        {(row.unit_price * row.quantity_to_be_purchase).toLocaleString()}
-                                                    </td>
-                                                    <td className={`border`}>
-                                                        {(row.actual_purchase ?? 0).toLocaleString()}
-                                                    </td>
-                                                    <td className={`border`}>
-                                                        {row?.purchase?.reduce((o, n) => o + n?.total_price, 0).toLocaleString()}
-                                                    </td>
-                                                </tr>
-                                            ),
-                                        )}
-                                        <tr>
-                                            <th colSpan={7} className={`text-right border`}>Total</th>
-                                            <th className={`text-center border`}>
-                                                {
-                                                    requisition_products?.reduce((o, n) => {
-                                                        return n?.purchase?.reduce((a,b) => {
-                                                            return a + b.total_price;
-                                                        },o)
-                                                    },0).toLocaleString()
-                                                }
-                                            </th>
-                                        </tr>
+                                        <tbody
+                                            className={`shadow-none text-gray-800`}>
+                                            {requisition_products?.map(
+                                                (row, i) => (
+                                                    <tr
+                                                        className={`border text-center bg-white`}
+                                                        key={i + 1}>
+                                                        <td
+                                                            className={`border`}>
+                                                            {i + 1}
+                                                        </td>
+                                                        <td
+                                                            className={`border text-left`}>
+                                                            {row.title}{' '}
+                                                            {
+                                                                row
+                                                                    .product_option
+                                                                    ?.title
+                                                            }
+                                                        </td>
+                                                        <td
+                                                            className={`border`}>
+                                                            {row.product?.unit}
+                                                        </td>
+                                                        <td
+                                                            className={`border`}>
+                                                            {parseFloat(
+                                                                row.required_quantity,
+                                                            ).toLocaleString()}
+                                                        </td>
+                                                        <td
+                                                            className={`border`}>
+                                                            {row.quantity_to_be_purchase.toLocaleString()}
+                                                        </td>
+                                                        <td
+                                                            className={`border`}>
+                                                            {(
+                                                                row.unit_price *
+                                                                row.quantity_to_be_purchase
+                                                            ).toLocaleString()}
+                                                        </td>
+                                                        <td
+                                                            className={`border`}>
+                                                            {(
+                                                                row.actual_purchase ??
+                                                                0
+                                                            ).toLocaleString()}
+                                                        </td>
+                                                        <td
+                                                            className={`border`}>
+                                                            {row?.purchase
+                                                                ?.reduce(
+                                                                    (o, n) =>
+                                                                        o +
+                                                                        n?.total_price,
+                                                                    0,
+                                                                )
+                                                                .toLocaleString()}
+                                                        </td>
+                                                    </tr>
+                                                ),
+                                            )}
+                                            <tr>
+                                                <th
+                                                    colSpan={7}
+                                                    className={`text-right border`}>
+                                                    Total
+                                                </th>
+                                                <th
+                                                    className={`text-center border`}>
+                                                    {requisition_products
+                                                        ?.reduce((o, n) => {
+                                                            return n?.purchase?.reduce(
+                                                                (a, b) => {
+                                                                    return (
+                                                                        a +
+                                                                        b.total_price
+                                                                    )
+                                                                },
+                                                                o,
+                                                            )
+                                                        }, 0)
+                                                        .toLocaleString()}
+                                                </th>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>

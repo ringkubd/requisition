@@ -1,6 +1,6 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
-    basic: {}
+    basic: {},
 }
 export const ProductBasicFormSlice = createSlice({
     name: 'product_basic_form',
@@ -10,14 +10,18 @@ export const ProductBasicFormSlice = createSlice({
             return state.basic
         },
         setProductBasicInfo: (state, action) => {
-            state.basic = action.payload;
+            state.basic = action.payload
         },
         resetProductBasicInfo: state => {
-            state.basic = {};
-        }
-    }
-});
+            state.basic = {}
+        },
+    },
+})
 
-export const {getProductBasicInfo, setProductBasicInfo, resetProductBasicInfo} = ProductBasicFormSlice.actions;
+export const {
+    getProductBasicInfo,
+    setProductBasicInfo,
+    resetProductBasicInfo,
+} = ProductBasicFormSlice.actions
 
-export default ProductBasicFormSlice.reducer;
+export default ProductBasicFormSlice.reducer

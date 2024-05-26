@@ -1,36 +1,42 @@
-import Head from "next/head";
-import AppLayout from "@/components/Layouts/AppLayout";
-import { wrapper } from "@/store";
-import { Button, Card, Label, Select, TextInput } from "flowbite-react";
-import DataTable from 'react-data-table-component';
-import NavLink from "@/components/navLink";
-import { useRouter } from "next/router";
-import Actions from "@/components/actions";
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import Image from "next/image";
+import Head from 'next/head'
+import AppLayout from '@/components/Layouts/AppLayout'
+import { wrapper } from '@/store'
+import { Button, Card, Label, Select, TextInput } from 'flowbite-react'
+import DataTable from 'react-data-table-component'
+import NavLink from '@/components/navLink'
+import { useRouter } from 'next/router'
+import Actions from '@/components/actions'
+import React, { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
+import Image from 'next/image'
 import {
     getPurchase,
     useGetPurchaseQuery,
     useDestroyPurchaseMutation,
     getRunningQueriesThunk,
-} from "@/store/service/purchase";
-import Datepicker from "react-tailwindcss-datepicker";
-import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
-import { AiOutlineSearch } from "react-icons/ai";
-import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
-import { setDateRange } from "@/store/slice/filterDateRange";
+} from '@/store/service/purchase'
+import Datepicker from 'react-tailwindcss-datepicker'
+import { useGetDepartmentByOrganizationBranchQuery } from '@/store/service/deparment'
+import { AiOutlineSearch } from 'react-icons/ai'
+import Link from 'next/link'
+import { useDispatch, useSelector } from 'react-redux'
+import { setDateRange } from '@/store/slice/filterDateRange'
 
 const Purchase = () => {
     const router = useRouter()
-    const [searchParams, setSearchParams] = useState({});
-    const { data, isLoading, isError, isSuccess } = useGetPurchaseQuery(searchParams)
+    const [searchParams, setSearchParams] = useState({})
+    const { data, isLoading, isError, isSuccess } = useGetPurchaseQuery(
+        searchParams,
+    )
     const [destroy, destroyResponse] = useDestroyPurchaseMutation()
-    const [columns, setColumns] = useState([]);
-    const {data: departments, isLoading: departmentsISLoading, isError: departmentsISError} = useGetDepartmentByOrganizationBranchQuery();
-    const dispatch = useDispatch();
-    const dateRange = useSelector(state => state.filter_date_range);
+    const [columns, setColumns] = useState([])
+    const {
+        data: departments,
+        isLoading: departmentsISLoading,
+        isError: departmentsISError,
+    } = useGetDepartmentByOrganizationBranchQuery()
+    const dispatch = useDispatch()
+    const dateRange = useSelector(state => state.filter_date_range)
 
     useEffect(() => {
         if (!destroyResponse.isLoading && destroyResponse.isSuccess) {
@@ -39,7 +45,7 @@ const Purchase = () => {
     }, [destroyResponse])
 
     useEffect(() => {
-        if (isSuccess && data){
+        if (isSuccess && data) {
             setColumns([
                 {
                     name: 'SL',
@@ -52,11 +58,14 @@ const Purchase = () => {
                 },
                 {
                     name: 'Product',
-                    selector: row => <Link href={`product/${row.product?.id}/view`}>
-                        { row.product?.title +
-                        (row.productOption?.title.includes('N/A')
-                            ? ''
-                            : ' - ' + row.productOption?.title) }</Link>,
+                    selector: row => (
+                        <Link href={`product/${row.product?.id}/view`}>
+                            {row.product?.title +
+                                (row.productOption?.title.includes('N/A')
+                                    ? ''
+                                    : ' - ' + row.productOption?.title)}
+                        </Link>
+                    ),
                     sortable: true,
                     minWidth: '220px',
                 },
@@ -72,14 +81,22 @@ const Purchase = () => {
                                     src={row.supplier?.logo}
                                 />
                             </Link>
-                        ) : (
-                            row.supplier?.name ?  <Link href={`/suppliers/${row.supplier_id}/view`}> {row.supplier?.name} </Link> : null
-                        ),
+                        ) : row.supplier?.name ? (
+                            <Link href={`/suppliers/${row.supplier_id}/view`}>
+                                {' '}
+                                {row.supplier?.name}{' '}
+                            </Link>
+                        ) : null,
                     sortable: true,
                 },
                 {
                     name: 'P.R. No.',
-                    selector: row => <Link href={`purchase-requisition/${row.purchaseRequisition?.id}/view`}>{row.purchaseRequisition?.prf_no}</Link>,
+                    selector: row => (
+                        <Link
+                            href={`purchase-requisition/${row.purchaseRequisition?.id}/view`}>
+                            {row.purchaseRequisition?.prf_no}
+                        </Link>
+                    ),
                     sortable: true,
                     width: '96px',
                 },
@@ -134,17 +151,19 @@ const Purchase = () => {
     }, [data, isLoading, isSuccess])
 
     const changeSearchParams = (key, value) => {
-        setSearchParams({...searchParams , [key]: value, page: 1});
+        setSearchParams({ ...searchParams, [key]: value, page: 1 })
     }
 
     useEffect(() => {
-        const filterdData = Object.fromEntries(Object.entries(dateRange).filter(([_, v]) => v != null));
-        if (Object.keys(filterdData).length){
+        const filterdData = Object.fromEntries(
+            Object.entries(dateRange).filter(([_, v]) => v != null),
+        )
+        if (Object.keys(filterdData).length) {
             changeSearchParams('dateRange', JSON.stringify(dateRange))
-        }else{
-            changeSearchParams('dateRange', "");
+        } else {
+            changeSearchParams('dateRange', '')
         }
-    }, [dateRange]);
+    }, [dateRange])
 
     return (
         <>
@@ -267,4 +286,4 @@ export const getServerSideProps = wrapper.getServerSideProps(
     },
 )
 
-export default Purchase;
+export default Purchase

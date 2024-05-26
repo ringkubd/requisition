@@ -1,5 +1,5 @@
-import { onQueryStartedErrorToast } from "@/lib/clientHelper";
-import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { onQueryStartedErrorToast } from '@/lib/clientHelper'
+import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
 export const DepartmentApiService = GeneralBaseAPI.injectEndpoints({
     endpoints: builder => ({
@@ -11,17 +11,17 @@ export const DepartmentApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         editDepartment: builder.query({
-            query: (id) => ({
+            query: id => ({
                 url: `departments/${id}`,
             }),
             providesTags: ['editDepartment'],
             onQueryStarted: onQueryStartedErrorToast,
         }),
         updateDepartment: builder.mutation({
-            query: ({id, ...patch}) => ({
+            query: ({ id, ...patch }) => ({
                 url: `departments/${id}`,
                 method: 'PATCH',
-                body: patch
+                body: patch,
             }),
             invalidatesTags: ['getDepartment', 'editDepartment'],
             onQueryStarted: onQueryStartedErrorToast,
@@ -36,7 +36,7 @@ export const DepartmentApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         destroyDepartment: builder.mutation({
-            query : (arg) => ({
+            query: arg => ({
                 url: `departments/${arg}`,
                 method: 'DELETE',
             }),
@@ -44,13 +44,13 @@ export const DepartmentApiService = GeneralBaseAPI.injectEndpoints({
             onQueryStarted: onQueryStartedErrorToast,
         }),
         getDepartmentByOrganizationBranch: builder.query({
-            query: (arg) => ({
+            query: arg => ({
                 url: 'departments-by-organization-branch',
                 method: 'GET',
-                params: arg
+                params: arg,
             }),
             onQueryStarted: onQueryStartedErrorToast,
-        })
+        }),
     }),
 })
 
@@ -62,7 +62,7 @@ export const {
     useDestroyDepartmentMutation,
     useGetDepartmentByOrganizationBranchQuery,
     util: { getRunningQueriesThunk },
-} = DepartmentApiService;
+} = DepartmentApiService
 
 export const {
     getDepartment,
@@ -70,4 +70,4 @@ export const {
     updateDepartment,
     storeDepartment,
     destroyDepartment,
-} = DepartmentApiService.endpoints;
+} = DepartmentApiService.endpoints
