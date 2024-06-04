@@ -37,13 +37,13 @@ class AppBaseController extends Controller
         ], 200);
     }
 
-    public function newIRFNO(){
+    public function newIRFNO($departmentName = false){
         $year = Carbon::now();
         $lastYear = Carbon::now()->subYear();
         $lastYearMax = DB::table('irf_nos')->whereRaw("year(created_at) = $lastYear->year")->max('id') ?? 0;
         $id = DB::table('irf_nos')->whereRaw("year(created_at) = $year->year")->max('id') - $lastYearMax;
         $id = $id < 1 ? 1 : $id++;
-        $department = auth_department_name();
+        $department = $departmentName ?? auth_department_name();
         return $id.'/'.$year->format('y').'/'.$department;
     }
 

@@ -4,7 +4,6 @@ import { Button, Card, Label, TextInput } from 'flowbite-react'
 import NavLink from '@/components/navLink'
 import { useRouter } from 'next/router'
 import { ErrorMessage, Formik } from 'formik'
-import * as Yup from 'yup'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import {
@@ -18,13 +17,20 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group'
 import { AsyncPaginate } from 'react-select-async-paginate'
 import axios from '@/lib/axios'
 import Select from 'react-select'
+import validationSchema from "@/validations/initial_requisition";
+import { addItem, loadCategory } from "@/lib/initial_requisition";
+import { useGetDepartmentQuery } from "@/store/service/deparment";
+import { useAuth } from "@/hooks/auth";
+import * as Yup from "yup";
 
 const InitialRequisitionCreate = props => {
     const router = useRouter()
+    const {user} = useAuth();
     const [
         storeInitialRequisition,
         storeResult,
     ] = useStoreInitialRequisitionMutation()
+    const {data: departments, isLoading: departmentISLoading, isError: departmentISError} = useGetDepartmentQuery();
     const [products, setProducts] = useState([])
     const selectRef = useRef()
     const [selectedProduct, setSelectedProduct] = useState(null)
@@ -32,6 +38,7 @@ const InitialRequisitionCreate = props => {
     const [productOptions, setProductOptions] = useState([])
     const [productUnit, setProductUnit] = useState('')
     const [selectedCategory, setSelectedCategory] = useState('')
+    const [selectedDepartment, setSelectedDepartment] = useState('')
 
     const suggestionQuery = useGetPurposeSuggestionQuery(
         {
@@ -71,6 +78,7 @@ const InitialRequisitionCreate = props => {
         quantity_to_be_purchase: '',
         purpose: '',
         estimated_cost: 0,
+        department_id: user?.selected_department ?? selectedDepartment.value,
     }
     useEffect(() => {
         if (storeResult.isError) {
@@ -86,6 +94,10 @@ const InitialRequisitionCreate = props => {
         }
     }, [storeResult])
     const submit = () => {
+        if (selectedDepartment === ''){
+            toast.error('Department is required')
+            return;
+        }
         if (requisitionData.length) {
             storeInitialRequisition(
                 requisitionData.map(i => ({
@@ -97,38 +109,41 @@ const InitialRequisitionCreate = props => {
                     quantity_to_be_purchase: i.quantity_to_be_purchase,
                     purpose: i.purpose,
                     estimated_cost: i.estimated_cost,
+                    department_id: selectedDepartment.value,
+                    department_name: selectedDepartment.label,
                 })),
             )
+
         } else {
             toast.warn('Perhaps you forgot to add the item.')
         }
     }
-    const addItems = (values, pageProps) => {
-        values.estimated_cost =
-            parseFloat(
-                products
-                    .filter(p => p.id == values.product_id)[0]
-                    ?.product_options.filter(
-                        o => o.id == values.product_option_id,
-                    )[0].unit_price,
-            ) * parseFloat(values.quantity_to_be_purchase)
-        setRequisitionData([...requisitionData, values])
-        pageProps.setSubmitting(false)
-        pageProps.resetForm()
-        selectRef.current.clearValue()
-        selectRef.current.removeValue()
+    // const addItems = (values, pageProps) => {
+    //     values.estimated_cost =
+    //         parseFloat(
+    //             products
+    //                 .filter(p => p.id == values.product_id)[0]
+    //                 ?.product_options.filter(
+    //                     o => o.id == values.product_option_id,
+    //                 )[0].unit_price,
+    //         ) * parseFloat(values.quantity_to_be_purchase)
+    //     setRequisitionData([...requisitionData, values])
+    //     pageProps.setSubmitting(false)
+    //     pageProps.resetForm()
+    //     selectRef.current.clearValue()
+    //     selectRef.current.removeValue()
+    // }
+
+    const itemAddInList = (values, pageProps) => {
+        addItem(values, products, (values) => {
+            setRequisitionData([...requisitionData, values])
+            pageProps.setSubmitting(false)
+            pageProps.resetForm()
+            selectRef.current.clearValue()
+            selectRef.current.removeValue()
+        })
     }
 
-    const validationSchema = Yup.object().shape({
-        product_id: Yup.number().required().label('Product'),
-        product_option_id: Yup.number().required().label('Variant'),
-        required_quantity: Yup.number().required().label('Required Quantity'),
-        available_quantity: Yup.number().required().label('Available Quantity'),
-        quantity_to_be_purchase: Yup.number()
-            .required()
-            .label('Quantity to be purchase'),
-        purpose: Yup.string().required().label('Purpose'),
-    })
     const removeItem = item => {
         setSubmitRemoveProcessing(true)
         setRequisitionData(
@@ -218,27 +233,7 @@ const InitialRequisitionCreate = props => {
             },
         }
     }
-    async function loadCategory(search, loadedOptions, { page }) {
-        const response = await axios.get(`/api/category-select`, {
-            params: {
-                search: search,
-                page: page,
-            },
-        })
-        const responseJSON = response.data
-        return {
-            options: responseJSON.data?.categories?.map(r => {
-                return {
-                    label: r.title,
-                    value: r.id,
-                }
-            }),
-            hasMore: responseJSON.data.count > 20,
-            additional: {
-                page: search ? 1 : page + 1,
-            },
-        }
-    }
+
     return (
         <>
             <AppLayout
@@ -272,34 +267,55 @@ const InitialRequisitionCreate = props => {
                             </div>
                             <Formik
                                 initialValues={initValues}
-                                onSubmit={addItems}
+                                onSubmit={itemAddInList}
                                 validationSchema={validationSchema}
                                 innerRef={formikForm}>
                                 {({
-                                    handleSubmit,
-                                    handleChange,
-                                    handleBlur,
-                                    setFieldValue,
-                                    values,
-                                    errors,
-                                    isSubmitting,
-                                    setErrors,
-                                }) => (
+                                      handleSubmit,
+                                      handleChange,
+                                      handleBlur,
+                                      setFieldValue,
+                                      values,
+                                      errors,
+                                      isSubmitting,
+                                      setErrors,
+                                  }) => (
                                     <div
                                         className={`flex flex-col w-full m-auto`}>
                                         {requisitionData.length ? (
-                                            <div
-                                                className={`flex flex-row w-full justify-end justify-items-end items-end`}>
-                                                <Button
-                                                    isProcessing={
-                                                        storeResult.isLoading
-                                                    }
-                                                    onClick={submit}
-                                                    type="submit"
-                                                    color={`success`}>
-                                                    Submit
-                                                </Button>
-                                            </div>
+                                            <>
+                                                {
+                                                    !departmentISLoading && ! departmentISError && departments && (
+                                                        <label htmlFor={`department_id`} className={`font-bold flex flex-row justify-end mb-2 space-x-3 items-center`}>
+                                                            <span>Department</span>
+                                                            <Select
+                                                                id={`department_id`}
+                                                                name={`department_id`}
+                                                                options={departments.data.map(d => ({label: d.name, value: d.id}))}
+                                                                defaultValue={departments?.data?.filter(d => d.id === user?.selected_department).map(d => ({value: d.id, label: d.name}))[0]}
+                                                                onChange={(value) => {
+                                                                    setFieldValue('department_id', value.value)
+                                                                    setSelectedDepartment( value)
+                                                                }}
+                                                            />
+                                                        </label>
+
+                                                    )
+                                                }
+
+                                                <div
+                                                    className={`flex flex-row w-full justify-end justify-items-end items-end`}>
+                                                    <Button
+                                                        isProcessing={
+                                                            storeResult.isLoading
+                                                        }
+                                                        onClick={submit}
+                                                        type="submit"
+                                                        color={`success`}>
+                                                        Submit
+                                                    </Button>
+                                                </div>
+                                            </>
                                         ) : null}
 
                                         <div className="flex flex-col xl:flex-row gap-4 w-full justify-center shadow-md py-6 px-4">
@@ -417,7 +433,7 @@ const InitialRequisitionCreate = props => {
                                                             )
                                                             ?.map(po => ({
                                                                 label:
-                                                                    po.option_value,
+                                                                po.option_value,
                                                                 value: po.id,
                                                             }))}
                                                         onChange={newValue => {
@@ -432,16 +448,16 @@ const InitialRequisitionCreate = props => {
                                                             setFieldValue(
                                                                 'available_quantity',
                                                                 newValue.stock ??
-                                                                    0,
+                                                                0,
                                                             )
                                                             setFieldValue(
                                                                 'last_purchase_date',
                                                                 newValue.last_purchase_date
                                                                     ? moment(
-                                                                          newValue.last_purchase_date,
-                                                                      )?.format(
-                                                                          'Y-MM-DD',
-                                                                      )
+                                                                        newValue.last_purchase_date,
+                                                                    )?.format(
+                                                                        'Y-MM-DD',
+                                                                    )
                                                                     : null,
                                                             )
                                                         }}
@@ -450,13 +466,13 @@ const InitialRequisitionCreate = props => {
                                                         options={productOptions?.map(
                                                             o => ({
                                                                 label:
-                                                                    o.option_value,
+                                                                o.option_value,
                                                                 value: o.id,
                                                                 stock: o.stock,
                                                                 last_purchase_date:
-                                                                    o
-                                                                        .option_purchase_history[0]
-                                                                        ?.purchase_date,
+                                                                o
+                                                                    .option_purchase_history[0]
+                                                                    ?.purchase_date,
                                                             }),
                                                         )}
                                                         className={`select`}
@@ -517,12 +533,12 @@ const InitialRequisitionCreate = props => {
                                                             setFieldValue(
                                                                 'quantity_to_be_purchase',
                                                                 e.target.value -
-                                                                    values.available_quantity <
-                                                                    0
+                                                                values.available_quantity <
+                                                                0
                                                                     ? 0
                                                                     : e.target
-                                                                          .value -
-                                                                          values.available_quantity,
+                                                                        .value -
+                                                                    values.available_quantity,
                                                             )
                                                         }}
                                                     />

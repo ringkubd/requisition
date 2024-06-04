@@ -134,13 +134,14 @@ class InitialRequisitionAPIController extends AppBaseController
      */
     public function store(Request $request): JsonResponse
     {
-        $irf_no = $this->newIRFNO();
         $allProduct = $request->all();
         $estimated_cost = collect($allProduct)->sum('estimated_cost');
-
+        $department = $allProduct[0]['department_id'] ?? auth_department_id();
+        $department_name = $allProduct[0]['department_name'] ?? auth_department_name();
+        $irf_no = $this->newIRFNO($department_name);
         $initialRequisition = InitialRequisition::create([
             'user_id' => $request->user()->id,
-            'department_id' => auth_department_id(),
+            'department_id' =>  $department,
             'branch_id' => auth_branch_id(),
             'irf_no' => $irf_no,
             'ir_no' => 5,
@@ -150,11 +151,13 @@ class InitialRequisitionAPIController extends AppBaseController
             'irf_no' => $irf_no
         ]);
         $approval_status = $initialRequisition->approval_status()->create([
-            'department_id' => auth_department_id(),
+            'department_id' => $department,
             'department_status' => 1,
         ]);
         $allProduct = array_map(function($p){
             unset($p['estimated_cost']);
+            unset($p['department_id']);
+            unset($p['department_name']);
             if (array_key_exists('last_purchase_date', $p) && ($p['last_purchase_date'] == "" || $p['last_purchase_date'] == null)){
                 $p['last_purchase_date'] = null;
             }

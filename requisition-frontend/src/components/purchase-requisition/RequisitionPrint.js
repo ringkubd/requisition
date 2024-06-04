@@ -379,7 +379,8 @@ const RequisitionPrint = forwardRef(
                                                                 className={`form-checkbox mr-2`}
                                                                 checked={
                                                                     mainData?.payment_type ===
-                                                                    2
+                                                                    2 ||  mainData?.payment_type ===
+                                                                    3
                                                                 }
                                                                 disabled
                                                             />

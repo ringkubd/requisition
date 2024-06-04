@@ -4,7 +4,6 @@ import { Button, Card, Label, TextInput } from 'flowbite-react'
 import NavLink from '@/components/navLink'
 import { useRouter } from 'next/router'
 import { ErrorMessage, Formik } from 'formik'
-import * as Yup from 'yup'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import {
@@ -18,6 +17,8 @@ import UpdateVariantForm from '@/components/initial-requisition/updateVariantFor
 import axios from '@/lib/axios'
 import { AsyncPaginate } from 'react-select-async-paginate'
 import Select from 'react-select'
+import { addItem } from "@/lib/initial_requisition";
+import validationSchema from "@/validations/initial_requisition";
 
 const Edit = props => {
     const router = useRouter()
@@ -87,21 +88,18 @@ const Edit = props => {
             toast.warn('Perhaps you forgot to add the item.')
         }
     }
-    const addItems = (values, pageProps) => {
-        values.estimated_cost =
-            parseFloat(
-                products
-                    .filter(p => p.id == values.product_id)[0]
-                    ?.product_options.filter(
-                        o => o.id == values.product_option_id,
-                    )[0].unit_price,
-            ) * parseFloat(values.quantity_to_be_purchase)
-        setRequisitionData([...requisitionData, values])
-        pageProps.setSubmitting(false)
-        pageProps.resetForm()
-        selectRef.current.clearValue()
-        selectRef.current.removeValue()
+
+    const itemAddInList = (values, pageProps) => {
+        addItem(values, products, (values) => {
+            setRequisitionData([...requisitionData, values])
+            pageProps.setSubmitting(false)
+            pageProps.resetForm()
+            selectRef.current.clearValue()
+            selectRef.current.removeValue()
+        })
     }
+
+
 
     const updateItems = values => {
         const updated = requisitionData.map(rd => {
@@ -141,16 +139,7 @@ const Edit = props => {
         selectRef.current.clearValue()
     }
 
-    const validationSchema = Yup.object().shape({
-        product_id: Yup.number().required().label('Product'),
-        product_option_id: Yup.number().required().label('Variant'),
-        required_quantity: Yup.number().required().label('Required Quantity'),
-        available_quantity: Yup.number().required().label('Available Quantity'),
-        quantity_to_be_purchase: Yup.number()
-            .required()
-            .label('Quantity to be purchase'),
-        purpose: Yup.string().required().label('Purpose'),
-    })
+
     const removeItem = item => {
         setSubmitRemoveProcessing(true)
         setRequisitionData(
@@ -321,7 +310,7 @@ const Edit = props => {
                             {!isLoading && !isError && (
                                 <Formik
                                     initialValues={initValues}
-                                    onSubmit={addItems}
+                                    onSubmit={itemAddInList}
                                     validationSchema={validationSchema}
                                     innerRef={formikForm}>
                                     {({

@@ -16,6 +16,7 @@ import Actions from '@/components/actions'
 import axios from '@/lib/axios'
 import { AsyncPaginate } from 'react-select-async-paginate'
 import { useAuth } from '@/hooks/auth'
+import { loadCategory } from "@/lib/initial_requisition";
 const create = props => {
     const router = useRouter()
     const { user } = useAuth()
@@ -121,7 +122,6 @@ const create = props => {
         }
     }, [storeResult])
     const submit = async (values, pageProps) => {
-        console.log(values)
         setItems([...items, values])
     }
 
@@ -183,27 +183,27 @@ const create = props => {
         }
     }
 
-    async function loadCategory(search, loadedOptions, { page }) {
-        const response = await axios.get(`/api/category-select`, {
-            params: {
-                search: search,
-                page: page,
-            },
-        })
-        const responseJSON = response.data
-        return {
-            options: responseJSON.data?.categories?.map(r => {
-                return {
-                    label: r.title,
-                    value: r.id,
-                }
-            }),
-            hasMore: responseJSON.data.count > 20,
-            additional: {
-                page: search ? 1 : page + 1,
-            },
-        }
-    }
+    // async function loadCategory(search, loadedOptions, { page }) {
+    //     const response = await axios.get(`/api/category-select`, {
+    //         params: {
+    //             search: search,
+    //             page: page,
+    //         },
+    //     })
+    //     const responseJSON = response.data
+    //     return {
+    //         options: responseJSON.data?.categories?.map(r => {
+    //             return {
+    //                 label: r.title,
+    //                 value: r.id,
+    //             }
+    //         }),
+    //         hasMore: responseJSON.data.count > 20,
+    //         additional: {
+    //             page: search ? 1 : page + 1,
+    //         },
+    //     }
+    // }
     return (
         <>
             <AppLayout
