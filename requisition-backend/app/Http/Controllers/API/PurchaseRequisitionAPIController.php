@@ -149,8 +149,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $purchase = [
             'user_id' => auth()->user()->id,
             'prf_no' => $prfNo,
-            'branch_id' => auth_branch_id(),
-            'department_id' => auth_department_id(),
+            'branch_id' => $initial_requisition->branch_id,
+            'department_id' => $initial_requisition->department_id,
             'initial_requisition_id' => $initial_requisition_id,
             'irf_no' => $initial_requisition->irf_no,
             'ir_no' => $initial_requisition->ir_no,
