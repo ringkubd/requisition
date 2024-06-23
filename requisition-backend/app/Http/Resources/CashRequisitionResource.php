@@ -27,7 +27,7 @@ class CashRequisitionResource extends JsonResource
             'ir_no' => $this->ir_no,
             'approval_status' => new RequisitionStatusResource($this->approval_status),
             'current_status' => $this->approval_status?->current_status,
-            'total_cost' => $this->total_cost,
+            'total_cost' => round($this->total_cost),
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
