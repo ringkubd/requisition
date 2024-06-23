@@ -21,7 +21,7 @@ class CashRequisitionItemResource extends JsonResource
             'unit' => $this->unit,
             'required_unit' => $this->required_unit,
             'unit_price' => $this->unit_price,
-            'cost' => $this->required_unit * $this->unit_price,
+            'cost' => round($this->required_unit * $this->unit_price),
             'last_purchase_date' => $this->last_purchase_date,
             'purpose' => $this->purpose,
             'deleted_at' => $this->deleted_at,

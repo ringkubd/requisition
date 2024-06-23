@@ -495,7 +495,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                     break;
                 case 'ceo':
                     $data['ceo_status'] = $request->status;
-                    if ($request->status == 2){
+                    if ((int)$request->status === 2){
                         $data['ceo_approved_at'] = now();
                         $notifiedUsers[] = $requisition->initialRequisition->user;
                         $notifiedUsers[] = User::whereHas('organizations', function ($q){
