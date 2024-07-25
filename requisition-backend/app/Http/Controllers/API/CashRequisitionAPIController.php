@@ -364,32 +364,32 @@ class CashRequisitionAPIController extends AppBaseController
                             $user = $request->user();
                             $one_time_key = new OneTimeLogin();
                             $key = $one_time_key->generate($ceo->id);
-                            if (!config('app.debug')) {
-                                $ceo->notify(new WhatsAppNotification(
-                                        Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
-                                        $ceo->mobile_no,
-                                        Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]),
-                                        Component::quickReplyButton([$requisition->id . '_' . $user->id . '_2_ceo_cash']),
-                                        Component::quickReplyButton([$requisition->id . '_' . $user->id . '_3_ceo_cash']),
-                                    )
-                                );
-                                $ceo->notify(new WhatsAppNotification(
-                                        Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
-                                        '+8801725271724',
-                                        Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]),
-                                        Component::quickReplyButton([$requisition->id . '_' . $user->id . '_2_ceo_cash']),
-                                        Component::quickReplyButton([$requisition->id . '_' . $user->id . '_3_ceo_cash']),
-                                    )
-                                );
-                                $ceo->notify(new WhatsAppNotification(
-                                        Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
-                                        '+8801737956549',
-                                        Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]),
-                                        Component::quickReplyButton([$requisition->id . '_' . $user->id . '_2_ceo_cash']),
-                                        Component::quickReplyButton([$requisition->id . '_' . $user->id . '_3_ceo_cash']),
-                                    )
-                                );
-                            }
+//                            if (!config('app.debug')) {
+//                                $ceo->notify(new WhatsAppNotification(
+//                                        Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
+//                                        $ceo->mobile_no,
+//                                        Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]),
+//                                        Component::quickReplyButton([$requisition->id . '_' . $user->id . '_2_ceo_cash']),
+//                                        Component::quickReplyButton([$requisition->id . '_' . $user->id . '_3_ceo_cash']),
+//                                    )
+//                                );
+//                                $ceo->notify(new WhatsAppNotification(
+//                                        Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
+//                                        '+8801725271724',
+//                                        Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]),
+//                                        Component::quickReplyButton([$requisition->id . '_' . $user->id . '_2_ceo_cash']),
+//                                        Component::quickReplyButton([$requisition->id . '_' . $user->id . '_3_ceo_cash']),
+//                                    )
+//                                );
+//                                $ceo->notify(new WhatsAppNotification(
+//                                        Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),
+//                                        '+8801737956549',
+//                                        Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]),
+//                                        Component::quickReplyButton([$requisition->id . '_' . $user->id . '_2_ceo_cash']),
+//                                        Component::quickReplyButton([$requisition->id . '_' . $user->id . '_3_ceo_cash']),
+//                                    )
+//                                );
+//                            }
                         };
                     }
                     break;
