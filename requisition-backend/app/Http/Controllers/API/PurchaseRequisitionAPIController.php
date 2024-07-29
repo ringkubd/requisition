@@ -12,6 +12,7 @@ use App\Models\InitialRequisition;
 use App\Models\OneTimeLogin;
 use App\Models\PurchaseRequisition;
 use App\Models\User;
+use App\Notifications\CeoMailNotification;
 use App\Notifications\PushNotification;
 use App\Notifications\RequisitionStatusNotification;
 use App\Notifications\WhatsAppNotification;
@@ -458,12 +459,12 @@ class PurchaseRequisitionAPIController extends AppBaseController
                             })->first();
                         if (!$ceo) break;
 
-                        $requisitor_name = $requisition->user;
-                        $user = $request->user();
-                        $one_time_key = new OneTimeLogin();
-                        $key = $one_time_key->generate($ceo->id);
+//                        $requisitor_name = $requisition->user;
+//                        $user = $request->user();
+//                        $one_time_key = new OneTimeLogin();
+//                        $key = $one_time_key->generate($ceo->id);
                         broadcast(new RequisitionStatusEvent(new PurchaseRequisitionResource($requisition), [$requisition->user, $requisition->initialRequisition->user]));
-
+                        $ceo->notify(new CeoMailNotification($requisition));
 //                        if (!config('app.debug')){
 //                            //Component::quickReplyButton([$requisition->id.'_'.$requisitor_name->id.'_2_ceo_purchase']),
 //                            $ceo->notify(new WhatsAppNotification(

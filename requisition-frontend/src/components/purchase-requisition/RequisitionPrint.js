@@ -118,7 +118,7 @@ const RequisitionPrint = forwardRef(
                                         : number2wordEnglish(
                                               Math.round(
                                                   mainData?.estimated_total_amount,
-                                              ) ?? 0,
+                                              ).toString()?? 0,
                                           )}
                                 </strong>{' '}
                                 for purchase of the following:

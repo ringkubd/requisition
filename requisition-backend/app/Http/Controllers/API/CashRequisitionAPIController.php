@@ -7,6 +7,7 @@ use App\Models\CashRequisition;
 use App\Models\Department;
 use App\Models\OneTimeLogin;
 use App\Models\User;
+use App\Notifications\CeoMailNotification;
 use App\Notifications\PushNotification;
 use App\Notifications\RequisitionStatusNotification;
 use App\Notifications\WhatsAppNotification;
@@ -142,6 +143,18 @@ class CashRequisitionAPIController extends AppBaseController
             'department_id' => auth_department_id(),
             'department_status' => 1,
         ]);
+
+        $requisitor_name = $request->user()->name;
+        $head_of_department =User::find(Department::find(auth_department_id())->head_of_department);
+        if (!empty($head_of_department)){
+            $head_of_department->notify(new PushNotification(
+                "A purchase requisition is initiated.",
+                "$requisitor_name generated a cash requisition P.R. No. $prf_no. Please approve or reject it.",
+                $cashRequisition
+            ));
+
+            $head_of_department->notify(new RequisitionStatusNotification($cashRequisition));
+        }
 
         return $this->sendResponse(
             new CashRequisitionResource($cashRequisition),
@@ -360,10 +373,11 @@ class CashRequisitionAPIController extends AppBaseController
                                 $q->where('name', 'CEO');
                             })->first();
                         if ($ceo) {
-                            $requisitor_name = $requisition->user;
-                            $user = $request->user();
-                            $one_time_key = new OneTimeLogin();
-                            $key = $one_time_key->generate($ceo->id);
+//                            $requisitor_name = $requisition->user;
+//                            $user = $request->user();
+//                            $one_time_key = new OneTimeLogin();
+//                            $key = $one_time_key->generate($ceo->id);
+                            $ceo->notify(new CeoMailNotification($requisition));
 //                            if (!config('app.debug')) {
 //                                $ceo->notify(new WhatsAppNotification(
 //                                        Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no."),

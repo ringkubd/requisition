@@ -90,7 +90,9 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                         <strong className={`underline font-bold italic`}>
                             {mainData?.total_cost === 0
                                 ? 'Zero'
-                                : number2wordEnglish(mainData?.total_cost ?? 0)}
+                                : number2wordEnglish(
+                                    Math.round(mainData?.total_cost ?? 0).toString(),
+                                )}
                         </strong>{' '}
                         for purchase of the following:
                     </div>

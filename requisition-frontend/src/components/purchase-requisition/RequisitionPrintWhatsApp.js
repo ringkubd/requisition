@@ -114,10 +114,11 @@ const RequisitionPrintWhatsApp = forwardRef(
                                     {mainData?.estimated_total_amount === 0
                                         ? 'Zero'
                                         : number2wordEnglish(
-                                              Math.round(
-                                                  mainData?.estimated_total_amount,
-                                              ) ?? 0,
-                                          )}
+                                            Math.round(
+                                                mainData?.estimated_total_amount,
+                                            ).toString() ?? 0,
+                                        )}
+
                                 </strong>{' '}
                                 for purchase of the following:
                             </div>
