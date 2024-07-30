@@ -182,6 +182,7 @@ const Report = () => {
                 avg: true,
                 use_date: true,
                 variant: true,
+                usage: true,
             })
         } else if (reportType === 'usage' && reportFormat !== 'category_base') {
             setColumns({

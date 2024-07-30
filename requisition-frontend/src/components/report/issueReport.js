@@ -74,19 +74,27 @@ const IssueReport = forwardRef(({ data, isLoading, columns }, ref) => {
                             colSpan={3}>
                             Balance
                         </th>
+                        {columns.usage ? (
+                            <th
+                                scope="col"
+                                className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}
+                                rowSpan={2}>
+                                Use Area
+                            </th>
+                        ) : null}
                         {columns.avg ? (
                             <th
                                 scope="col"
                                 className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}
                                 rowSpan={2}>
-                                Avg. Rate
+                                Avg. Rate (Taka)
                             </th>
                         ) : null}
                         <th
                             scope="col"
                             className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}
                             rowSpan={2}>
-                            Sum
+                            Amount (Taka)
                         </th>
                     </tr>
                     <tr>
@@ -177,6 +185,11 @@ const IssueReport = forwardRef(({ data, isLoading, columns }, ref) => {
                                             {item.balance_after_issue}
                                             {item.product?.unit}
                                         </td>
+                                        {columns.usage ? (
+                                            <td className={`border p-0 text-left px-1 w-64`}>
+                                                { item.uses_area}
+                                            </td>
+                                        ) : null}
                                         {columns.avg ? (
                                             <td className={`border p-0`}>
                                                 {parseFloat(
