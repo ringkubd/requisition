@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Cache;
 if (!function_exists('auth_organizations')) {
     function auth_organizations()
     {
-        if (auth()->user()->hasRole('administrator')) {
+        if (request()->user()->hasRole('administrator')) {
             return Organization::get();
         }
-        return auth()->user()->organizations;
+        return request()->user()->organizations;
     }
 }
 
@@ -21,7 +21,7 @@ if (!function_exists('auth_organization_id')) {
         if (Cache::has('select_organization_'.\request()->user()->id)) {
             return (int)Cache::get('select_organization_'.\request()->user()->id);
         }
-        return auth()->user()->defaultOrganization?->id; // login branch organization id
+        return request()->user()->defaultOrganization?->id; // login branch organization id
     }
 }
 
@@ -33,17 +33,17 @@ if (!function_exists('auth_organization_name')) {
             return Organization::where('id', $organizationId)->first()->name ?? 'Not Found';
         }
 
-        return auth()->user()->defaultOrganization?->name ?? 'Fail To set'; // login branch organization name
+        return request()->user()->defaultOrganization?->name ?? 'Fail To set'; // login branch organization name
     }
 }
 if (!function_exists('auth_branches')){
     function auth_branches(){
         $organization_id = auth_organization_id();
 
-        if (auth()->user()->hasRole('administrator')) {
+        if (request()->user()->hasRole('administrator')) {
             return Branch::where('organization_id', $organization_id)->get();
         }
-        return auth()->user()->branches->where('organization_id', $organization_id);
+        return request()->user()->branches->where('organization_id', $organization_id);
     }
 }
 
@@ -52,7 +52,7 @@ if (!function_exists('auth_branch_id')){
         if (Cache::has('select_branch_'.\request()->user()?->id)) {
             return Cache::get('select_branch_'.\request()->user()->id);
         }
-        return auth()->user()->defaultBranch?->id; // login branch organization id
+        return request()->user()->defaultBranch?->id; // login branch organization id
     }
 }
 
@@ -79,7 +79,7 @@ if (!function_exists('auth_designation_id')){
         if (Cache::has($key)) {
             return Cache::get($key);
         }
-        return auth()->user()->designations->first()?->id; // login branch organization id
+        return request()->user()->designations->first()?->id; // login branch organization id
     }
 }
 if (!function_exists('auth_designation_name')){

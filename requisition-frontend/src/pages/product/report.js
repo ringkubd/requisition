@@ -98,6 +98,7 @@ const Report = () => {
         avg: true,
         use_date: true,
         variant: true,
+        usage: false,
     })
 
     const { start_date, end_date } =
@@ -186,6 +187,7 @@ const Report = () => {
             setColumns({
                 category: true,
                 avg: true,
+                usage: true,
             })
         }
     }, [reportType, reportFormat])
