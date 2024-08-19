@@ -515,7 +515,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                         $data['accounts_status'] = 1;
                         $data['department_approved_by'] = \request()->user()->id;
                         $data['department_approved_at'] = now();
-                        $department = Department::query()->where('branch_id', $requisition->branch_id)->where('name', 'Accounts')->with('users')->first();
+                        $department = Department::query()->where('branch_id', auth_branch_id())->where('name', 'Accounts')->with('users')->first();
                         if (!empty($department)){
                             foreach ($department->users as $user){
                                 if ($user->hasPermissionTo('accounts-approval-purchase')){
