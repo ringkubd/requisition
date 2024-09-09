@@ -110,7 +110,7 @@ const RequisitionPrint = forwardRef(
                                     ).toLocaleString()}
                                     /-
                                 </strong>{' '}
-                                (In Word){' '}
+                                (In Words){' '}
                                 <strong
                                     className={`underline font-bold italic`}>
                                     {mainData?.estimated_total_amount === 0

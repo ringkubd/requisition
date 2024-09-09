@@ -86,7 +86,7 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                         <strong className={`underline font-bold italic`}>
                             {mainData?.total_cost.toLocaleString()}/-
                         </strong>{' '}
-                        (In Word){' '}
+                        (In Words){' '}
                         <strong className={`underline font-bold italic`}>
                             {mainData?.total_cost === 0
                                 ? 'Zero'
