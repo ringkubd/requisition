@@ -72,6 +72,13 @@ if (!function_exists('auth_department_name')){
 
     }
 }
+if (!function_exists('auth_department_head')){
+    function auth_department_head(){
+        return \App\Models\Department::find(auth_department_id())?->head_of_department;
+
+    }
+}
+
 
 if (!function_exists('auth_designation_id')){
     function auth_designation_id(){
