@@ -126,9 +126,7 @@ const Status = ({
             (currentStatus?.stage === 'department' &&
                 currentStatus?.status === 'Pending' &&
                 isDepartmentHead &&
-                (parseInt(requisition.department_id) ===
-                    user?.current_department_head ||
-                    user?.role_names?.includes('System Administrator'))) ||
+                (user?.department_id?.includes(parseInt(requisition.department_id)) || user?.role_names?.includes('System Administrator'))) ||
             (currentStatus?.stage === 'accounts' &&
                 currentStatus?.status === 'Pending' &&
                 (isDepartmentHead || manualPermission) &&
