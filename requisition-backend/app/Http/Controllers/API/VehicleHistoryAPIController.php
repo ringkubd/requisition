@@ -82,6 +82,9 @@ class VehicleHistoryAPIController extends AppBaseController
             ->when($request->date && !$request->month, function ($q) use ($request){
                 $q->whereRaw("date(refuel_date) = '$request->date'");
             })
+            ->when($request->vehicle, function ($q, $v) use ($request){
+                $q->where('vehicle_id', $v);
+            })
             ->latest()
             ->paginate();
         return response()->json([

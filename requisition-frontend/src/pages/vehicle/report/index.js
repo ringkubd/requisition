@@ -18,17 +18,25 @@ import moment from 'moment'
 import Select from 'react-select'
 import { useReactToPrint } from 'react-to-print'
 import Datepicker from 'react-tailwindcss-datepicker'
+import { useGetVehicleQuery } from "@/store/service/vehicle/VehicleAPI";
 
 const Vehicle = () => {
     const router = useRouter()
     const [page, setPage] = useState(1)
     const [month, setMonth] = useState('')
+    const [vehicle, setVehicle] = useState('')
     const [date, setDate] = useState('')
     const dateRef = useRef()
+    const {
+        data: vehicles,
+        isLoading: vehicleIsLoading,
+        isError: vehicleIsError,
+    } = useGetVehicleQuery()
     const { data, isLoading, isError } = useGetVehicleHistoryQuery({
         page,
         month,
         date,
+        vehicle
     })
     const [destroy, destroyResponse] = useDestroyVehicleHistoryMutation()
     const [columns, setColumns] = useState([])
@@ -36,7 +44,7 @@ const Vehicle = () => {
 
     useEffect(() => {
         if (!destroyResponse.isLoading && destroyResponse.isSuccess) {
-            toast.success('Vehicle deleted.')
+            toast.success('Fuel entry deleted.')
         }
     }, [destroyResponse])
     useEffect(() => {
@@ -196,6 +204,22 @@ const Vehicle = () => {
                                     }}
                                 />
                             </div>
+                            {vehicles && (
+                                <div
+                                    className={`flex flex-row justify-center items-center space-x-3 ml-4`}>
+                                    <Label>Vehicle</Label>
+                                    <Select
+                                        options={vehicles?.data?.map(d => ({
+                                            label: d.reg_no,
+                                            value: d.id,
+                                        }))}
+                                        onChange={value => {
+                                            setVehicle(value.value)
+                                        }}
+                                    />
+                                </div>
+                            )}
+
                             <div
                                 className={`flex flex-row justify-center items-center space-x-3 ml-4`}>
                                 <Label>Date</Label>
