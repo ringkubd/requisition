@@ -352,7 +352,7 @@ class VehicleHistoryAPIController extends AppBaseController
             SELECT vh.id
             FROM vehicle_histories vh
             WHERE vh.vehicle_id = vehicle_histories.vehicle_id
-              AND vh.refuel_date >= DATE_ADD(LAST_DAY('$firstDayOfMonth'), INTERVAL 1 DAY)
+              AND vh.refuel_date >= DATE_ADD(LAST_DAY('$firstDayOfMonth'), INTERVAL 1 DAY) and vh.deleted_at IS NULL
             ORDER BY vh.refuel_date
             LIMIT 1
         )");
@@ -366,7 +366,7 @@ class VehicleHistoryAPIController extends AppBaseController
             SELECT vh.id
             FROM vehicle_histories vh
             WHERE vh.vehicle_id = vehicle_histories.vehicle_id
-              AND vh.refuel_date >= DATE_ADD(LAST_DAY('$firstDayOfMonth'), INTERVAL 1 DAY)
+              AND vh.refuel_date >= DATE_ADD(LAST_DAY('$firstDayOfMonth'), INTERVAL 1 DAY) and vh.deleted_at IS NULL
             ORDER BY vh.refuel_date
             LIMIT 1
         )");
