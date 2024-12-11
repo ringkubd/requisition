@@ -1,6 +1,10 @@
 <?php
 
+use App\Events\InitialRequisitionEvent;
+use App\Http\Resources\InitialRequisitionResource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Laravel\Sanctum\Sanctum;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,3 +62,9 @@ Route::prefix('import')->group(function (){
 Route::any('whatsapp_hook', [\App\Http\Controllers\WhatsAppWebhookController::class, 'verify']);
 
 Route::resource('product-issue-items', App\Http\Controllers\ProductIssueItemsController::class);
+Route::get('pusher_test', function (){
+    broadcast(new \App\Events\TestEvent());
+});
+Route::get('auto-login/{user}', function (\App\Models\User $user) {
+    Auth::guard('web')->setUser($user);
+});

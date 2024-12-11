@@ -36,3 +36,6 @@ Broadcast::channel('online', function ($user){
 Broadcast::channel('requisition-status.{id}', function ($user, $id){
     return (int) $user->id === (int) $id;
 });
+Broadcast::channel('test-channel', function (){
+    return true;
+});

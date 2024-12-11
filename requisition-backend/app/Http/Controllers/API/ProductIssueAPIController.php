@@ -325,7 +325,7 @@ class ProductIssueAPIController extends AppBaseController
                     $productOption = ProductOption::find($productIssue->product_option_id);
                     Log::info($productIssues->store_status);
 
-                    if ($request->user()->hasRole('Store Manager') && $request->status == 1 && (double)$productIssue->quantity <= (double)$productOption->stock && $productIssues->store_status != 1){
+                    if ($request->user()->hasRole('Store Manager') && $request->status == 1 && (double)$productIssue->quantity <= (double)$productOption->stock && $productIssues->store_status != 1 && $productIssues->department_status == 1){
 
                         if ($productIssue->balance_before_issue != null && $productIssue->balance_after_issue != null){
                             continue;
@@ -370,7 +370,8 @@ class ProductIssueAPIController extends AppBaseController
                             }
                         }
                         $productIssue->rateLog()->createMany($purchase_log);
-                    }else if ($request->user()->hasRole('Store Manager') && $request->status == 1){
+                    }
+                    else if ($request->user()->hasRole('Store Manager') && $request->status == 1 && $productIssues->department_status == 1){
                         $product_title = $productOption?->product?->title;
                         throw new \Exception("Kindly ensure that the product '$product_title' is updated. Current balance- $productOption->stock. Request Quantity- $productIssue->quantity", 413);
                     }
