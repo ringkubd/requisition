@@ -17,7 +17,7 @@ class VehicleHistoryResource extends JsonResource
         return [
             'id' => $this->id,
             'vehicle_id' => $this->vehicle_id,
-            'vehicle' => $this->vehicle->brand." - ".$this->vehicle->model." - ".$this->vehicle->reg_no,
+            'vehicle' => $this->vehicle->brand . " - " . $this->vehicle->model . " - " . $this->vehicle->reg_no,
             'cash_requisition_id' => $this->cash_requisition_id,
             'cashRequisition' => $this->cashRequisition,
             'refuel_date' => $this->refuel_date,
@@ -31,6 +31,7 @@ class VehicleHistoryResource extends JsonResource
             'pump' => $this->pump,
             'user_id' => $this->user_id,
             'user' => $this->user,
+            'amount' => round($this->quantity * $this->rate),
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
