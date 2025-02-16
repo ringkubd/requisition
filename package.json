@@ -1,5 +1,5 @@
 {
-    "name": "IsDBBISEWInventorySystem",
+    "name": "isdbbisewinventorysystem",
     "version": "1.1.0",
     "private": true,
     "scripts": {
@@ -73,5 +73,6 @@
         "prettier": "2.2.1",
         "tailwindcss": "^3.3.3",
         "tailwindcss-animate": "^1.0.7"
-    }
+    },
+    "packageManager": "yarn@1.22.19"
 }

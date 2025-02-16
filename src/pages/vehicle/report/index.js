@@ -8,48 +8,54 @@ import { useRouter } from 'next/router'
 import Actions from '@/components/actions'
 import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
-import {
-    getVehicleHistory,
-    useDestroyVehicleHistoryMutation,
-    useGetVehicleHistoryQuery,
-    getRunningQueriesThunk,
-} from '@/store/service/vehicle/VehicleHistoryAPI'
+import
+    {
+        getVehicleHistory,
+        useDestroyVehicleHistoryMutation,
+        useGetVehicleHistoryQuery,
+        getRunningQueriesThunk,
+    } from '@/store/service/vehicle/VehicleHistoryAPI'
 import moment from 'moment'
 import Select from 'react-select'
 import { useReactToPrint } from 'react-to-print'
 import Datepicker from 'react-tailwindcss-datepicker'
 import { useGetVehicleQuery } from "@/store/service/vehicle/VehicleAPI";
 
-const Vehicle = () => {
+const Vehicle = () =>
+{
     const router = useRouter()
-    const [page, setPage] = useState(1)
-    const [month, setMonth] = useState('')
-    const [vehicle, setVehicle] = useState('')
-    const [date, setDate] = useState('')
+    const [ page, setPage ] = useState( 1 )
+    const [ month, setMonth ] = useState( '' )
+    const [ vehicle, setVehicle ] = useState( '' )
+    const [ date, setDate ] = useState( '' )
     const dateRef = useRef()
     const {
         data: vehicles,
         isLoading: vehicleIsLoading,
         isError: vehicleIsError,
     } = useGetVehicleQuery()
-    const { data, isLoading, isError } = useGetVehicleHistoryQuery({
+    const { data, isLoading, isError } = useGetVehicleHistoryQuery( {
         page,
         month,
         date,
         vehicle
-    })
-    const [destroy, destroyResponse] = useDestroyVehicleHistoryMutation()
-    const [columns, setColumns] = useState([])
-    const dataRef = useRef(null)
+    } )
+    const [ destroy, destroyResponse ] = useDestroyVehicleHistoryMutation()
+    const [ columns, setColumns ] = useState( [] )
+    const dataRef = useRef( null )
 
-    useEffect(() => {
-        if (!destroyResponse.isLoading && destroyResponse.isSuccess) {
-            toast.success('Fuel entry deleted.')
+    useEffect( () =>
+    {
+        if ( !destroyResponse.isLoading && destroyResponse.isSuccess )
+        {
+            toast.success( 'Fuel entry deleted.' )
         }
-    }, [destroyResponse])
-    useEffect(() => {
-        if (!isLoading && !isError && data) {
-            setColumns([
+    }, [ destroyResponse ] )
+    useEffect( () =>
+    {
+        if ( !isLoading && !isError && data )
+        {
+            setColumns( [
                 {
                     name: 'Vehicle',
                     selector: row => row?.vehicle,
@@ -58,7 +64,7 @@ const Vehicle = () => {
                 },
                 {
                     name: 'Date',
-                    selector: row => moment(row.refuel_date).format('DD MMM Y'),
+                    selector: row => moment( row.refuel_date ).format( 'DD MMM Y' ),
                     sortable: true,
                 },
                 {
@@ -88,8 +94,7 @@ const Vehicle = () => {
                 },
                 {
                     name: 'Value',
-                    selector: row =>
-                        parseFloat(row.rate * row.quantity).toFixed(2),
+                    selector: row => row.amount,
                     sortable: true,
                 },
                 {
@@ -126,14 +131,14 @@ const Vehicle = () => {
                     ),
                     ignoreRowClick: true,
                 },
-            ])
+            ] )
         }
-    }, [isLoading, isError, data])
+    }, [ isLoading, isError, data ] )
 
-    const handlePrint = useReactToPrint({
+    const handlePrint = useReactToPrint( {
         content: () => dataRef.current,
-        onBeforePrint: a => console.log(a),
-    })
+        onBeforePrint: a => console.log( a ),
+    } )
 
     return (
         <>
@@ -186,21 +191,22 @@ const Vehicle = () => {
                                 <Select
                                     options={Array.from(
                                         { length: 24 - 1 + 1 },
-                                        (_, i) => i,
-                                    ).map((m, index) => ({
+                                        ( _, i ) => i,
+                                    ).map( ( m, index ) => ( {
                                         label: moment()
-                                            .subtract(index, 'month')
-                                            .format('MMM y'),
+                                            .subtract( index, 'month' )
+                                            .format( 'MMM y' ),
                                         value: moment()
-                                            .subtract(index, 'month')
-                                            .format('MM-y'),
-                                    }))}
+                                            .subtract( index, 'month' )
+                                            .format( 'MM-y' ),
+                                    } ) )}
                                     defaultValue={{
-                                        value: moment().format('MM-y'),
-                                        label: moment().format('MMM y'),
+                                        value: moment().format( 'MM-y' ),
+                                        label: moment().format( 'MMM y' ),
                                     }}
-                                    onChange={value => {
-                                        setMonth(value.value)
+                                    onChange={value =>
+                                    {
+                                        setMonth( value.value )
                                     }}
                                 />
                             </div>
@@ -209,12 +215,13 @@ const Vehicle = () => {
                                     className={`flex flex-row justify-center items-center space-x-3 ml-4`}>
                                     <Label>Vehicle</Label>
                                     <Select
-                                        options={vehicles?.data?.map(d => ({
+                                        options={vehicles?.data?.map( d => ( {
                                             label: d.reg_no,
                                             value: d.id,
-                                        }))}
-                                        onChange={value => {
-                                            setVehicle(value.value)
+                                        } ) )}
+                                        onChange={value =>
+                                        {
+                                            setVehicle( value.value )
                                         }}
                                     />
                                 </div>
@@ -227,7 +234,7 @@ const Vehicle = () => {
                                     ref={dateRef}
                                     useRange={false}
                                     asSingle={true}
-                                    onChange={d => setDate(d.startDate)}
+                                    onChange={d => setDate( d.startDate )}
                                     value={{ startDate: date, endDate: date }}
                                 />
                             </div>
@@ -248,7 +255,7 @@ const Vehicle = () => {
                                     paginationPerPage={15}
                                     paginationServer
                                     paginationTotalRows={data?.number_of_rows}
-                                    onChangePage={page => setPage(page)}
+                                    onChangePage={page => setPage( page )}
                                 />
                             </div>
                         ) : null}
@@ -260,10 +267,11 @@ const Vehicle = () => {
 }
 
 export const getServerSideProps = wrapper.getServerSideProps(
-    store => async context => {
+    store => async context =>
+    {
         // const params = context.params
-        store.dispatch(getVehicleHistory.initiate())
-        await Promise.all(store.dispatch(getRunningQueriesThunk()))
+        store.dispatch( getVehicleHistory.initiate() )
+        await Promise.all( store.dispatch( getRunningQueriesThunk() ) )
         return {
             props: {},
         }

@@ -37,3 +37,6 @@ analyze
 nginx.ssl.conf
 soketi_nginx.conf
 package-lock.json
+
+/.history
+/.idea

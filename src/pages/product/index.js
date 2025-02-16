@@ -1,3 +1,4 @@
+import React from 'react';
 import Head from 'next/head'
 import AppLayout from '@/components/Layouts/AppLayout'
 import { wrapper } from '@/store'
@@ -70,8 +71,8 @@ const Product = () => {
                 //     sortable: true,
                 // },
                 {
-                    name: 'Actions',
-                    cell: row => (
+                    name: "Actions",
+                    cell: (row) => (
                         <Actions
                             itemId={row.id}
                             edit={`/product/${row.id}/edit`}
@@ -125,7 +126,7 @@ const Product = () => {
                                     id={`category`}
                                     className={`select !min-w-[70px]`}
                                     classNames={{
-                                        control: state => 'select',
+                                        control: (state) => 'select',
                                     }}
                                     options={category?.data
                                         ?.filter(c => !c.parent_id)
@@ -207,18 +208,18 @@ const Product = () => {
                 </div>
             </AppLayout>
         </>
-    )
-}
+    );
+};
 
 export const getServerSideProps = wrapper.getServerSideProps(
-    store => async context => {
+    (store) => async () => {
         // const params = context.params
-        store.dispatch(getProduct.initiate())
-        await Promise.all(store.dispatch(getRunningQueriesThunk()))
+        store.dispatch(getProduct.initiate());
+        await Promise.all(store.dispatch(getRunningQueriesThunk()));
         return {
             props: {},
-        }
-    },
-)
+        };
+    }
+);
 
-export default Product
+export default Product;
