@@ -142,10 +142,10 @@ const IssuePrint = forwardRef(({ products }, ref) => {
                                             {p?.note}
                                         </td>
                                         <td className={`border p-1`}>
-                                            {p?.balance_before_issue}
-                                            {p?.balance_before_issue
-                                                ? p?.product?.unit
-                                                : ''}
+                                              {
+                                            p?.balance_before_issue ? p?.balance_before_issue : p.variant.stock
+                                        }
+                                            {p?.product?.unit}
                                         </td>
                                         <td className={`border p-1`}>
                                             {p?.quantity}
