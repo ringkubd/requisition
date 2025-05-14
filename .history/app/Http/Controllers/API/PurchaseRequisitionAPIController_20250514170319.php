@@ -200,12 +200,10 @@ class PurchaseRequisitionAPIController extends AppBaseController
 
             $head_of_department->notify(new RequisitionStatusNotification($purchaseRequisition));
 
-            if (!empty($head_of_department->mobile_no)) {
-                $head_of_department->notify(new WhatsAppCommonNotification(
-                    Component::text("Requisitor Name: $requisitor_name,  P.R. NO.: $prfNo, I.R.F. NO.: $initial_requisition->irf_no."),
-                    $head_of_department->mobile_no
-                ));
-            }
+            $head_of_department->notify(new WhatsAppCommonNotification(
+                Component::text("Requisitor Name: $requisitor_name,  P.R. NO.: $prfNo, I.R.F. NO.: $initial_requisition->irf_no."),
+                $head_of_department->mobile_no
+            ));
         }
         return $this->sendResponse(
             new PurchaseRequisitionResource($purchaseRequisition),

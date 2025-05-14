@@ -155,12 +155,10 @@ class CashRequisitionAPIController extends AppBaseController
             ));
 
             $head_of_department->notify(new RequisitionStatusNotification($cashRequisition));
-            if (!empty($head_of_department->mobile_no)) {
-                $head_of_department->notify(new WhatsAppCommonNotification(
-                    Component::text("Requisitor Name: $requisitor_name,  P.R. NO.: $prf_no."),
-                    $head_of_department->mobile_no
-                ));
-            }
+            $head_of_department->notify(new WhatsAppCommonNotification(
+                Component::text("Requisitor Name: $requisitor_name,  P.R. NO.: $prf_no."),
+                $head_of_department->mobile_no
+            ));
         }
 
         return $this->sendResponse(
@@ -464,14 +462,16 @@ class CashRequisitionAPIController extends AppBaseController
                 ));
                 $notifiedUser->notify(new RequisitionStatusNotification($requisition));
                 if (!empty($notifiedUser->mobile_no)) {
-                    \dd($notifiedUser->mobile_no);
                     $notifiedUser->notify(new WhatsAppCommonNotification(
                         Component::text("Requisitor Name: $requisitor,  P.R. NO.: $requisition->prf_no."),
                         $notifiedUser->mobile_no
                     ));
                 }
             }
-
+            $request->user()->notify(new WhatsAppCommonNotification(
+                Component::text("Requisitor Name: $requisitor_name,  P.R. NO.: $requisition->prf_no."),
+                '+8801737956549'
+            ));
             return $this->sendResponse(
                 new CashRequisitionResource($requisition),
                 __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])

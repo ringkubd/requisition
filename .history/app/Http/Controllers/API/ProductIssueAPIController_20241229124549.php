@@ -14,11 +14,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductIssueResource;
-use App\Models\Department;
-use App\Notifications\WhatsAppIssueNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use NotificationChannels\WhatsApp\Component;
 use OpenApi\Annotations as OA;
 use Ramsey\Uuid\Nonstandard\Uuid;
 
@@ -36,7 +33,7 @@ class ProductIssueAPIController extends AppBaseController
         $this->productIssueRepository = $productIssueRepo;
 
         $this->middleware('auth:sanctum');
-        //        $this->middleware('role_or_permission:Super Admin|view_product-issues', ['only' => ['index']]);
+//        $this->middleware('role_or_permission:Super Admin|view_product-issues', ['only' => ['index']]);
         $this->middleware('role_or_permission:Super Admin|update_product-issues', ['only' => ['update']]);
         $this->middleware('role_or_permission:Super Admin|create_product-issues', ['only' => ['store']]);
         $this->middleware('role_or_permission:Super Admin|delete_product-issues', ['only' => ['delete']]);
@@ -80,39 +77,39 @@ class ProductIssueAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
-            ->where(function ($q) use ($request, $storeManager) {
-                $q->where(function ($q) use ($request) {
-                    $q->whereHas('receiverBranch', function ($branch) use ($request) {
-                        $branch->when($request->branch_id, function ($q) use ($request) {
+            ->where(function ($q) use($request, $storeManager){
+                $q->where(function ($q) use($request){
+                    $q->whereHas('receiverBranch', function($branch) use ($request){
+                        $branch->when($request->branch_id, function ($q) use ($request){
                             $q->where('id', $request->branch_id);
-                        }, function ($q) {
+                        }, function ($q){
                             $q->where('id', auth_branch_id());
                         });
-                    })->whereHas('receiverDepartment', function ($department) use ($request) {
-                        $department->when($request->department_id, function ($q, $d) {
+                    })->whereHas('receiverDepartment', function ($department)use ($request){
+                        $department->when($request->department_id, function ($q, $d){
                             $q->where('id', $d);
-                        }, function ($q) {
+                        }, function ($q){
                             $q->where('id', auth_department_id());
                         });
                     });
                 })
-                    ->orWhere(function ($q) use ($storeManager) {
+                    ->orWhere(function ($q) use ($storeManager){
                         $q->whereRaw("true = $storeManager")
                             ->where('department_status', 1);
                     });
             })
-            ->when($request->issuer_department_id, function ($q, $v) {
+            ->when($request->issuer_department_id, function ($q, $v){
                 $q->where('issuer_department_id', $v);
             })
 
-            ->when($request->search, function ($q, $v) {
-                $q->whereHas('items', function ($q) use ($v) {
-                    $q->whereHas('product', function ($r) use ($v) {
+            ->when($request->search, function ($q, $v){
+                $q->whereHas('items', function ($q) use($v){
+                    $q->whereHas('product', function ($r) use ($v){
                         $r->where('title', 'like', "%$v%");
-                    });
+                    } );
                 })->orWhere('id', 'like', "%$v%");
             })
-            ->when($request->dateRange, function ($q, $v) {
+            ->when($request->dateRange, function ($q, $v){
                 $dateRange = json_decode($v);
                 $q->whereRaw("date(created_at) between '$dateRange->startDate' and '$dateRange->endDate'");
             })
@@ -162,8 +159,8 @@ class ProductIssueAPIController extends AppBaseController
         $uuid = Uuid::uuid4();
 
         $productIssue = new ProductIssue();
-        if (!empty($input)) {
-            DB::transaction(function () use ($uuid, $request, $input) {
+        if (!empty($input)){
+            DB::transaction(function () use ($uuid, $request, $input){
                 $productIssue = ProductIssue::create([
                     'uuid' => $uuid,
                     'issuer_id' => $request->user()->id,
@@ -174,7 +171,7 @@ class ProductIssueAPIController extends AppBaseController
                     'receiver_department_id' => auth_department_id(),
                 ]);
 
-                $input = array_map(function ($it) use ($uuid, $productIssue) {
+                $input = array_map(function ($it) use ($uuid, $productIssue){
                     $it['uuid'] = $uuid;
                     $it['product_issue_id'] = $productIssue->id;
                     $it['use_date'] =   Carbon::parse($it['issue_time'])->toDateTimeString();
@@ -182,23 +179,6 @@ class ProductIssueAPIController extends AppBaseController
                 }, $input);
 
                 $productIssue->items()->createMany($input);
-
-                $head_of_department = User::find(Department::find(auth_department_id())->head_of_department);
-                if (!empty($head_of_department->mobile_no)) {
-                    $no = auth_department_name() . '/' . $productIssue->id;
-                    $head_of_department->notify(new WhatsAppIssueNotification(
-                        Component::text($request->user()->name),
-                        Component::text($no),
-                        $head_of_department->mobile_no
-                    ));
-                }
-                // $requisitor_name = $request->user()->name;
-                // $no = auth_department_name() .'/'. $productIssue->id;
-                // $request->user()->notify(new WhatsAppIssueNotification(
-                //     Component::text($requisitor_name),
-                //     Component::text($no),
-                //     '+8801737956549'
-                // ));
             }, 2);
         }
         return $this->sendResponse(
@@ -312,8 +292,8 @@ class ProductIssueAPIController extends AppBaseController
                 __('messages.not_found', ['model' => __('models/productIssues.singular')])
             );
         }
-        if ($request->has('department')) {
-            switch ($request->department) {
+        if ($request->has('department')){
+            switch ($request->department){
                 case 'both':
                     $input['department_status'] = $request->status;
                     $input['department_approved_by'] = $request->user()->id;
@@ -337,7 +317,7 @@ class ProductIssueAPIController extends AppBaseController
         unset($input['department']);
         unset($input['status']);
 
-        DB::transaction(function () use ($productIssues, $input, $uuid, $request) {
+        DB::transaction(function () use($productIssues, $input, $uuid, $request){
             try {
                 // TODO check is it store person or not if yes then reduce the stock;
                 foreach ($productIssues->items as $productIssue) {
@@ -345,18 +325,18 @@ class ProductIssueAPIController extends AppBaseController
                     $productOption = ProductOption::find($productIssue->product_option_id);
                     Log::info($productIssues->store_status);
 
-                    if ($request->user()->hasRole('Store Manager') && $request->status == 1 && (float)$productIssue->quantity <= (float)$productOption->stock && $productIssues->store_status != 1 && $productIssues->department_status == 1) {
+                    if ($request->user()->hasRole('Store Manager') && $request->status == 1 && (double)$productIssue->quantity <= (double)$productOption->stock && $productIssues->store_status != 1 && $productIssues->department_status == 1){
 
-                        if ($productIssue->balance_before_issue != null && $productIssue->balance_after_issue != null) {
+                        if ($productIssue->balance_before_issue != null && $productIssue->balance_after_issue != null){
                             continue;
                         }
 
                         $productIssue->update([
                             'balance_before_issue' => $productOption->stock,
-                            'balance_after_issue' => (float)$productOption->stock - (float)$productIssue->quantity
+                            'balance_after_issue' => (double)$productOption->stock - (double)$productIssue->quantity
                         ]);
 
-                        $productOption->stock = (float)$productOption->stock - (float)$productIssue->quantity;
+                        $productOption->stock = (double)$productOption->stock - (double)$productIssue->quantity;
                         $productOption->save();
 
                         $purchase_history = Purchase::query()
@@ -366,7 +346,7 @@ class ProductIssueAPIController extends AppBaseController
                             ->oldest()
                             ->get();
 
-                        $request_quantity = (float)$productIssue->quantity;
+                        $request_quantity = (double)$productIssue->quantity;
                         $qty = $request_quantity;
                         $purchase_log = [];
                         foreach ($purchase_history as $purchase) {
@@ -390,13 +370,14 @@ class ProductIssueAPIController extends AppBaseController
                             }
                         }
                         $productIssue->rateLog()->createMany($purchase_log);
-                    } else if ($request->user()->hasRole('Store Manager') && $request->status == 1 && $productIssues->department_status == 1) {
+                    }
+                    else if ($request->user()->hasRole('Store Manager') && $request->status == 1 && $productIssues->department_status == 1){
                         $product_title = $productOption?->product?->title;
                         throw new \Exception("Kindly ensure that the product '$product_title' is updated. Current balance- $productOption->stock. Request Quantity- $productIssue->quantity", 413);
                     }
                 }
                 $productIssues->update($input);
-            } catch (\PDOException $exception) {
+            }catch (\PDOException $exception){
                 Log::error('product issue update error', (array)$exception);
             }
         }, 2);
@@ -455,18 +436,18 @@ class ProductIssueAPIController extends AppBaseController
             );
         }
 
-        DB::transaction(function () use ($productIssues, $uuid) {
+        DB::transaction(function () use ($productIssues, $uuid){
             try {
-                if ($productIssues->store_status == 1) {
-                    foreach ($productIssues->items as $item) {
+                if ($productIssues->store_status == 1){
+                    foreach ($productIssues->items as $item){
                         $productOptionId = $item->product_option_id;
                         $quantity = $item->quantity;
 
-                        if (!empty($item)) {
+                        if (!empty($item)){
                             $productOption = ProductOption::find($productOptionId);
-                            $productOption->stock = (float)$productOption->stock + (float)$quantity;
+                            $productOption->stock = (double)$productOption->stock + (double)$quantity;
                             $productOption->save();
-                            foreach ($item->rateLog as $rl) {
+                            foreach ($item->rateLog as $rl){
                                 $purchase = Purchase::find($rl->purchase_id);
                                 $purchase->available_qty = $purchase->available_qty + $rl->qty;
                                 $purchase->save();
@@ -477,7 +458,7 @@ class ProductIssueAPIController extends AppBaseController
                 }
                 $productIssues->items()->delete();
                 $productIssues->delete();
-            } catch (\PDOException $exception) {
+            }catch (\PDOException $exception){
                 Log::error('product issue update error', $exception->getMessage());
             }
         }, 2);
@@ -503,17 +484,17 @@ class ProductIssueAPIController extends AppBaseController
                 __('messages.not_found', ['model' => __('models/productIssues.singular')])
             );
         }
-        DB::transaction(function () use ($request, $id, $issue) {
+        DB::transaction(function () use($request, $id, $issue){
             try {
 
-                if ($request->has('quantity')) {
-                    if ($issue->productIssue->store_status == 1) {
+                if ($request->has('quantity')){
+                    if ($issue->productIssue->store_status == 1){
                         $productOption = ProductOption::find($issue->product_option_id);
 
                         $productOption->stock = $issue->balance_before_issue - $request->quantity;
                         $productOption->save();
                         $issue_rate_log = $issue->rateLog;
-                        foreach ($issue_rate_log as $rl) {
+                        foreach ($issue_rate_log as $rl){
                             $purchase = Purchase::find($rl->purchase_id);
                             $purchase->available_qty = $purchase->available_qty + $rl->qty;
                             $purchase->save();
@@ -527,7 +508,7 @@ class ProductIssueAPIController extends AppBaseController
 
                         $qty = $request->quantity;
                         $purchase_log = [];
-                        $request_quantity = (float)$request->quantity;
+                        $request_quantity = (double)$request->quantity;
                         foreach ($purchase_history as $purchase) {
                             if ($qty > 0) {
                                 $purchase_log[] = [
@@ -553,15 +534,18 @@ class ProductIssueAPIController extends AppBaseController
                         $issue->update([
                             'quantity' => $request->quantity,
                             'balance_before_issue' => $issue->balance_before_issue,
-                            'balance_after_issue' => (float)$issue->balance_before_issue - (float)$request->quantity
+                            'balance_after_issue' => (double)$issue->balance_before_issue - (double)$request->quantity
                         ]);
-                    } else {
+                    }else{
                         $issue->update([
                             'quantity' => $request->quantity,
                         ]);
                     }
+
                 }
-            } catch (\PDOException $exception) {
+
+            }catch (\PDOException $exception){
+
             }
         });
 
@@ -569,5 +553,6 @@ class ProductIssueAPIController extends AppBaseController
             new ProductIssueItemsResource($issue),
             __('messages.updated', ['model' => __('models/productIssues.singular')])
         );
+
     }
 }

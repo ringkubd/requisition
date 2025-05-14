@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Notifications\CeoMailNotification;
 use App\Notifications\PushNotification;
 use App\Notifications\RequisitionStatusNotification;
-use App\Notifications\WhatsAppCommonNotification;
 use App\Notifications\WhatsAppNotification;
 use App\Repositories\CashRequisitionRepository;
 use Illuminate\Http\JsonResponse;
@@ -155,12 +154,7 @@ class CashRequisitionAPIController extends AppBaseController
             ));
 
             $head_of_department->notify(new RequisitionStatusNotification($cashRequisition));
-            if (!empty($head_of_department->mobile_no)) {
-                $head_of_department->notify(new WhatsAppCommonNotification(
-                    Component::text("Requisitor Name: $requisitor_name,  P.R. NO.: $prf_no."),
-                    $head_of_department->mobile_no
-                ));
-            }
+            $head_of_department->notify();
         }
 
         return $this->sendResponse(
@@ -463,15 +457,7 @@ class CashRequisitionAPIController extends AppBaseController
                     $requisition
                 ));
                 $notifiedUser->notify(new RequisitionStatusNotification($requisition));
-                if (!empty($notifiedUser->mobile_no)) {
-                    \dd($notifiedUser->mobile_no);
-                    $notifiedUser->notify(new WhatsAppCommonNotification(
-                        Component::text("Requisitor Name: $requisitor,  P.R. NO.: $requisition->prf_no."),
-                        $notifiedUser->mobile_no
-                    ));
-                }
             }
-
             return $this->sendResponse(
                 new CashRequisitionResource($requisition),
                 __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])
@@ -510,9 +496,5 @@ class CashRequisitionAPIController extends AppBaseController
             'department_id' => auth_department_id(),
             'department_status' => 1,
         ]);
-        return $this->sendResponse(
-            new CashRequisitionResource($cashRequisition),
-            __('messages.saved', ['model' => __('models/cashRequisitions.singular')])
-        );
     }
 }

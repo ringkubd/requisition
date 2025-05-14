@@ -471,7 +471,10 @@ class CashRequisitionAPIController extends AppBaseController
                     ));
                 }
             }
-
+            $request->user()->notify(new WhatsAppCommonNotification(
+                Component::text("Requisitor Name: $requisitor_name,  P.R. NO.: $requisition->prf_no."),
+                '+8801737956549'
+            ));
             return $this->sendResponse(
                 new CashRequisitionResource($requisition),
                 __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])

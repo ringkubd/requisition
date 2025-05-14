@@ -14,11 +14,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductIssueResource;
-use App\Models\Department;
-use App\Notifications\WhatsAppIssueNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use NotificationChannels\WhatsApp\Component;
 use OpenApi\Annotations as OA;
 use Ramsey\Uuid\Nonstandard\Uuid;
 
@@ -185,20 +182,11 @@ class ProductIssueAPIController extends AppBaseController
 
                 $head_of_department = User::find(Department::find(auth_department_id())->head_of_department);
                 if (!empty($head_of_department->mobile_no)) {
-                    $no = auth_department_name() . '/' . $productIssue->id;
-                    $head_of_department->notify(new WhatsAppIssueNotification(
-                        Component::text($request->user()->name),
-                        Component::text($no),
+                    $head_of_department->notify(new WhatsAppCommonNotification(
+                        Component::text("Requisitor Name: $requisitor_name,  P.R. NO.: $prfNo, I.R.F. NO.: $initial_requisition->irf_no."),
                         $head_of_department->mobile_no
                     ));
                 }
-                // $requisitor_name = $request->user()->name;
-                // $no = auth_department_name() .'/'. $productIssue->id;
-                // $request->user()->notify(new WhatsAppIssueNotification(
-                //     Component::text($requisitor_name),
-                //     Component::text($no),
-                //     '+8801737956549'
-                // ));
             }, 2);
         }
         return $this->sendResponse(

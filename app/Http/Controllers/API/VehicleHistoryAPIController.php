@@ -67,9 +67,9 @@ class VehicleHistoryAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
-            ->when($request->month && !$request->date, function ($q) use($request){
-                $q->when($request->month, function ($q) use ($request){
-                    $month = Carbon::parse('01-'.$request->month);
+            ->when($request->month && !$request->date, function ($q) use ($request) {
+                $q->when($request->month, function ($q) use ($request) {
+                    $month = Carbon::parse('01-' . $request->month);
                     $firstDayOfMonth = $month->firstOfMonth()->toDateString();
                     $lastDayOfMonth = $month->lastOfMonth()->toDateString();
                     $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
@@ -79,10 +79,10 @@ class VehicleHistoryAPIController extends AppBaseController
                     $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'");
                 });
             })
-            ->when($request->date && !$request->month, function ($q) use ($request){
+            ->when($request->date && !$request->month, function ($q) use ($request) {
                 $q->whereRaw("date(refuel_date) = '$request->date'");
             })
-            ->when($request->vehicle, function ($q, $v) use ($request){
+            ->when($request->vehicle, function ($q, $v) use ($request) {
                 $q->where('vehicle_id', $v);
             })
             ->latest()
@@ -131,7 +131,7 @@ class VehicleHistoryAPIController extends AppBaseController
         $input['user_id'] = $request->user()->id;
         $input['cash_requisition_item_id'] = CashRequisitionItem::query()
             ->where('cash_requisition_id', $request->cash_requisition_id)
-            ->whereHas('item', function ($q) use ($request){
+            ->whereHas('item', function ($q) use ($request) {
                 $q->where('id', $request->cash_requisition_item_id);
             })->first()?->id;
 
@@ -319,12 +319,12 @@ class VehicleHistoryAPIController extends AppBaseController
     public function cashRequisitionSelect(Request $request): JsonResponse
     {
         $requisition = CashRequisition::query()
-            ->whereHas('cashRequisitionItems', function ($q) use($request){
-                $q->whereHas('item', function ($q) use($request){
+            ->whereHas('cashRequisitionItems', function ($q) use ($request) {
+                $q->whereHas('item', function ($q) use ($request) {
                     $q->where('id', $request->cash_item);
                 })->doesntHave('vehicleHistory');
             })
-            ->whereHas('approval_status', function ($q){
+            ->whereHas('approval_status', function ($q) {
                 $q->where('ceo_status', 2);
             })
             ->latest()
@@ -341,12 +341,12 @@ class VehicleHistoryAPIController extends AppBaseController
     public function monthlyReport(Request $request): JsonResponse
     {
         $vehicle_report = Vehicle::query()
-            ->with(['vehicleHistories' => function ($q) use($request){
-                $q->when($request->month, function ($q) use ($request){
-                    $month = Carbon::parse('01-'.$request->month);
+            ->with(['vehicleHistories' => function ($q) use ($request) {
+                $q->when($request->month, function ($q) use ($request) {
+                    $month = Carbon::parse('01-' . $request->month);
                     $firstDayOfMonth = $month->firstOfMonth()->toDateString();
                     $lastDayOfMonth = $month->lastOfMonth()->toDateString();
-                    $q->where(function ($q) use ($month, $firstDayOfMonth, $lastDayOfMonth){
+                    $q->where(function ($q) use ($month, $firstDayOfMonth, $lastDayOfMonth) {
                         $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'")
                             ->orWhereRaw("vehicle_histories.id = (
             SELECT vh.id
@@ -360,7 +360,7 @@ class VehicleHistoryAPIController extends AppBaseController
                 }, function ($q) {
                     $firstDayOfMonth = Carbon::now()->firstOfMonth()->toDateString();
                     $lastDayOfMonth = Carbon::now()->lastOfMonth()->toDateString();
-                    $q->where(function ($q) use ($firstDayOfMonth, $lastDayOfMonth){
+                    $q->where(function ($q) use ($firstDayOfMonth, $lastDayOfMonth) {
                         $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'")
                             ->orWhereRaw("vehicle_histories.id = (
             SELECT vh.id
@@ -373,6 +373,7 @@ class VehicleHistoryAPIController extends AppBaseController
                     });
                 });
             }])
+            ->where('id', 5)
             ->get();
 
         return response()->json([
