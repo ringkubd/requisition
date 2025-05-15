@@ -16,10 +16,12 @@ use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductIssueResource;
 use App\Models\Department;
 use App\Models\OneTimeLogin;
+use App\Notifications\WhatsAppIssueButtonNotification;
 use App\Notifications\WhatsAppIssueNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use NotificationChannels\WhatsApp\Component;
+use NotificationChannels\WhatsApp\Component\QuickReplyButton;
 use OpenApi\Annotations as OA;
 use Ramsey\Uuid\Nonstandard\Uuid;
 
@@ -189,20 +191,27 @@ class ProductIssueAPIController extends AppBaseController
                     $no = auth_department_name() . '/' . $productIssue->id;
                     $one_time_key = new OneTimeLogin();
                     $key = $one_time_key->generate($head_of_department->id);
-                    $head_of_department->notify(new WhatsAppIssueNotification(
-                        Component::text($request->user()->name),
-                        Component::text($no),
-                        Component::urlButton(["/issue_view?issue_id=" . $productIssue->id . "&key=" . $key]),
-                        Component::urlButton(["/issue_recommended?issue_id=" . $productIssue->id . "&key=" . $key]),
-                        $head_of_department->mobile_no
-                    ));
+                    // $head_of_department->notify(new WhatsAppIssueNotification(
+                    //     Component::text($request->user()->name),
+                    //     Component::text($no),
+                    //     Component::urlButton(["/issue_view?issue_id=" . $productIssue->id . "&key=" . $key]),
+                    //     Component::urlButton(["/issue_recommended?issue_id=" . $productIssue->id . "&key=" . $key]),
+                    //     $head_of_department->mobile_no
+                    // ));
                 }
-                // $requisitor_name = $request->user()->name;
-                // $no = auth_department_name() .'/'. $productIssue->id;
-                // $request->user()->notify(new WhatsAppIssueNotification(
+                $requisitor_name = $request->user()->name;
+                $no = auth_department_name() . '/' . $productIssue->id;
+
+                $one_time_key = new OneTimeLogin();
+                $key = $one_time_key->generate($request->user()->id);
+
+                // $request->user()->notify(new WhatsAppIssueButtonNotification(
                 //     Component::text($requisitor_name),
                 //     Component::text($no),
-                //     '+8801737956549'
+                //     Component::quickReplyButton([$productIssue->id . '_' . $request->user()->id . '_2_department_issue_recommended']),
+                //     Component::quickReplyButton([$productIssue->id . '_' . $request->user()->id . '_2_department_issue_rejected']),
+                //     Component::urlButton(["/issue_view/$productIssue->id/whatsapp_view?auth_key=$key->auth_key"]),
+                //     $no
                 // ));
             }, 2);
         }
