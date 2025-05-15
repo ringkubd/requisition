@@ -17,15 +17,19 @@ class WhatsAppIssueNotification extends Notification
 
     public Component $name;
     public Component $no;
+    public Component $recommended_url;
+    public Component $view_url;
     public string $to;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Component $name, Component $no, string $to)
+    public function __construct(Component $name, Component $no, Component $recommended_url, Component $view_url, string $to)
     {
         $this->name = $name;
         $this->no = $no;
+        $this->recommended_url = $recommended_url;
+        $this->view_url = $view_url;
         $this->to = $to;
     }
 
@@ -49,6 +53,8 @@ class WhatsAppIssueNotification extends Notification
             ->name('inventory_issue_notification')
             ->body($this->name)
             ->body($this->no)
+            ->buttons($this->recommended_url)
+            ->buttons($this->view_url)
             ->to($this->to);
     }
 }

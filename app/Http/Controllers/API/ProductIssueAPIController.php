@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductIssueResource;
 use App\Models\Department;
+use App\Models\OneTimeLogin;
 use App\Notifications\WhatsAppIssueNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -186,9 +187,13 @@ class ProductIssueAPIController extends AppBaseController
                 $head_of_department = User::find(Department::find(auth_department_id())->head_of_department);
                 if (!empty($head_of_department->mobile_no)) {
                     $no = auth_department_name() . '/' . $productIssue->id;
+                    $one_time_key = new OneTimeLogin();
+                    $key = $one_time_key->generate($head_of_department->id);
                     $head_of_department->notify(new WhatsAppIssueNotification(
                         Component::text($request->user()->name),
                         Component::text($no),
+                        Component::urlButton(["/issue_view?issue_id=" . $productIssue->id . "&key=" . $key]),
+                        Component::urlButton(["/issue_recommended?issue_id=" . $productIssue->id . "&key=" . $key]),
                         $head_of_department->mobile_no
                     ));
                 }
