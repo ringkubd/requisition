@@ -40,7 +40,7 @@ export default function WhatsappView( props )
 
 
     const { data, isLoading, isError } = useEditIssueQuery( router.query.id, {
-        skip: !router.query.id,
+        skip: !router.query.id || !loggedIn,
     } )
     const handlePrint = useReactToPrint( {
         content: () => printPageRef.current,
