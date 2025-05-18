@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import AppLayout from '@/components/Layouts/AppLayout'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
@@ -7,6 +7,7 @@ import { useReactToPrint } from 'react-to-print'
 import { useEditIssueQuery } from '@/store/service/issue'
 import IssuePrint from '@/components/issue/IssuePrint'
 import Status from '@/components/issue/Status'
+import GuestLayout from '@/components/Layouts/GuestLayout'
 import { useOneTimeLoginMutation } from '@/store/service/user/management'
 
 export default function WhatsappView( props )
