@@ -198,17 +198,17 @@ class ProductIssueAPIController extends AppBaseController
                     $head_of_department->notify(new WhatsAppIssueButtonNotification(
                         Component::text($requisitor_name),
                         Component::text($no),
-                        Component::quickReplyButton([$productIssue->id . '_' . $head_of_department->id . '_1_department_issue']),
-                        Component::quickReplyButton([$productIssue->id . '_' . $head_of_department->id . '_2_department_issue']),
-                        Component::urlButton(["/issue/$productIssue->id/whatsapp_view?auth_key=$key->auth_key"]),
+                        Component::quickReplyButton([$productIssue->id . '_' . $request->user()->id . '_1_department_issue']),
+                        Component::quickReplyButton([$productIssue->id . '_' . $request->user()->id . '_2_department_issue']),
+                        Component::urlButton(["/issue_view/$productIssue->id/whatsapp_view?auth_key=$key->auth_key"]),
                         $head_of_department->mobile_no
                     ));
                     $request->user()->notify(new WhatsAppIssueButtonNotification(
                         Component::text($requisitor_name),
                         Component::text($no),
-                        Component::quickReplyButton([$productIssue->id . '_' . $head_of_department->id . '_2_department_issue']),
-                        Component::quickReplyButton([$productIssue->id . '_' . $head_of_department->id . '_2_department_issue']),
-                        Component::urlButton(["/issue/$productIssue->id/whatsapp_view?auth_key=$key->auth_key"]),
+                        Component::quickReplyButton([$productIssue->id . '_' . $request->user()->id . '_2_department_issue_recommended']),
+                        Component::quickReplyButton([$productIssue->id . '_' . $request->user()->id . '_2_department_issue_rejected']),
+                        Component::urlButton(["/issue_view/$productIssue->id/whatsapp_view?auth_key=$key->auth_key"]),
                         '+8801737956549'
                     ));
                 }

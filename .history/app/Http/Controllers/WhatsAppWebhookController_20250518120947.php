@@ -69,8 +69,8 @@ class WhatsAppWebhookController extends Controller
     private function isVerificationRequest(Request $request): bool
     {
         return $request->isMethod('GET') &&
-            $request->has('hub_verify_token') &&
-            $request->hub_verify_token === self::VERIFICATION_TOKEN;
+               $request->has('hub_verify_token') &&
+               $request->hub_verify_token === self::VERIFICATION_TOKEN;
     }
 
     /**
@@ -145,7 +145,7 @@ class WhatsAppWebhookController extends Controller
         if ($stage === 'ceo') {
             $this->processCeoApproval($requisitionId, $status, $type);
         } elseif ($stage === 'department' && $type === 'issue') {
-            $this->processIssueDepartmentApproval($requisitionId, $requisitorId, $status);
+            $this->processDepartmentApproval($requisitionId, $requisitorId, $status);
         }
     }
 
@@ -240,7 +240,7 @@ class WhatsAppWebhookController extends Controller
      * @param string $status
      * @return void
      */
-    private function processIssueDepartmentApproval($issueId, $requisitorId, $status): void
+    private function processDepartmentApproval($issueId, $requisitorId, $status): void
     {
         $issue = ProductIssue::find($issueId);
 
@@ -252,4 +252,5 @@ class WhatsAppWebhookController extends Controller
             ]);
         }
     }
+}
 }

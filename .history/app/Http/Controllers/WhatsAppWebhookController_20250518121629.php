@@ -145,7 +145,7 @@ class WhatsAppWebhookController extends Controller
         if ($stage === 'ceo') {
             $this->processCeoApproval($requisitionId, $status, $type);
         } elseif ($stage === 'department' && $type === 'issue') {
-            $this->processIssueDepartmentApproval($requisitionId, $requisitorId, $status);
+            $this->processDepartmentApproval($requisitionId, $requisitorId, $status);
         }
     }
 
@@ -240,7 +240,7 @@ class WhatsAppWebhookController extends Controller
      * @param string $status
      * @return void
      */
-    private function processIssueDepartmentApproval($issueId, $requisitorId, $status): void
+    private function processDepartmentApproval($issueId, $requisitorId, $status): void
     {
         $issue = ProductIssue::find($issueId);
 

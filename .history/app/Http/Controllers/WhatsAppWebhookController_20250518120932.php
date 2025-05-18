@@ -18,21 +18,21 @@ class WhatsAppWebhookController extends Controller
 {
     /**
      * Parsed message data from WhatsApp
-     *
+     * 
      * @var stdClass
      */
     private stdClass $messages;
-
+    
     /**
      * WhatsApp webhook verification token
-     *
+     * 
      * @var string
      */
     private const VERIFICATION_TOKEN = "verification_token";
 
     /**
      * Handle WhatsApp webhook verification and process incoming messages
-     *
+     * 
      * @param Request $request
      * @return mixed
      */
@@ -40,42 +40,42 @@ class WhatsAppWebhookController extends Controller
     {
         // Store raw webhook data for debugging
         Storage::put("whatsapp_" . uniqid() . '.txt', json_encode($request->all()));
-
+        
         // Handle webhook verification from WhatsApp
         if ($this->isVerificationRequest($request)) {
             return $request->hub_challenge;
         }
-
+        
         // Verify webhook signature
         if (!$this->verifySignature($request)) {
             return response()->json(['error' => 'Invalid signature'], Response::HTTP_UNAUTHORIZED);
         }
-
+        
         // Process button messages
         $message = $this->parseMessage($request->entry);
         if ($message->message_type === "button") {
             $this->processButtonMessage($message);
         }
-
+        
         return response()->json(['success' => true]);
     }
-
+    
     /**
      * Check if the request is a verification request from WhatsApp
-     *
+     * 
      * @param Request $request
      * @return bool
      */
     private function isVerificationRequest(Request $request): bool
     {
-        return $request->isMethod('GET') &&
-            $request->has('hub_verify_token') &&
-            $request->hub_verify_token === self::VERIFICATION_TOKEN;
+        return $request->isMethod('GET') && 
+               $request->has('hub_verify_token') && 
+               $request->hub_verify_token === self::VERIFICATION_TOKEN;
     }
 
     /**
      * Verify the signature of the incoming request
-     *
+     * 
      * @param Request $request
      * @return bool
      */
@@ -89,14 +89,14 @@ class WhatsAppWebhookController extends Controller
 
     /**
      * Parse the incoming message from WhatsApp
-     *
+     * 
      * @param array $entry
      * @return stdClass
      */
     private function parseMessage($entry): stdClass
     {
         $this->messages = new stdClass();
-
+        
         if (!empty($entry)) {
             $firstEntry = collect(json_decode(json_encode($entry), true)[0]);
             $this->messages->id = $firstEntry['id'];
@@ -113,13 +113,13 @@ class WhatsAppWebhookController extends Controller
             $this->messages->timestamp = $this->messages->first_message['timestamp'] ?? "";
             $this->messages->button = $this->messages->first_message['button'] ?? [];
         }
-
+        
         return $this->messages;
     }
-
+    
     /**
      * Process a button message from WhatsApp
-     *
+     * 
      * @param stdClass $message
      * @return void
      */
@@ -127,31 +127,31 @@ class WhatsAppWebhookController extends Controller
     {
         $payload = explode('_', $message->button['payload'] ?? '');
         Log::info('Button payload', ['raw' => $message->button['payload'] ?? '']);
-
+        
         // Ensure we have at least the minimum required elements
         if (count($payload) < 3) {
             Log::warning('Invalid payload format', ['payload' => $payload]);
             return;
         }
-
+        
         $requisitionId = $payload[0] ?? null;
         $requisitorId = $payload[1] ?? null;
         $status = $payload[2] ?? null;
         $stage = $payload[3] ?? 'ceo';
         $type = $payload[4] ?? 'purchase';
-
+        
         Log::info('Parsed payload', compact('requisitionId', 'requisitorId', 'status', 'stage', 'type'));
-
+        
         if ($stage === 'ceo') {
             $this->processCeoApproval($requisitionId, $status, $type);
         } elseif ($stage === 'department' && $type === 'issue') {
-            $this->processIssueDepartmentApproval($requisitionId, $requisitorId, $status);
+            $this->processDepartmentApproval($requisitionId, $requisitorId, $status);
         }
     }
-
+    
     /**
      * Process CEO approval for purchase or cash requisitions
-     *
+     * 
      * @param int $requisitionId
      * @param string $status
      * @param string $type
@@ -161,7 +161,7 @@ class WhatsAppWebhookController extends Controller
     {
         $requisition = null;
         $updated = false;
-
+        
         // Find and update the appropriate requisition type
         if ($type === 'purchase') {
             $requisition = PurchaseRequisition::find($requisitionId);
@@ -174,16 +174,16 @@ class WhatsAppWebhookController extends Controller
                 $updated = $this->updateRequisitionStatus($requisition, $status);
             }
         }
-
+        
         // Send notifications if update was successful
         if ($updated && $requisition) {
             $this->sendNotifications($requisition);
         }
     }
-
+    
     /**
      * Update the status of a requisition
-     *
+     * 
      * @param mixed $requisition
      * @param string $status
      * @return bool
@@ -194,17 +194,17 @@ class WhatsAppWebhookController extends Controller
             'ceo_status' => $status,
             'ceo_approved_at' => now()
         ];
-
+        
         if ($requisition->approval_status) {
             return $requisition->approval_status()->update($statusData);
         } else {
             return (bool) $requisition->approval_status()->updateOrCreate([], $statusData);
         }
     }
-
+    
     /**
      * Send notifications to relevant users about requisition status
-     *
+     * 
      * @param mixed $requisition
      * @return void
      */
@@ -218,10 +218,10 @@ class WhatsAppWebhookController extends Controller
                 })
                 ->first()
         ];
-
+        
         foreach ($notifiedUsers as $notifiedUser) {
             if (!$notifiedUser) continue;
-
+            
             $requisitor = $requisition->user->name;
             $notifiedUser->notify(new PushNotification(
                 "A purchase requisition has been generated and for your approval.",
@@ -231,19 +231,19 @@ class WhatsAppWebhookController extends Controller
             $notifiedUser->notify(new RequisitionStatusNotification($requisition));
         }
     }
-
+    
     /**
      * Process department approval for product issue
-     *
+     * 
      * @param int $issueId
      * @param int $requisitorId
      * @param string $status
      * @return void
      */
-    private function processIssueDepartmentApproval($issueId, $requisitorId, $status): void
+    private function processDepartmentApproval($issueId, $requisitorId, $status): void
     {
         $issue = ProductIssue::find($issueId);
-
+        
         if ($issue && $issue->department_status) {
             $issue->approval_status()->update([
                 'department_status' => $status,
@@ -252,4 +252,5 @@ class WhatsAppWebhookController extends Controller
             ]);
         }
     }
+}
 }

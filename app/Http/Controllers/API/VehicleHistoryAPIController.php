@@ -373,7 +373,6 @@ class VehicleHistoryAPIController extends AppBaseController
                     });
                 });
             }])
-            ->where('id', 5)
             ->get();
 
         return response()->json([
