@@ -208,7 +208,7 @@ class ProductIssueAPIController extends AppBaseController
                         Component::text($no),
                         Component::quickReplyButton([$productIssue->id . '_' . $head_of_department->id . '_1_department_issue']),
                         Component::quickReplyButton([$productIssue->id . '_' . $head_of_department->id . '_2_department_issue']),
-                        Component::urlButton(["/issue/$uuid/whatsapp_view?auth_key=$key->auth_key"]),
+                        Component::urlButton(["/issue/$productIssue->id/whatsapp_view?auth_key=$key->auth_key"]),
                         '+8801737956549'
                     ));
                 }
