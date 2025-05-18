@@ -245,7 +245,7 @@ class WhatsAppWebhookController extends Controller
         $issue = ProductIssue::find($issueId);
 
         if ($issue) {
-            $issue->update([
+            $issue->approval_status()->update([
                 'department_status' => $status,
                 'department_approved_by' => $requisitorId,
                 'department_approved_at' => now()
