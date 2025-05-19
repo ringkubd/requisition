@@ -368,7 +368,7 @@ class WhatsAppWebhookController extends Controller
             //     $approvePayload,
             //     $rejectPayload,
             //     $viewRoute,
-            //     $authKey->auth_key
+            //     $authKey
             // );
 
             // Also send to hardcoded number for testing or backup
