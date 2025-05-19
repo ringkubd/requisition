@@ -195,7 +195,7 @@ class CashRequisitionAPIController extends AppBaseController
 
         // Send WhatsApp notifications if mobile number exists
         if (!empty($head_of_department->mobile_no)) {
-            // $this->sendWhatsAppNotification($head_of_department, $cashRequisition, $requisitorName, $prfNo);
+            $this->sendWhatsAppNotification($head_of_department, $cashRequisition, $requisitorName, $prfNo);
         }
 
         // Also send to testing/backup number
@@ -775,5 +775,19 @@ class CashRequisitionAPIController extends AppBaseController
             new CashRequisitionResource($newRequisition),
             __('messages.saved', ['model' => __('models/cashRequisitions.singular')])
         );
+    }
+
+    /**
+     * Generate a new PRF number
+     *
+     * @return string
+     */
+    private function newPRFNO(): string
+    {
+        // Generate a unique PRF number format: PRF-YYYYMMDD-XXXXX
+        $date = date('Ymd');
+        $random = str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
+
+        return "PRF-{$date}-{$random}";
     }
 }

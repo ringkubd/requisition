@@ -776,4 +776,18 @@ class CashRequisitionAPIController extends AppBaseController
             __('messages.saved', ['model' => __('models/cashRequisitions.singular')])
         );
     }
+
+    /**
+     * Generate a new PRF number
+     *
+     * @return string
+     */
+    public function newPRFNO(): string
+    {
+        // Generate a unique PRF number format: PRF-YYYYMMDD-XXXXX
+        $date = date('Ymd');
+        $random = str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
+
+        return "PRF-{$date}-{$random}";
+    }
 }

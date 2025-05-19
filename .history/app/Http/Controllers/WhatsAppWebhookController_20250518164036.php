@@ -4,18 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\CashRequisition;
 use App\Models\Department;
-use App\Models\OneTimeLogin;
 use App\Models\ProductIssue;
 use App\Models\PurchaseRequisition;
 use App\Models\User;
 use App\Notifications\PushNotification;
 use App\Notifications\RequisitionStatusNotification;
-use App\Notifications\WhatsAppAccountNotification;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use NotificationChannels\WhatsApp\Component;
 use stdClass;
 
 class WhatsAppWebhookController extends Controller
@@ -170,12 +167,12 @@ class WhatsAppWebhookController extends Controller
 
         // Find and update the appropriate requisition type
         if ($type === 'purchase') {
-            $requisition = PurchaseRequisition::find($requisitionId, ['*']);
+            $requisition = PurchaseRequisition::find($requisitionId);
             if ($requisition) {
                 $updated = $this->updateRequisitionStatus($requisition, $status);
             }
         } elseif ($type === 'cash') {
-            $requisition = CashRequisition::find($requisitionId, ['*']);
+            $requisition = CashRequisition::find($requisitionId);
             if ($requisition) {
                 $updated = $this->updateRequisitionStatus($requisition, $status);
             }
@@ -229,10 +226,11 @@ class WhatsAppWebhookController extends Controller
             if (!$notifiedUser) continue;
 
             $requisitor = $requisition->user->name;
-            $messageTitle = "A purchase requisition has been generated and for your approval.";
-            $messageBody = "$requisitor is generated an requisition P.R. NO. $requisition->prf_no against I.R.F. NO. $requisition->irf_no. Please review and approve.";
-
-            $notifiedUser->notify(new PushNotification($messageTitle, $messageBody));
+            $notifiedUser->notify(new PushNotification(
+                "A purchase requisition has been generated and for your approval.",
+                "$requisitor is generated an requisition P.R. NO. $requisition->prf_no against I.R.F. NO. $requisition->irf_no. Please review and approve.",
+                $requisition
+            ));
             $notifiedUser->notify(new RequisitionStatusNotification($requisition));
         }
     }
@@ -247,7 +245,7 @@ class WhatsAppWebhookController extends Controller
      */
     private function processIssueDepartmentApproval($issueId, $requisitorId, $status): void
     {
-        $issue = ProductIssue::find($issueId, ['*']);
+        $issue = ProductIssue::find($issueId);
 
         if ($issue) {
             $issue->update([
@@ -259,168 +257,42 @@ class WhatsAppWebhookController extends Controller
     }
 
 
-    /**
-     * Process department approval for purchase or cash requisitions
-     *
-     * @param int $requisitionId
-     * @param int $requisitorId
-     * @param string $status
-     * @param string $type
-     * @return void
-     */
     private function processDepartmentApproval($requisitionId, $requisitorId, $status, $type): void
     {
-        // Get requisition based on type
-        $requisition = $type === 'cash'
-            ? CashRequisition::find($requisitionId, ['*'])
-            : PurchaseRequisition::find($requisitionId, ['*']);
-
-        if (!$requisition) {
-            Log::warning("Requisition not found", compact('requisitionId', 'type'));
-            return;
+        if ($type === 'cash') {
+            $requisition = CashRequisition::find($requisitionId);
+        } else {
+            $requisition = PurchaseRequisition::find($requisitionId);
         }
 
-        // Update approval status
-        $this->updateDepartmentApprovalStatus($requisition, $requisitorId, $status);
+        if ($requisition) {
 
-        // Send notifications to accounts department users
-        $this->notifyAccountsDepartment($requisition, $requisitorId, $type);
-    }
-
-    /**
-     * Update department approval status for a requisition
-     *
-     * @param mixed $requisition
-     * @param int $requisitorId
-     * @param string $status
-     * @return bool
-     */
-    private function updateDepartmentApprovalStatus($requisition, $requisitorId, $status): bool
-    {
-        $statusData = [
-            'department_approved_by' => $requisitorId,
-            'department_approved_at' => now(),
-            'accounts_status' => $status
-        ];
-
-        if ($requisition->approval_status) {
-            return $requisition->approval_status()->update($statusData);
-        }
-
-        return (bool) $requisition->approval_status()->updateOrCreate([], $statusData);
-    }
-
-    /**
-     * Send notifications to accounts department users
-     *
-     * @param mixed $requisition
-     * @param int $requisitorId
-     * @param string $type
-     * @return void
-     */
-    private function notifyAccountsDepartment($requisition, $requisitorId, $type): void
-    {
-        $department = Department::query()
-            ->where('branch_id', auth_branch_id())
-            ->where('name', 'Accounts')
-            ->with('users')
-            ->first();
-
-        if (empty($department) || empty($department->users)) {
-            return;
-        }
-
-        $isCashRequisition = $type === 'cash';
-        $permissionName = $isCashRequisition
-            ? 'accounts-approval-cash'
-            : 'accounts-approval-purchase';
-        $notificationTitle = $isCashRequisition
-            ? "A cash requisition has been generated and for your approval."
-            : "A purchase requisition has been generated and for your approval.";
-        $notificationBody = ($isCashRequisition ? "A cash" : "A purchase")
-            . " requisition P.R. NO. $requisition->prf_no against I.R.F. NO. $requisition->irf_no"
-            . " is generated by {$requisition->user->name}. Please review and approve.";
-
-        // Path for view differs based on type
-        $viewRoute = $isCashRequisition
-            ? "/cash-requisition/$requisition->id/whatsapp_view"
-            : "/purchase-requisition/$requisition->id/whatsapp_view";
-
-        foreach ($department->users as $user) {
-            if (!$user->hasPermissionTo($permissionName)) {
-                continue;
+            $data['department_approved_by'] = $requisitorId;
+            $data['department_approved_at'] = now();
+            $data['accounts_status'] = $status;
+            if ($requisition->approval_status) {
+                $requisition->approval_status()->update($data);
+            } else {
+                $requisition->approval_status()->updateOrCreate($data);
             }
+            $department = Department::query()->where('branch_id', auth_branch_id())->where('name', 'Accounts')->with('users')->first();
+            if (!empty($department)) {
+                foreach ($department->users as $user) {
+                    if ($type == "cash" && $user->hasPermissionTo('accounts-approval-cash')) {
+                        $user->notify(new PushNotification(
+                            "A cash requisition has been generated and for your approval.",
+                            "A cash requisition P.R. NO. $requisition->prf_no against I.R.F. NO. $requisition->irf_no is generated by {$requisition->user->name}. Please review and approve.",
 
-            // Send push notification
-            $user->notify(new PushNotification($notificationTitle, $notificationBody));
-
-            // Get button payload
-            $approvePayload = $requisition->id . '_' . $requisitorId . '_2_department_' . $type;
-            $rejectPayload = $requisition->id . '_' . $requisitorId . '_3_department_' . $type;
-            $authKey = OneTimeLogin::generate($requisitorId)->auth_key;
-
-            // Send WhatsApp notifications
-            $this->sendWhatsAppNotification(
-                $user,
-                $requisition,
-                $requisitorId,
-                $approvePayload,
-                $rejectPayload,
-                $viewRoute,
-                $authKey
-            );
-
-            // Also send to hardcoded number for testing or backup
-            $this->sendWhatsAppNotification(
-                $user,
-                $requisition,
-                $requisitorId,
-                $approvePayload,
-                $rejectPayload,
-                $viewRoute,
-                $authKey,
-                '+8801737956549'
-            );
+                        ));
+                    } elseif ($type == "purchase" && $user->hasPermissionTo('accounts-approval-purchase')) {
+                        $user->notify(new PushNotification(
+                            "A purchase requisition has been generated and for your approval.",
+                            "A purchase requisition P.R. NO. $requisition->prf_no against I.R.F. NO. $requisition->irf_no is generated by {$requisition->user->name}. Please review and approve.",
+                            $requisition
+                        ));
+                    }
+                }
+            }
         }
-    }
-
-    /**
-     * Send WhatsApp notification to a user
-     *
-     * @param User $user
-     * @param mixed $requisition
-     * @param int $requisitorId
-     * @param string $approvePayload
-     * @param string $rejectPayload
-     * @param string $viewRoute
-     * @param string $authKey
-     * @param string|null $overridePhone
-     * @return void
-     */
-    private function sendWhatsAppNotification(
-        $user,
-        $requisition,
-        $requisitorId,
-        $approvePayload,
-        $rejectPayload,
-        $viewRoute,
-        $authKey,
-        $overridePhone = null
-    ): void {
-        $phoneNumber = $overridePhone ?? $user->mobile_no;
-
-        if (empty($phoneNumber)) {
-            return;
-        }
-
-        $user->notify(new WhatsAppAccountNotification(
-            Component::text($requisition->department->name),
-            Component::text($requisition->user->name),
-            Component::text($requisition->prf_no),
-            Component::quickReplyButton([$approvePayload]),
-            Component::quickReplyButton([$rejectPayload]),
-            Component::urlButton([$viewRoute . "?auth_key=" . $authKey]),
-            $phoneNumber
-        ));
     }
 }
