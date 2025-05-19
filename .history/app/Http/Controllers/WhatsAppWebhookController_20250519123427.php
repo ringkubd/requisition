@@ -11,7 +11,6 @@ use App\Models\User;
 use App\Notifications\PushNotification;
 use App\Notifications\RequisitionStatusNotification;
 use App\Notifications\WhatsAppAccountNotification;
-use App\Notifications\WhatsAppNotification;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -153,8 +152,6 @@ class WhatsAppWebhookController extends Controller
             $this->processIssueDepartmentApproval($requisitionId, $requisitorId, $status);
         } elseif ($stage === 'department' && $type !== 'issue') {
             $this->processDepartmentApproval($requisitionId, $requisitorId, $status, $type);
-        } elseif ($stage === 'accounts') {
-            $this->processAccountsApproval($requisitionId, $requisitorId, $status, $type);
         }
     }
 
@@ -422,154 +419,5 @@ class WhatsAppWebhookController extends Controller
             Component::urlButton([$viewRoute . "?auth_key=" . $authKey]),
             $phoneNumber
         ));
-    }
-
-    /**
-     * Process accounts approval for purchase or cash requisitions
-     *
-     * @param int $requisitionId
-     * @param int $requisitorId
-     * @param string $status
-     * @param string $type
-     * @return void
-     */
-    private function processAccountsApproval($requisitionId, $requisitorId, $status, $type): void
-    {
-        $requisition = null;
-        $updated = false;
-
-        // Find the requisition based on type
-        if ($type === 'purchase') {
-            $requisition = PurchaseRequisition::find($requisitionId, ['*']);
-            if ($requisition) {
-                $updated = $this->updateAccountsApprovalStatus($requisition, $requisitorId, $status);
-            }
-        } elseif ($type === 'cash') {
-            $requisition = CashRequisition::find($requisitionId, ['*']);
-            if ($requisition) {
-                $updated = $this->updateAccountsApprovalStatus($requisition, $requisitorId, $status);
-            }
-        }
-
-        if ($updated && $requisition && $status == 2) {
-            // If accounts approved, notify CEO
-            $this->notifyCEO($requisition, $requisitorId, $type);
-        }
-    }
-
-    /**
-     * Update accounts approval status for a requisition
-     *
-     * @param mixed $requisition
-     * @param int $requisitorId
-     * @param string $status
-     * @return bool
-     */
-    private function updateAccountsApprovalStatus($requisition, $requisitorId, $status): bool
-    {
-        $statusData = [
-            'accounts_status' => $status,
-            'accounts_approved_by' => $requisitorId,
-            'accounts_approved_at' => now()
-        ];
-
-        // If approved, set CEO status to pending
-        if ($status == 2) {
-            $statusData['ceo_status'] = 1;
-        }
-
-        if ($requisition->approval_status) {
-            return $requisition->approval_status()->update($statusData);
-        }
-
-        return (bool) $requisition->approval_status()->updateOrCreate([], $statusData);
-    }
-
-    /**
-     * Send notifications to CEO for requisition approval
-     *
-     * @param mixed $requisition
-     * @param int $requisitorId
-     * @param string $type
-     * @return void
-     */
-    private function notifyCEO($requisition, $requisitorId, $type): void
-    {
-        // Find CEO user
-        $ceo = User::query()
-            ->whereHas('organizations', function ($q) {
-                $q->where('id', function ($query) {
-                    $query->selectRaw('id from organizations where id = (select organization_id from branches where id = (select branch_id from users where id = ?))', [auth()->id()]);
-                });
-            })
-            ->whereHas('designations', function ($q) {
-                $q->where('name', 'CEO');
-            })
-            ->first();
-
-        if (!$ceo) {
-            Log::warning("CEO not found for notification", ['requisition_id' => $requisition->id, 'type' => $type]);
-            return;
-        }
-
-        // Skip in debug mode
-        if (config('app.debug')) {
-            return;
-        }
-
-        // Create one-time login key for CEO
-        $one_time_key = new OneTimeLogin();
-        $key = $one_time_key->generate($ceo->id);
-
-        // Generate view route path
-        $viewRoute = $type === 'cash'
-            ? "cash-requisition/$requisition->id/whatsapp_view"
-            : "purchase-requisition/$requisition->id/whatsapp_view";
-
-        // Prepare payloads for button actions
-        $approvePayload = $requisition->id . '_' . $requisitorId . '_2_ceo_' . $type;
-        $rejectPayload = $requisition->id . '_' . $requisitorId . '_3_ceo_' . $type;
-
-        // Create components for WhatsApp notification
-        $messageText = Component::text("Requisitor Name: {$requisition->user->name},  P.R. NO.: $requisition->prf_no.");
-        $viewUrl = Component::urlButton([$viewRoute . "?auth_key=" . $key->auth_key]);
-        $approveButton = Component::quickReplyButton([$approvePayload]);
-        $rejectButton = Component::quickReplyButton([$rejectPayload]);
-
-        // Notification title and body for push notification
-        $notificationTitle = "A " . $type . " requisition has been approved by accounts and needs your approval.";
-        $notificationBody = "A " . $type . " requisition P.R. NO. $requisition->prf_no against I.R.F. NO. $requisition->irf_no is generated by {$requisition->user->name} and approved by accounts. Please review and approve.";
-
-        // Send push notification
-        $ceo->notify(new PushNotification($notificationTitle, $notificationBody));
-
-        // Send WhatsApp notification to CEO's mobile
-        if ($ceo->mobile_no) {
-            $ceo->notify(new WhatsAppNotification(
-                $messageText,
-                $ceo->mobile_no,
-                $viewUrl,
-                $approveButton,
-                $rejectButton
-            ));
-        }
-
-        // Send to backup numbers
-        $backupNumbers = ['+8801725271724', '+8801737956549'];
-        foreach ($backupNumbers as $number) {
-            $ceo->notify(new WhatsAppNotification(
-                $messageText,
-                $number,
-                $viewUrl,
-                $approveButton,
-                $rejectButton
-            ));
-        }
-
-        Log::info('CEO notification sent for ' . $type . ' requisition', [
-            'requisition_id' => $requisition->id,
-            'ceo_id' => $ceo->id,
-            'status' => 'pending approval'
-        ]);
     }
 }

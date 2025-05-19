@@ -192,7 +192,8 @@ class CashRequisitionAPIController extends AppBaseController
         // Send push notification
         $head_of_department->notify(new PushNotification(
             "A purchase requisition is initiated.",
-            "$requisitorName generated a cash requisition P.R. No. $prfNo. Please approve or reject it."
+            "$requisitorName generated a cash requisition P.R. No. $prfNo. Please approve or reject it.",
+            $cashRequisition
         ));
 
         // Send WhatsApp notifications if mobile number exists
@@ -540,16 +541,16 @@ class CashRequisitionAPIController extends AppBaseController
 
             // Find and notify both requisitor and store manager
             $storeManager = $this->findStoreManager();
-
+            
             // Make sure we're adding valid users to notification list
             if ($requisition->user) {
                 $notifiedUsers[] = $requisition->user;
             }
-
+            
             if ($storeManager) {
                 $notifiedUsers[] = $storeManager;
             }
-
+            
             // Also notify the accounts department about CEO approval
             $accountsUsers = $this->findAccountsDepartmentUsers();
             foreach ($accountsUsers as $user) {
@@ -729,7 +730,8 @@ class CashRequisitionAPIController extends AppBaseController
             // Send push notification
             $user->notify(new PushNotification(
                 "A purchase requisition has been generated and for your approval.",
-                "$requisitor is generated an requisition P.R. NO. $prfNo against I.R.F. NO. $irfNo. Please review and approve."
+                "$requisitor is generated an requisition P.R. NO. $prfNo against I.R.F. NO. $irfNo. Please review and approve.",
+                $requisition
             ));
 
             // Send requisition status notification

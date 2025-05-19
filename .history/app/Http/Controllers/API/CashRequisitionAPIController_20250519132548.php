@@ -540,16 +540,16 @@ class CashRequisitionAPIController extends AppBaseController
 
             // Find and notify both requisitor and store manager
             $storeManager = $this->findStoreManager();
-
+            
             // Make sure we're adding valid users to notification list
             if ($requisition->user) {
                 $notifiedUsers[] = $requisition->user;
             }
-
+            
             if ($storeManager) {
                 $notifiedUsers[] = $storeManager;
             }
-
+            
             // Also notify the accounts department about CEO approval
             $accountsUsers = $this->findAccountsDepartmentUsers();
             foreach ($accountsUsers as $user) {

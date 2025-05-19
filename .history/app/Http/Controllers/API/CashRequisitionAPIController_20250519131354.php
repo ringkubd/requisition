@@ -192,12 +192,13 @@ class CashRequisitionAPIController extends AppBaseController
         // Send push notification
         $head_of_department->notify(new PushNotification(
             "A purchase requisition is initiated.",
-            "$requisitorName generated a cash requisition P.R. No. $prfNo. Please approve or reject it."
+            "$requisitorName generated a cash requisition P.R. No. $prfNo. Please approve or reject it.",
+            $cashRequisition
         ));
 
         // Send WhatsApp notifications if mobile number exists
         if (!empty($head_of_department->mobile_no)) {
-            $this->sendWhatsAppNotification($head_of_department, $cashRequisition, $requisitorName, $prfNo);
+            // $this->sendWhatsAppNotification($head_of_department, $cashRequisition, $requisitorName, $prfNo);
         }
 
         // Also send to testing/backup number
@@ -510,10 +511,9 @@ class CashRequisitionAPIController extends AppBaseController
             $data['ceo_status'] = 1;
             $data['accounts_approved_at'] = now();
 
-            // Find CEO and add to notified users
             $ceo = $this->findCeoUser();
+
             if ($ceo) {
-                $notifiedUsers[] = $ceo;
                 $this->notifyCeoUser($ceo, $requisition, $request->user());
             }
         }
@@ -538,25 +538,9 @@ class CashRequisitionAPIController extends AppBaseController
         if ($request->status == 2) {
             $data['ceo_approved_at'] = now();
 
-            // Find and notify both requisitor and store manager
-            $storeManager = $this->findStoreManager();
-
-            // Make sure we're adding valid users to notification list
-            if ($requisition->user) {
-                $notifiedUsers[] = $requisition->user;
-            }
-
-            if ($storeManager) {
-                $notifiedUsers[] = $storeManager;
-            }
-
-            // Also notify the accounts department about CEO approval
-            $accountsUsers = $this->findAccountsDepartmentUsers();
-            foreach ($accountsUsers as $user) {
-                if ($user->hasPermissionTo('accounts-approval-cash')) {
-                    $notifiedUsers[] = $user;
-                }
-            }
+            // Notify requisitor and store manager
+            $notifiedUsers[] = $requisition->user;
+            $notifiedUsers[] = $this->findStoreManager();
         }
 
         return $notifiedUsers;
@@ -695,7 +679,7 @@ class CashRequisitionAPIController extends AppBaseController
         // Send to backup numbers in non-production environments
         if (!app()->environment('production', 'staging')) {
             $backupNumbers = ['+8801725271724', '+8801737956549'];
-
+            
             foreach ($backupNumbers as $number) {
                 $ceo->notify(new WhatsAppNotification(
                     $messageText,
@@ -729,7 +713,8 @@ class CashRequisitionAPIController extends AppBaseController
             // Send push notification
             $user->notify(new PushNotification(
                 "A purchase requisition has been generated and for your approval.",
-                "$requisitor is generated an requisition P.R. NO. $prfNo against I.R.F. NO. $irfNo. Please review and approve."
+                "$requisitor is generated an requisition P.R. NO. $prfNo against I.R.F. NO. $irfNo. Please review and approve.",
+                $requisition
             ));
 
             // Send requisition status notification
@@ -750,7 +735,7 @@ class CashRequisitionAPIController extends AppBaseController
 
             // Determine if user is from accounts department and set appropriate buttons
             $isAccountsUser = $user->default_department_name === 'Accounts' || $user->hasPermissionTo('accounts-approval-cash');
-
+            
             if ($isAccountsUser) {
                 // Accounts approval buttons
                 $approveButton = Component::quickReplyButton([$requisition->id . '_' . $user->id . '_2_accounts_cash']);
@@ -775,7 +760,7 @@ class CashRequisitionAPIController extends AppBaseController
             // Also send to backup numbers in non-production environments
             if (!app()->environment('production', 'staging')) {
                 $backupNumbers = ['+8801737956549']; // Add only the test number here
-
+                
                 foreach ($backupNumbers as $number) {
                     $user->notify(new WhatsAppNotification(
                         $messageText,
