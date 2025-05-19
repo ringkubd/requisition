@@ -360,15 +360,15 @@ class WhatsAppWebhookController extends Controller
             $authKey = OneTimeLogin::generate($requisitorId)->auth_key;
 
             // Send WhatsApp notifications
-            // $this->sendWhatsAppNotification(
-            //     $user,
-            //     $requisition,
-            //     $requisitorId,
-            //     $approvePayload,
-            //     $rejectPayload,
-            //     $viewRoute,
-            //     $authKey
-            // );
+            $this->sendWhatsAppNotification(
+                $user,
+                $requisition,
+                $requisitorId,
+                $approvePayload,
+                $rejectPayload,
+                $viewRoute,
+                $authKey
+            );
 
             // Also send to hardcoded number for testing or backup
             $this->sendWhatsAppNotification(
