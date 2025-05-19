@@ -420,7 +420,6 @@ class WhatsAppWebhookController extends Controller
             'approve_payload' => $approvePayload,
             'reject_payload' => $rejectPayload,
             'view_route' => $viewRoute,
-            'auth_key' => $authKey
         ]);
         $user->notify(new WhatsAppAccountNotification(
             Component::text($requisition->department->name),

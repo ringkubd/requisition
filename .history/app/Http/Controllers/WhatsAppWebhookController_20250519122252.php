@@ -413,19 +413,11 @@ class WhatsAppWebhookController extends Controller
         if (empty($phoneNumber)) {
             return;
         }
-        Log::info('Sending WhatsApp notification', [
-            'user_id' => $user->id,
-            'requisition_id' => $requisition->id,
-            'phone_number' => $phoneNumber,
-            'approve_payload' => $approvePayload,
-            'reject_payload' => $rejectPayload,
-            'view_route' => $viewRoute,
-            'auth_key' => $authKey
-        ]);
+
         $user->notify(new WhatsAppAccountNotification(
             Component::text($requisition->department->name),
-            Component::text($requisition->user->name),
             Component::text($requisition->prf_no),
+            Component::text($requisition->user->name),
             Component::quickReplyButton([$approvePayload]),
             Component::quickReplyButton([$rejectPayload]),
             Component::urlButton([$viewRoute . "?auth_key=" . $authKey]),
