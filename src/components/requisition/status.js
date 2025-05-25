@@ -2,26 +2,31 @@ import { useAuth } from '@/hooks/auth'
 import { Button, Tooltip } from 'flowbite-react'
 import { useEffect, useState } from 'react'
 import { AiFillCheckSquare, AiFillDelete } from 'react-icons/ai'
-import {
+import
+{
     useUpdateCashStatusMutation,
     useUpdateInitialStatusMutation,
     useUpdatePurchaseStatusMutation,
 } from '@/store/service/dashboard'
-const Status = ({
+const Status = ( {
     requisition,
     type,
     from = 'dashboard',
     changeStatus = undefined,
-}) => {
+} ) =>
+{
     const { user } = useAuth()
-    const [selectedDropdown, setSelectedDropdown] = useState('Status')
+    const [ selectedDropdown, setSelectedDropdown ] = useState( 'Status' )
     const isDepartmentHead =
-        user?.current_department_head === parseInt(user?.id) ||
-        user?.role_names?.includes('System Administrator')
-    const [currentStatus, setCurrentStatus] = useState(
+        user?.current_department_head === parseInt( user?.id ) ||
+        user?.role_names?.includes( 'System Administrator' ) || ( type === 'cash' ? user?.permissions.filter( p => p.name === "approve_department_cash" ).length : user?.permissions.filter( p => p.name === "approve_department_purchase" ).length )
+
+    const [ currentStatus, setCurrentStatus ] = useState(
         requisition.current_status,
     )
-    const [manualPermission, setManualPermission] = useState(false)
+
+
+    const [ manualPermission, setManualPermission ] = useState( false )
     const [
         updateInitial,
         {
@@ -46,107 +51,126 @@ const Status = ({
             isLoading: cashISLoading,
         },
     ] = useUpdateCashStatusMutation()
-    const [rowID, setRowID] = useState(requisition.id)
+    const [ rowID, setRowID ] = useState( requisition.id )
 
-    useEffect(() => {
-        switch (type) {
+    useEffect( () =>
+    {
+        console.log( user?.permissions?.filter( p => p.name === "approve_department_cash" ).length );
+    }, [ user ] );
+
+    useEffect( () =>
+    {
+        switch ( type )
+        {
             case 'purchase':
-                if (from === 'print_view') {
-                    setManualPermission(user?.purchase_approval_permission)
-                } else {
-                    setCurrentStatus(requisition.purchase_current_status)
+                if ( from === 'print_view' )
+                {
+                    setManualPermission( user?.purchase_approval_permission )
+                } else
+                {
+                    setCurrentStatus( requisition.purchase_current_status )
                     requisition = requisition.purchase_requisitions
-                    setManualPermission(user?.purchase_approval_permission)
-                    setRowID(requisition.id)
+                    setManualPermission( user?.purchase_approval_permission )
+                    setRowID( requisition.id )
                 }
                 break
             case 'cash':
-                setManualPermission(user?.cash_approval_permission)
+                setManualPermission( user?.cash_approval_permission )
                 break
         }
-        setSelectedDropdown(currentStatus?.status ?? 'Status')
-    }, [])
+        setSelectedDropdown( currentStatus?.status ?? 'Status' )
+    }, [] )
 
-    useEffect(() => {
-        if (isSuccessPurchaseUpdate) {
-            setCurrentStatus(purchaseResponse?.data?.current_status)
-            if (changeStatus) {
-                changeStatus(purchaseResponse?.data)
+    useEffect( () =>
+    {
+        if ( isSuccessPurchaseUpdate )
+        {
+            setCurrentStatus( purchaseResponse?.data?.current_status )
+            if ( changeStatus )
+            {
+                changeStatus( purchaseResponse?.data )
             }
         }
-        if (isSuccessCashUpdate || isSuccessInitialUpdate) {
-            if (isSuccessCashUpdate) {
-                setCurrentStatus(cashResponse?.data?.current_status)
-                if (changeStatus) {
-                    changeStatus(cashResponse?.data)
+        if ( isSuccessCashUpdate || isSuccessInitialUpdate )
+        {
+            if ( isSuccessCashUpdate )
+            {
+                setCurrentStatus( cashResponse?.data?.current_status )
+                if ( changeStatus )
+                {
+                    changeStatus( cashResponse?.data )
                 }
             }
         }
-    }, [isSuccessInitialUpdate, isSuccessCashUpdate, isSuccessPurchaseUpdate])
+    }, [ isSuccessInitialUpdate, isSuccessCashUpdate, isSuccessPurchaseUpdate ] )
 
-    const updateStatus = async ({ status, notes } = {}) => {
-        const confirmation = confirm('Are you sure?')
-        if (status && confirmation) {
+    const updateStatus = async ( { status, notes } = {} ) =>
+    {
+        const confirmation = confirm( 'Are you sure?' )
+        if ( status && confirmation )
+        {
             const statusText = status === 2 ? 'Approved' : 'Rejected'
-            setSelectedDropdown(statusText)
-            switch (type) {
+            setSelectedDropdown( statusText )
+            switch ( type )
+            {
                 case 'initial':
-                    updateInitial({
+                    updateInitial( {
                         id: requisition.id,
                         notes: notes,
                         status: status,
                         stage: currentStatus?.stage,
-                    })
+                    } )
                     break
                 case 'purchase':
-                    updatePurchase({
+                    updatePurchase( {
                         id: rowID,
                         notes: notes,
                         status: status,
                         stage: currentStatus?.stage,
-                    })
+                    } )
                     break
                 case 'cash':
-                    updateCash({
+                    updateCash( {
                         id: requisition.id,
                         notes: notes,
                         status: status,
                         stage: currentStatus?.stage,
-                    })
+                    } )
                     break
             }
         }
     }
     return (
         <div>
-            {(currentStatus?.stage === 'ceo' &&
+            {( currentStatus?.stage === 'ceo' &&
                 currentStatus?.status === 'Pending' &&
                 user?.designation_name === 'CEO' &&
-                type !== 'initial') ||
-            (currentStatus?.stage === 'department' &&
-                currentStatus?.status === 'Pending' &&
-                isDepartmentHead &&
-                (user?.department_id?.includes(parseInt(requisition.department_id)) || user?.role_names?.includes('System Administrator'))) ||
-            (currentStatus?.stage === 'accounts' &&
-                currentStatus?.status === 'Pending' &&
-                (isDepartmentHead || manualPermission) &&
-                user?.default_department_name === 'Accounts' &&
-                type !== 'initial') ||
-            (parseInt(requisition.department_id) ===
-                parseInt(user?.default_department_id) &&
-                isDepartmentHead &&
-                (currentStatus?.stage === 'department' ||
-                    !currentStatus?.stage) &&
-                currentStatus?.status === 'Pending') ? (
+                type !== 'initial' ) ||
+                ( currentStatus?.stage === 'department' &&
+                    currentStatus?.status === 'Pending' &&
+                    isDepartmentHead &&
+                    ( user?.department_id?.includes( parseInt( requisition.department_id ) ) || user?.role_names?.includes( 'System Administrator' ) ) ) ||
+                ( currentStatus?.stage === 'accounts' &&
+                    currentStatus?.status === 'Pending' &&
+                    ( isDepartmentHead || manualPermission ) &&
+                    user?.default_department_name === 'Accounts' &&
+                    type !== 'initial' ) ||
+                ( parseInt( requisition.department_id ) ===
+                    parseInt( user?.default_department_id ) &&
+                    isDepartmentHead &&
+                    ( currentStatus?.stage === 'department' ||
+                        !currentStatus?.stage ) &&
+                    currentStatus?.status === 'Pending' ) ? (
                 <div className="flex flex-wrap">
                     <Tooltip content={`Approve`} placement={`left-start`}>
                         <Button
                             gradientDuoTone="greenToBlue"
-                            onClick={() => {
-                                updateStatus({
+                            onClick={() =>
+                            {
+                                updateStatus( {
                                     status: 2,
                                     notes: '',
-                                })
+                                } )
                             }}
                             isProcessing={
                                 cashISLoading ||
@@ -160,11 +184,12 @@ const Status = ({
                     <Tooltip content={`Reject`} placement={`top`}>
                         <Button
                             gradientDuoTone="redToYellow"
-                            onClick={() => {
-                                updateStatus({
+                            onClick={() =>
+                            {
+                                updateStatus( {
                                     status: 3,
                                     notes: '',
-                                })
+                                } )
                             }}
                             isProcessing={
                                 cashISLoading ||
@@ -177,19 +202,19 @@ const Status = ({
                     </Tooltip>
                 </div>
             ) : (
-                (currentStatus?.stage
-                    ? (currentStatus?.status === 'Pending'
-                          ? 'Pending in '
-                          : currentStatus?.status + ' by ') +
-                      (currentStatus?.stage === 'department'
-                          ? requisition?.department?.name
-                          : currentStatus?.stage?.charAt(0)?.toUpperCase() +
-                            currentStatus?.stage?.slice(1)) +
-                      ' Department'
+                ( currentStatus?.stage
+                    ? ( currentStatus?.status === 'Pending'
+                        ? 'Pending in '
+                        : currentStatus?.status + ' by ' ) +
+                    ( currentStatus?.stage === 'department'
+                        ? requisition?.department?.name
+                        : currentStatus?.stage?.charAt( 0 )?.toUpperCase() +
+                        currentStatus?.stage?.slice( 1 ) ) +
+                    ' Department'
                     : ''
                 )
-                    .replace('Ceo Department', 'CEO')
-                    .replace('dept.', ' ')
+                    .replace( 'Ceo Department', 'CEO' )
+                    .replace( 'dept.', ' ' )
             )}
         </div>
     )
