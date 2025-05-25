@@ -4,60 +4,68 @@ import { useAuth } from '@/hooks/auth'
 import { useUpdateIssueMutation } from '@/store/service/issue'
 import { AiFillCheckSquare, AiFillDelete } from 'react-icons/ai'
 
-const IssueStatus = ({ row }) => {
+const IssueStatus = ( { row } ) =>
+{
     const { user } = useAuth()
-    const [selectedDropdown, setSelectedDropdown] = useState('Status')
+    const [ selectedDropdown, setSelectedDropdown ] = useState( 'Status' )
     const isDepartmentHead =
-        user?.current_department_head === parseInt(user?.id)
-    const [isReceiverDepartment, setISReceiverDepartment] = useState(
-        parseInt(row?.receiver_department_id) ===
-            parseInt(user?.selected_department),
+        user?.current_department_head === parseInt( user?.id ) ||
+        user?.role_names?.includes( 'System Administrator' ) || user?.permissions?.filter( p => p.name === "approve_department_issue" ).length
+    const [ isReceiverDepartment, setISReceiverDepartment ] = useState(
+        parseInt( row?.receiver_department_id ) ===
+        parseInt( user?.selected_department ),
     )
-    const [isStoreManager, setISStoreManager] = useState(
-        user?.role_object?.filter(r => r.name === 'Store Manager').length,
+    const [ isStoreManager, setISStoreManager ] = useState(
+        user?.role_object?.filter( r => r.name === 'Store Manager' ).length,
     )
     const [
         updateIssue,
         { data, isLoading, isSuccess, isError },
     ] = useUpdateIssueMutation()
 
-    useEffect(() => {
+    useEffect( () =>
+    {
         setISReceiverDepartment(
-            parseInt(row?.receiver_department_id) ===
-                parseInt(user?.selected_department),
+            parseInt( row?.receiver_department_id ) ===
+            parseInt( user?.selected_department ),
         )
         setISStoreManager(
-            user?.role_object?.filter(r => r.name === 'Store Manager').length,
+            user?.role_object?.filter( r => r.name === 'Store Manager' ).length,
         )
 
         if (
-            parseInt(row?.receiver_department_id) ===
-                parseInt(user?.selected_department) &&
+            parseInt( row?.receiver_department_id ) ===
+            parseInt( user?.selected_department ) &&
             row.department_status
-        ) {
-            setSelectedDropdown('Approved')
+        )
+        {
+            setSelectedDropdown( 'Approved' )
         } else if (
-            parseInt(row?.receiver_department_id) ===
-                parseInt(user?.selected_department) &&
+            parseInt( row?.receiver_department_id ) ===
+            parseInt( user?.selected_department ) &&
             !row.department_status
-        ) {
-            setSelectedDropdown('Pending')
+        )
+        {
+            setSelectedDropdown( 'Pending' )
         }
         if (
-            user?.role_object?.filter(r => r.name === 'Store Manager').length &&
+            user?.role_object?.filter( r => r.name === 'Store Manager' ).length &&
             row.store_status
-        ) {
-            setSelectedDropdown('Approved')
+        )
+        {
+            setSelectedDropdown( 'Approved' )
         } else if (
-            user?.role_object?.filter(r => r.name === 'Store Manager').length &&
+            user?.role_object?.filter( r => r.name === 'Store Manager' ).length &&
             !row.store_status
-        ) {
-            setSelectedDropdown('Pending')
+        )
+        {
+            setSelectedDropdown( 'Pending' )
         }
-    }, [user, row])
-    const updateStatus = (arg, selected) => {
-        const c = confirm('Are your sure?')
-        if (!c) return
+    }, [ user, row ] )
+    const updateStatus = ( arg, selected ) =>
+    {
+        const c = confirm( 'Are your sure?' )
+        if ( !c ) return
         const both =
             isStoreManager &&
             row?.department_status &&
@@ -65,28 +73,29 @@ const IssueStatus = ({ row }) => {
             isDepartmentHead
         const storeManager = isStoreManager && row?.department_status
         const department = isReceiverDepartment && isDepartmentHead
-        updateIssue({
+        updateIssue( {
             ...arg,
             department: both
                 ? 'both'
                 : storeManager
-                ? 'store'
-                : department
-                ? 'department'
-                : '',
-        })
-        setSelectedDropdown(selected)
+                    ? 'store'
+                    : department
+                        ? 'department'
+                        : '',
+        } )
+        setSelectedDropdown( selected )
     }
     return (
         <div>
-            {((isStoreManager && row?.department_status) ||
-                (isReceiverDepartment && isDepartmentHead)) &&
-            selectedDropdown !== 'Approved' ? (
+            {( ( isStoreManager && row?.department_status ) ||
+                ( isReceiverDepartment && isDepartmentHead ) ) &&
+                selectedDropdown !== 'Approved' ? (
                 <div className="flex flex-wrap">
                     <Tooltip content={`Approved`} placement={`left-start`}>
                         <Button
                             gradientDuoTone="greenToBlue"
-                            onClick={() => {
+                            onClick={() =>
+                            {
                                 updateStatus(
                                     {
                                         status: 1,
@@ -101,7 +110,8 @@ const IssueStatus = ({ row }) => {
                     <Tooltip content={`Reject`} placement={`top`}>
                         <Button
                             gradientDuoTone="redToYellow"
-                            onClick={() => {
+                            onClick={() =>
+                            {
                                 updateStatus(
                                     {
                                         status: 2,
