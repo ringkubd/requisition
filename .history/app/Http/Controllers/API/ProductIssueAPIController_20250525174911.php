@@ -190,7 +190,9 @@ class ProductIssueAPIController extends AppBaseController
                 $requisitor_name = $request->user()->name;
 
                 $department_autority = User::query()
-                    ->where('default_branch_id', auth_branch_id())
+                    ->whereHas('branches', function ($q) use ($productIssue) {
+                        $q->where('id',  $productIssue->receiver_branch_id);
+                    })
                     ->permission('approve_department_issue')
                     ->get();
 
