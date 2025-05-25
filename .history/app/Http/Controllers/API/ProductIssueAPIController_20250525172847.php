@@ -166,68 +166,64 @@ class ProductIssueAPIController extends AppBaseController
 
         $productIssue = new ProductIssue();
         if (!empty($input)) {
-            DB::transaction(function () use ($uuid, $request, $input) {
-                $productIssue = ProductIssue::create([
-                    'uuid' => $uuid,
-                    'issuer_id' => $request->user()->id,
-                    'issuer_branch_id' => auth_branch_id(),
-                    'issuer_department_id' => auth_department_id(),
-                    'receiver_id' => $input[0]['receiver_id'],
-                    'receiver_branch_id' => auth_branch_id(),
-                    'receiver_department_id' => auth_department_id(),
-                ]);
+            // DB::transaction(function () use ($uuid, $request, $input) {
+            $productIssue = ProductIssue::create([
+                'uuid' => $uuid,
+                'issuer_id' => $request->user()->id,
+                'issuer_branch_id' => auth_branch_id(),
+                'issuer_department_id' => auth_department_id(),
+                'receiver_id' => $input[0]['receiver_id'],
+                'receiver_branch_id' => auth_branch_id(),
+                'receiver_department_id' => auth_department_id(),
+            ]);
 
-                $input = array_map(function ($it) use ($uuid, $productIssue) {
-                    $it['uuid'] = $uuid;
-                    $it['product_issue_id'] = $productIssue->id;
-                    $it['use_date'] =   Carbon::parse($it['issue_time'])->toDateTimeString();
-                    return $it;
-                }, $input);
+            $input = array_map(function ($it) use ($uuid, $productIssue) {
+                $it['uuid'] = $uuid;
+                $it['product_issue_id'] = $productIssue->id;
+                $it['use_date'] =   Carbon::parse($it['issue_time'])->toDateTimeString();
+                return $it;
+            }, $input);
 
-                $productIssue->items()->createMany($input);
+            $productIssue->items()->createMany($input);
 
-                // $head_of_department = User::find(Department::find(auth_department_id())->head_of_department);
-                $requisitor_name = $request->user()->name;
+            // $head_of_department = User::find(Department::find(auth_department_id())->head_of_department);
+            $requisitor_name = $request->user()->name;
 
-                $department_autority = User::query()
-                    ->whereHas('branches', function ($q) use ($productIssue) {
-                        $q->where('id',  auth_branch_id());
-                    })
-                    ->permission('approve_department_issue')
-                    ->get();
+            $department_autority = User::query()
+                ->whereHas('branches', function ($q) use ($productIssue) {
+                    $q->where('id',  $productIssue->branch_id);
+                })
+                ->whereHas('permissions', function ($q) {
+                    $q->where('name', 'approve_department_issue');
+                })
+                ->get();
+            \dd($department_autority);
+            // $requisition->id . '_' . $requisitor_name->id . '_2_ceo_purchase'
 
-                Log::info('department_authority', [
-                    "authority" => $department_autority,
-                    "requisitor_name" => $requisitor_name,
-                    "branch_id" => auth_branch_id(),
-
-                ]);
-                // $requisition->id . '_' . $requisitor_name->id . '_2_ceo_purchase'
-
-                foreach ($department_autority as $authority) {
-                    if (!empty($authority->mobile_no)) {
-                        $no = auth_department_name() . '/' . $productIssue->id;
-                        $one_time_key = new OneTimeLogin();
-                        $key = $one_time_key->generate($authority->id);
-                        $authority->notify(new WhatsAppIssueButtonNotification(
-                            Component::text($requisitor_name),
-                            Component::text($no),
-                            Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_1_department_issue']),
-                            Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_2_department_issue']),
-                            Component::urlButton(["/issue/$uuid/whatsapp_view?auth_key=$key->auth_key"]),
-                            $authority->mobile_no
-                        ));
-                        $request->user()->notify(new WhatsAppIssueButtonNotification(
-                            Component::text($requisitor_name),
-                            Component::text($no),
-                            Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_1_department_issue']),
-                            Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_2_department_issue']),
-                            Component::urlButton(["/issue/$uuid/whatsapp_view?auth_key=$key->auth_key"]),
-                            '+8801737956549'
-                        ));
-                    }
+            foreach ($department_autority as $authority) {
+                if (!empty($authority->mobile_no)) {
+                    $no = auth_department_name() . '/' . $productIssue->id;
+                    $one_time_key = new OneTimeLogin();
+                    $key = $one_time_key->generate($authority->id);
+                    $authority->notify(new WhatsAppIssueButtonNotification(
+                        Component::text($requisitor_name),
+                        Component::text($no),
+                        Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_1_department_issue']),
+                        Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_2_department_issue']),
+                        Component::urlButton(["/issue/$uuid/whatsapp_view?auth_key=$key->auth_key"]),
+                        $authority->mobile_no
+                    ));
+                    $request->user()->notify(new WhatsAppIssueButtonNotification(
+                        Component::text($requisitor_name),
+                        Component::text($no),
+                        Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_1_department_issue']),
+                        Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_2_department_issue']),
+                        Component::urlButton(["/issue/$uuid/whatsapp_view?auth_key=$key->auth_key"]),
+                        '+8801737956549'
+                    ));
                 }
-            }, 2);
+            }
+            // }, 2);
         }
         return $this->sendResponse(
             new ProductIssueResource($productIssue),

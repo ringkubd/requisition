@@ -191,42 +191,43 @@ class ProductIssueAPIController extends AppBaseController
 
                 $department_autority = User::query()
                     ->whereHas('branches', function ($q) use ($productIssue) {
-                        $q->where('id',  auth_branch_id());
+                        $q->where('id',  $productIssue->branch_id);
                     })
-                    ->permission('approve_department_issue')
+                    // ->whereHas('permissions', function ($q) {
+                    //     $q->where('name', 'approve_department_issue');
+                    // })
                     ->get();
-
                 Log::info('department_authority', [
                     "authority" => $department_autority,
                     "requisitor_name" => $requisitor_name,
-                    "branch_id" => auth_branch_id(),
+                    "branch_id" => $productIssue->branch_id,
 
                 ]);
                 // $requisition->id . '_' . $requisitor_name->id . '_2_ceo_purchase'
 
-                foreach ($department_autority as $authority) {
-                    if (!empty($authority->mobile_no)) {
-                        $no = auth_department_name() . '/' . $productIssue->id;
-                        $one_time_key = new OneTimeLogin();
-                        $key = $one_time_key->generate($authority->id);
-                        $authority->notify(new WhatsAppIssueButtonNotification(
-                            Component::text($requisitor_name),
-                            Component::text($no),
-                            Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_1_department_issue']),
-                            Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_2_department_issue']),
-                            Component::urlButton(["/issue/$uuid/whatsapp_view?auth_key=$key->auth_key"]),
-                            $authority->mobile_no
-                        ));
-                        $request->user()->notify(new WhatsAppIssueButtonNotification(
-                            Component::text($requisitor_name),
-                            Component::text($no),
-                            Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_1_department_issue']),
-                            Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_2_department_issue']),
-                            Component::urlButton(["/issue/$uuid/whatsapp_view?auth_key=$key->auth_key"]),
-                            '+8801737956549'
-                        ));
-                    }
-                }
+                // foreach ($department_autority as $authority) {
+                //     if (!empty($authority->mobile_no)) {
+                //         $no = auth_department_name() . '/' . $productIssue->id;
+                //         $one_time_key = new OneTimeLogin();
+                //         $key = $one_time_key->generate($authority->id);
+                //         $authority->notify(new WhatsAppIssueButtonNotification(
+                //             Component::text($requisitor_name),
+                //             Component::text($no),
+                //             Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_1_department_issue']),
+                //             Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_2_department_issue']),
+                //             Component::urlButton(["/issue/$uuid/whatsapp_view?auth_key=$key->auth_key"]),
+                //             $authority->mobile_no
+                //         ));
+                //         $request->user()->notify(new WhatsAppIssueButtonNotification(
+                //             Component::text($requisitor_name),
+                //             Component::text($no),
+                //             Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_1_department_issue']),
+                //             Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_2_department_issue']),
+                //             Component::urlButton(["/issue/$uuid/whatsapp_view?auth_key=$key->auth_key"]),
+                //             '+8801737956549'
+                //         ));
+                //     }
+                // }
             }, 2);
         }
         return $this->sendResponse(

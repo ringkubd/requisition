@@ -24,6 +24,7 @@ use NotificationChannels\WhatsApp\Component;
 use NotificationChannels\WhatsApp\Component\QuickReplyButton;
 use OpenApi\Annotations as OA;
 use Ramsey\Uuid\Nonstandard\Uuid;
+use Log;
 
 /**
  * Class ProductIssueController
@@ -191,17 +192,13 @@ class ProductIssueAPIController extends AppBaseController
 
                 $department_autority = User::query()
                     ->whereHas('branches', function ($q) use ($productIssue) {
-                        $q->where('id',  auth_branch_id());
+                        $q->where('id',  $productIssue->branch_id);
                     })
-                    ->permission('approve_department_issue')
+                    ->whereHas('permissions', function ($q) {
+                        $q->where('name', 'approve_department_issue');
+                    })
                     ->get();
-
-                Log::info('department_authority', [
-                    "authority" => $department_autority,
-                    "requisitor_name" => $requisitor_name,
-                    "branch_id" => auth_branch_id(),
-
-                ]);
+                // Log::info('department_authority',$department_autority);
                 // $requisition->id . '_' . $requisitor_name->id . '_2_ceo_purchase'
 
                 foreach ($department_autority as $authority) {

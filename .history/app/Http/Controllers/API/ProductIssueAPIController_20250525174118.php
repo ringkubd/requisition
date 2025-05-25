@@ -195,7 +195,6 @@ class ProductIssueAPIController extends AppBaseController
                     })
                     ->permission('approve_department_issue')
                     ->get();
-
                 Log::info('department_authority', [
                     "authority" => $department_autority,
                     "requisitor_name" => $requisitor_name,
