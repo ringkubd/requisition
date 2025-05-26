@@ -213,6 +213,7 @@ class CashRequisitionAPIController extends AppBaseController
             ->whereHas('roles.permissions', function ($q) {
                 $q->where('name', 'approve_department_cash');
             })
+            ->where('id', '!=', $request->user()->id)
             ->get();
 
         if (empty($department_autority)) {

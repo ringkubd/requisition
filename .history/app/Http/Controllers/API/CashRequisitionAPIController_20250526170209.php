@@ -208,9 +208,9 @@ class CashRequisitionAPIController extends AppBaseController
         // Normal notification flow
         $department_autority = User::query()
             ->whereHas('departments', function ($q) use ($cashRequisition) {
-                $q->where('id',  \auth_department_id());
+                $q->where('id',  auth_department_id());
             })
-            ->whereHas('roles.permissions', function ($q) {
+            ->whereHas('permissions', function ($q) {
                 $q->where('name', 'approve_department_cash');
             })
             ->get();

@@ -504,10 +504,10 @@ class PurchaseRequisitionAPIController extends AppBaseController
         }
 
         $department_autority = User::query()
-            ->whereHas('departments', function ($q) {
-                $q->where('id',  \auth_department_id());
+            ->whereHas('department', function ($q) use ($purchaseRequisition) {
+                $q->where('id',  $purchaseRequisition->branch_id);
             })
-            ->whereHas('roles.permissions', function ($q) {
+            ->whereHas('permissions', function ($q) {
                 $q->where('name', 'approve_department_purchase');
             })
             ->get();
