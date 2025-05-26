@@ -25,26 +25,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setDateRange } from '@/store/slice/filterDateRange'
 import { hasPermission } from '@/lib/helpers'
 
-
 const ProductIssue = () =>
 {
     const { user } = useAuth()
     const router = useRouter()
-
-    // Debug: Check if running on server or client
-    if ( typeof window === 'undefined' )
-    {
-        // eslint-disable-next-line no-console
-        console.debug( 'ProductIssue: Running on server' )
-    } else
-    {
-        // eslint-disable-next-line no-console
-        console.debug( 'ProductIssue: Running on client' )
-    }
-
-    // Debug: Log user from useAuth
-    // eslint-disable-next-line no-console
-    console.debug( 'ProductIssue: useAuth() returned user:', user )
     const dispatch = useDispatch()
     const dateRange = useSelector( state => state.filter_date_range )
     const [ searchParams, setSearchParams ] = useState( {} )
@@ -63,25 +47,8 @@ const ProductIssue = () =>
     )
     const [ dataTableData, setDataTableData ] = useState( [] )
 
-    // Debug: Log initial states
-    if ( typeof window !== 'undefined' )
-    {
-        // eslint-disable-next-line no-console
-        console.debug( 'ProductIssue: user', user )
-        console.debug( 'ProductIssue: searchParams', searchParams )
-        console.debug( 'ProductIssue: data', data )
-        console.debug( 'ProductIssue: isLoading', isLoading )
-        console.debug( 'ProductIssue: isError', isError )
-        console.debug( 'ProductIssue: departments', departments )
-        console.debug( 'ProductIssue: columns', columns )
-        console.debug( 'ProductIssue: dataTableData', dataTableData )
-    }
-
     useEffect( () =>
     {
-        // Debug: Log user in useEffect
-        // eslint-disable-next-line no-console
-        console.debug( 'ProductIssue: useEffect user:', user )
         if ( user )
         {
             setISStoreManager(
@@ -102,79 +69,72 @@ const ProductIssue = () =>
 
     useEffect( () =>
     {
-        try
+        if ( !isLoading && !isError && data )
         {
-            if ( !isLoading && !isError && data )
-            {
-                const issueData = data?.product_issue
-                setDataTableData( issueData )
-                setColumns( [
-                    {
-                        name: 'SL.',
-                        selector: ( row, index ) =>
-                            row.receiver_department?.name + '/' + row.id,
-                        sortable: true,
-                    },
-                    {
-                        name: 'No. of Item',
-                        selector: row => row.products?.length,
-                        sortable: true,
-                    },
-                    {
-                        name: 'Receiver',
-                        selector: row => row.receiver?.name,
-                        sortable: true,
-                    },
-                    {
-                        name: 'Department',
-                        selector: row => row.receiver_department?.name,
-                        sortable: true,
-                    },
-                    {
-                        name: 'Issuer',
-                        selector: row => row.issuer?.name,
-                        sortable: true,
-                    },
-                    {
-                        name: 'Issue Time',
-                        selector: row =>
-                            moment( row.created_at ).format( 'D MMM Y @ H:mm ' ),
-                        sortable: true,
-                    },
-                    {
-                        name: 'Status',
-                        cell: row => <IssueStatus key={row.uuid} row={row} />,
-                    },
-                    {
-                        name: 'Actions',
-                        cell: row => (
-                            <Actions
-                                itemId={row.uuid}
-                                edit={
-                                    isStoreManager &&
-                                        ( !row.store_status ||
-                                            moment().diff(
-                                                moment( row.updated_at ),
-                                                'days',
-                                            ) < 1 )
-                                        ? `/issue/${row.uuid}/edit`
-                                        : false
-                                }
-                                // view={`/issue/${row.uuid}/view`}
-                                destroy={destroy}
-                                print={`/issue/${row.uuid}/print_view`}
-                                progressing={destroyResponse.isLoading}
-                                permissionModule={`product-issues`}
-                            />
-                        ),
-                        ignoreRowClick: true,
-                    },
-                ] )
-            }
-        } catch ( err )
-        {
-            // eslint-disable-next-line no-console
-            console.error( 'ProductIssue: Error in useEffect (columns/data)', err )
+            const issueData = data?.product_issue
+            setDataTableData( issueData )
+            setColumns( [
+                {
+                    name: 'SL.',
+                    selector: ( row, index ) =>
+                        row.receiver_department?.name + '/' + row.id,
+                    sortable: true,
+                },
+                {
+                    name: 'No. of Item',
+                    selector: row => row.products?.length,
+                    sortable: true,
+                },
+                {
+                    name: 'Receiver',
+                    selector: row => row.receiver?.name,
+                    sortable: true,
+                },
+                {
+                    name: 'Department',
+                    selector: row => row.receiver_department?.name,
+                    sortable: true,
+                },
+                {
+                    name: 'Issuer',
+                    selector: row => row.issuer?.name,
+                    sortable: true,
+                },
+                {
+                    name: 'Issue Time',
+                    selector: row =>
+                        moment( row.created_at ).format( 'D MMM Y @ H:mm ' ),
+                    sortable: true,
+                },
+                {
+                    name: 'Status',
+                    selector: row => <IssueStatus key={row.uuid} row={row} />,
+                },
+                {
+                    name: 'Actions',
+                    cell: row => (
+                        <Actions
+                            itemId={row.uuid}
+                            edit={
+                                isStoreManager &&
+                                    ( !row.store_status ||
+                                        moment().diff(
+                                            moment( row.updated_at ),
+                                            'days',
+                                        ) < 1 )
+                                    ? `/issue/${row.uuid}/edit`
+                                    : false
+                            }
+                            // view={`/issue/${row.uuid}/view`}
+                            destroy={destroy}
+                            print={`/issue/${row.uuid}/print_view`}
+                            progressing={destroyResponse.isLoading}
+                            permissionModule={`product-issues`}
+                        />
+                    ),
+                    ignoreRowClick: true,
+                },
+            ] )
         }
     }, [ isLoading, data, isStoreManager ] )
 
@@ -196,47 +156,6 @@ const ProductIssue = () =>
             changeSearchParams( 'dateRange', '' )
         }
     }, [ dateRange ] )
-
-    // Debug: Wrap DataTable in try/catch
-    let dataTableRender = null
-    try
-    {
-        dataTableRender = (
-            <DataTable
-                columns={columns}
-                data={dataTableData}
-                pagination
-                responsive
-                progressPending={isLoading}
-                persistTableHead={true}
-                paginationServer
-                onChangePage={( page, totalRows ) =>
-                    setSearchParams( {
-                        ...searchParams,
-                        page: page,
-                    } )
-                }
-                onChangeRowsPerPage={(
-                    currentRowsPerPage,
-                    currentPage,
-                ) =>
-                    setSearchParams( {
-                        ...searchParams,
-                        page: currentPage,
-                        per_page: currentRowsPerPage,
-                    } )
-                }
-                paginationResetDefaultPage={false}
-                paginationTotalRows={data?.number_of_rows}
-                paginationPerPage={15}
-            />
-        )
-    } catch ( err )
-    {
-        // eslint-disable-next-line no-console
-        console.error( 'ProductIssue: Error rendering DataTable', err )
-        dataTableRender = <div style={{ color: 'red' }}>Error rendering DataTable</div>
-    }
 
     return (
         <>
@@ -318,7 +237,34 @@ const ProductIssue = () =>
                             </div>
                         </div>
 
-                        {dataTableRender}
+                        <DataTable
+                            columns={columns}
+                            data={dataTableData}
+                            pagination
+                            responsive
+                            progressPending={isLoading}
+                            persistTableHead={true}
+                            paginationServer
+                            onChangePage={( page, totalRows ) =>
+                                setSearchParams( {
+                                    ...searchParams,
+                                    page: page,
+                                } )
+                            }
+                            onChangeRowsPerPage={(
+                                currentRowsPerPage,
+                                currentPage,
+                            ) =>
+                                setSearchParams( {
+                                    ...searchParams,
+                                    page: currentPage,
+                                    per_page: currentRowsPerPage,
+                                } )
+                            }
+                            paginationResetDefaultPage={false}
+                            paginationTotalRows={data?.number_of_rows}
+                            paginationPerPage={15}
+                        />
                     </Card>
                 </div>
             </AppLayout>
