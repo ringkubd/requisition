@@ -4,18 +4,18 @@ import { userSlice } from '@/store/service/user'
 import { createWrapper } from 'next-redux-wrapper'
 import { productMetaSlice } from '@/store/service/product/productMetaSlice'
 import
-    {
-        FLUSH,
-        persistReducer,
-        REHYDRATE,
-        PAUSE,
-        PERSIST,
-        PURGE,
-        REGISTER,
-        persistStore,
-    } from 'reduxjs-toolkit-persist'
-// import storage from 'reduxjs-toolkit-persist/lib/storage'
-import storage from "@/store/persistStorage";
+{
+    FLUSH,
+    persistReducer,
+    REHYDRATE,
+    PAUSE,
+    PERSIST,
+    PURGE,
+    REGISTER,
+    persistStore,
+} from 'reduxjs-toolkit-persist'
+import storage from 'reduxjs-toolkit-persist/lib/storage'
+// import storage from "@/store/persistStorage";
 import autoMergeLevel1 from 'reduxjs-toolkit-persist/lib/stateReconciler/autoMergeLevel1'
 import { optionSlice } from '@/store/service/options/optionSlice'
 import { ProductActiveFormSlice } from '@/store/service/product/product_active_form'

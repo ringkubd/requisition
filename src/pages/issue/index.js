@@ -30,6 +30,21 @@ const ProductIssue = () =>
 {
     const { user } = useAuth()
     const router = useRouter()
+
+    // Debug: Check if running on server or client
+    if ( typeof window === 'undefined' )
+    {
+        // eslint-disable-next-line no-console
+        console.debug( 'ProductIssue: Running on server' )
+    } else
+    {
+        // eslint-disable-next-line no-console
+        console.debug( 'ProductIssue: Running on client' )
+    }
+
+    // Debug: Log user from useAuth
+    // eslint-disable-next-line no-console
+    console.debug( 'ProductIssue: useAuth() returned user:', user )
     const dispatch = useDispatch()
     const dateRange = useSelector( state => state.filter_date_range )
     const [ searchParams, setSearchParams ] = useState( {} )
@@ -64,6 +79,9 @@ const ProductIssue = () =>
 
     useEffect( () =>
     {
+        // Debug: Log user in useEffect
+        // eslint-disable-next-line no-console
+        console.debug( 'ProductIssue: useEffect user:', user )
         if ( user )
         {
             setISStoreManager(
