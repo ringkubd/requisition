@@ -193,17 +193,13 @@ class ProductIssueAPIController extends AppBaseController
                     ->whereHas('departments', function ($q) {
                         $q->where('id', auth_department_id());
                     })
-                    ->whereHas('roles.permissions', function ($q) {
-                        $q->where('name', 'approve_department_issue');
-                    })
-                    ->where('id', '!=', $request->user()->id)
-                    // ->permission('approve_department_issue')
+                    ->permission('approve_department_issue')
                     ->get();
 
                 Log::info('department_authority', [
                     "authority" => $department_autority,
                     "requisitor_name" => $requisitor_name,
-                    "department_id" => auth_department_id(),
+                    "branch_id" => auth_branch_id(),
 
                 ]);
                 // $requisition->id . '_' . $requisitor_name->id . '_2_ceo_purchase'
