@@ -1,0 +1,306 @@
+import React, { useEffect, useState } from 'react'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import moment from 'moment'
+
+// UI Components
+import { Button, Card, Label, Select, TextInput } from 'flowbite-react'
+import DataTable from 'react-data-table-component'
+import Datepicker from 'react-tailwindcss-datepicker'
+import { AiOutlineSearch } from 'react-icons/ai'
+
+// Navigation & Layout
+import AppLayout from '@/components/Layouts/AppLayout'
+import NavLink from '@/components/navLink'
+import Actions from '@/components/actions'
+
+// Comment out backend dependencies but keep imports for UI to work properly
+// import { useAuth } from '@/hooks/auth'
+// import { wrapper } from '@/store' 
+// import { useDispatch, useSelector } from 'react-redux'
+// import { toast } from 'react-toastify'
+import {
+    useGetIssueQuery,
+    useDestroyIssueMutation,
+    getRunningQueriesThunk,
+    getIssue,
+} from '@/store/service/issue'
+import { useGetDepartmentByOrganizationBranchQuery } from '@/store/service/deparment'
+import { setDateRange } from '@/store/slice/filterDateRange'
+import { hasPermission } from '@/lib/helpers'
+*/
+
+// Simple debug function
+const debug = ( message ) =>
+{
+    if ( typeof window !== 'undefined' )
+    {
+        console.log( `[DEBUG] ${message}` );
+    }
+};
+
+// Dummy data for testing UI without backend
+const dummyIssueData = [
+    {
+        id: 1,
+        uuid: 'abc-123',
+        receiver: { name: 'John Doe' },
+        receiver_department: { name: 'Engineering' },
+        issuer: { name: 'Jane Smith' },
+        products: [ { id: 101 }, { id: 102 }, { id: 103 } ],
+        created_at: '2025-05-24T10:30:00Z',
+        department_status: true,
+        store_status: true,
+        updated_at: '2025-05-24T11:30:00Z'
+    },
+    {
+        id: 2,
+        uuid: 'def-456',
+        receiver: { name: 'Robert Brown' },
+        receiver_department: { name: 'Marketing' },
+        issuer: { name: 'Sarah Wilson' },
+        products: [ { id: 201 }, { id: 202 } ],
+        created_at: '2025-05-25T09:15:00Z',
+        department_status: true,
+        store_status: false,
+        updated_at: '2025-05-25T09:45:00Z'
+    },
+    {
+        id: 3,
+        uuid: 'ghi-789',
+        receiver: { name: 'Michael Lee' },
+        receiver_department: { name: 'Finance' },
+        issuer: { name: 'Lisa Chen' },
+        products: [ { id: 301 } ],
+        created_at: '2025-05-26T08:00:00Z',
+        department_status: false,
+        store_status: false,
+        updated_at: '2025-05-26T08:10:00Z'
+    },
+    {
+        id: 4,
+        uuid: 'jkl-012',
+        receiver: { name: 'David Miller' },
+        receiver_department: { name: 'IT' },
+        issuer: { name: 'Emily Jones' },
+        products: [ { id: 401 }, { id: 402 }, { id: 403 }, { id: 404 } ],
+        created_at: '2025-05-20T14:30:00Z',
+        department_status: true,
+        store_status: true,
+        updated_at: '2025-05-20T15:00:00Z'
+    }
+];
+
+const ProductIssue = () =>
+{
+    // Using dummy data instead of fetching from backend
+    const [ issues ] = useState( dummyIssueData );
+    const [ debugLog ] = useState( [
+        { time: new Date().toISOString(), type: 'info', source: 'init', message: 'Using dummy data' }
+    ] );
+
+
+    // Helper function to format dates
+    const formatDate = ( dateString ) =>
+    {
+        try
+        {
+            const date = new Date( dateString );
+            return date.toLocaleString( 'en-US', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            } );
+        } catch ( e )
+        {
+            return 'Invalid date';
+        }
+    };
+
+    // Render a status badge
+    const StatusBadge = ( { departmentStatus, storeStatus } ) =>
+    {
+        if ( departmentStatus && storeStatus )
+        {
+            return <span className="bg-green-100 text-green-800 px-2 py-1 rounded">Approved & Issued</span>;
+        } else if ( departmentStatus )
+        {
+            return <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Pending in store</span>;
+        } else
+        {
+            return <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">Pending in department</span>;
+        }
+    };
+
+    // Error component - kept from original
+    const ErrorComponent = () => (
+        <div className="bg-red-50 p-6 rounded-lg border border-red-200 my-4 text-center">
+            <h3 className="text-red-600 font-semibold text-lg mb-2">Error Loading Data</h3>
+            <p className="text-gray-700 mb-4">There was a problem loading the product issues.</p>
+            <Button
+                color="failure"
+                onClick={() => window.location.reload()}
+            >
+                Refresh Page
+            </Button>
+        </div>
+    )
+
+    // Main render - simple table with dummy data
+    return (
+        <div className="min-h-screen bg-gray-100 py-6">
+            <Head>
+                <title>Product Issue Management (Dummy Data)</title>
+            </Head>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900">Product Issue Management</h1>
+                    <p className="mt-2 text-gray-600 bg-yellow-100 p-2 rounded">
+                        <strong>DEBUGGING MODE:</strong> Using dummy data instead of backend API
+                    </p>
+                </div>
+
+                <Card>
+                    {/* Simple Header */}
+                    <div className="p-4 border-b flex justify-between items-center">
+                        <div>
+                            <Button color="blue">Create New Issue</Button>
+                        </div>
+                        <div>
+                            <input
+                                type="text"
+                                className="px-4 py-2 border rounded"
+                                placeholder="Search issues..."
+                            />
+                        </div>
+                    </div>
+
+                    {/* Simple Table */}
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receiver</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issuer</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issue Time</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {issues.map( ( issue ) => (
+                                    <tr key={issue.id}>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            {issue.id}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {issue.receiver_department?.name || 'N/A'}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {issue.products?.length || 0}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {issue.receiver?.name || 'N/A'}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {issue.issuer?.name || 'N/A'}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {formatDate( issue.created_at )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <StatusBadge
+                                                departmentStatus={issue.department_status}
+                                                storeStatus={issue.store_status}
+                                            />
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <div className="flex space-x-2">
+                                                <button className="text-indigo-600 hover:text-indigo-900">Edit</button>
+                                                <button className="text-red-600 hover:text-red-900">Delete</button>
+                                                <button className="text-gray-600 hover:text-gray-900">Print</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Simple Pagination */}
+                    <div className="px-4 py-3 border-t flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-gray-700">
+                                Showing <span className="font-medium">1</span> to <span className="font-medium">{issues.length}</span> of{' '}
+                                <span className="font-medium">{issues.length}</span> results
+                            </p>
+                        </div>
+                        <div className="flex space-x-2">
+                            <Button color="light" disabled>Previous</Button>
+                            <Button color="light" disabled>Next</Button>
+                        </div>
+                    </div>
+
+                    {/* Debug Panel */}
+                    <div className="mt-4 p-4 border-t border-gray-200">
+                        <details className="bg-gray-50 rounded-lg p-3">
+                            <summary className="font-bold text-red-600 cursor-pointer">
+                                Debug Information (click to expand)
+                            </summary>
+                            <div className="mt-3 overflow-auto max-h-96 bg-gray-100 p-3 rounded text-xs font-mono">
+                                <h3 className="font-bold mb-2">Component State:</h3>
+                                <pre className="overflow-auto p-2 bg-white border rounded">
+                                    {JSON.stringify( {
+                                        issueCount: issues.length,
+                                        dummyDataMode: true,
+                                        clientSide: typeof window !== 'undefined',
+                                        timestamp: new Date().toISOString()
+                                    }, null, 2 )}
+                                </pre>
+
+                                <h3 className="font-bold mt-4 mb-2">Debug Log:</h3>
+                                <div className="overflow-auto p-2 bg-white border rounded">
+                                    {debugLog.map( ( log, i ) => (
+                                        <div key={i} className={`mb-1 p-1 border-b ${log.type === 'error' ? 'bg-red-50' :
+                                            log.type === 'warning' ? 'bg-yellow-50' : 'bg-white'
+                                            }`}>
+                                            <span className="text-gray-500">{log.time}</span>
+                                            <span className={`ml-2 font-bold ${log.type === 'error' ? 'text-red-600' :
+                                                log.type === 'warning' ? 'text-yellow-600' : 'text-blue-600'
+                                                }`}>
+                                                [{log.source}]
+                                            </span>
+                                            <span className="ml-2">{log.message}</span>
+                                        </div>
+                                    ) )}
+                                </div>
+
+                                <h3 className="font-bold mt-4 mb-2">Sample Data:</h3>
+                                <pre className="overflow-auto p-2 bg-white border rounded">
+                                    {JSON.stringify( issues[ 0 ], null, 2 )}
+                                </pre>
+                            </div>
+                        </details>
+                    </div>
+                </Card>
+            </div>
+        </div>
+    );
+}
+
+// Simple export with no server-side props or Redux wrapper
+// This avoids any server-side code execution that might reference document/window
+export function getStaticProps()
+{
+    return {
+        props: {}, // no props needed as we're using dummy data
+    };
+}
+
+export default ProductIssue
