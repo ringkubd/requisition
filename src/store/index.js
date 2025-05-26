@@ -3,18 +3,19 @@ import { setupListeners } from '@reduxjs/toolkit/query'
 import { userSlice } from '@/store/service/user'
 import { createWrapper } from 'next-redux-wrapper'
 import { productMetaSlice } from '@/store/service/product/productMetaSlice'
-import {
-    FLUSH,
-    persistReducer,
-    REHYDRATE,
-    PAUSE,
-    PERSIST,
-    PURGE,
-    REGISTER,
-    persistStore,
-} from 'reduxjs-toolkit-persist'
-import storage from 'reduxjs-toolkit-persist/lib/storage'
-// import storage from "@/store/persistStorage";
+import
+    {
+        FLUSH,
+        persistReducer,
+        REHYDRATE,
+        PAUSE,
+        PERSIST,
+        PURGE,
+        REGISTER,
+        persistStore,
+    } from 'reduxjs-toolkit-persist'
+// import storage from 'reduxjs-toolkit-persist/lib/storage'
+import storage from "@/store/persistStorage";
 import autoMergeLevel1 from 'reduxjs-toolkit-persist/lib/stateReconciler/autoMergeLevel1'
 import { optionSlice } from '@/store/service/options/optionSlice'
 import { ProductActiveFormSlice } from '@/store/service/product/product_active_form'
@@ -30,18 +31,20 @@ import ProductSearchSlice from '@/store/slice/productSearchSlice'
 import SupplierSlice from '@/store/slice/supplierSlice'
 import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
-const middlewares = [GeneralBaseAPI.middleware]
+const middlewares = [ GeneralBaseAPI.middleware ]
 
 let transforms = null
 
-if (process.env.NODE_ENV === 'production') {
-    const encrypt = encryptTransform({
+if ( process.env.NODE_ENV === 'production' )
+{
+    const encrypt = encryptTransform( {
         secretKey: process.env.NEXT_PUBLIC_REDUX_SECRET,
-        onError: function (error) {
+        onError: function ( error )
+        {
             // Handle the error.
         },
-    })
-    transforms = [encrypt]
+    } )
+    transforms = [ encrypt ]
 }
 
 const persistConfig = {
@@ -52,7 +55,7 @@ const persistConfig = {
     blacklist: [],
 }
 
-const combineReducer = combineReducers({
+const combineReducer = combineReducers( {
     users: userSlice.reducer,
     errors: errorSlice.reducer,
     dashboard: DashboardSlice.reducer,
@@ -67,16 +70,16 @@ const combineReducer = combineReducers({
     supplier_search: SupplierSlice.reducer,
     filter_date_range: FilterDateRange.reducer,
 
-    [GeneralBaseAPI.reducerPath]: GeneralBaseAPI.reducer,
-})
+    [ GeneralBaseAPI.reducerPath ]: GeneralBaseAPI.reducer,
+} )
 
-const _persistedReducer = persistReducer(persistConfig, combineReducer)
+const _persistedReducer = persistReducer( persistConfig, combineReducer )
 
 const makeStore = () =>
-    configureStore({
+    configureStore( {
         reducer: _persistedReducer,
         middleware: getDefaultMiddleware =>
-            getDefaultMiddleware({
+            getDefaultMiddleware( {
                 immutableCheck: true,
                 serializableCheck: {
                     /* ignore persistence actions */
@@ -89,15 +92,15 @@ const makeStore = () =>
                         REGISTER,
                     ],
                 },
-            }).concat(middlewares),
-    })
+            } ).concat( middlewares ),
+    } )
 
-setupListeners(makeStore().dispatch)
+setupListeners( makeStore().dispatch )
 
 export const wrapper = createWrapper(
     makeStore,
     process.env.NODE_ENV === 'development' ? { debug: true } : { debug: false },
 )
 export const store = makeStore()
-export const perStore = persistStore(store)
+export const perStore = persistStore( store )
 export const dispatch = store.dispatch
