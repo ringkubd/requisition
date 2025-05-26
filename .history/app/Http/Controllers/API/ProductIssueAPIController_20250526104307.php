@@ -190,9 +190,7 @@ class ProductIssueAPIController extends AppBaseController
                 $requisitor_name = $request->user()->name;
 
                 $department_autority = User::query()
-                    ->whereHas('departments', function ($q) {
-                        $q->where('id', auth_department_id());
-                    })
+                    ->where('default_branch_id', auth_branch_id())
                     ->whereHas('permissions', function ($q) {
                         $q->where('name', 'approve_department_issue');
                     })
@@ -597,7 +595,7 @@ class ProductIssueAPIController extends AppBaseController
 
         return $this->sendResponse(
             new ProductIssueItemsResource($issue),
-            "Product Issue updated successfully"
+            __('messages.updated', ['model' => __('models/productIssues.singular')])
         );
     }
 }
