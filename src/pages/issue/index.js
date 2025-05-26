@@ -8,7 +8,8 @@ import { useRouter } from 'next/router'
 import Actions from '@/components/actions'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import {
+import
+{
     useGetIssueQuery,
     useDestroyIssueMutation,
     getRunningQueriesThunk,
@@ -25,148 +26,163 @@ import { setDateRange } from '@/store/slice/filterDateRange'
 import { hasPermission } from '@/lib/helpers'
 
 
-const ProductIssue = () => {
+const ProductIssue = () =>
+{
     const { user } = useAuth()
     const router = useRouter()
     const dispatch = useDispatch()
-    const dateRange = useSelector(state => state.filter_date_range)
-    const [searchParams, setSearchParams] = useState({})
-    const { data, isLoading, isError } = useGetIssueQuery(searchParams)
+    const dateRange = useSelector( state => state.filter_date_range )
+    const [ searchParams, setSearchParams ] = useState( {} )
+    const { data, isLoading, isError } = useGetIssueQuery( searchParams )
     const {
         data: departments,
         isLoading: departmentsISLoading,
         isError: departmentsISError,
     } = useGetDepartmentByOrganizationBranchQuery()
-    const [destroy, destroyResponse] = useDestroyIssueMutation()
-    const [columns, setColumns] = useState([])
-    const [isStoreManager, setISStoreManager] = useState(
+    const [ destroy, destroyResponse ] = useDestroyIssueMutation()
+    const [ columns, setColumns ] = useState( [] )
+    const [ isStoreManager, setISStoreManager ] = useState(
         user?.role_object?.filter(
             r => r.name === 'Store Manager' || r.name === 'Super Admin',
         ).length,
     )
-    const [dataTableData, setDataTableData] = useState([])
+    const [ dataTableData, setDataTableData ] = useState( [] )
 
     // Debug: Log initial states
-    if (typeof window !== 'undefined') {
+    if ( typeof window !== 'undefined' )
+    {
         // eslint-disable-next-line no-console
-        console.debug('ProductIssue: user', user)
-        console.debug('ProductIssue: searchParams', searchParams)
-        console.debug('ProductIssue: data', data)
-        console.debug('ProductIssue: isLoading', isLoading)
-        console.debug('ProductIssue: isError', isError)
-        console.debug('ProductIssue: departments', departments)
-        console.debug('ProductIssue: columns', columns)
-        console.debug('ProductIssue: dataTableData', dataTableData)
+        console.debug( 'ProductIssue: user', user )
+        console.debug( 'ProductIssue: searchParams', searchParams )
+        console.debug( 'ProductIssue: data', data )
+        console.debug( 'ProductIssue: isLoading', isLoading )
+        console.debug( 'ProductIssue: isError', isError )
+        console.debug( 'ProductIssue: departments', departments )
+        console.debug( 'ProductIssue: columns', columns )
+        console.debug( 'ProductIssue: dataTableData', dataTableData )
     }
 
-    useEffect(() => {
-        if (user) {
+    useEffect( () =>
+    {
+        if ( user )
+        {
             setISStoreManager(
                 user?.role_object?.filter(
                     r => r.name === 'Store Manager' || r.name === 'Super Admin',
                 ).length,
             )
         }
-    }, [user])
+    }, [ user ] )
 
-    useEffect(() => {
-        if (!destroyResponse.isLoading && destroyResponse.isSuccess) {
-            toast.success('Product Issue removed.')
+    useEffect( () =>
+    {
+        if ( !destroyResponse.isLoading && destroyResponse.isSuccess )
+        {
+            toast.success( 'Product Issue removed.' )
         }
-    }, [destroyResponse])
+    }, [ destroyResponse ] )
 
-    useEffect(() => {
-        try {
-            if (!isLoading && !isError && data) {
+    useEffect( () =>
+    {
+        try
+        {
+            if ( !isLoading && !isError && data )
+            {
                 const issueData = data?.product_issue
-                setDataTableData(issueData)
-                setColumns([
-                {
-                    name: 'SL.',
-                    selector: (row, index) =>
-                        row.receiver_department?.name + '/' + row.id,
-                    sortable: true,
-                },
-                {
-                    name: 'No. of Item',
-                    selector: row => row.products?.length,
-                    sortable: true,
-                },
-                {
-                    name: 'Receiver',
-                    selector: row => row.receiver?.name,
-                    sortable: true,
-                },
-                {
-                    name: 'Department',
-                    selector: row => row.receiver_department?.name,
-                    sortable: true,
-                },
-                {
-                    name: 'Issuer',
-                    selector: row => row.issuer?.name,
-                    sortable: true,
-                },
-                {
-                    name: 'Issue Time',
-                    selector: row =>
-                        moment(row.created_at).format('D MMM Y @ H:mm '),
-                    sortable: true,
-                },
-                {
-                    name: 'Status',
-                    selector: row => <IssueStatus key={row.uuid} row={row} />,
-                },
-                {
-                    name: 'Actions',
-                    cell: row => (
-                        <Actions
-                            itemId={row.uuid}
-                            edit={
-                                isStoreManager &&
-                                (!row.store_status ||
-                                    moment().diff(
-                                        moment(row.updated_at),
-                                        'days',
-                                    ) < 1)
-                                    ? `/issue/${row.uuid}/edit`
-                                    : false
-                            }
-                            // view={`/issue/${row.uuid}/view`}
-                            destroy={destroy}
-                            print={`/issue/${row.uuid}/print_view`}
-                            progressing={destroyResponse.isLoading}
-                            permissionModule={`product-issues`}
-                        />
-                    ),
-                    ignoreRowClick: true,
-                },
-                ])
+                setDataTableData( issueData )
+                setColumns( [
+                    {
+                        name: 'SL.',
+                        selector: ( row, index ) =>
+                            row.receiver_department?.name + '/' + row.id,
+                        sortable: true,
+                    },
+                    {
+                        name: 'No. of Item',
+                        selector: row => row.products?.length,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Receiver',
+                        selector: row => row.receiver?.name,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Department',
+                        selector: row => row.receiver_department?.name,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Issuer',
+                        selector: row => row.issuer?.name,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Issue Time',
+                        selector: row =>
+                            moment( row.created_at ).format( 'D MMM Y @ H:mm ' ),
+                        sortable: true,
+                    },
+                    {
+                        name: 'Status',
+                        cell: row => <IssueStatus key={row.uuid} row={row} />,
+                    },
+                    {
+                        name: 'Actions',
+                        cell: row => (
+                            <Actions
+                                itemId={row.uuid}
+                                edit={
+                                    isStoreManager &&
+                                        ( !row.store_status ||
+                                            moment().diff(
+                                                moment( row.updated_at ),
+                                                'days',
+                                            ) < 1 )
+                                        ? `/issue/${row.uuid}/edit`
+                                        : false
+                                }
+                                // view={`/issue/${row.uuid}/view`}
+                                destroy={destroy}
+                                print={`/issue/${row.uuid}/print_view`}
+                                progressing={destroyResponse.isLoading}
+                                permissionModule={`product-issues`}
+                            />
+                        ),
+                        ignoreRowClick: true,
+                    },
+                ] )
             }
-        } catch (err) {
+        } catch ( err )
+        {
             // eslint-disable-next-line no-console
-            console.error('ProductIssue: Error in useEffect (columns/data)', err)
+            console.error( 'ProductIssue: Error in useEffect (columns/data)', err )
         }
-    }, [isLoading, data, isStoreManager])
+    }, [ isLoading, data, isStoreManager ] )
 
-    const changeSearchParams = (key, value) => {
-        setSearchParams({ ...searchParams, [key]: value, page: 1 })
+    const changeSearchParams = ( key, value ) =>
+    {
+        setSearchParams( { ...searchParams, [ key ]: value, page: 1 } )
     }
 
-    useEffect(() => {
+    useEffect( () =>
+    {
         const filterdData = Object.fromEntries(
-            Object.entries(dateRange).filter(([_, v]) => v != null),
+            Object.entries( dateRange ).filter( ( [ _, v ] ) => v != null ),
         )
-        if (Object.keys(filterdData).length) {
-            changeSearchParams('dateRange', JSON.stringify(dateRange))
-        } else {
-            changeSearchParams('dateRange', '')
+        if ( Object.keys( filterdData ).length )
+        {
+            changeSearchParams( 'dateRange', JSON.stringify( dateRange ) )
+        } else
+        {
+            changeSearchParams( 'dateRange', '' )
         }
-    }, [dateRange])
+    }, [ dateRange ] )
 
     // Debug: Wrap DataTable in try/catch
     let dataTableRender = null
-    try {
+    try
+    {
         dataTableRender = (
             <DataTable
                 columns={columns}
@@ -176,30 +192,31 @@ const ProductIssue = () => {
                 progressPending={isLoading}
                 persistTableHead={true}
                 paginationServer
-                onChangePage={(page, totalRows) =>
-                    setSearchParams({
+                onChangePage={( page, totalRows ) =>
+                    setSearchParams( {
                         ...searchParams,
                         page: page,
-                    })
+                    } )
                 }
                 onChangeRowsPerPage={(
                     currentRowsPerPage,
                     currentPage,
                 ) =>
-                    setSearchParams({
+                    setSearchParams( {
                         ...searchParams,
                         page: currentPage,
                         per_page: currentRowsPerPage,
-                    })
+                    } )
                 }
                 paginationResetDefaultPage={false}
                 paginationTotalRows={data?.number_of_rows}
                 paginationPerPage={15}
             />
         )
-    } catch (err) {
+    } catch ( err )
+    {
         // eslint-disable-next-line no-console
-        console.error('ProductIssue: Error rendering DataTable', err)
+        console.error( 'ProductIssue: Error rendering DataTable', err )
         dataTableRender = <div style={{ color: 'red' }}>Error rendering DataTable</div>
     }
 
@@ -220,7 +237,7 @@ const ProductIssue = () => {
                 <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
                     <Card>
                         <div className="flex sm:flex-row flex-col space-x-4 space-y-4  shadow-lg py-4 px-4">
-                            {hasPermission('create_product-issues', user) ? (
+                            {hasPermission( 'create_product-issues', user ) ? (
                                 <NavLink
                                     active={router.pathname === 'issue/create'}
                                     href={`issue/create`}>
@@ -236,8 +253,9 @@ const ProductIssue = () => {
                                 <Datepicker
                                     inputId={`date_range`}
                                     inputName={`date_range`}
-                                    onChange={d => {
-                                        dispatch(setDateRange(d))
+                                    onChange={d =>
+                                    {
+                                        dispatch( setDateRange( d ) )
                                     }}
                                     value={dateRange}
                                 />
@@ -251,18 +269,19 @@ const ProductIssue = () => {
                                         <Select
                                             className={`dark:text-black`}
                                             id={`user_department_id`}
-                                            onChange={e => {
+                                            onChange={e =>
+                                            {
                                                 changeSearchParams(
                                                     'issuer_department_id',
                                                     e.target.value,
                                                 )
                                             }}>
                                             <option></option>
-                                            {departments?.data?.map(o => (
+                                            {departments?.data?.map( o => (
                                                 <option key={o.id} value={o.id}>
                                                     {o.name}
                                                 </option>
-                                            ))}
+                                            ) )}
                                         </Select>
                                     </label>
                                 ) : null}
@@ -270,7 +289,8 @@ const ProductIssue = () => {
                             <div>
                                 <TextInput
                                     icon={AiOutlineSearch}
-                                    onBlur={e => {
+                                    onBlur={e =>
+                                    {
                                         changeSearchParams(
                                             'search',
                                             e.target.value,
@@ -289,10 +309,11 @@ const ProductIssue = () => {
 }
 
 export const getServerSideProps = wrapper.getServerSideProps(
-    store => async context => {
+    store => async context =>
+    {
         // const params = context.params
-        store.dispatch(getIssue.initiate())
-        await Promise.all(store.dispatch(getRunningQueriesThunk()))
+        store.dispatch( getIssue.initiate() )
+        await Promise.all( store.dispatch( getRunningQueriesThunk() ) )
         return {
             props: {},
         }
