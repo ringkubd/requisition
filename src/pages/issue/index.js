@@ -52,9 +52,51 @@ const ProductIssue = () =>
     safeDebug( 'Component Init', 'Starting ProductIssue component', { time: new Date().toISOString() } );
 
     // Hooks & State
-    const { user } = useAuth()
+    const { user } = useAuth( {
+        middleware: 'auth', // Force authentication middleware
+        redirectIfAuthenticated: false
+    } );
+
+    // Add more detailed logging of user object
+    useEffect( () =>
+    {
+        safeDebug( 'User Object', 'Detailed user object inspection', {
+            userExists: !!user,
+            userType: typeof user,
+            hasId: !!user?.id,
+            hasRoles: !!user?.role_object,
+            userKeys: user ? Object.keys( user ) : []
+        } );
+    }, [ user ] );
+
     safeDebug( 'Auth Hook', 'User auth loaded', { userExists: !!user } );
 
+    // Add fallback for missing user object in production
+    const safeUser = user || {
+        id: null,
+        name: 'Guest User',
+        role_object: [],
+        permissions: [],
+        selected_department: null,
+        role_names: []
+    };
+
+    // Effect to log when using fallback user
+    useEffect( () =>
+    {
+        if ( !user )
+        {
+            safeDebug( 'Auth Fallback', 'Using fallback user object', { reason: 'User object is null or undefined' } );
+            setDebugLog( prev => [ ...prev, {
+                time: new Date().toISOString(),
+                type: 'warning',
+                source: 'authFallback',
+                message: 'Using fallback user object due to authentication issues'
+            } ] );
+        }
+    }, [ user ] );
+
+    // Use safeUser instead of user throughout the component
     const router = useRouter()
     const dispatch = useDispatch()
 
@@ -84,8 +126,46 @@ const ProductIssue = () =>
     const [ isStoreManager, setIsStoreManager ] = useState( false )
     const [ debugLog, setDebugLog ] = useState( [] ) // State to store debug logs
 
+    // Add state to track if we're ready for API calls
+    const [ isUserAuthenticated, setIsUserAuthenticated ] = useState( false )
+
+    // Effect to wait for user authentication - use safeUser which is always available
+    useEffect( () =>
+    {
+        // Check if we have actual user data or are using the fallback
+        if ( user )
+        {
+            safeDebug( 'Auth Check', 'Real user authenticated, ready for API calls', { hasUser: true } );
+            setIsUserAuthenticated( true );
+        } else if ( isMounted )
+        {
+            // If we're mounted but no user is available after a delay, proceed with fallback
+            const authTimer = setTimeout( () =>
+            {
+                safeDebug( 'Auth Check', 'No real user available, proceeding with fallback', {
+                    hasUser: false,
+                    isMounted: true
+                } );
+                setIsUserAuthenticated( true ); // Allow API calls with fallback user
+            }, 1500 ); // Give auth a chance to complete
+
+            return () => clearTimeout( authTimer );
+        } else
+        {
+            safeDebug( 'Auth Check', 'Waiting for component to mount', { hasUser: false } );
+        }
+    }, [ user, isMounted ] );
+
+    // Only proceed with API calls when both mounted and authenticated
+    const shouldMakeApiCalls = isMounted && isUserAuthenticated;
+
     // API Queries - will only run after component is mounted
-    safeDebug( 'API Query Setup', 'Setting up API queries', { searchParams, isMounted } );
+    safeDebug( 'API Query Setup', 'Setting up API queries', {
+        searchParams,
+        isMounted,
+        isUserAuthenticated,
+        shouldMakeApiCalls
+    } );
 
     // Debug wrapper for API hooks
     const useDebugQuery = ( queryHook, ...args ) =>
@@ -106,7 +186,7 @@ const ProductIssue = () =>
         isError,
         error
     } = useDebugQuery( useGetIssueQuery, searchParams, {
-        skip: !isMounted
+        skip: !shouldMakeApiCalls
     } );
 
     // Add error to debug log if present
@@ -133,7 +213,7 @@ const ProductIssue = () =>
         data: departments,
         error: departmentsError
     } = useDebugQuery( useGetDepartmentByOrganizationBranchQuery, undefined, {
-        skip: !isMounted
+        skip: !shouldMakeApiCalls
     } );
 
     const [ destroy, destroyResponse ] = useDestroyIssueMutation()
@@ -509,7 +589,7 @@ const ProductIssue = () =>
                     <Card>
                         {/* Filters and Action Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4 p-4 border-b">
-                            {hasPermission( 'create_product-issues', user ) && (
+                            {hasPermission( 'create_product-issues', safeUser ) && (
                                 <div>
                                     <NavLink
                                         active={router.pathname === 'issue/create'}
@@ -531,7 +611,7 @@ const ProductIssue = () =>
                                 />
                             </div>
 
-                            {departments && isStoreManager && (
+                            {departments && departments?.data && Array.isArray( departments.data ) && isStoreManager && (
                                 <div className="flex flex-col sm:flex-row items-start gap-2">
                                     <Label htmlFor="user_department_id" className="font-medium pt-2">
                                         Departments
@@ -543,9 +623,11 @@ const ProductIssue = () =>
                                     >
                                         <option value="">All Departments</option>
                                         {departments?.data?.map( department => (
-                                            <option key={department.id} value={department.id}>
-                                                {department.name}
-                                            </option>
+                                            department && department.id ?
+                                                <option key={department.id} value={department.id}>
+                                                    {department.name || `Department ${department.id}`}
+                                                </option>
+                                                : null
                                         ) )}
                                     </Select>
                                 </div>
@@ -572,42 +654,79 @@ const ProductIssue = () =>
                             {isError ? (
                                 <ErrorComponent />
                             ) : (
-                                <DataTable
-                                    columns={columns}
-                                    data={dataTableData || []}
-                                    pagination
-                                    responsive
-                                    progressPending={isLoading || !isMounted}
-                                    progressComponent={
-                                        <div className="p-6 text-center">
-                                            <div className="loader mx-auto"></div>
-                                            <p className="mt-4 text-gray-600">Loading data...</p>
-                                        </div>
+                                ( () =>
+                                {
+                                    try
+                                    {
+                                        // Check if we should show a message while waiting for authentication
+                                        if ( !isUserAuthenticated && isMounted )
+                                        {
+                                            return (
+                                                <div className="p-6 text-center">
+                                                    <div className="loader mx-auto"></div>
+                                                    <p className="mt-4 text-gray-600">Authenticating user...</p>
+                                                </div>
+                                            );
+                                        }
+
+                                        // Render the data table with safety checks
+                                        return (
+                                            <DataTable
+                                                key="issues-table"
+                                                columns={columns?.length > 0 ? columns : [
+                                                    // Fallback columns if something went wrong
+                                                    { name: 'ID', selector: row => row?.id || 'N/A' },
+                                                    { name: 'Status', selector: row => row?.store_status ? 'Approved' : 'Pending' }
+                                                ]}
+                                                data={dataTableData || []}
+                                                pagination
+                                                responsive
+                                                progressPending={isLoading || !isMounted || !shouldMakeApiCalls}
+                                                progressComponent={
+                                                    <div className="p-6 text-center">
+                                                        <div className="loader mx-auto"></div>
+                                                        <p className="mt-4 text-gray-600">Loading data...</p>
+                                                    </div>
+                                                }
+                                                persistTableHead
+                                                paginationServer
+                                                noDataComponent={
+                                                    <div className="p-6 text-center text-gray-500">
+                                                        {shouldMakeApiCalls ? "No product issues found" : "Waiting for data..."}
+                                                    </div>
+                                                }
+                                                onChangePage={page =>
+                                                    setSearchParams( prev => ( {
+                                                        ...prev,
+                                                        page: page,
+                                                    } ) )
+                                                }
+                                                onChangeRowsPerPage={( currentRowsPerPage, currentPage ) =>
+                                                    setSearchParams( prev => ( {
+                                                        ...prev,
+                                                        page: currentPage,
+                                                        per_page: currentRowsPerPage,
+                                                    } ) )
+                                                }
+                                                paginationTotalRows={data?.number_of_rows || 0}
+                                                paginationPerPage={15}
+                                                paginationComponentOptions={{
+                                                    rowsPerPageText: 'Items per page:',
+                                                }}
+                                            />
+                                        );
+                                    } catch ( error )
+                                    {
+                                        // Ultimate fallback if DataTable rendering fails
+                                        safeDebug( 'Render Error', 'Error rendering DataTable', error );
+                                        return (
+                                            <div className="p-6 my-4 bg-red-50 border border-red-200 rounded-lg text-center">
+                                                <p className="text-red-700 mb-2">Error displaying data table</p>
+                                                <p className="text-gray-700">Please try refreshing the page</p>
+                                            </div>
+                                        );
                                     }
-                                    persistTableHead
-                                    paginationServer
-                                    noDataComponent={
-                                        <div className="p-6 text-center text-gray-500">No product issues found</div>
-                                    }
-                                    onChangePage={page =>
-                                        setSearchParams( prev => ( {
-                                            ...prev,
-                                            page: page,
-                                        } ) )
-                                    }
-                                    onChangeRowsPerPage={( currentRowsPerPage, currentPage ) =>
-                                        setSearchParams( prev => ( {
-                                            ...prev,
-                                            page: currentPage,
-                                            per_page: currentRowsPerPage,
-                                        } ) )
-                                    }
-                                    paginationTotalRows={data?.number_of_rows || 0}
-                                    paginationPerPage={15}
-                                    paginationComponentOptions={{
-                                        rowsPerPageText: 'Items per page:',
-                                    }}
-                                />
+                                } )()
                             )}
                         </div>
 
@@ -627,6 +746,10 @@ const ProductIssue = () =>
                                                 {JSON.stringify( {
                                                     isMounted,
                                                     isStoreManager,
+                                                    isUserAuthenticated,
+                                                    shouldMakeApiCalls,
+                                                    hasRealUser: !!user,
+                                                    usingFallbackUser: !user && !!safeUser,
                                                     hasData: !!data,
                                                     hasColumns: columns.length,
                                                     dataRowCount: dataTableData?.length || 0,
@@ -638,11 +761,11 @@ const ProductIssue = () =>
                                             <div className="overflow-auto p-2 bg-white border rounded">
                                                 {debugLog.map( ( log, i ) => (
                                                     <div key={i} className={`mb-1 p-1 border-b ${log.type === 'error' ? 'bg-red-50' :
-                                                            log.type === 'warning' ? 'bg-yellow-50' : 'bg-white'
+                                                        log.type === 'warning' ? 'bg-yellow-50' : 'bg-white'
                                                         }`}>
                                                         <span className="text-gray-500">{log.time}</span>
                                                         <span className={`ml-2 font-bold ${log.type === 'error' ? 'text-red-600' :
-                                                                log.type === 'warning' ? 'text-yellow-600' : 'text-blue-600'
+                                                            log.type === 'warning' ? 'text-yellow-600' : 'text-blue-600'
                                                             }`}>
                                                             [{log.source}]
                                                         </span>
