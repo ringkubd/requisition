@@ -106,51 +106,51 @@ const ProductIssue = () =>
                         moment( row.created_at ).format( 'D MMM Y @ H:mm ' ),
                     sortable: true,
                 },
-                {
-                    name: 'Status',
-                    cell: row =>
-                    {
-                        try
-                        {
-                            if ( !row || typeof row !== 'object' )
-                            {
-                                return "Data error";
-                            }
-                            // Safe rendering method for production
-                            return <IssueStatus key={row.uuid || Math.random()} row={row} />;
-                        } catch ( error )
-                        {
-                            console.error( "Error rendering IssueStatus:", error );
-                            // Fallback to basic text
-                            return row?.store_status ? "Approved" : "Pending";
-                        }
-                    },
-                    sortable: false, // Disable sorting on this column to prevent issues
-                },
-                {
-                    name: 'Actions',
-                    cell: row => (
-                        <Actions
-                            itemId={row.uuid}
-                            edit={
-                                isStoreManager &&
-                                    ( !row.store_status ||
-                                        moment().diff(
-                                            moment( row.updated_at ),
-                                            'days',
-                                        ) < 1 )
-                                    ? `/issue/${row.uuid}/edit`
-                                    : false
-                            }
-                            // view={`/issue/${row.uuid}/view`}
-                            destroy={destroy}
-                            print={`/issue/${row.uuid}/print_view`}
-                            progressing={destroyResponse.isLoading}
-                            permissionModule={`product-issues`}
-                        />
-                    ),
-                    ignoreRowClick: true,
-                },
+                // {
+                //     name: 'Status',
+                //     cell: row =>
+                //     {
+                //         try
+                //         {
+                //             if ( !row || typeof row !== 'object' )
+                //             {
+                //                 return "Data error";
+                //             }
+                //             // Safe rendering method for production
+                //             return <IssueStatus key={row.uuid || Math.random()} row={row} />;
+                //         } catch ( error )
+                //         {
+                //             console.error( "Error rendering IssueStatus:", error );
+                //             // Fallback to basic text
+                //             return row?.store_status ? "Approved" : "Pending";
+                //         }
+                //     },
+                //     sortable: false, // Disable sorting on this column to prevent issues
+                // },
+                // {
+                //     name: 'Actions',
+                //     cell: row => (
+                //         <Actions
+                //             itemId={row.uuid}
+                //             edit={
+                //                 isStoreManager &&
+                //                     ( !row.store_status ||
+                //                         moment().diff(
+                //                             moment( row.updated_at ),
+                //                             'days',
+                //                         ) < 1 )
+                //                     ? `/issue/${row.uuid}/edit`
+                //                     : false
+                //             }
+                //             // view={`/issue/${row.uuid}/view`}
+                //             destroy={destroy}
+                //             print={`/issue/${row.uuid}/print_view`}
+                //             progressing={destroyResponse.isLoading}
+                //             permissionModule={`product-issues`}
+                //         />
+                //     ),
+                //     ignoreRowClick: true,
+                // },
             ] )
         }
     }, [ isLoading, data, isStoreManager ] )
@@ -254,7 +254,7 @@ const ProductIssue = () =>
                             </div>
                         </div>
 
-                        {/* <DataTable
+                        <DataTable
                             columns={columns}
                             data={dataTableData}
                             pagination
@@ -281,7 +281,7 @@ const ProductIssue = () =>
                             paginationResetDefaultPage={false}
                             paginationTotalRows={data?.number_of_rows}
                             paginationPerPage={15}
-                        /> */}
+                        />
                     </Card>
                 </div>
             </AppLayout>
