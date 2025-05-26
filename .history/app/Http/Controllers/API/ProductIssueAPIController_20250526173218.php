@@ -78,8 +78,6 @@ class ProductIssueAPIController extends AppBaseController
     {
         $storeManager = $request->user()->hasRole('Store Manager') ? 'TRUE' : 'FALSE';
 
-        return [];
-
         $productIssues = $this->productIssueRepository->allQuery(
             $request->except(['skip', 'limit']),
             $request->get('skip'),
