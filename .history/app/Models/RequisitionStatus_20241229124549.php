@@ -3,9 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-
+ use Illuminate\Database\Eloquent\SoftDeletes; use Illuminate\Database\Eloquent\Factories\HasFactory;
 /**
  * @OA\Schema(
  *      schema="RequisitionStatus",
@@ -70,11 +68,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *          format="date-time"
  *      )
  * )
- */ class RequisitionStatus extends Model
+ */class RequisitionStatus extends Model
 {
-    use SoftDeletes;
-    use HasFactory;
-    public $table = 'requisition_statuses';
+     use SoftDeletes;    use HasFactory;    public $table = 'requisition_statuses';
 
     public $fillable = [
         'requisition_type',
@@ -85,12 +81,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         'ceo_status',
         'notes',
         'department_approved_by',
-        'department_approved_at',
-        'accounts_approved_by',
-        'accounts_approved_at',
-        'deleted_at',
-        'created_at',
-        'updated_at',
+        'accounts_approved_by'
     ];
 
     public static array $rules = [
@@ -136,7 +127,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
             4 => 'Change',
             default => 'Pending',
         };
-        if ($department_status != 'Approved') {
+        if ($department_status != 'Approved'){
             return ['stage' => 'department', 'status' => $department_status];
         }
         $accounts_status = match ($this->accounts_status) {
@@ -146,7 +137,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
             4 => 'Change',
             default => 'Pending',
         };
-        if ($accounts_status != 'Approved') {
+        if ($accounts_status != 'Approved'){
             return ['stage' => 'accounts', 'status' => $accounts_status];
         }
         $ceo_status = match ($this->ceo_status) {

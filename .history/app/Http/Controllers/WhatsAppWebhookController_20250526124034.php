@@ -301,7 +301,6 @@ class WhatsAppWebhookController extends Controller
     private function updateDepartmentApprovalStatus($requisition, $requisitorId, $status): bool
     {
         $statusData = [
-            'department_status' => $status,
             'department_approved_by' => $requisitorId,
             'department_approved_at' => now()
         ];

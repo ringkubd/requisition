@@ -301,9 +301,9 @@ class WhatsAppWebhookController extends Controller
     private function updateDepartmentApprovalStatus($requisition, $requisitorId, $status): bool
     {
         $statusData = [
-            'department_status' => $status,
             'department_approved_by' => $requisitorId,
-            'department_approved_at' => now()
+            'department_approved_at' => now(),
+            'department_status' => $status
         ];
 
         if ($status == 2) {
@@ -363,8 +363,8 @@ class WhatsAppWebhookController extends Controller
             $user->notify(new PushNotification($notificationTitle, $notificationBody));
 
             // Get button payload
-            $approvePayload = $requisition->id . '_' . $requisitorId . '_2_accounts_' . $type;
-            $rejectPayload = $requisition->id . '_' . $requisitorId . '_3_accounts_' . $type;
+            $approvePayload = $requisition->id . '_' . $requisitorId . '_2_department_' . $type;
+            $rejectPayload = $requisition->id . '_' . $requisitorId . '_3_department_' . $type;
             $one_time_key = new OneTimeLogin();
             $authKey = $one_time_key->generate($user->id);
 

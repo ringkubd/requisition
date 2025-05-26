@@ -61,7 +61,7 @@ if (!function_exists('auth_branch_id')) {
 if (!function_exists('auth_department_id')) {
     function auth_department_id()
     {
-        $key = 'select_department_' . \request()?->user()?->id;
+        $key = 'select_department_' . \request()->user()->id;
         if (Cache::has($key)) {
             return Cache::get($key);
         }
@@ -86,7 +86,7 @@ if (!function_exists('auth_department_head')) {
 if (!function_exists('auth_designation_id')) {
     function auth_designation_id()
     {
-        $key = 'select_designation_' . \request()?->user()?->id;
+        $key = 'select_designation_' . \request()->user()->id;
         if (Cache::has($key)) {
             return Cache::get($key);
         }
@@ -96,7 +96,7 @@ if (!function_exists('auth_designation_id')) {
 if (!function_exists('auth_designation_name')) {
     function auth_designation_name()
     {
-        if (Cache::has('select_designation_name_' . \request()?->user()?->id)) {
+        if (Cache::has('select_designation_name_' . \request()->user()->id)) {
             return Cache::get('select_designation_name_' . \request()->user()->id);
         } else {
             $designation = \App\Models\Designation::find(auth_designation_id())->name;
