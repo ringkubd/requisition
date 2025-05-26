@@ -24,14 +24,16 @@ export const useAuth = ( { middleware, redirectIfAuthenticated } = {} ) =>
     const csrf = () => axios.get( '/sanctum/csrf-cookie' )
 
     // Only update Redux store when we have a valid user object
-    useEffect(() => {
+    useEffect( () =>
+    {
         // Only update Redux store when we have a valid user object
         // Use useEffect to avoid potential issues with timing
-        if (user && typeof user === 'object') {
+        if ( user && typeof user === 'object' )
+        {
             // Ensure we're dispatching a valid object to the Redux store
-            dispatch(setUser(user))
+            dispatch( setUser( user ) )
         }
-    }, [user])
+    }, [ user ] )
 
     const register = async ( { setErrors, ...props } ) =>
     {
@@ -127,7 +129,8 @@ export const useAuth = ( { middleware, redirectIfAuthenticated } = {} ) =>
 
     useEffect( () =>
     {
-        try {
+        try
+        {
             if ( middleware === 'guest' && redirectIfAuthenticated && user && typeof user === 'object' )
             {
                 // Only dispatch if user is a valid object
@@ -146,10 +149,11 @@ export const useAuth = ( { middleware, redirectIfAuthenticated } = {} ) =>
             }
 
             if ( middleware === 'auth' && error ) logout()
-        } catch (error) {
-            console.error("Error in auth middleware:", error);
+        } catch ( error )
+        {
+            console.error( "Error in auth middleware:", error );
             // If we're in auth middleware and encounter an error, safest to logout
-            if (middleware === 'auth') logout()
+            if ( middleware === 'auth' ) logout()
         }
     }, [ user, error ] )
 

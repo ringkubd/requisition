@@ -1,18 +1,23 @@
-const getCookie = cookieName => {
+const getCookie = cookieName =>
+{
     // Check if we're in a browser environment
-    if (typeof document === 'undefined') {
+    if ( typeof document === 'undefined' )
+    {
         return undefined;
     }
-    
-    const cookieArray = document.cookie.split(';')
 
-    for (const cookie of cookieArray) {
+    const cookieArray = document.cookie.split( ';' )
+
+    for ( const cookie of cookieArray )
+    {
         let cookieString = cookie
 
-        while (cookieString.charAt(0) == ' ') {
-            cookieString = cookieString.substring(1, cookieString.length)
+        while ( cookieString.charAt( 0 ) == ' ' )
+        {
+            cookieString = cookieString.substring( 1, cookieString.length )
         }
-        if (cookieString.indexOf(cookieName + '=') == 0) {
+        if ( cookieString.indexOf( cookieName + '=' ) == 0 )
+        {
             return cookieString.substring(
                 cookieName.length + 1,
                 cookieString.length,

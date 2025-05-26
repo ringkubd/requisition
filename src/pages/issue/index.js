@@ -108,15 +108,19 @@ const ProductIssue = () =>
                 },
                 {
                     name: 'Status',
-                    cell: row => {
-                        try {
-                            if (!row || typeof row !== 'object') {
+                    cell: row =>
+                    {
+                        try
+                        {
+                            if ( !row || typeof row !== 'object' )
+                            {
                                 return "Data error";
                             }
                             // Safe rendering method for production
                             return <IssueStatus key={row.uuid || Math.random()} row={row} />;
-                        } catch (error) {
-                            console.error("Error rendering IssueStatus:", error);
+                        } catch ( error )
+                        {
+                            console.error( "Error rendering IssueStatus:", error );
                             // Fallback to basic text
                             return row?.store_status ? "Approved" : "Pending";
                         }
@@ -250,7 +254,7 @@ const ProductIssue = () =>
                             </div>
                         </div>
 
-                        <DataTable
+                        {/* <DataTable
                             columns={columns}
                             data={dataTableData}
                             pagination
@@ -277,7 +281,7 @@ const ProductIssue = () =>
                             paginationResetDefaultPage={false}
                             paginationTotalRows={data?.number_of_rows}
                             paginationPerPage={15}
-                        />
+                        /> */}
                     </Card>
                 </div>
             </AppLayout>

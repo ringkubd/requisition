@@ -17,11 +17,13 @@ export const userSlice = createSlice( {
         setUser: ( state, action ) =>
         {
             // Validate the payload before setting it
-            if (action.payload && typeof action.payload === 'object') {
+            if ( action.payload && typeof action.payload === 'object' )
+            {
                 state.user = action.payload
-            } else {
+            } else
+            {
                 // Log error but maintain current state (don't crash by setting invalid data)
-                console.error("Invalid user data passed to Redux setUser", action.payload)
+                console.error( "Invalid user data passed to Redux setUser", action.payload )
             }
         },
         setSelectedBranch: ( state, action ) =>

@@ -1,16 +1,18 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
 import { fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react'
 
-export const GeneralBaseAPI = createApi({
+export const GeneralBaseAPI = createApi( {
     reducerPath: 'general_service',
-    baseQuery: fetchBaseQuery({
+    baseQuery: fetchBaseQuery( {
         baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,
-        prepareHeaders: headers => {
+        prepareHeaders: headers =>
+        {
             // Always set Accept header regardless of environment
-            headers.set('Accept', `application/json`)
-            
+            headers.set( 'Accept', `application/json` )
+
             // Only execute browser-specific code when document is defined (client-side)
-            if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+            if ( typeof window !== 'undefined' && typeof document !== 'undefined' )
+            {
                 // Fetch CSRF cookie
                 fetch(
                     process.env.NEXT_PUBLIC_BACKEND_URL + '/sanctum/csrf-cookie',
@@ -19,31 +21,35 @@ export const GeneralBaseAPI = createApi({
                         credentials: 'include',
                     },
                 )
-                
-                // Process cookies for CSRF token
-                try {
-                    let cookieArray = document.cookie.split(';')
-                    // this can probably be improved by using a regex.. but this works for now
-                    for (var i = 0; i < cookieArray.length; i++) {
-                        let cookiePair = cookieArray[i].split('=')
 
-                        if (cookiePair[0].trim() == 'XSRF-TOKEN-PORTAL') {
+                // Process cookies for CSRF token
+                try
+                {
+                    let cookieArray = document.cookie.split( ';' )
+                    // this can probably be improved by using a regex.. but this works for now
+                    for ( var i = 0; i < cookieArray.length; i++ )
+                    {
+                        let cookiePair = cookieArray[ i ].split( '=' )
+
+                        if ( cookiePair[ 0 ].trim() == 'XSRF-TOKEN-PORTAL' )
+                        {
                             headers.set(
                                 'X-XSRF-TOKEN-PORTAL',
-                                decodeURIComponent(cookiePair[1]),
+                                decodeURIComponent( cookiePair[ 1 ] ),
                             )
                         }
                     }
-                } catch (error) {
-                    console.error('Error processing cookies:', error);
+                } catch ( error )
+                {
+                    console.error( 'Error processing cookies:', error );
                 }
             }
 
             return headers
         },
         credentials: 'include',
-    }),
-    endpoints: () => ({}),
+    } ),
+    endpoints: () => ( {} ),
     tagTypes: [
         'getSuppliers',
         'editSuppliers',
@@ -103,4 +109,4 @@ export const GeneralBaseAPI = createApi({
         'editBranch',
         'cash-requisition-select-vehicle',
     ],
-})
+} )
