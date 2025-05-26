@@ -586,8 +586,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
     {
         $data['accounts_status'] = $request->status;
         $data['accounts_notes'] = $request->notes;
-        $data['accounts_approved_at'] = now();
-        $data['accounts_approved_by'] = $request->user()->id;
+        $data['accounts_approval_date'] = now();
+        $data['accounts_approval_by'] = $request->user()->id;
 
         if ($request->status == 2) {
             // Approved - notify CEO

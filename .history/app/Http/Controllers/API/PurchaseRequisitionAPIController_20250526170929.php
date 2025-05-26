@@ -586,8 +586,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
     {
         $data['accounts_status'] = $request->status;
         $data['accounts_notes'] = $request->notes;
-        $data['accounts_approved_at'] = now();
-        $data['accounts_approved_by'] = $request->user()->id;
+        $data['accounts_approval_date'] = now();
+        $data['accounts_approval_by'] = $request->user()->id;
 
         if ($request->status == 2) {
             // Approved - notify CEO
@@ -643,8 +643,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
     {
         $data['department_status'] = $request->status;
         $data['department_notes'] = $request->notes;
-        $data['department_approved_at'] = now();
-        $data['department_approved_by'] = \auth()?->user()?->id;
+        $data['department_approval_date'] = now();
+        $data['department_approval_by'] = \auth()->user()->id;
 
         if ($request->status == 2) {
             // Approved - notify accounts department
