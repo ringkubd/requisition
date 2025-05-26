@@ -22,6 +22,11 @@ const Select2 = ({
     const [currentScrollPage, setCurrentScrollPage] = useState(1)
 
     useEffect(() => {
+        // Check if we're in a browser environment
+        if (typeof document === 'undefined' || !ulElementRef.current) {
+            return; // Return early if we're not in browser or ref isn't ready
+        }
+        
         const app = document.body
         ulElementRef.current.addEventListener('scroll', a => {
             const current = ulElementRef.current
@@ -29,7 +34,7 @@ const Select2 = ({
                 current.offsetHeight + current.scrollTop >
                 current.scrollHeight
             ) {
-                const value = searchInputRef.current.value
+                const value = searchInputRef.current?.value || ''
                 const regexp = new RegExp(`^${value}`, 'i')
                 const currentScroll = currentScrollPage
                 let newfilterOptions = options

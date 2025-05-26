@@ -110,14 +110,18 @@ const ProductIssue = () =>
                     name: 'Status',
                     cell: row => {
                         try {
+                            if (!row || typeof row !== 'object') {
+                                return "Data error";
+                            }
                             // Safe rendering method for production
-                            return <IssueStatus key={row.uuid} row={row} />;
+                            return <IssueStatus key={row.uuid || Math.random()} row={row} />;
                         } catch (error) {
                             console.error("Error rendering IssueStatus:", error);
                             // Fallback to basic text
                             return row?.store_status ? "Approved" : "Pending";
                         }
                     },
+                    sortable: false, // Disable sorting on this column to prevent issues
                 },
                 {
                     name: 'Actions',

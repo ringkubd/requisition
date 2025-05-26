@@ -1,4 +1,9 @@
 const getCookie = cookieName => {
+    // Check if we're in a browser environment
+    if (typeof document === 'undefined') {
+        return undefined;
+    }
+    
     const cookieArray = document.cookie.split(';')
 
     for (const cookie of cookieArray) {

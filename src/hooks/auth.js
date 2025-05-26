@@ -24,10 +24,14 @@ export const useAuth = ( { middleware, redirectIfAuthenticated } = {} ) =>
     const csrf = () => axios.get( '/sanctum/csrf-cookie' )
 
     // Only update Redux store when we have a valid user object
-    if ( user )
-    {
-        dispatch( setUser( user ) )
-    }
+    useEffect(() => {
+        // Only update Redux store when we have a valid user object
+        // Use useEffect to avoid potential issues with timing
+        if (user && typeof user === 'object') {
+            // Ensure we're dispatching a valid object to the Redux store
+            dispatch(setUser(user))
+        }
+    }, [user])
 
     const register = async ( { setErrors, ...props } ) =>
     {
@@ -123,22 +127,30 @@ export const useAuth = ( { middleware, redirectIfAuthenticated } = {} ) =>
 
     useEffect( () =>
     {
-        if ( middleware === 'guest' && redirectIfAuthenticated && user )
-        {
-            store.dispatch( setUser( user ) )
-            router.push( redirectIfAuthenticated )
-        }
+        try {
+            if ( middleware === 'guest' && redirectIfAuthenticated && user && typeof user === 'object' )
+            {
+                // Only dispatch if user is a valid object
+                store.dispatch( setUser( user ) )
+                router.push( redirectIfAuthenticated )
+            }
 
-        if (
-            window.location.pathname === '/api/verify-email' &&
-            user?.email_verified_at
-        )
-        {
-            store.dispatch( setUser( user ) )
-            router.push( redirectIfAuthenticated )
-        }
+            if (
+                window.location.pathname === '/api/verify-email' &&
+                user && typeof user === 'object' && user?.email_verified_at
+            )
+            {
+                // Only dispatch if user is a valid object
+                store.dispatch( setUser( user ) )
+                router.push( redirectIfAuthenticated )
+            }
 
-        if ( middleware === 'auth' && error ) logout()
+            if ( middleware === 'auth' && error ) logout()
+        } catch (error) {
+            console.error("Error in auth middleware:", error);
+            // If we're in auth middleware and encounter an error, safest to logout
+            if (middleware === 'auth') logout()
+        }
     }, [ user, error ] )
 
     return {
