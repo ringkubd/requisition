@@ -38,12 +38,12 @@ class ProductIssueAPIController extends AppBaseController
     {
         $this->productIssueRepository = $productIssueRepo;
 
-        // $this->middleware('auth:sanctum');
-        // //        $this->middleware('role_or_permission:Super Admin|view_product-issues', ['only' => ['index']]);
-        // $this->middleware('role_or_permission:Super Admin|update_product-issues', ['only' => ['update']]);
-        // $this->middleware('role_or_permission:Super Admin|create_product-issues', ['only' => ['store']]);
-        // $this->middleware('role_or_permission:Super Admin|delete_product-issues', ['only' => ['delete']]);
-        // $this->middleware('role_or_permission:Super Admin|Store Manager|update_product-issues', ['only' => ['updateQuantity']]);
+        $this->middleware('auth:sanctum');
+        //        $this->middleware('role_or_permission:Super Admin|view_product-issues', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Super Admin|update_product-issues', ['only' => ['update']]);
+        $this->middleware('role_or_permission:Super Admin|create_product-issues', ['only' => ['store']]);
+        $this->middleware('role_or_permission:Super Admin|delete_product-issues', ['only' => ['delete']]);
+        $this->middleware('role_or_permission:Super Admin|Store Manager|update_product-issues', ['only' => ['updateQuantity']]);
     }
 
     /**
