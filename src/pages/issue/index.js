@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setDateRange } from '@/store/slice/filterDateRange'
 import { hasPermission } from '@/lib/helpers'
 
+
 const ProductIssue = () => {
     const { user } = useAuth()
     const router = useRouter()
@@ -45,6 +46,19 @@ const ProductIssue = () => {
     )
     const [dataTableData, setDataTableData] = useState([])
 
+    // Debug: Log initial states
+    if (typeof window !== 'undefined') {
+        // eslint-disable-next-line no-console
+        console.debug('ProductIssue: user', user)
+        console.debug('ProductIssue: searchParams', searchParams)
+        console.debug('ProductIssue: data', data)
+        console.debug('ProductIssue: isLoading', isLoading)
+        console.debug('ProductIssue: isError', isError)
+        console.debug('ProductIssue: departments', departments)
+        console.debug('ProductIssue: columns', columns)
+        console.debug('ProductIssue: dataTableData', dataTableData)
+    }
+
     useEffect(() => {
         if (user) {
             setISStoreManager(
@@ -62,10 +76,11 @@ const ProductIssue = () => {
     }, [destroyResponse])
 
     useEffect(() => {
-        if (!isLoading && !isError && data) {
-            const issueData = data?.product_issue
-            setDataTableData(issueData)
-            setColumns([
+        try {
+            if (!isLoading && !isError && data) {
+                const issueData = data?.product_issue
+                setDataTableData(issueData)
+                setColumns([
                 {
                     name: 'SL.',
                     selector: (row, index) =>
@@ -126,7 +141,11 @@ const ProductIssue = () => {
                     ),
                     ignoreRowClick: true,
                 },
-            ])
+                ])
+            }
+        } catch (err) {
+            // eslint-disable-next-line no-console
+            console.error('ProductIssue: Error in useEffect (columns/data)', err)
         }
     }, [isLoading, data, isStoreManager])
 
@@ -144,6 +163,45 @@ const ProductIssue = () => {
             changeSearchParams('dateRange', '')
         }
     }, [dateRange])
+
+    // Debug: Wrap DataTable in try/catch
+    let dataTableRender = null
+    try {
+        dataTableRender = (
+            <DataTable
+                columns={columns}
+                data={dataTableData}
+                pagination
+                responsive
+                progressPending={isLoading}
+                persistTableHead={true}
+                paginationServer
+                onChangePage={(page, totalRows) =>
+                    setSearchParams({
+                        ...searchParams,
+                        page: page,
+                    })
+                }
+                onChangeRowsPerPage={(
+                    currentRowsPerPage,
+                    currentPage,
+                ) =>
+                    setSearchParams({
+                        ...searchParams,
+                        page: currentPage,
+                        per_page: currentRowsPerPage,
+                    })
+                }
+                paginationResetDefaultPage={false}
+                paginationTotalRows={data?.number_of_rows}
+                paginationPerPage={15}
+            />
+        )
+    } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('ProductIssue: Error rendering DataTable', err)
+        dataTableRender = <div style={{ color: 'red' }}>Error rendering DataTable</div>
+    }
 
     return (
         <>
@@ -222,34 +280,7 @@ const ProductIssue = () => {
                             </div>
                         </div>
 
-                        <DataTable
-                            columns={columns}
-                            data={dataTableData}
-                            pagination
-                            responsive
-                            progressPending={isLoading}
-                            persistTableHead={true}
-                            paginationServer
-                            onChangePage={(page, totalRows) =>
-                                setSearchParams({
-                                    ...searchParams,
-                                    page: page,
-                                })
-                            }
-                            onChangeRowsPerPage={(
-                                currentRowsPerPage,
-                                currentPage,
-                            ) =>
-                                setSearchParams({
-                                    ...searchParams,
-                                    page: currentPage,
-                                    per_page: currentRowsPerPage,
-                                })
-                            }
-                            paginationResetDefaultPage={false}
-                            paginationTotalRows={data?.number_of_rows}
-                            paginationPerPage={15}
-                        />
+                        {dataTableRender}
                     </Card>
                 </div>
             </AppLayout>
