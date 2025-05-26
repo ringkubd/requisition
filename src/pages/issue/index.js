@@ -108,7 +108,16 @@ const ProductIssue = () =>
                 },
                 {
                     name: 'Status',
-                    cell: row => <IssueStatus key={row.uuid} row={row} />,
+                    cell: row => {
+                        try {
+                            // Safe rendering method for production
+                            return <IssueStatus key={row.uuid} row={row} />;
+                        } catch (error) {
+                            console.error("Error rendering IssueStatus:", error);
+                            // Fallback to basic text
+                            return row?.store_status ? "Approved" : "Pending";
+                        }
+                    },
                 },
                 {
                     name: 'Actions',

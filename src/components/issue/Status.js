@@ -6,17 +6,30 @@ import { AiFillCheckSquare, AiFillDelete } from 'react-icons/ai'
 
 const IssueStatus = ( { row } ) =>
 {
+    // Guard against row being null or undefined
+    if (!row) {
+        return <span>No data</span>;
+    }
+    
     const { user } = useAuth()
     const [ selectedDropdown, setSelectedDropdown ] = useState( 'Status' )
-    const isDepartmentHead =
-        user?.current_department_head === parseInt( user?.id ) ||
-        user?.role_names?.includes( 'System Administrator' ) || user?.permissions?.filter( p => p.name === "approve_department_issue" ).length
+    
+    // More defensive checks for user and permissions
+    const isDepartmentHead = 
+        (user && typeof user === 'object') ? 
+            (user?.current_department_head === parseInt( user?.id ) ||
+            user?.role_names?.includes?.( 'System Administrator' ) || 
+            (user?.permissions && Array.isArray(user?.permissions) && 
+             user?.permissions.filter( p => p?.name === "approve_department_issue" )?.length)) : false
     const [ isReceiverDepartment, setISReceiverDepartment ] = useState(
-        parseInt( row?.receiver_department_id ) ===
-        parseInt( user?.selected_department ),
+        (row?.receiver_department_id && user?.selected_department) ? 
+            parseInt( row.receiver_department_id ) === parseInt( user.selected_department )
+            : false
     )
     const [ isStoreManager, setISStoreManager ] = useState(
-        user?.role_object?.filter( r => r.name === 'Store Manager' ).length,
+        (user?.role_object && Array.isArray(user.role_object)) ?
+            user.role_object.filter( r => r?.name === 'Store Manager' ).length > 0
+            : false
     )
     const [
         updateIssue,
@@ -25,13 +38,22 @@ const IssueStatus = ( { row } ) =>
 
     useEffect( () =>
     {
-        setISReceiverDepartment(
-            parseInt( row?.receiver_department_id ) ===
-            parseInt( user?.selected_department ),
-        )
-        setISStoreManager(
-            user?.role_object?.filter( r => r.name === 'Store Manager' ).length,
-        )
+        try {
+            if (row && user) {
+                setISReceiverDepartment(
+                    (row.receiver_department_id && user.selected_department) ? 
+                        parseInt( row.receiver_department_id ) === parseInt( user.selected_department )
+                        : false
+                )
+                setISStoreManager(
+                    (user.role_object && Array.isArray(user.role_object)) ?
+                        user.role_object.filter( r => r?.name === 'Store Manager' ).length > 0
+                        : false
+                )
+            }
+        } catch (error) {
+            console.error("Error in IssueStatus useEffect:", error);
+        }
 
         if (
             parseInt( row?.receiver_department_id ) ===
