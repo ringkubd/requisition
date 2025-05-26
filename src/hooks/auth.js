@@ -5,120 +5,141 @@ import { useRouter } from 'next/router'
 import { setUser } from '@/store/service/user'
 import { store, dispatch } from '@/store'
 
-export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
+export const useAuth = ( { middleware, redirectIfAuthenticated } = {} ) =>
+{
     const router = useRouter()
 
-    const { data: user, error, mutate } = useSWR('/api/user', () =>
+    const { data: user, error, mutate } = useSWR( '/api/user', () =>
         axios
-            .get('/api/user')
-            .then(res => res.data?.data)
-            .catch(error => {
-                if (error.response.status !== 409) throw error
+            .get( '/api/user' )
+            .then( res => res.data?.data )
+            .catch( error =>
+            {
+                if ( error.response.status !== 409 ) throw error
 
-                router.push('/verify-email')
-            }),
+                router.push( '/verify-email' )
+            } ),
     )
 
-    const csrf = () => axios.get('/sanctum/csrf-cookie')
-    dispatch(setUser({ ...user }))
+    const csrf = () => axios.get( '/sanctum/csrf-cookie' )
 
-    const register = async ({ setErrors, ...props }) => {
-        await csrf()
-
-        setErrors([])
-
-        axios
-            .post('/api/register', props)
-            .then(() => mutate())
-            .catch(error => {
-                if (error.response.status !== 422) throw error
-
-                setErrors(error.response.data.errors)
-            })
+    // Only update Redux store when we have a valid user object
+    if ( user )
+    {
+        dispatch( setUser( user ) )
     }
 
-    const login = async ({ setErrors, setStatus, ...props }) => {
+    const register = async ( { setErrors, ...props } ) =>
+    {
         await csrf()
 
-        setErrors([])
-        setStatus(null)
+        setErrors( [] )
 
         axios
-            .post('/api/login', props)
-            .then(() => mutate())
-            .catch(error => {
+            .post( '/api/register', props )
+            .then( () => mutate() )
+            .catch( error =>
+            {
+                if ( error.response.status !== 422 ) throw error
+
+                setErrors( error.response.data.errors )
+            } )
+    }
+
+    const login = async ( { setErrors, setStatus, ...props } ) =>
+    {
+        await csrf()
+
+        setErrors( [] )
+        setStatus( null )
+
+        axios
+            .post( '/api/login', props )
+            .then( () => mutate() )
+            .catch( error =>
+            {
                 // if (error.response.status !== 422) throw error
-                setErrors(error?.response?.data?.errors)
-            })
+                setErrors( error?.response?.data?.errors )
+            } )
     }
 
-    const forgotPassword = async ({ setErrors, setStatus, email }) => {
+    const forgotPassword = async ( { setErrors, setStatus, email } ) =>
+    {
         await csrf()
 
-        setErrors([])
-        setStatus(null)
+        setErrors( [] )
+        setStatus( null )
 
         axios
-            .post('/api/forgot-password', { email })
-            .then(response => setStatus(response.data.status))
-            .catch(error => {
-                if (error.response.status !== 422) throw error
+            .post( '/api/forgot-password', { email } )
+            .then( response => setStatus( response.data.status ) )
+            .catch( error =>
+            {
+                if ( error.response.status !== 422 ) throw error
 
-                setErrors(error.response.data.errors)
-            })
+                setErrors( error.response.data.errors )
+            } )
     }
 
-    const resetPassword = async ({ setErrors, setStatus, ...props }) => {
+    const resetPassword = async ( { setErrors, setStatus, ...props } ) =>
+    {
         await csrf()
 
-        setErrors([])
-        setStatus(null)
+        setErrors( [] )
+        setStatus( null )
 
         axios
-            .post('/api/reset-password', {
+            .post( '/api/reset-password', {
                 token: router.query.token,
                 ...props,
-            })
-            .then(response =>
-                router.push('/login?reset=' + btoa(response.data.status)),
+            } )
+            .then( response =>
+                router.push( '/login?reset=' + btoa( response.data.status ) ),
             )
-            .catch(error => {
-                if (error.response.status !== 422) throw error
+            .catch( error =>
+            {
+                if ( error.response.status !== 422 ) throw error
 
-                setErrors(error.response.data.errors)
-            })
+                setErrors( error.response.data.errors )
+            } )
     }
 
-    const resendEmailVerification = ({ setStatus }) => {
+    const resendEmailVerification = ( { setStatus } ) =>
+    {
         axios
-            .post('/api/email/verification-notification')
-            .then(response => setStatus(response.data.status))
+            .post( '/api/email/verification-notification' )
+            .then( response => setStatus( response.data.status ) )
     }
 
-    const logout = async () => {
-        if (!error) {
-            await axios.post('/logout').then(() => mutate())
+    const logout = async () =>
+    {
+        if ( !error )
+        {
+            await axios.post( '/logout' ).then( () => mutate() )
         }
 
         window.location.pathname = '/login'
     }
 
-    useEffect(() => {
-        if (middleware === 'guest' && redirectIfAuthenticated && user) {
-            store.dispatch(setUser(user))
-            router.push(redirectIfAuthenticated)
+    useEffect( () =>
+    {
+        if ( middleware === 'guest' && redirectIfAuthenticated && user )
+        {
+            store.dispatch( setUser( user ) )
+            router.push( redirectIfAuthenticated )
         }
 
         if (
             window.location.pathname === '/api/verify-email' &&
             user?.email_verified_at
-        ) {
-            store.dispatch(setUser(user))
-            router.push(redirectIfAuthenticated)
+        )
+        {
+            store.dispatch( setUser( user ) )
+            router.push( redirectIfAuthenticated )
         }
 
-        if (middleware === 'auth' && error) logout()
-    }, [user, error])
+        if ( middleware === 'auth' && error ) logout()
+    }, [ user, error ] )
 
     return {
         user,
@@ -131,4 +152,4 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     }
 }
 
-export const csrf = () => axios.get('/sanctum/csrf-cookie')
+export const csrf = () => axios.get( '/sanctum/csrf-cookie' )

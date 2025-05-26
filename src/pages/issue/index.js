@@ -108,7 +108,7 @@ const ProductIssue = () =>
                 },
                 {
                     name: 'Status',
-                    selector: row => <IssueStatus key={row.uuid} row={row} />,
+                    cell: row => <IssueStatus key={row.uuid} row={row} />,
                 },
                 {
                     name: 'Actions',
