@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react'
 import { Badge, Card } from 'flowbite-react'
 import DataTable from 'react-data-table-component'
 import Status from '@/components/requisition/status'
-import {
-    getDashboardCashData,
-    getDashboardData,
-    useGetDashboardCashDataQuery,
-    useGetDashboardDataQuery,
-    getRunningQueriesThunk,
-} from '@/store/service/dashboard'
+import
+    {
+        getDashboardCashData,
+        getDashboardData,
+        useGetDashboardCashDataQuery,
+        useGetDashboardDataQuery,
+        getRunningQueriesThunk,
+    } from '@/store/service/dashboard'
 import { useAuth } from '@/hooks/auth'
 import { Tabs } from 'flowbite-react'
 import { AiFillGolden, AiFillMoneyCollect } from 'react-icons/ai'
@@ -18,36 +19,43 @@ import moment from 'moment'
 import { wrapper } from '@/store'
 import Link from 'next/link'
 import { isMobile } from 'react-device-detect'
+import { useGetIssueQuery } from '@/store/service/issue'
 
-const Dashboard = () => {
+const Dashboard = () =>
+{
     const { user } = useAuth()
-    const [initialColumns, setInitialColumns] = useState([])
-    const [cashColumns, setCashColumns] = useState([])
-    const [searchParams, setSearchParams] = useState({})
-    const [searchCashParams, setSearchCashParams] = useState({})
+    const [ initialColumns, setInitialColumns ] = useState( [] )
+    const [ cashColumns, setCashColumns ] = useState( [] )
+    const [ searchParams, setSearchParams ] = useState( {} )
+    const [ searchCashParams, setSearchCashParams ] = useState( {} )
     const { data, isLoading, isError, isSuccess } = useGetDashboardDataQuery(
         searchParams,
     )
+
+    const { data: issue } = useGetIssueQuery();
     const {
         data: cash,
         isLoading: cashISLoading,
         isError: cashISError,
         isSuccess: cashISSuccess,
-    } = useGetDashboardCashDataQuery(searchCashParams)
-    const [initialPending, setInitialPending] = useState(0)
-    const [cashPending, setCashPending] = useState(0)
+    } = useGetDashboardCashDataQuery( searchCashParams )
+    const [ initialPending, setInitialPending ] = useState( 0 )
+    const [ cashPending, setCashPending ] = useState( 0 )
 
-    useEffect(() => {
-        if (isSuccess && data && user) {
-            const pending = data.initial.filter(d => {
+    useEffect( () =>
+    {
+        if ( isSuccess && data && user )
+        {
+            const pending = data.initial.filter( d =>
+            {
                 // return (d.current_status?.status === "Pending" || d.purchase_current_status?.status === "Pending")
                 return d.purchase_current_status?.status === 'Pending'
-            }).length
-            setInitialPending(pending)
-            setInitialColumns([
+            } ).length
+            setInitialPending( pending )
+            setInitialColumns( [
                 {
                     name: 'Sl',
-                    selector: (row, sl) => sl + 1,
+                    selector: ( row, sl ) => sl + 1,
                     sortable: true,
                     maxWidth: '61px',
                     minWidth: '10px',
@@ -94,7 +102,7 @@ const Dashboard = () => {
                                 row.purchase_requisitions
                                     ?.estimated_total_amount ?? 0,
                             ),
-                        ).toLocaleString('bd'),
+                        ).toLocaleString( 'bd' ),
                     sortable: true,
                     maxWidth: '140px',
                     minWidth: '10px',
@@ -140,19 +148,22 @@ const Dashboard = () => {
                             ''
                         ),
                 },
-            ])
+            ] )
         }
-    }, [data, isSuccess, user])
-    useEffect(() => {
-        if (cashISSuccess && cash && user) {
-            const pending = cash.cash.filter(d => {
+    }, [ data, isSuccess, user ] )
+    useEffect( () =>
+    {
+        if ( cashISSuccess && cash && user )
+        {
+            const pending = cash.cash.filter( d =>
+            {
                 return d.current_status?.status === 'Pending'
-            }).length
-            setCashPending(pending)
-            setCashColumns([
+            } ).length
+            setCashPending( pending )
+            setCashColumns( [
                 {
                     name: 'Sl',
-                    selector: (row, sl) => sl + 1,
+                    selector: ( row, sl ) => sl + 1,
                     sortable: true,
                     maxWidth: '61px',
                     minWidth: '10px',
@@ -181,7 +192,7 @@ const Dashboard = () => {
                 {
                     name: 'Est. Cost',
                     selector: row =>
-                        parseFloat(row.total_cost ?? 0).toLocaleString('bd'),
+                        parseFloat( row.total_cost ?? 0 ).toLocaleString( 'bd' ),
                     sortable: true,
                     maxWidth: '140px',
                     minWidth: '10px',
@@ -195,7 +206,7 @@ const Dashboard = () => {
                 {
                     name: 'Generated at',
                     selector: row =>
-                        moment(row.created_at).format('hh:mm DD MMM Y'),
+                        moment( row.created_at ).format( 'hh:mm DD MMM Y' ),
                     sortable: true,
                     omit: isMobile,
                 },
@@ -215,12 +226,13 @@ const Dashboard = () => {
                         />
                     ),
                 },
-            ])
+            ] )
         }
-    }, [cash, cashISSuccess, user])
+    }, [ cash, cashISSuccess, user ] )
 
-    const changeSearchParams = (key, value) => {
-        setSearchParams({ ...searchParams, [key]: value, page: 1 })
+    const changeSearchParams = ( key, value ) =>
+    {
+        setSearchParams( { ...searchParams, [ key ]: value, page: 1 } )
     }
 
     const conditionalRowStyles = [
@@ -228,11 +240,11 @@ const Dashboard = () => {
             when: row =>
                 row?.current_status?.status === 'Rejected' ||
                 row?.purchase_current_status?.status === 'Rejected',
-            style: row => ({
+            style: row => ( {
                 backgroundColor: '#f5e6f1',
                 boxShadow: '10px 10px red',
                 textShadow: 'text-shadow: 2px 2px red',
-            }),
+            } ),
         },
     ]
 
@@ -283,21 +295,21 @@ const Dashboard = () => {
                                             paginationServer
                                             responsive
                                             persistTableHead
-                                            onChangePage={(page, totalRows) =>
-                                                setSearchParams({
+                                            onChangePage={( page, totalRows ) =>
+                                                setSearchParams( {
                                                     ...searchParams,
                                                     page: page,
-                                                })
+                                                } )
                                             }
                                             onChangeRowsPerPage={(
                                                 currentRowsPerPage,
                                                 currentPage,
                                             ) =>
-                                                setSearchParams({
+                                                setSearchParams( {
                                                     ...searchParams,
                                                     page: currentPage,
                                                     per_page: currentRowsPerPage,
-                                                })
+                                                } )
                                             }
                                             paginationTotalRows={
                                                 data?.number_of_rows
@@ -334,21 +346,21 @@ const Dashboard = () => {
                                             paginationServer
                                             responsive
                                             persistTableHead
-                                            onChangePage={(page, totalRows) =>
-                                                setSearchCashParams({
+                                            onChangePage={( page, totalRows ) =>
+                                                setSearchCashParams( {
                                                     ...searchCashParams,
                                                     page: page,
-                                                })
+                                                } )
                                             }
                                             onChangeRowsPerPage={(
                                                 currentRowsPerPage,
                                                 currentPage,
                                             ) =>
-                                                setSearchCashParams({
+                                                setSearchCashParams( {
                                                     ...searchCashParams,
                                                     page: currentPage,
                                                     per_page: currentRowsPerPage,
-                                                })
+                                                } )
                                             }
                                             paginationTotalRows={
                                                 cash?.number_of_rows
@@ -369,11 +381,12 @@ const Dashboard = () => {
     )
 }
 export const getServerSideProps = wrapper.getServerSideProps(
-    store => async context => {
+    store => async context =>
+    {
         // const params = context.params
-        store.dispatch(getDashboardData.initiate())
-        store.dispatch(getDashboardCashData.initiate())
-        await Promise.all(store.dispatch(getRunningQueriesThunk()))
+        store.dispatch( getDashboardData.initiate() )
+        store.dispatch( getDashboardCashData.initiate() )
+        await Promise.all( store.dispatch( getRunningQueriesThunk() ) )
         return {
             props: {},
         }
