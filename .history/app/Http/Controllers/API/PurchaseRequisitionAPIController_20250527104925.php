@@ -611,8 +611,9 @@ class PurchaseRequisitionAPIController extends AppBaseController
     private function processCeoApproval(Request $request, PurchaseRequisition $requisition, array $data): array
     {
         $data['ceo_status'] = $request->status;
-        $data['notes'] = $request->notes;
-        $data['ceo_approved_at'] = now();
+        $data['ceo_notes'] = $request->notes;
+        $data['ceo_approval_date'] = now();
+        $data['ceo_approval_by'] = $request->user()->id;
 
         if ($request->status == 2) {
             // Approved - notify requisitor and store manager
@@ -650,7 +651,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
             $accountsUsers = $this->findAccountsDepartmentUsers();
 
             foreach ($accountsUsers as $user) {
-                $this->notifyAccountsUser($user, $requisition);
+                $this->notifyAccountsUser($user, $requisition, $user);
             }
         }
 
@@ -739,8 +740,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
             $key = $one_time_key->generate($testUser->id);
             $messageText = Component::text("Requisitor Name: {$requisition->user->name}, P.R. NO.: {$requisition->prf_no}.");
             $viewUrl = Component::urlButton(["/purchase-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]);
-            $approveButton = Component::quickReplyButton([$requisition->id . '_' . $ceo->id . '_2_ceo_purchase']);
-            $rejectButton = Component::quickReplyButton([$requisition->id . '_' . $ceo->id . '_3_ceo_purchase']);
+            $approveButton = Component::quickReplyButton([$requisition->id . '_' . $currentUser->id . '_2_ceo_purchase']);
+            $rejectButton = Component::quickReplyButton([$requisition->id . '_' . $currentUser->id . '_3_ceo_purchase']);
 
             // Send email notification using both notification types
             $testUser->notify(new CeoMailNotification($requisition));
@@ -763,8 +764,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $key = $one_time_key->generate($ceo->id);
         $messageText = Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no.");
         $viewUrl = Component::urlButton(["/purchase-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]);
-        $approveButton = Component::quickReplyButton([$requisition->id . '_' . $ceo->id . '_2_ceo_purchase']);
-        $rejectButton = Component::quickReplyButton([$requisition->id . '_' . $ceo->id . '_3_ceo_purchase']);
+        $approveButton = Component::quickReplyButton([$requisition->id . '_' . $currentUser->id . '_2_ceo_purchase']);
+        $rejectButton = Component::quickReplyButton([$requisition->id . '_' . $currentUser->id . '_3_ceo_purchase']);
 
         // Send email notification using both notification types
         $ceo->notify(new CeoMailNotification($requisition));
@@ -965,7 +966,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
      * @param User $currentUser
      * @return void
      */
-    private function notifyAccountsUser(User $currentUser, PurchaseRequisition $requisition): void
+    private function notifyAccountsUser(User $user, PurchaseRequisition $requisition, User $currentUser): void
     {
         // if (config('app.debug')) {
         //     return;
@@ -1002,7 +1003,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
 
         $requisitor_name = $requisition->user;
         $one_time_key = new OneTimeLogin();
-        $key = $one_time_key->generate($currentUser->id);
+        $key = $one_time_key->generate($user->id);
         $departmentComponent = Component::text($requisition->department->name);
         $nameComponent = Component::text($requisitor_name->name);
         $prfComponent = Component::text($requisition->prf_no);
@@ -1011,18 +1012,18 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $rejectButton = Component::quickReplyButton([$requisition->id . '_' . $currentUser->id . '_3_accounts_purchase']);
 
         // Send email notification
-        $currentUser->notify(new RequisitionStatusNotification($requisition));
+        $user->notify(new RequisitionStatusNotification($requisition));
 
         // Send to accounts user's mobile
-        if ($currentUser->mobile_no) {
-            $currentUser->notify(new WhatsAppAccountNotification(
+        if ($user->mobile_no) {
+            $user->notify(new WhatsAppAccountNotification(
                 $departmentComponent,
                 $nameComponent,
                 $prfComponent,
                 $approveButton,
                 $rejectButton,
                 $viewUrl,
-                $currentUser->mobile_no
+                $user->mobile_no
             ));
         }
 
@@ -1031,7 +1032,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
             $backupNumbers = ['+8801737956549'];
 
             foreach ($backupNumbers as $number) {
-                $currentUser->notify(new WhatsAppAccountNotification(
+                $user->notify(new WhatsAppAccountNotification(
                     $departmentComponent,
                     $nameComponent,
                     $prfComponent,

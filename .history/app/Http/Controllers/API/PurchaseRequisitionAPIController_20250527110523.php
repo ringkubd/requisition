@@ -611,7 +611,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
     private function processCeoApproval(Request $request, PurchaseRequisition $requisition, array $data): array
     {
         $data['ceo_status'] = $request->status;
-        $data['notes'] = $request->notes;
+        $data['ceo_notes'] = $request->notes;
         $data['ceo_approved_at'] = now();
 
         if ($request->status == 2) {

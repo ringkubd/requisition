@@ -611,8 +611,9 @@ class PurchaseRequisitionAPIController extends AppBaseController
     private function processCeoApproval(Request $request, PurchaseRequisition $requisition, array $data): array
     {
         $data['ceo_status'] = $request->status;
-        $data['notes'] = $request->notes;
-        $data['ceo_approved_at'] = now();
+        $data['ceo_notes'] = $request->notes;
+        $data['ceo_approval_date'] = now();
+        $data['ceo_approval_by'] = $request->user()->id;
 
         if ($request->status == 2) {
             // Approved - notify requisitor and store manager
