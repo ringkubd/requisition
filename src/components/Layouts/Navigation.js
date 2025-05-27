@@ -147,13 +147,6 @@ const Navigation = ( { user } ) =>
                                         ) : (
                                             ''
                                         )}
-                                        <DropdownLink
-                                            href="/issue"
-                                            active={router.pathname
-                                                .includes( 'issue' )
-                                                .toString()}>
-                                            Issue
-                                        </DropdownLink>
                                     </Dropdown>
                                 ) : (
                                     ''
