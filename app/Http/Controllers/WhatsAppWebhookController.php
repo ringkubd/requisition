@@ -175,12 +175,12 @@ class WhatsAppWebhookController extends Controller
         if ($type === 'purchase') {
             $requisition = PurchaseRequisition::find($requisitionId, ['*']);
             if ($requisition) {
-                $updated = $this->updateRequisitionStatus($requisition, $status);
+                $updated = $this->updateRequisitionStatus($requisition, $status, 'purchase');
             }
         } elseif ($type === 'cash') {
             $requisition = CashRequisition::find($requisitionId, ['*']);
             if ($requisition) {
-                $updated = $this->updateRequisitionStatus($requisition, $status);
+                $updated = $this->updateRequisitionStatus($requisition, $status, 'cash');
             }
         }
 
@@ -197,18 +197,19 @@ class WhatsAppWebhookController extends Controller
      * @param string $status
      * @return bool
      */
-    private function updateRequisitionStatus($requisition, $status): bool
+    private function updateRequisitionStatus($requisition, $status, $type = "purchase"): bool
     {
         $statusData = [
             'ceo_status' => $status,
             'ceo_approved_at' => now()
         ];
 
-        if ($requisition->approval_status) {
-            return $requisition->approval_status()->update($statusData);
-        } else {
-            return (bool) $requisition->approval_status()->updateOrCreate([], $statusData);
+        $requisition->approval_status()->updateOrCreate([], $statusData);
+
+        if ($type == 'purchase') {
+            $requisition->initialRequisition->approval_status()->updateOrCreate([], $statusData);
         }
+        return true;
     }
 
     /**
@@ -284,7 +285,7 @@ class WhatsAppWebhookController extends Controller
         }
 
         // Update approval status
-        $this->updateDepartmentApprovalStatus($requisition, $requisitorId, $status);
+        $this->updateDepartmentApprovalStatus($requisition, $requisitorId, $status, $type);
 
         // Send notifications to accounts department users
         $this->notifyAccountsDepartment($requisition, $requisitorId, $type);
@@ -298,7 +299,7 @@ class WhatsAppWebhookController extends Controller
      * @param string $status
      * @return bool
      */
-    private function updateDepartmentApprovalStatus($requisition, $requisitorId, $status): bool
+    private function updateDepartmentApprovalStatus($requisition, $requisitorId, $status, $type = "purchase"): bool
     {
         $statusData = [
             'department_status' => $status,
@@ -311,8 +312,8 @@ class WhatsAppWebhookController extends Controller
             $statusData['accounts_status'] = 1;
         }
 
-        if ($requisition->approval_status) {
-            return $requisition->approval_status()->update($statusData);
+        if ($type == 'purchase') {
+            $requisition->initialRequisition->approval_status()->updateOrCreate([], $statusData);
         }
 
         return (bool) $requisition->approval_status()->updateOrCreate([], $statusData);
@@ -447,12 +448,12 @@ class WhatsAppWebhookController extends Controller
         if ($type === 'purchase') {
             $requisition = PurchaseRequisition::find($requisitionId, ['*']);
             if ($requisition) {
-                $updated = $this->updateAccountsApprovalStatus($requisition, $requisitorId, $status);
+                $updated = $this->updateAccountsApprovalStatus($requisition, $requisitorId, $status, 'purchase');
             }
         } elseif ($type === 'cash') {
             $requisition = CashRequisition::find($requisitionId, ['*']);
             if ($requisition) {
-                $updated = $this->updateAccountsApprovalStatus($requisition, $requisitorId, $status);
+                $updated = $this->updateAccountsApprovalStatus($requisition, $requisitorId, $status, 'cash');
             }
         }
 
@@ -470,7 +471,7 @@ class WhatsAppWebhookController extends Controller
      * @param string $status
      * @return bool
      */
-    private function updateAccountsApprovalStatus($requisition, $requisitorId, $status): bool
+    private function updateAccountsApprovalStatus($requisition, $requisitorId, $status, $type = "purchase"): bool
     {
         $statusData = [
             'accounts_status' => $status,
@@ -489,8 +490,8 @@ class WhatsAppWebhookController extends Controller
             $statusData['ceo_status'] = 1;
         }
 
-        if ($requisition->approval_status) {
-            return $requisition->approval_status()->update($statusData);
+        if ($type == 'purchase') {
+            $requisition->initialRequisition->approval_status()->updateOrCreate([], $statusData);
         }
 
         return (bool) $requisition->approval_status()->updateOrCreate([], $statusData);

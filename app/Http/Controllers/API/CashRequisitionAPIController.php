@@ -21,7 +21,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\CashRequisitionResource;
 use App\Notifications\WhatsAppAccountNotification;
+use App\Notifications\WhatsAppStoreNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use NotificationChannels\WhatsApp\Component;
 use NotificationChannels\WhatsApp\Component\QuickReplyButton;
 use NotificationChannels\WhatsApp\Component\UrlButton;
@@ -489,32 +491,27 @@ class CashRequisitionAPIController extends AppBaseController
         // Process based on approval stage
         switch ($request->stage) {
             case 'accounts':
-                $notifiedUsers = $this->processAccountsApproval($request, $requisition, $data);
-                // Notify accounts users
-                $accountsUsers = $this->findAccountsDepartmentUsers();
-                foreach ($accountsUsers as $user) {
-                    if ($user->hasPermissionTo('accounts-approval-cash')) {
-                        $this->notifyAccountsUser($user, $requisition, $request->user());
-                    }
-                }
-                break;
-
-            case 'ceo':
-                $notifiedUsers = $this->processCeoApproval($request, $requisition, $data);
-                // Notify CEO
+                $this->processAccountsApproval($request, $requisition, $data);
                 $ceo = $this->findCeoUser();
                 if ($ceo) {
                     $this->notifyCeoUser($ceo, $requisition, $request->user());
                 }
                 break;
 
+            case 'ceo':
+                $finalNotification = $this->processCeoApproval($request, $requisition, $data);
+                foreach ($finalNotification as $user) {
+                    $this->notifyStoreManager($user, $requisition, $request->user());
+                }
+                // Notify CEO
+                break;
+
             default:
                 $notifiedUsers = $this->processDepartmentApproval($request, $requisition, $data);
-                // Notify department head
-                $departmentHead = User::find($head_of_department);
-                if ($departmentHead) {
-                    $this->notifyDepartmentUser($departmentHead, $requisition, $request->user());
+                foreach ($notifiedUsers as $user) {
+                    $this->notifyAccountsUser($user, $requisition, $request->user());
                 }
+
                 break;
         }
 
@@ -593,14 +590,6 @@ class CashRequisitionAPIController extends AppBaseController
             if ($storeManager) {
                 $notifiedUsers[] = $storeManager;
             }
-
-            // Also notify the accounts department about CEO approval
-            $accountsUsers = $this->findAccountsDepartmentUsers();
-            foreach ($accountsUsers as $user) {
-                if ($user->hasPermissionTo('accounts-approval-cash')) {
-                    $notifiedUsers[] = $user;
-                }
-            }
         }
 
         return $notifiedUsers;
@@ -628,8 +617,10 @@ class CashRequisitionAPIController extends AppBaseController
             // Find accounts department users with permission
             $accountsUsers = $this->findAccountsDepartmentUsers();
 
+            Log::info('Accounts Users Count: ', [$accountsUsers]);
+
             foreach ($accountsUsers as $user) {
-                if ($user->hasPermissionTo('accounts-approval-cash')) {
+                if ($user->hasAnyPermission(['accounts-approval-cash'])) {
                     $notifiedUsers[] = $user;
                 }
             }
@@ -682,6 +673,11 @@ class CashRequisitionAPIController extends AppBaseController
         $department = Department::query()
             ->where('branch_id', auth_branch_id())
             ->where('name', 'Accounts')
+            ->whereHas('users', function ($q) {
+                $q->whereHas('roles.permissions', function ($q) {
+                    $q->where('name', 'accounts-approval-cash');
+                });
+            })
             ->with('users')
             ->first();
 
@@ -758,6 +754,13 @@ class CashRequisitionAPIController extends AppBaseController
         // Send email notification using both notification types
         $ceo->notify(new CeoMailNotification($requisition));
         $ceo->notify(new RequisitionStatusNotification($requisition));
+        $ceo->notify(new WhatsAppNotification(
+            $messageText,
+            $ceo->mobile_no,
+            $viewUrl,
+            $approveButton,
+            $rejectButton
+        ));
 
         // Send to backup numbers in non-production environments
         $backupNumbers = ['+8801725271724', '+8801737956549'];
@@ -1109,5 +1112,82 @@ class CashRequisitionAPIController extends AppBaseController
                 }
             }
         }
+    }
+
+    /**
+     * Send notifications to store manager
+     *
+     * @param User $storeManager
+     * @param PurchaseRequisition $requisition
+     * @param User $currentUser
+     * @return void
+     */
+    private function notifyStoreManager(User $storeManager, CashRequisition $requisition, User $currentUser): void
+    {
+        // if (config('app.debug')) {
+        //     return;
+        // }
+
+        if (NotificationTestHelper::isTestModeEnabled()) {
+            $testUser = NotificationTestHelper::getTestUser();
+            $testPhone = NotificationTestHelper::getTestPhone();
+
+            // Send push notification
+            $testUser->notify(new PushNotification(
+                "A purchase requisition has been approved.",
+                "Purchase requisition P.R. NO. {$requisition->prf_no} for {$requisition->user->name} has been approved by CEO. Please process the order."
+            ));
+
+            // Send email notification
+            $testUser->notify(new RequisitionStatusNotification($requisition));
+
+            // Generate message for WhatsApp
+            $messageBody = Component::text("A purchase requisition P.R. NO. {$requisition->prf_no} for {$requisition->user->name} has been approved by CEO. Please process the order.");
+
+            // Send WhatsApp notification to test phone
+            $testUser->notify(new WhatsAppStoreNotification(
+                $messageBody,
+                $testPhone
+            ));
+
+            return;
+        }
+
+        // Send push notification
+        $storeManager->notify(new PushNotification(
+            "A purchase requisition has been approved.",
+            "Purchase requisition P.R. NO. {$requisition->prf_no} for {$requisition->user->name} has been approved by CEO. Please process the order."
+        ));
+
+        // Send email notification
+        $storeManager->notify(new RequisitionStatusNotification($requisition));
+
+        // // Skip WhatsApp notifications in debug mode
+        // if (config('app.debug')) {
+        //     return;
+        // }
+
+        // Generate message for WhatsApp
+        $messageBody = Component::text("A purchase requisition P.R. NO. {$requisition->prf_no} for {$requisition->user->name} has been approved by CEO. Please process the order.");
+
+        // Send to store manager's mobile
+        if ($storeManager->mobile_no) {
+            $storeManager->notify(new WhatsAppStoreNotification(
+                $messageBody,
+                $storeManager->mobile_no
+            ));
+        }
+
+        // Send to backup numbers in non-production environments
+        // if (!app()->environment('production', 'staging')) {
+        $backupNumbers = ['+8801737956549'];
+
+        foreach ($backupNumbers as $number) {
+            $storeManager->notify(new WhatsAppStoreNotification(
+                $messageBody,
+                $number
+            ));
+        }
+        // }
     }
 }

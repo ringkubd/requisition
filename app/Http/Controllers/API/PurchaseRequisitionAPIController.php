@@ -27,8 +27,10 @@ use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\PurchaseRequisitionResource;
 use App\Notifications\WhatsAppDepartmentNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use NotificationChannels\WhatsApp\Component;
 use OpenApi\Annotations as OA;
+use PgSql\Lob;
 
 /**
  * Class PurchaseRequisitionController
@@ -589,8 +591,11 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $data['accounts_approved_at'] = now();
         $data['accounts_approved_by'] = $request->user()->id;
 
+
+
         if ($request->status == 2) {
             // Approved - notify CEO
+            $data['ceo_status'] = 1;
             $ceo = $this->findCeoUser();
             if ($ceo) {
                 $this->notifyCeoUser($ceo, $requisition, $request->user());
@@ -647,8 +652,9 @@ class PurchaseRequisitionAPIController extends AppBaseController
 
         if ($request->status == 2) {
             // Approved - notify accounts department
+            $data['accounts_status'] = 1;
             $accountsUsers = $this->findAccountsDepartmentUsers();
-
+            Log::info('Accounts Users: ', [$accountsUsers]);
             foreach ($accountsUsers as $user) {
                 $this->notifyAccountsUser($user, $requisition);
             }
@@ -695,7 +701,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
         // Find users in accounts department who have approval permissions
         return User::whereHas('departments', function ($q) {
             $q->where('name', 'Accounts');
-        })->orWhereHas('permissions', function ($q) {
+        })->whereHas('roles.permissions', function ($q) {
             $q->where('name', 'accounts-approval-purchase');
         })->get();
     }
@@ -709,12 +715,12 @@ class PurchaseRequisitionAPIController extends AppBaseController
      */
     private function updateRequisitionApprovalStatus(PurchaseRequisition $requisition, array $data): void
     {
-        // Update or create approval status
-        if ($requisition->approval_status) {
-            $requisition->approval_status->update($data);
-        } else {
-            $requisition->approval_status()->create($data);
-        }
+        // Update or create the purchase requisition's approval status using updateOrCreate
+        $requisition->approval_status()->updateOrCreate([], $data);
+
+
+        // Update or create the initial requisition's approval status
+        $requisition->initialRequisition->approval_status()->updateOrCreate([], $data);
     }
 
     /**
@@ -782,19 +788,19 @@ class PurchaseRequisitionAPIController extends AppBaseController
         }
 
         // Send to backup numbers in non-production environments
-        if (!app()->environment('production', 'staging')) {
-            $backupNumbers = ['+8801725271724', '+8801737956549'];
+        // if (!app()->environment('production', 'staging')) {
+        $backupNumbers = ['+8801725271724', '+8801737956549'];
 
-            foreach ($backupNumbers as $number) {
-                $ceo->notify(new WhatsAppNotification(
-                    $messageText,
-                    $number,
-                    $viewUrl,
-                    $approveButton,
-                    $rejectButton
-                ));
-            }
+        foreach ($backupNumbers as $number) {
+            $ceo->notify(new WhatsAppNotification(
+                $messageText,
+                $number,
+                $viewUrl,
+                $approveButton,
+                $rejectButton
+            ));
         }
+        // }
     }
 
     /**
@@ -1027,21 +1033,21 @@ class PurchaseRequisitionAPIController extends AppBaseController
         }
 
         // Send to backup numbers in non-production environments
-        if (!app()->environment('production', 'staging')) {
-            $backupNumbers = ['+8801737956549'];
+        // if (!app()->environment('production', 'staging')) {
+        $backupNumbers = ['+8801737956549'];
 
-            foreach ($backupNumbers as $number) {
-                $currentUser->notify(new WhatsAppAccountNotification(
-                    $departmentComponent,
-                    $nameComponent,
-                    $prfComponent,
-                    $approveButton,
-                    $rejectButton,
-                    $viewUrl,
-                    $number
-                ));
-            }
+        foreach ($backupNumbers as $number) {
+            $currentUser->notify(new WhatsAppAccountNotification(
+                $departmentComponent,
+                $nameComponent,
+                $prfComponent,
+                $approveButton,
+                $rejectButton,
+                $viewUrl,
+                $number
+            ));
         }
+        // }
     }
 
     /**
@@ -1086,44 +1092,44 @@ class PurchaseRequisitionAPIController extends AppBaseController
             $isTestingCeoUser = isset($_ENV['TEST_WHATSAPP_NOTIFICATION_TYPE']) &&
                 $_ENV['TEST_WHATSAPP_NOTIFICATION_TYPE'] === 'ceo';
 
-            if ($isTestingAccountsUser) {
-                // For accounts user, use WhatsAppAccountNotification
-                $departmentComponent = Component::text($requisition->department->name);
-                $nameComponent = Component::text($requisitor);
-                $prfNoComponent = Component::text($prfNo);
+            // if ($isTestingAccountsUser) {
+            //     // For accounts user, use WhatsAppAccountNotification
+            //     $departmentComponent = Component::text($requisition->department->name);
+            //     $nameComponent = Component::text($requisitor);
+            //     $prfNoComponent = Component::text($prfNo);
 
-                $testUser->notify(new WhatsAppAccountNotification(
-                    $departmentComponent,
-                    $nameComponent,
-                    $prfNoComponent,
-                    $approveButton,
-                    $rejectButton,
-                    $viewUrl,
-                    $testPhone
-                ));
-            } elseif ($isTestingCeoUser) {
-                // For CEO user, use WhatsAppNotification
-                $testUser->notify(new WhatsAppNotification(
-                    $messageText,
-                    $testPhone,
-                    $viewUrl,
-                    $approveButton,
-                    $rejectButton
-                ));
-            } else {
-                // For department users, use WhatsAppDepartmentNotification
-                $nameComponent = Component::text($requisitor);
-                $prfNoComponent = Component::text($prfNo);
+            //     $testUser->notify(new WhatsAppAccountNotification(
+            //         $departmentComponent,
+            //         $nameComponent,
+            //         $prfNoComponent,
+            //         $approveButton,
+            //         $rejectButton,
+            //         $viewUrl,
+            //         $testPhone
+            //     ));
+            // } elseif ($isTestingCeoUser) {
+            //     // For CEO user, use WhatsAppNotification
+            //     $testUser->notify(new WhatsAppNotification(
+            //         $messageText,
+            //         $testPhone,
+            //         $viewUrl,
+            //         $approveButton,
+            //         $rejectButton
+            //     ));
+            // } else {
+            //     // For department users, use WhatsAppDepartmentNotification
+            //     $nameComponent = Component::text($requisitor);
+            //     $prfNoComponent = Component::text($prfNo);
 
-                $testUser->notify(new WhatsAppDepartmentNotification(
-                    $nameComponent,
-                    $prfNoComponent,
-                    $approveButton,
-                    $rejectButton,
-                    $viewUrl,
-                    $testPhone
-                ));
-            }
+            //     $testUser->notify(new WhatsAppDepartmentNotification(
+            //         $nameComponent,
+            //         $prfNoComponent,
+            //         $approveButton,
+            //         $rejectButton,
+            //         $viewUrl,
+            //         $testPhone
+            //     ));
+            // }
 
             return;
         }
