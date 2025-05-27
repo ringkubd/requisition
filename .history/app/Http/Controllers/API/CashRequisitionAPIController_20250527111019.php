@@ -97,7 +97,7 @@ class CashRequisitionAPIController extends AppBaseController
 
         return $this->sendResponse(
             CashRequisitionResource::collection($cashRequisitions),
-            __('messages.retrieved', ['model' => __('models/cashRequisitions.plural')])
+            'Cash Requisitions retrieved successfully'
         );
     }
 
@@ -171,7 +171,7 @@ class CashRequisitionAPIController extends AppBaseController
 
         return $this->sendResponse(
             new CashRequisitionResource($cashRequisition),
-            __('messages.saved', ['model' => __('models/cashRequisitions.singular')])
+            'Cash Requisition saved successfully'
         );
     }
 
@@ -207,10 +207,10 @@ class CashRequisitionAPIController extends AppBaseController
 
         // Normal notification flow
         $department_autority = User::query()
-            ->whereHas('branches', function ($q) use ($cashRequisition) {
-                $q->where('id',  $cashRequisition->branch_id);
+            ->whereHas('departments', function ($q) use ($cashRequisition) {
+                $q->where('id',  \auth_department_id());
             })
-            ->whereHas('permissions', function ($q) {
+            ->whereHas('roles.permissions', function ($q) {
                 $q->where('name', 'approve_department_cash');
             })
             ->get();
@@ -236,8 +236,10 @@ class CashRequisitionAPIController extends AppBaseController
         }
 
         $user = User::where('email', 'ajr.jahid@gmail.com')->first();
-        // Also send to testing/backup number
-        $this->sendWhatsAppNotification($user, $cashRequisition, $requisitorName, $prfNo, '+8801737956549');
+        if ($user) {
+            // Also send to testing/backup number
+            $this->sendWhatsAppNotification($user, $cashRequisition, $requisitorName, $prfNo, '+8801737956549');
+        }
     }
 
     /**
@@ -257,12 +259,6 @@ class CashRequisitionAPIController extends AppBaseController
         if (empty($phoneNumber)) {
             return;
         }
-
-        // // Send common notification
-        // $user->notify(new WhatsAppCommonNotification(
-        //     Component::text("Requisitor Name: $requisitorName,  P.R. NO.: $prfNo."),
-        //     $phoneNumber
-        // ));
 
         // Generate one-time login key
         $one_time_key = new OneTimeLogin();
@@ -324,13 +320,13 @@ class CashRequisitionAPIController extends AppBaseController
 
         if (empty($cashRequisition)) {
             return $this->sendError(
-                __('messages.not_found', ['model' => __('models/cashRequisitions.singular')])
+                'Cash Requisition not found'
             );
         }
 
         return $this->sendResponse(
             new CashRequisitionResource($cashRequisition),
-            __('messages.retrieved', ['model' => __('models/cashRequisitions.singular')])
+            'Cash Requisition retrieved successfully'
         );
     }
 
@@ -382,32 +378,32 @@ class CashRequisitionAPIController extends AppBaseController
 
         if (empty($cashRequisition)) {
             return $this->sendError(
-                __('messages.not_found', ['model' => __('models/cashRequisitions.singular')])
+                'Cash Requisition not found'
             );
         }
 
         DB::transaction(function () use ($id, $input, $cashRequisition) {
-            // Update main requisition
             $totalCost = collect($input)->sum('cost');
-            $cashRequisition = $this->cashRequisitionRepository->update([
-                'total_cost' => $totalCost
+
+            // Update cash requisition
+            $this->cashRequisitionRepository->update([
+                'total_cost' => $totalCost,
             ], $id);
 
-            // Update items - remove cost and id fields
+            // Update requisition items
+            $cashRequisition->cashRequisitionItems()->delete();
             $newItems = collect($input)->map(function ($item) {
-                return collect($item)->except(['cost', 'id']);
+                return collect($item)->except(['cost']);
             });
+            $cashRequisition->cashRequisitionItems()->createMany($newItems->toArray());
 
-            if ($cashRequisition) {
-                // Replace all items
-                $cashRequisition->cashRequisitionItems()->delete();
-                $cashRequisition->cashRequisitionItems()->createMany($newItems->toArray());
-            }
+            // Update PRF record
+            $cashRequisition->prfNOS()->update(['total' => $totalCost]);
         });
 
         return $this->sendResponse(
-            new CashRequisitionResource($cashRequisition),
-            __('messages.updated', ['model' => __('models/cashRequisitions.singular')])
+            new CashRequisitionResource($cashRequisition->fresh()),
+            'Cash Requisition updated successfully'
         );
     }
 
@@ -454,20 +450,20 @@ class CashRequisitionAPIController extends AppBaseController
 
         if (empty($cashRequisition)) {
             return $this->sendError(
-                __('messages.not_found', ['model' => __('models/cashRequisitions.singular')])
+                'Cash Requisition not found'
             );
         }
 
         DB::transaction(function () use ($cashRequisition) {
-            // Delete related items first
             $cashRequisition->cashRequisitionItems()->delete();
-            // Then delete the requisition
+            $cashRequisition->prfNOS()->delete();
+            $cashRequisition->approval_status()->delete();
             $cashRequisition->delete();
         });
 
         return $this->sendResponse(
             $id,
-            __('messages.deleted', ['model' => __('models/cashRequisitions.singular')])
+            'Cash Requisition deleted successfully'
         );
     }
 
@@ -536,7 +532,7 @@ class CashRequisitionAPIController extends AppBaseController
 
         return $this->sendResponse(
             new CashRequisitionResource($requisition),
-            __('messages.retrieved', ['model' => __('models/initialRequisitionProducts.plural')])
+            'Cash Requisition processed successfully'
         );
     }
 
@@ -718,9 +714,9 @@ class CashRequisitionAPIController extends AppBaseController
      */
     private function notifyCeoUser(User $ceo, CashRequisition $requisition, User $currentUser): void
     {
-        if (config('app.debug')) {
-            return;
-        }
+        // if (config('app.debug')) {
+        //     return;
+        // }
 
         $requisitor_name = $requisition->user;
         $one_time_key = new OneTimeLogin();
@@ -763,19 +759,7 @@ class CashRequisitionAPIController extends AppBaseController
         $ceo->notify(new CeoMailNotification($requisition));
         $ceo->notify(new RequisitionStatusNotification($requisition));
 
-        // Send to CEO's mobile
-        // if ($ceo->mobile_no) {
-        //     $ceo->notify(new WhatsAppNotification(
-        //         $messageText,
-        //         $ceo->mobile_no,
-        //         $viewUrl,
-        //         $approveButton,
-        //         $rejectButton
-        //     ));
-        // }
-
-        // // Send to backup numbers in non-production environments
-        // if (!app()->environment('production', 'staging')) {
+        // Send to backup numbers in non-production environments
         $backupNumbers = ['+8801725271724', '+8801737956549'];
 
         foreach ($backupNumbers as $number) {
@@ -787,7 +771,6 @@ class CashRequisitionAPIController extends AppBaseController
                 $rejectButton
             ));
         }
-        // }
     }
 
     /**
@@ -800,9 +783,9 @@ class CashRequisitionAPIController extends AppBaseController
      */
     private function notifyDepartmentUser(User $user, CashRequisition $requisition, User $currentUser): void
     {
-        if (config('app.debug')) {
-            return;
-        }
+        // if (config('app.debug')) {
+        //     return;
+        // }
 
         $requisitor_name = $requisition->user;
         $one_time_key = new OneTimeLogin();
@@ -877,11 +860,12 @@ class CashRequisitionAPIController extends AppBaseController
      * @param CashRequisition $requisition
      * @param User $currentUser
      * @return void
-     */    private function notifyAccountsUser(User $user, CashRequisition $requisition, User $currentUser): void
+     */
+    private function notifyAccountsUser(User $currentUser, CashRequisition $requisition): void
     {
-        if (config('app.debug')) {
-            return;
-        }
+        // if (config('app.debug')) {
+        //     return;
+        // }
 
         $requisitor_name = $requisition->user;
         $one_time_key = new OneTimeLogin();
@@ -892,7 +876,9 @@ class CashRequisitionAPIController extends AppBaseController
             $testPhone = NotificationTestHelper::getTestPhone();
             $key = $one_time_key->generate($testUser->id);
 
-            $messageText = Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no.");
+            $departmentComponent = Component::text($requisition->department->name ?? 'Unknown Department');
+            $nameComponent = Component::text($requisitor_name->name);
+            $prfComponent = Component::text($requisition->prf_no);
             $viewUrl = Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]);
             $approveButton = Component::quickReplyButton([$requisition->id . '_' . $currentUser->id . '_2_accounts_cash']);
             $rejectButton = Component::quickReplyButton([$requisition->id . '_' . $currentUser->id . '_3_accounts_cash']);
@@ -900,36 +886,42 @@ class CashRequisitionAPIController extends AppBaseController
             // Send email notification
             $testUser->notify(new RequisitionStatusNotification($requisition));
 
-            // Send WhatsApp to test number
-            $testUser->notify(new WhatsAppNotification(
-                $messageText,
-                $testPhone,
-                $viewUrl,
+            // Send WhatsApp to test number - Using WhatsAppAccountNotification for accounts users
+            $testUser->notify(new WhatsAppAccountNotification(
+                $departmentComponent,
+                $nameComponent,
+                $prfComponent,
                 $approveButton,
-                $rejectButton
+                $rejectButton,
+                $viewUrl,
+                $testPhone
             ));
 
             return;
         }
 
         // Regular notification flow
-        $key = $one_time_key->generate($user->id);
-        $messageText = Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no.");
+        $key = $one_time_key->generate($currentUser->id);
+        $departmentComponent = Component::text($requisition->department->name ?? 'Unknown Department');
+        $nameComponent = Component::text($requisitor_name->name);
+        $prfComponent = Component::text($requisition->prf_no);
         $viewUrl = Component::urlButton(["/cash-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]);
         $approveButton = Component::quickReplyButton([$requisition->id . '_' . $currentUser->id . '_2_accounts_cash']);
         $rejectButton = Component::quickReplyButton([$requisition->id . '_' . $currentUser->id . '_3_accounts_cash']);
 
         // Send email notification
-        $user->notify(new RequisitionStatusNotification($requisition));
+        $currentUser->notify(new RequisitionStatusNotification($requisition));
 
-        // Send to accounts user's mobile
-        if ($user->mobile_no) {
-            $user->notify(new WhatsAppNotification(
-                $messageText,
-                $user->mobile_no,
-                $viewUrl,
+        // Send to accounts user's mobile - Using WhatsAppAccountNotification for accounts users
+        if ($currentUser->mobile_no) {
+            $currentUser->notify(new WhatsAppAccountNotification(
+                $departmentComponent,
+                $nameComponent,
+                $prfComponent,
                 $approveButton,
-                $rejectButton
+                $rejectButton,
+                $viewUrl,
+                $currentUser->mobile_no
             ));
         }
 
@@ -938,12 +930,14 @@ class CashRequisitionAPIController extends AppBaseController
             $backupNumbers = ['+8801737956549'];
 
             foreach ($backupNumbers as $number) {
-                $user->notify(new WhatsAppNotification(
-                    $messageText,
-                    $number,
-                    $viewUrl,
+                $currentUser->notify(new WhatsAppAccountNotification(
+                    $departmentComponent,
+                    $nameComponent,
+                    $prfComponent,
                     $approveButton,
-                    $rejectButton
+                    $rejectButton,
+                    $viewUrl,
+                    $number
                 ));
             }
         }
@@ -963,7 +957,7 @@ class CashRequisitionAPIController extends AppBaseController
 
         if (empty($originalRequisition)) {
             return $this->sendError(
-                __('messages.not_found', ['model' => __('models/cashRequisitions.singular')])
+                'Cash Requisition not found'
             );
         }
 
@@ -1004,7 +998,7 @@ class CashRequisitionAPIController extends AppBaseController
 
         return $this->sendResponse(
             new CashRequisitionResource($newRequisition),
-            __('messages.saved', ['model' => __('models/cashRequisitions.singular')])
+            'Cash Requisition copied successfully'
         );
     }
 
@@ -1051,16 +1045,22 @@ class CashRequisitionAPIController extends AppBaseController
             $isAccountsUser = $user->default_department_name === 'Accounts' || $user->hasPermissionTo('accounts-approval-cash');
 
             if ($isAccountsUser) {
-                // Accounts approval buttons
+                // Accounts approval buttons - Using WhatsAppAccountNotification for accounts users
                 $approveButton = Component::quickReplyButton([$requisition->id . '_' . $user->id . '_2_accounts_cash']);
                 $rejectButton = Component::quickReplyButton([$requisition->id . '_' . $user->id . '_3_accounts_cash']);
+                $departmentComponent = Component::text($requisition->department->name);
+                $nameComponent = Component::text($requisitor);
+                $prfNoComponent = Component::text($prfNo);
+
                 if ($user->mobile_no) {
-                    $user->notify(new WhatsAppNotification(
-                        $messageText,
-                        $user->mobile_no,
-                        $viewUrl,
+                    $user->notify(new WhatsAppAccountNotification(
+                        $departmentComponent,
+                        $nameComponent,
+                        $prfNoComponent,
                         $approveButton,
-                        $rejectButton
+                        $rejectButton,
+                        $viewUrl,
+                        $user->mobile_no
                     ));
                 }
             } else {
@@ -1083,13 +1083,29 @@ class CashRequisitionAPIController extends AppBaseController
                 $backupNumbers = ['+8801737956549']; // Add only the test number here
 
                 foreach ($backupNumbers as $number) {
-                    $user->notify(new WhatsAppNotification(
-                        $messageText,
-                        $number,
-                        $viewUrl,
-                        $approveButton,
-                        $rejectButton
-                    ));
+                    if ($isAccountsUser) {
+                        $departmentComponent = Component::text($requisition->department->name);
+                        $nameComponent = Component::text($requisitor);
+                        $prfNoComponent = Component::text($prfNo);
+
+                        $user->notify(new WhatsAppAccountNotification(
+                            $departmentComponent,
+                            $nameComponent,
+                            $prfNoComponent,
+                            $approveButton,
+                            $rejectButton,
+                            $viewUrl,
+                            $number
+                        ));
+                    } else {
+                        $user->notify(new WhatsAppNotification(
+                            $messageText,
+                            $number,
+                            $viewUrl,
+                            $approveButton,
+                            $rejectButton
+                        ));
+                    }
                 }
             }
         }

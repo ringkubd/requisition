@@ -901,7 +901,7 @@ class CashRequisitionAPIController extends AppBaseController
         }
 
         // Regular notification flow
-        $key = $one_time_key->generate($currentUser->id);
+        $key = $one_time_key->generate($user->id);
         $departmentComponent = Component::text($requisition->department->name ?? 'Unknown Department');
         $nameComponent = Component::text($requisitor_name->name);
         $prfComponent = Component::text($requisition->prf_no);
@@ -910,18 +910,18 @@ class CashRequisitionAPIController extends AppBaseController
         $rejectButton = Component::quickReplyButton([$requisition->id . '_' . $currentUser->id . '_3_accounts_cash']);
 
         // Send email notification
-        $currentUser->notify(new RequisitionStatusNotification($requisition));
+        $user->notify(new RequisitionStatusNotification($requisition));
 
         // Send to accounts user's mobile - Using WhatsAppAccountNotification for accounts users
-        if ($currentUser->mobile_no) {
-            $currentUser->notify(new WhatsAppAccountNotification(
+        if ($user->mobile_no) {
+            $user->notify(new WhatsAppAccountNotification(
                 $departmentComponent,
                 $nameComponent,
                 $prfComponent,
                 $approveButton,
                 $rejectButton,
                 $viewUrl,
-                $currentUser->mobile_no
+                $user->mobile_no
             ));
         }
 
@@ -930,7 +930,7 @@ class CashRequisitionAPIController extends AppBaseController
             $backupNumbers = ['+8801737956549'];
 
             foreach ($backupNumbers as $number) {
-                $currentUser->notify(new WhatsAppAccountNotification(
+                $user->notify(new WhatsAppAccountNotification(
                     $departmentComponent,
                     $nameComponent,
                     $prfComponent,
