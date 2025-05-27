@@ -1,68 +1,68 @@
 import { onQueryStartedErrorToast } from '@/lib/clientHelper'
 import { GeneralBaseAPI } from '@/store/generalBaseAPI'
 
-export const PurchaseApiService = GeneralBaseAPI.injectEndpoints({
-    endpoints: builder => ({
-        getPurchase: builder.query({
-            query: arg => ({
+export const PurchaseApiService = GeneralBaseAPI.injectEndpoints( {
+    endpoints: builder => ( {
+        getPurchase: builder.query( {
+            query: arg => ( {
                 url: 'purchases',
                 params: arg,
-            }),
-            providesTags: ['getPurchase'],
+            } ),
+            providesTags: [ 'getPurchase' ],
             onQueryStarted: onQueryStartedErrorToast,
-        }),
-        editPurchase: builder.query({
-            query: id => ({
+        } ),
+        editPurchase: builder.query( {
+            query: id => ( {
                 url: `purchases/${id}`,
-            }),
-            providesTags: ['editPurchase'],
+            } ),
+            providesTags: [ 'editPurchase' ],
             onQueryStarted: onQueryStartedErrorToast,
-        }),
-        updatePurchase: builder.mutation({
-            query: ({ id, ...patch }) => ({
+        } ),
+        updatePurchase: builder.mutation( {
+            query: ( { id, ...patch } ) => ( {
                 url: `purchases/${id}`,
                 method: 'PATCH',
                 body: patch,
                 formData: true,
-            }),
-            invalidatesTags: ['getPurchase', 'editPurchase'],
+            } ),
+            invalidatesTags: [ 'getPurchase', 'editPurchase' ],
             onQueryStarted: onQueryStartedErrorToast,
-        }),
-        storePurchase: builder.mutation({
-            query: arg => {
-                console.log(arg.logo)
+        } ),
+        storePurchase: builder.mutation( {
+            query: arg =>
+            {
+                console.log( arg.logo )
                 return {
                     url: 'purchases',
                     method: 'POST',
                     body: arg,
                 }
             },
-            invalidatesTags: ['getPurchase'],
+            invalidatesTags: [ 'getPurchase' ],
             onQueryStarted: onQueryStartedErrorToast,
-        }),
-        destroyPurchase: builder.mutation({
-            query: arg => ({
+        } ),
+        destroyPurchase: builder.mutation( {
+            query: arg => ( {
                 url: `purchases/${arg}`,
                 method: 'DELETE',
-            }),
-            invalidatesTags: ['getPurchase'],
+            } ),
+            invalidatesTags: [ 'getPurchase' ],
             onQueryStarted: onQueryStartedErrorToast,
-        }),
-        selectSuppliers: builder.query({
-            query: arg => ({
+        } ),
+        selectSuppliers: builder.query( {
+            query: arg => ( {
                 url: `suppliers-select`,
                 params: arg,
-            }),
-            providesTags: ['select_suppliers'],
+            } ),
+            providesTags: [ 'select_suppliers' ],
             onQueryStarted: onQueryStartedErrorToast,
-        }),
-    }),
-})
+        } ),
+    } ),
+} )
 
 export const {
     useGetPurchaseQuery,
     useEditPurchaseQuery,
-    useGetPurchaseByOrganizationBranchQuery,
     useUpdatePurchaseMutation,
     useStorePurchaseMutation,
     useDestroyPurchaseMutation,
