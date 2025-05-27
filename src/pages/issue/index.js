@@ -237,7 +237,7 @@ const ProductIssue = () =>
                             </div>
                         </div>
 
-                        <DataTable
+                        {/* <DataTable
                             columns={columns}
                             data={dataTableData}
                             pagination
@@ -264,7 +264,7 @@ const ProductIssue = () =>
                             paginationResetDefaultPage={false}
                             paginationTotalRows={data?.number_of_rows}
                             paginationPerPage={15}
-                        />
+                        /> */}
                     </Card>
                 </div>
             </AppLayout>
