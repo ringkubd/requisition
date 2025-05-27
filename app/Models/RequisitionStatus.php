@@ -83,6 +83,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         'department_status',
         'accounts_status',
         'ceo_status',
+        'ceo_approved_at',
         'notes',
         'department_approved_by',
         'department_approved_at',
