@@ -19,7 +19,7 @@ import moment from 'moment'
 import IssueStatus from '@/components/issue/Status'
 import { useAuth } from '@/hooks/auth'
 import Datepicker from 'react-tailwindcss-datepicker'
-// import { useGetDepartmentByOrganizationBranchQuery } from '@/store/service/deparment'
+import { useGetDepartmentByOrganizationBranchQuery } from '@/store/service/deparment'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { useDispatch, useSelector } from 'react-redux'
 import { setDateRange } from '@/store/slice/filterDateRange'
@@ -33,11 +33,11 @@ const ProductIssue = () =>
     const dateRange = useSelector( state => state.filter_date_range )
     const [ searchParams, setSearchParams ] = useState( {} )
     const { data, isLoading, isError } = useGetIssueQuery( searchParams )
-    // const {
-    //     data: departments,
-    //     isLoading: departmentsISLoading,
-    //     isError: departmentsISError,
-    // } = useGetDepartmentByOrganizationBranchQuery()
+    const {
+        data: departments,
+        isLoading: departmentsISLoading,
+        isError: departmentsISError,
+    } = useGetDepartmentByOrganizationBranchQuery()
     const [ destroy, destroyResponse ] = useDestroyIssueMutation()
     const [ columns, setColumns ] = useState( [] )
     const [ isStoreManager, setISStoreManager ] = useState(
@@ -106,34 +106,34 @@ const ProductIssue = () =>
                         moment( row.created_at ).format( 'D MMM Y @ H:mm ' ),
                     sortable: true,
                 },
-                // {
-                //     name: 'Status',
-                //     selector: row => <IssueStatus key={row.uuid} row={row} />,
-                // },
-                // {
-                //     name: 'Actions',
-                //     cell: row => (
-                //         <Actions
-                //             itemId={row.uuid}
-                //             edit={
-                //                 isStoreManager &&
-                //                     ( !row.store_status ||
-                //                         moment().diff(
-                //                             moment( row.updated_at ),
-                //                             'days',
-                //                         ) < 1 )
-                //                     ? `/issue/${row.uuid}/edit`
-                //                     : false
-                //             }
-                //             // view={`/issue/${row.uuid}/view`}
-                //             destroy={destroy}
-                //             print={`/issue/${row.uuid}/print_view`}
-                //             progressing={destroyResponse.isLoading}
-                //             permissionModule={`product-issues`}
-                //         />
-                //     ),
-                //     ignoreRowClick: true,
-                // },
+                {
+                    name: 'Status',
+                    selector: row => <IssueStatus key={row.uuid} row={row} />,
+                },
+                {
+                    name: 'Actions',
+                    cell: row => (
+                        <Actions
+                            itemId={row.uuid}
+                            edit={
+                                isStoreManager &&
+                                    ( !row.store_status ||
+                                        moment().diff(
+                                            moment( row.updated_at ),
+                                            'days',
+                                        ) < 1 )
+                                    ? `/issue/${row.uuid}/edit`
+                                    : false
+                            }
+                            // view={`/issue/${row.uuid}/view`}
+                            destroy={destroy}
+                            print={`/issue/${row.uuid}/print_view`}
+                            progressing={destroyResponse.isLoading}
+                            permissionModule={`product-issues`}
+                        />
+                    ),
+                    ignoreRowClick: true,
+                },
             ] )
         }
     }, [ isLoading, data, isStoreManager ] )
@@ -198,7 +198,7 @@ const ProductIssue = () =>
                                 />
                             </div>
                             <div>
-                                {/* {departments && isStoreManager ? (
+                                {departments && isStoreManager ? (
                                     <label
                                         htmlFor={`user_department_id`}
                                         className={`flex flex-col sm:flex-row sm:items-center dark:text-black`}>
@@ -221,7 +221,7 @@ const ProductIssue = () =>
                                             ) )}
                                         </Select>
                                     </label>
-                                ) : null} */}
+                                ) : null}
                             </div>
                             <div>
                                 <TextInput
