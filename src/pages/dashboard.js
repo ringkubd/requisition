@@ -5,13 +5,13 @@ import { Badge, Card } from 'flowbite-react'
 import DataTable from 'react-data-table-component'
 import Status from '@/components/requisition/status'
 import
-    {
-        getDashboardCashData,
-        getDashboardData,
-        useGetDashboardCashDataQuery,
-        useGetDashboardDataQuery,
-        getRunningQueriesThunk,
-    } from '@/store/service/dashboard'
+{
+    getDashboardCashData,
+    getDashboardData,
+    useGetDashboardCashDataQuery,
+    useGetDashboardDataQuery,
+    getRunningQueriesThunk,
+} from '@/store/service/dashboard'
 import { useAuth } from '@/hooks/auth'
 import { Tabs } from 'flowbite-react'
 import { AiFillGolden, AiFillMoneyCollect } from 'react-icons/ai'
@@ -19,7 +19,6 @@ import moment from 'moment'
 import { wrapper } from '@/store'
 import Link from 'next/link'
 import { isMobile } from 'react-device-detect'
-import { useGetIssueQuery } from '@/store/service/issue'
 
 const Dashboard = () =>
 {
@@ -32,7 +31,6 @@ const Dashboard = () =>
         searchParams,
     )
 
-    const { data: issue } = useGetIssueQuery();
     const {
         data: cash,
         isLoading: cashISLoading,
