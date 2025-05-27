@@ -1,55 +1,100 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
 import { fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react'
 
-export const GeneralBaseAPI = createApi( {
-    reducerPath: 'general_service',
-    baseQuery: fetchBaseQuery( {
-        baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,
-        prepareHeaders: headers =>
-        {
-            // Always set Accept header regardless of environment
-            headers.set( 'Accept', `application/json` )
-
-            // Only execute browser-specific code when document is defined (client-side)
-            if ( typeof window !== 'undefined' && typeof document !== 'undefined' )
-            {
-                // Fetch CSRF cookie
-                fetch(
-                    process.env.NEXT_PUBLIC_BACKEND_URL + '/sanctum/csrf-cookie',
-                    {
-                        method: 'GET',
-                        credentials: 'include',
-                    },
-                )
-
-                // Process cookies for CSRF token
-                try
-                {
-                    let cookieArray = document.cookie.split( ';' )
-                    // this can probably be improved by using a regex.. but this works for now
-                    for ( var i = 0; i < cookieArray.length; i++ )
-                    {
-                        let cookiePair = cookieArray[ i ].split( '=' )
-
-                        if ( cookiePair[ 0 ].trim() == 'XSRF-TOKEN-PORTAL' )
-                        {
-                            headers.set(
-                                'X-XSRF-TOKEN-PORTAL',
-                                decodeURIComponent( cookiePair[ 1 ] ),
-                            )
-                        }
-                    }
-                } catch ( error )
-                {
-                    console.error( 'Error processing cookies:', error );
-                }
+// Helper function to safely get CSRF token from cookies
+const getCSRFToken = () => {
+    if (typeof document === 'undefined') return null;
+    
+    try {
+        const cookieArray = document.cookie.split(';');
+        for (let i = 0; i < cookieArray.length; i++) {
+            const cookiePair = cookieArray[i].split('=');
+            if (cookiePair[0].trim() === 'XSRF-TOKEN-PORTAL') {
+                return decodeURIComponent(cookiePair[1]);
             }
+        }
+    } catch (error) {
+        console.error('Error extracting CSRF token:', error);
+    }
+    return null;
+};
 
-            return headers
-        },
+// Helper to refresh CSRF token
+const refreshCSRF = async () => {
+    if (typeof window === 'undefined') return null;
+    
+    try {
+        const response = await fetch(
+            process.env.NEXT_PUBLIC_BACKEND_URL + '/sanctum/csrf-cookie',
+            {
+                method: 'GET',
+                credentials: 'include',
+            }
+        );
+        
+        if (response.ok) {
+            // Wait a moment for cookies to be set
+            await new Promise(resolve => setTimeout(resolve, 100));
+            return getCSRFToken();
+        }
+    } catch (error) {
+        console.error('Error refreshing CSRF token:', error);
+    }
+    return null;
+};
+
+// Create a base query with retry logic for auth failures
+const baseQueryWithRetry = async (args, api, extraOptions) => {
+    // Prepare headers with initial CSRF token
+    const prepareHeaders = () => {
+        const headers = new Headers();
+        headers.set('Accept', 'application/json');
+        
+        const token = getCSRFToken();
+        if (token) {
+            headers.set('X-XSRF-TOKEN-PORTAL', token);
+        }
+        
+        return headers;
+    };
+
+    // First attempt
+    let result = await fetchBaseQuery({
+        baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,
+        prepareHeaders,
         credentials: 'include',
-    } ),
-    endpoints: () => ( {} ),
+    })(args, api, extraOptions);
+
+    // If we get a 401, try refreshing CSRF token and retry once
+    if (result.error && result.error.status === 401) {
+        console.log('Received 401 error, attempting to refresh CSRF token and retry');
+        
+        // Refresh the CSRF token
+        await refreshCSRF();
+        
+        // Retry the request with new token
+        result = await fetchBaseQuery({
+            baseUrl: process.env.NEXT_PUBLIC_BACKEND_API_URL,
+            prepareHeaders,
+            credentials: 'include',
+        })(args, api, extraOptions);
+        
+        // Log the final result for debugging
+        if (result.error) {
+            console.error('Request still failed after retry:', result.error);
+        } else {
+            console.log('Request succeeded after retry');
+        }
+    }
+
+    return result;
+};
+
+// Enhanced API with better error handling and authentication
+export const GeneralBaseAPI = createApi({
+    reducerPath: 'general_service',
+    baseQuery: baseQueryWithRetry,
+    endpoints: () => ({}),
     tagTypes: [
         'getSuppliers',
         'editSuppliers',
@@ -109,4 +154,4 @@ export const GeneralBaseAPI = createApi( {
         'editBranch',
         'cash-requisition-select-vehicle',
     ],
-} )
+})
