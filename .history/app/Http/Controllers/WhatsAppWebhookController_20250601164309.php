@@ -301,12 +301,6 @@ class WhatsAppWebhookController extends Controller
      */
     private function updateDepartmentApprovalStatus($requisition, $requisitorId, $status, $type = "purchase"): bool
     {
-        // Retrieve existing approval status for the requisition
-        $existingStatus = $requisition->approval_status;
-        if ($existingStatus && $existingStatus->department_approved_at) {
-            Log::info('Department approval already updated for requisition', ['requisition_id' => $requisition->id]);
-            return true;
-        }
         $statusData = [
             'department_status' => $status,
             'department_approved_by' => $requisitorId,
@@ -482,7 +476,7 @@ class WhatsAppWebhookController extends Controller
         // Retrieve existing approval status for the requisition
         // approval_status is morphOne releation
 
-        $existingStatus = $requisition->approval_status;
+        $existingStatus = $requisition->approval_status()->first();
         if ($existingStatus && $existingStatus->accounts_approved_at) {
             Log::info('Accounts approval already updated for requisition', ['requisition_id' => $requisition->id]);
             return true;
