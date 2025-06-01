@@ -65,7 +65,7 @@ class DashboardAPIController extends AppBaseController
                         $q->where('ceo_status', '!=', 0);
                     });
                 }
-                if ($request->user()?->hasRole('Accounts')) {
+                if ($request->user()->hasRole('Accounts')) {
                     $query->whereHas('approval_status', function ($q) {
                         $q->where('accounts_status', '!=', 0);
                     });
