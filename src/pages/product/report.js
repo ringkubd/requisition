@@ -13,7 +13,8 @@ import Datepicker from 'react-tailwindcss-datepicker'
 import moment from 'moment'
 import PurchaseReport from '@/components/report/purchaseReport'
 import IssueReport from '@/components/report/issueReport'
-import {
+import
+{
     useIssuesReportMutation,
     usePurchaseReportMutation,
     useBothReportMutation,
@@ -27,11 +28,12 @@ import axios from '@/lib/axios'
 import { AsyncPaginate } from 'react-select-async-paginate'
 import ProductBalance from '@/components/report/productBalance'
 
-Object.filter = (obj, predicate) =>
-    Object.fromEntries(Object.entries(obj).filter(predicate))
-const Report = () => {
+Object.filter = ( obj, predicate ) =>
+    Object.fromEntries( Object.entries( obj ).filter( predicate ) )
+const Report = () =>
+{
     const router = useRouter()
-    const [selectedCategory, setSelectedCategory] = useState('')
+    const [ selectedCategory, setSelectedCategory ] = useState( '' )
     const {
         data: departments,
         isLoading: departmentISLoading,
@@ -79,19 +81,20 @@ const Report = () => {
         },
     ] = useProductCurrentBalanceMutation()
 
-    const [selectedCategoriesName, setSelectedCategoriesName] = useState([
+    const [ selectedCategoriesName, setSelectedCategoriesName ] = useState( [
         'All',
-    ])
-    const [variant, setVariant] = useState([])
+    ] )
+    const [ variant, setVariant ] = useState( [] )
 
-    useEffect(() => {
-        console.log(variant)
-    }, [variant])
+    useEffect( () =>
+    {
+        console.log( variant )
+    }, [ variant ] )
 
     const printRef = useRef()
-    const [reportType, setReportType] = useState('usage')
-    const [reportFormat, setReportFormat] = useState('category_base')
-    const [columns, setColumns] = useState({
+    const [ reportType, setReportType ] = useState( 'usage' )
+    const [ reportFormat, setReportFormat ] = useState( 'category_base' )
+    const [ columns, setColumns ] = useState( {
         category: true,
         issuer: true,
         department: true,
@@ -99,7 +102,7 @@ const Report = () => {
         use_date: true,
         variant: true,
         usage: false,
-    })
+    } )
 
     const { start_date, end_date } =
         issueReports ?? purchaseReport ?? bothReport ?? balance ?? {}
@@ -108,74 +111,85 @@ const Report = () => {
         category: '',
         department: '',
         start_date: '',
-        end_date: moment().format('Y-MM-DD'),
+        end_date: moment().format( 'Y-MM-DD' ),
         product: '',
         report_type: 'usage',
         report_format: 'category_base',
         product_option_id: '',
     }
 
-    const submit = (values, formikHelper) => {
-        if (values.report_type === 'purchase') {
-            submitPurchaseReport(values)
-        } else if (values.report_type === 'usage') {
-            submitIssueReport(values)
-        } else if (values.report_type === 'both') {
-            submitBothReport(values)
-        } else {
-            submitBalance(values)
+    const submit = ( values, formikHelper ) =>
+    {
+        if ( values.report_type === 'purchase' )
+        {
+            submitPurchaseReport( values )
+        } else if ( values.report_type === 'usage' )
+        {
+            submitIssueReport( values )
+        } else if ( values.report_type === 'both' )
+        {
+            submitBothReport( values )
+        } else
+        {
+            submitBalance( values )
         }
     }
-    Yup.addMethod(Yup.mixed, 'atLeastOneOf', function (list, v) {
-        return this.test({
+    Yup.addMethod( Yup.mixed, 'atLeastOneOf', function ( list, v )
+    {
+        return this.test( {
             name: 'atLeastOneOf',
             message: 'At least one of these fields: ${keys} is required.',
             exclusive: true,
-            params: { keys: list.join(', ') },
-            test: (value, context) => {
-                return list.some(f => !!context.parent[f])
+            params: { keys: list.join( ', ' ) },
+            test: ( value, context ) =>
+            {
+                return list.some( f => !!context.parent[ f ] )
             },
-        })
-    })
+        } )
+    } )
 
-    const validationSchema = Yup.object().shape({
-        category: Yup.array().label('Category'),
+    const validationSchema = Yup.object().shape( {
+        category: Yup.array().label( 'Category' ),
         department: Yup.number(),
         start_date: Yup.date(),
         end_date: Yup.date(),
-        product: Yup.mixed().atLeastOneOf([
+        product: Yup.mixed().atLeastOneOf( [
             'department',
             'start_date',
             'end_date',
             'product',
             'category',
-        ]),
-        report_type: Yup.string().required().label('Report Type'),
-    })
+        ] ),
+        report_type: Yup.string().required().label( 'Report Type' ),
+    } )
 
-    const handlePrint = useReactToPrint({
+    const handlePrint = useReactToPrint( {
         content: () => printRef.current,
-        onBeforePrint: a => console.log(a),
-    })
+        onBeforePrint: a => console.log( a ),
+    } )
 
-    useEffect(() => {
-        if (reportType === 'purchase' && reportFormat === 'category_base') {
-            setColumns({
+    useEffect( () =>
+    {
+        if ( reportType === 'purchase' && reportFormat === 'category_base' )
+        {
+            setColumns( {
                 category: true,
                 supplier: true,
                 department: true,
                 variant: true,
-            })
+            } )
         } else if (
             reportType === 'purchase' &&
             reportFormat !== 'category_base'
-        ) {
-            setColumns({
+        )
+        {
+            setColumns( {
                 category: true,
                 variant: true,
-            })
-        } else if (reportType === 'usage' && reportFormat === 'category_base') {
-            setColumns({
+            } )
+        } else if ( reportType === 'usage' && reportFormat === 'category_base' )
+        {
+            setColumns( {
                 category: true,
                 issuer: true,
                 department: true,
@@ -183,34 +197,37 @@ const Report = () => {
                 use_date: true,
                 variant: true,
                 usage: false,
-            })
-        } else if (reportType === 'usage' && reportFormat !== 'category_base') {
-            setColumns({
+            } )
+        } else if ( reportType === 'usage' && reportFormat !== 'category_base' )
+        {
+            setColumns( {
                 category: true,
                 avg: true,
                 usage: true,
-            })
+            } )
         }
-    }, [reportType, reportFormat])
-    async function loadOptions(search, loadedOptions, { page }) {
-        const response = await axios.get(`/api/product-select`, {
+    }, [ reportType, reportFormat ] )
+    async function loadOptions( search, loadedOptions, { page } )
+    {
+        const response = await axios.get( `/api/product-select`, {
             params: {
                 search: search,
                 page: page,
                 category_id: selectedCategory,
             },
-        })
+        } )
         const responseJSON = response.data?.data
 
         return {
-            options: responseJSON?.products.map((r, index) => {
+            options: responseJSON?.products.map( ( r, index ) =>
+            {
                 return {
                     label: r.title,
                     value: r.id,
                     product: r,
                     product_options: r.product_options,
                 }
-            }),
+            } ),
             hasMore: responseJSON.count > 20,
             additional: {
                 page: search ? 1 : page + 1,
@@ -239,14 +256,14 @@ const Report = () => {
                             initialValues={initialValues}
                             onSubmit={submit}
                             validationSchema={validationSchema}>
-                            {({
+                            {( {
                                 handleSubmit,
                                 handleChange,
                                 values,
                                 errors,
                                 isSubmitting,
                                 setFieldValue,
-                            }) => (
+                            } ) => (
                                 <div
                                     className={`flex flex-col w-full space-y-6`}>
                                     <div className="flex flex-col md:flex-row md:space-x-4">
@@ -263,9 +280,11 @@ const Report = () => {
                                                         values.report_type ===
                                                         'purchase'
                                                     }
-                                                    onChange={e => {
-                                                        handleChange(e)
-                                                        if (e.target.checked) {
+                                                    onChange={e =>
+                                                    {
+                                                        handleChange( e )
+                                                        if ( e.target.checked )
+                                                        {
                                                             setReportType(
                                                                 'purchase',
                                                             )
@@ -287,9 +306,11 @@ const Report = () => {
                                                         values.report_type ===
                                                         'usage'
                                                     }
-                                                    onChange={e => {
-                                                        handleChange(e)
-                                                        if (e.target.checked) {
+                                                    onChange={e =>
+                                                    {
+                                                        handleChange( e )
+                                                        if ( e.target.checked )
+                                                        {
                                                             setReportType(
                                                                 'usage',
                                                             )
@@ -311,9 +332,11 @@ const Report = () => {
                                                         values.report_type ===
                                                         'both'
                                                     }
-                                                    onChange={e => {
-                                                        handleChange(e)
-                                                        if (e.target.checked) {
+                                                    onChange={e =>
+                                                    {
+                                                        handleChange( e )
+                                                        if ( e.target.checked )
+                                                        {
                                                             setReportType(
                                                                 'both',
                                                             )
@@ -335,9 +358,11 @@ const Report = () => {
                                                         values.report_type ===
                                                         'balance'
                                                     }
-                                                    onChange={e => {
-                                                        handleChange(e)
-                                                        if (e.target.checked) {
+                                                    onChange={e =>
+                                                    {
+                                                        handleChange( e )
+                                                        if ( e.target.checked )
+                                                        {
                                                             setReportType(
                                                                 'balance',
                                                             )
@@ -352,14 +377,14 @@ const Report = () => {
                                             </div>
                                         </fieldset>
                                         {reportType !== 'both' &&
-                                        reportType !== 'balance' ? (
+                                            reportType !== 'balance' ? (
                                             <>
                                                 <fieldset className="flex flex-row gap-4 border border-solid border-gray-300 p-3 w-full shadow-md">
                                                     <legend className="mb-4 font-bold">
                                                         Columns
                                                     </legend>
-                                                    {Object.keys(columns).map(
-                                                        (c, i) => (
+                                                    {Object.keys( columns ).map(
+                                                        ( c, i ) => (
                                                             <div
                                                                 className="flex items-center gap-2"
                                                                 key={i}>
@@ -368,10 +393,11 @@ const Report = () => {
                                                                     name="column"
                                                                     defaultChecked={
                                                                         columns[
-                                                                            c
+                                                                        c
                                                                         ]
                                                                     }
-                                                                    onChange={e => {
+                                                                    onChange={e =>
+                                                                    {
                                                                         handleChange(
                                                                             e,
                                                                         )
@@ -412,14 +438,16 @@ const Report = () => {
                                                                     values.report_format ===
                                                                     'category_base'
                                                                 }
-                                                                onChange={e => {
+                                                                onChange={e =>
+                                                                {
                                                                     handleChange(
                                                                         e,
                                                                     )
                                                                     if (
                                                                         e.target
                                                                             .checked
-                                                                    ) {
+                                                                    )
+                                                                    {
                                                                         setReportFormat(
                                                                             'category_base',
                                                                         )
@@ -440,14 +468,16 @@ const Report = () => {
                                                                     values.report_format ===
                                                                     'item_base'
                                                                 }
-                                                                onChange={e => {
+                                                                onChange={e =>
+                                                                {
                                                                     handleChange(
                                                                         e,
                                                                     )
                                                                     if (
                                                                         e.target
                                                                             .checked
-                                                                    ) {
+                                                                    )
+                                                                    {
                                                                         setReportFormat(
                                                                             'item_base',
                                                                         )
@@ -471,11 +501,13 @@ const Report = () => {
                                                                     values.report_format ===
                                                                     'item_base'
                                                                 }
-                                                                onChange={e => {
+                                                                onChange={e =>
+                                                                {
                                                                     if (
                                                                         e.target
                                                                             .checked
-                                                                    ) {
+                                                                    )
+                                                                    {
                                                                         setReportFormat(
                                                                             'item_base',
                                                                         )
@@ -500,11 +532,13 @@ const Report = () => {
                                                                     values.report_format ===
                                                                     'option_base'
                                                                 }
-                                                                onChange={e => {
+                                                                onChange={e =>
+                                                                {
                                                                     if (
                                                                         e.target
                                                                             .checked
-                                                                    ) {
+                                                                    )
+                                                                    {
                                                                         setReportFormat(
                                                                             'option_base',
                                                                         )
@@ -539,14 +573,17 @@ const Report = () => {
                                             <Datepicker
                                                 inputId={`date_range`}
                                                 inputName={`date_range`}
-                                                onChange={d => {
+                                                onChange={d =>
+                                                {
                                                     setFieldValue(
                                                         'start_date',
-                                                        d.startDate,
+                                                        d.startDate ? moment( d.startDate ).format( 'YYYY-MM-DD' ) : '',
                                                     )
                                                     setFieldValue(
                                                         'end_date',
-                                                        d.endDate,
+                                                        d.endDate
+                                                            ? moment( d.endDate ).format( 'YYYY-MM-DD' )
+                                                            : ''
                                                     )
                                                 }}
                                                 value={{
@@ -571,10 +608,10 @@ const Report = () => {
                                                 }}
                                                 isLoading={departmentISLoading}
                                                 options={departments?.data?.map(
-                                                    d => ({
+                                                    d => ( {
                                                         label: d.name,
                                                         value: d.id,
-                                                    }),
+                                                    } ),
                                                 )}
                                                 onChange={newValue =>
                                                     setFieldValue(
@@ -603,15 +640,16 @@ const Report = () => {
                                                 }}
                                                 isLoading={categoryISLoading}
                                                 options={categories?.data
-                                                    ?.filter(c => !c.parent_id)
-                                                    .map(c => {
+                                                    ?.filter( c => !c.parent_id )
+                                                    .map( c =>
+                                                    {
                                                         const sub = c.subCategory?.map(
-                                                            s => ({
+                                                            s => ( {
                                                                 label:
                                                                     '=> ' +
                                                                     s.title,
                                                                 value: s.id,
-                                                            }),
+                                                            } ),
                                                         )
                                                         return {
                                                             label: c.title,
@@ -624,12 +662,13 @@ const Report = () => {
                                                                 ...sub,
                                                             ],
                                                         }
-                                                    })}
+                                                    } )}
                                                 isMulti
                                                 onChange={(
                                                     newValue,
                                                     actionMeta,
-                                                ) => {
+                                                ) =>
+                                                {
                                                     setSelectedCategory(
                                                         newValue?.map(
                                                             v => v.value,
@@ -666,21 +705,24 @@ const Report = () => {
                                                     control: state => 'select',
                                                 }}
                                                 isMulti
-                                                onChange={newValue => {
+                                                onChange={newValue =>
+                                                {
                                                     setFieldValue(
                                                         'product',
                                                         newValue?.map(
                                                             v => v.value,
                                                         ),
                                                     )
-                                                    if (newValue.length === 1) {
+                                                    if ( newValue.length === 1 )
+                                                    {
                                                         setVariant(
-                                                            newValue[0]
+                                                            newValue[ 0 ]
                                                                 .product_options,
                                                         )
                                                     }
-                                                    if (!newValue.length) {
-                                                        setVariant([])
+                                                    if ( !newValue.length )
+                                                    {
+                                                        setVariant( [] )
                                                     }
                                                 }}
                                                 additional={{
@@ -709,20 +751,21 @@ const Report = () => {
                                                     className={`font-bold`}
                                                 />
                                                 <Select
-                                                    options={variant.map(v => ({
+                                                    options={variant.map( v => ( {
                                                         label:
                                                             v.option.name +
                                                             '(' +
                                                             v.option_value +
                                                             ')',
                                                         value: v.id,
-                                                    }))}
+                                                    } ) )}
                                                     className={`select`}
                                                     classNames={{
                                                         control: state =>
                                                             'select',
                                                     }}
-                                                    onChange={newValue => {
+                                                    onChange={newValue =>
+                                                    {
                                                         setFieldValue(
                                                             'product_option_id',
                                                             newValue?.map(
@@ -774,10 +817,10 @@ const Report = () => {
                                             {reportType === 'purchase'
                                                 ? 'Purchase'
                                                 : reportType === 'usage'
-                                                ? 'Issue'
-                                                : reportType === 'balance'
-                                                ? 'Balance'
-                                                : 'Purchase and Issue'}{' '}
+                                                    ? 'Issue'
+                                                    : reportType === 'balance'
+                                                        ? 'Balance'
+                                                        : 'Purchase and Issue'}{' '}
                                             Report
                                         </p>
                                     </div>
@@ -787,20 +830,20 @@ const Report = () => {
                                             className={`px-4 w-fit font-extralight font-serif`}>
                                             Date:{' '}
                                             {reportType === 'balance'
-                                                ? moment(start_date).format(
-                                                      'DD MMM Y',
-                                                  )
-                                                : (start_date
-                                                      ? moment(
-                                                            start_date,
-                                                        ).format('DD MMM Y')
-                                                      : '') +
-                                                  ' - ' +
-                                                  (end_date
-                                                      ? moment(end_date).format(
-                                                            'DD MMM Y',
-                                                        )
-                                                      : '')}
+                                                ? moment( start_date ).format(
+                                                    'DD MMM Y',
+                                                )
+                                                : ( start_date
+                                                    ? moment(
+                                                        start_date,
+                                                    ).format( 'DD MMM Y' )
+                                                    : '' ) +
+                                                ' - ' +
+                                                ( end_date
+                                                    ? moment( end_date ).format(
+                                                        'DD MMM Y',
+                                                    )
+                                                    : '' )}
                                         </i>
                                     </div>
                                     <div
@@ -808,11 +851,11 @@ const Report = () => {
                                         <b>
                                             {selectedCategoriesName.length ===
                                                 1 ||
-                                            !selectedCategoriesName.length
+                                                !selectedCategoriesName.length
                                                 ? 'Category ' +
-                                                  (!selectedCategoriesName.length
-                                                      ? 'All'
-                                                      : selectedCategoriesName[0])
+                                                ( !selectedCategoriesName.length
+                                                    ? 'All'
+                                                    : selectedCategoriesName[ 0 ] )
                                                 : ''}
                                         </b>
                                     </div>
@@ -843,7 +886,7 @@ const Report = () => {
                                                 Object.keys(
                                                     Object.filter(
                                                         columns,
-                                                        ([name, status]) =>
+                                                        ( [ name, status ] ) =>
                                                             status === true,
                                                     ),
                                                 ).length * Math.random()
@@ -858,7 +901,7 @@ const Report = () => {
                                                 Object.keys(
                                                     Object.filter(
                                                         columns,
-                                                        ([name, status]) =>
+                                                        ( [ name, status ] ) =>
                                                             status === true,
                                                     ),
                                                 ).length * Math.random()
@@ -874,7 +917,7 @@ const Report = () => {
                                             Object.keys(
                                                 Object.filter(
                                                     columns,
-                                                    ([name, status]) =>
+                                                    ( [ name, status ] ) =>
                                                         status === true,
                                                 ),
                                             ).length * Math.random()
@@ -889,7 +932,7 @@ const Report = () => {
                                             Object.keys(
                                                 Object.filter(
                                                     columns,
-                                                    ([name, status]) =>
+                                                    ( [ name, status ] ) =>
                                                         status === true,
                                                 ),
                                             ).length * Math.random()
