@@ -4,35 +4,43 @@ import number2wordEnglish from 'number2english_word'
 import './CashPrint.module.css'
 import Image from 'next/image'
 
-const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
+const CashPrint = forwardRef( ( { mainData, requisition_products }, ref ) =>
+{
     const accountsCopy = useRef()
     const requisitorCopy = useRef()
     const hrRef = useRef()
-    const [rejected, setRejected] = useState(false)
+    const [ rejected, setRejected ] = useState( false )
 
-    useEffect(() => {
+    useEffect( () =>
+    {
         const accountsCopyHeight = accountsCopy.current.offsetHeight
         const requisitorCopyHeight = requisitorCopy.current.offsetHeight
         const totalHeight = accountsCopyHeight + requisitorCopyHeight
 
-        if (totalHeight > 1000) {
-            accountsCopy.current.classList.add('break-after-page')
-            requisitorCopy.current.classList.add('mt-4')
-            if (hrRef.current) {
+        if ( totalHeight > 1000 )
+        {
+            accountsCopy.current.classList.add( 'break-after-page' )
+            requisitorCopy.current.classList.add( 'mt-4' )
+            if ( hrRef.current )
+            {
                 hrRef.current.style.display = 'none'
             }
-        } else {
-            accountsCopy.current.classList.remove('break-after-page')
+        } else
+        {
+            accountsCopy.current.classList.remove( 'break-after-page' )
         }
-    })
-    useEffect(() => {
-        if (mainData?.purchase_current_status?.status === 'Rejected') {
-            setRejected(true)
+    } )
+    useEffect( () =>
+    {
+        if ( mainData?.purchase_current_status?.status === 'Rejected' )
+        {
+            setRejected( true )
         }
-        if (mainData?.current_status?.status === 'Rejected') {
-            setRejected(true)
+        if ( mainData?.current_status?.status === 'Rejected' )
+        {
+            setRejected( true )
         }
-    }, [mainData])
+    }, [ mainData ] )
 
     return (
         <div
@@ -40,7 +48,7 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
             ref={ref}>
             {rejected ? (
                 <Image
-                    src={require('../../../public/rejected.png')}
+                    src={require( '../../../public/rejected.png' )}
                     alt={`rejected`}
                     className={`absolute opacity-5 top-[50%] left-[35%]`}
                 />
@@ -72,7 +80,7 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                     <div className={`flex flex-row w-full justify-start`}>
                         <i className={`pr-4`}>Date: </i>
                         <p className={`underline`}>
-                            {moment(mainData?.created_at).format('DD-MMM-Y')}
+                            {moment( mainData?.created_at ).format( 'DD-MMM-Y' )}
                         </p>
                     </div>
                     <div className={`flex flex-row w-full justify-end`}>
@@ -91,7 +99,7 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                             {mainData?.total_cost === 0
                                 ? 'Zero'
                                 : number2wordEnglish(
-                                    Math.round(mainData?.total_cost ?? 0).toString(),
+                                    Math.round( mainData?.total_cost ?? 0 ).toString(),
                                 )}
                         </strong>{' '}
                         for purchase of the following:
@@ -145,7 +153,7 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                 </tr>
                             </thead>
                             <tbody className={`shadow-none text-gray-800`}>
-                                {requisition_products?.map((rp, index) => (
+                                {requisition_products?.map( ( rp, index ) => (
                                     <tr
                                         className={`border text-center bg-white`}
                                         key={index}>
@@ -158,8 +166,8 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                         <td className={`border p-0`}>
                                             {rp.last_purchase_date
                                                 ? moment(
-                                                      rp.last_purchase_date,
-                                                  ).format('DD MMM Y')
+                                                    rp.last_purchase_date,
+                                                ).format( 'DD MMM Y' )
                                                 : null}
                                         </td>
                                         <td className={`border p-0`}>
@@ -176,12 +184,12 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                         </td>
                                         <td className={`border p-0`}>
                                             {(
-                                                parseFloat(rp.unit_price) *
-                                                parseFloat(rp.required_unit)
+                                                parseFloat( rp.unit_price ) *
+                                                parseFloat( rp.required_unit )
                                             ).toLocaleString()}
                                         </td>
                                     </tr>
-                                ))}
+                                ) )}
                                 <tr>
                                     <th
                                         colSpan={7}
@@ -240,24 +248,25 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                                     <span className={`ml-2`}>
                                                         {mainData
                                                             ?.approval_status
-                                                            ?.department_approved_at
+                                                            ?.department_approved_at && mainData?.approval_status?.department_status === 2
                                                             ? mainData
-                                                                  ?.approval_status
-                                                                  ?.departmentApprovedBy
-                                                                  ?.name
+                                                                ?.approval_status
+                                                                ?.departmentApprovedBy
+                                                                ?.name
                                                             : ''}
                                                     </span>
                                                     <span className={`ml-2`}>
                                                         {mainData
                                                             ?.approval_status
-                                                            ?.department_approved_at
+                                                            ?.department_approved_at &&
+                                                            mainData?.approval_status?.department_status === 2
                                                             ? moment(
-                                                                  mainData
-                                                                      ?.approval_status
-                                                                      ?.department_approved_at,
-                                                              ).format(
-                                                                  'hh:mm A - DD MMM Y',
-                                                              )
+                                                                mainData
+                                                                    ?.approval_status
+                                                                    ?.department_approved_at,
+                                                            ).format(
+                                                                'hh:mm A - DD MMM Y',
+                                                            )
                                                             : ''}
                                                     </span>
                                                 </div>
@@ -356,25 +365,27 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                                             className={`ml-2`}>
                                                             {mainData
                                                                 ?.approval_status
-                                                                ?.accounts_approved_at
+                                                                ?.accounts_approved_at &&
+                                                                mainData?.approval_status?.accounts_status === 2
                                                                 ? mainData
-                                                                      ?.approval_status
-                                                                      ?.accountsApprovedBy
-                                                                      ?.name
+                                                                    ?.approval_status
+                                                                    ?.accountsApprovedBy
+                                                                    ?.name
                                                                 : ''}
                                                         </span>
                                                         <span
                                                             className={`ml-2`}>
                                                             {mainData
                                                                 ?.approval_status
-                                                                ?.accounts_approved_at
+                                                                ?.accounts_approved_at &&
+                                                                mainData?.approval_status?.accounts_status === 2
                                                                 ? moment(
-                                                                      mainData
-                                                                          ?.approval_status
-                                                                          ?.accounts_approved_at,
-                                                                  ).format(
-                                                                      'hh:mm A - DD MMM Y',
-                                                                  )
+                                                                    mainData
+                                                                        ?.approval_status
+                                                                        ?.accounts_approved_at,
+                                                                ).format(
+                                                                    'hh:mm A - DD MMM Y',
+                                                                )
                                                                 : ''}
                                                         </span>
                                                     </div>
@@ -397,20 +408,24 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                                 className={`w-full flex flex-col`}>
                                                 <span className={`ml-2`}>
                                                     {mainData?.approval_status
-                                                        ?.ceo_approved_at
+                                                        ?.ceo_approved_at &&
+                                                        mainData?.approval_status
+                                                            ?.ceo_status === 2
                                                         ? 'Neaz Khan'
                                                         : ''}
                                                 </span>
                                                 <span className={`ml-2`}>
                                                     {mainData?.approval_status
-                                                        ?.ceo_approved_at
+                                                        ?.ceo_approved_at &&
+                                                        mainData?.approval_status
+                                                            ?.ceo_status === 2
                                                         ? moment(
-                                                              mainData
-                                                                  ?.approval_status
-                                                                  ?.ceo_approved_at,
-                                                          ).format(
-                                                              'hh:mm A - DD MMM Y',
-                                                          )
+                                                            mainData
+                                                                ?.approval_status
+                                                                ?.ceo_approved_at,
+                                                        ).format(
+                                                            'hh:mm A - DD MMM Y',
+                                                        )
                                                         : ''}
                                                 </span>
                                             </div>
@@ -473,7 +488,7 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                     <div className={`flex flex-row w-full justify-start`}>
                         <i className={`pr-2`}>Date: </i>
                         <p className={`underline`}>
-                            {moment(mainData?.created_at).format('DD-MMM-Y')}
+                            {moment( mainData?.created_at ).format( 'DD-MMM-Y' )}
                         </p>
                     </div>
                     <div className={`flex flex-row w-full`}>
@@ -535,7 +550,7 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                 </tr>
                             </thead>
                             <tbody className={`shadow-none text-gray-800`}>
-                                {requisition_products?.map((rp, index) => (
+                                {requisition_products?.map( ( rp, index ) => (
                                     <tr
                                         className={`border text-center bg-white`}
                                         key={index}>
@@ -548,8 +563,8 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                         <td className={`border p-0`}>
                                             {rp.last_purchase_date
                                                 ? moment(
-                                                      rp.last_purchase_date,
-                                                  ).format('DD MMM Y')
+                                                    rp.last_purchase_date,
+                                                ).format( 'DD MMM Y' )
                                                 : null}
                                         </td>
                                         <td className={`border p-0`}>
@@ -566,12 +581,12 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                         </td>
                                         <td className={`border p-0`}>
                                             {(
-                                                parseFloat(rp.unit_price) *
-                                                parseFloat(rp.required_unit)
+                                                parseFloat( rp.unit_price ) *
+                                                parseFloat( rp.required_unit )
                                             ).toLocaleString()}
                                         </td>
                                     </tr>
-                                ))}
+                                ) )}
                                 <tr>
                                     <th
                                         colSpan={7}
@@ -590,5 +605,5 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
             </div>
         </div>
     )
-})
+} )
 export default CashPrint
