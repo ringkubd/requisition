@@ -5,35 +5,42 @@ import './RequisitionPrint.module.css'
 import Image from 'next/image'
 
 const RequisitionPrint = forwardRef(
-    ({ mainData, requisition_products }, ref) => {
+    ( { mainData, requisition_products }, ref ) =>
+    {
         const accountsCopy = useRef()
         const requisitorCopy = useRef()
         const hrRef = useRef()
-        const [rejected, setRejected] = useState(false)
+        const [ rejected, setRejected ] = useState( false )
 
-        useEffect(() => {
+        useEffect( () =>
+        {
             const accountsCopyHeight = accountsCopy.current.offsetHeight
             const requisitorCopyHeight = requisitorCopy.current.offsetHeight
             const totalHeight = accountsCopyHeight + requisitorCopyHeight
 
-            if (totalHeight > 1000) {
-                accountsCopy.current.classList.add('break-after-page')
-                requisitorCopy.current.classList.add('mt-4')
-                hrRef.current?.classList?.add('hidden')
-            } else {
-                accountsCopy.current.classList.remove('break-after-page')
-                hrRef.current?.classList?.remove('hidden')
+            if ( totalHeight > 1000 )
+            {
+                accountsCopy.current.classList.add( 'break-after-page' )
+                requisitorCopy.current.classList.add( 'mt-4' )
+                hrRef.current?.classList?.add( 'hidden' )
+            } else
+            {
+                accountsCopy.current.classList.remove( 'break-after-page' )
+                hrRef.current?.classList?.remove( 'hidden' )
             }
-        })
+        } )
 
-        useEffect(() => {
-            if (mainData?.purchase_current_status?.status === 'Rejected') {
-                setRejected(true)
+        useEffect( () =>
+        {
+            if ( mainData?.purchase_current_status?.status === 'Rejected' )
+            {
+                setRejected( true )
             }
-            if (mainData?.current_status?.status === 'Rejected') {
-                setRejected(true)
+            if ( mainData?.current_status?.status === 'Rejected' )
+            {
+                setRejected( true )
             }
-        }, [mainData])
+        }, [ mainData ] )
 
         return (
             <div
@@ -41,7 +48,7 @@ const RequisitionPrint = forwardRef(
                 ref={ref}>
                 {rejected ? (
                     <Image
-                        src={require('../../../public/rejected.png')}
+                        src={require( '../../../public/rejected.png' )}
                         alt={`rejected`}
                         className={`absolute opacity-5 top-[50%] left-[35%]`}
                     />
@@ -81,7 +88,7 @@ const RequisitionPrint = forwardRef(
                                 className={`flex flex-row w-full justify-start`}>
                                 <i className={`pr-4`}>Date: </i>
                                 <p className={`underline`}>
-                                    {moment(mainData?.created_at).format(
+                                    {moment( mainData?.created_at ).format(
                                         'DD-MMM-Y',
                                     )}
                                 </p>
@@ -116,10 +123,10 @@ const RequisitionPrint = forwardRef(
                                     {mainData?.estimated_total_amount === 0
                                         ? 'Zero'
                                         : number2wordEnglish(
-                                              Math.round(
-                                                  mainData?.estimated_total_amount,
-                                              ).toString()?? 0,
-                                          )}
+                                            Math.round(
+                                                mainData?.estimated_total_amount,
+                                            ).toString() ?? 0,
+                                        )}
                                 </strong>{' '}
                                 for purchase of the following:
                             </div>
@@ -184,7 +191,7 @@ const RequisitionPrint = forwardRef(
                                     <tbody
                                         className={`shadow-none text-gray-800`}>
                                         {requisition_products?.map(
-                                            (rp, index) => (
+                                            ( rp, index ) => (
                                                 <tr
                                                     className={`border text-center bg-white`}
                                                     key={index}>
@@ -198,9 +205,9 @@ const RequisitionPrint = forwardRef(
                                                         {rp?.product_option?.option_name?.includes(
                                                             'N/A',
                                                         ) ||
-                                                        rp?.product_option?.option_value?.includes(
-                                                            'NA',
-                                                        )
+                                                            rp?.product_option?.option_value?.includes(
+                                                                'NA',
+                                                            )
                                                             ? null
                                                             : `- ${rp?.product_option?.option_value}`}
                                                     </td>
@@ -208,10 +215,10 @@ const RequisitionPrint = forwardRef(
                                                         className={`border p-0`}>
                                                         {rp.last_purchase_date
                                                             ? moment(
-                                                                  rp.last_purchase_date,
-                                                              ).format(
-                                                                  'DD-MMM-YY',
-                                                              )
+                                                                rp.last_purchase_date,
+                                                            ).format(
+                                                                'DD-MMM-YY',
+                                                            )
                                                             : ''}
                                                     </td>
                                                     <td
@@ -245,7 +252,7 @@ const RequisitionPrint = forwardRef(
                                                         {Math.round(
                                                             parseFloat(
                                                                 rp.unit_price *
-                                                                    rp.quantity_to_be_purchase,
+                                                                rp.quantity_to_be_purchase,
                                                             ),
                                                         ).toLocaleString()}
                                                     </td>
@@ -293,10 +300,10 @@ const RequisitionPrint = forwardRef(
                                                                 className={`underline w-full`}>
                                                                 {mainData?.created_at
                                                                     ? moment(
-                                                                          mainData?.created_at,
-                                                                      ).format(
-                                                                          'hh:mm A - DD MMM Y',
-                                                                      )
+                                                                        mainData?.created_at,
+                                                                    ).format(
+                                                                        'hh:mm A - DD MMM Y',
+                                                                    )
                                                                     : ''}
                                                             </div>
                                                         </div>
@@ -319,25 +326,25 @@ const RequisitionPrint = forwardRef(
                                                                 className={`ml-2`}>
                                                                 {mainData
                                                                     ?.approval_status
-                                                                    ?.department_approved_at
+                                                                    ?.department_approved_at && mainData?.approval_status?.department_status === 2
                                                                     ? mainData
-                                                                          ?.approval_status
-                                                                          ?.departmentApprovedBy
-                                                                          ?.name
+                                                                        ?.approval_status
+                                                                        ?.departmentApprovedBy
+                                                                        ?.name
                                                                     : ''}
                                                             </span>
                                                             <span
                                                                 className={`ml-2`}>
                                                                 {mainData
                                                                     ?.approval_status
-                                                                    ?.department_approved_at
+                                                                    ?.department_approved_at && mainData?.approval_status?.department_status === 2
                                                                     ? moment(
-                                                                          mainData
-                                                                              ?.approval_status
-                                                                              ?.department_approved_at,
-                                                                      ).format(
-                                                                          'hh:mm A - DD MMM Y',
-                                                                      )
+                                                                        mainData
+                                                                            ?.approval_status
+                                                                            ?.department_approved_at,
+                                                                    ).format(
+                                                                        'hh:mm A - DD MMM Y',
+                                                                    )
                                                                     : ''}
                                                             </span>
                                                         </div>
@@ -379,7 +386,7 @@ const RequisitionPrint = forwardRef(
                                                                 className={`form-checkbox mr-2`}
                                                                 checked={
                                                                     mainData?.payment_type ===
-                                                                    2 ||  mainData?.payment_type ===
+                                                                    2 || mainData?.payment_type ===
                                                                     3
                                                                 }
                                                                 disabled
@@ -455,25 +462,25 @@ const RequisitionPrint = forwardRef(
                                                                     className={`ml-2`}>
                                                                     {mainData
                                                                         ?.approval_status
-                                                                        ?.accounts_approved_at
+                                                                        ?.accounts_approved_at && mainData?.approval_status?.accounts_status === 2
                                                                         ? mainData
-                                                                              ?.approval_status
-                                                                              ?.accountsApprovedBy
-                                                                              ?.name
+                                                                            ?.approval_status
+                                                                            ?.accountsApprovedBy
+                                                                            ?.name
                                                                         : ''}
                                                                 </span>
                                                                 <span
                                                                     className={`ml-2`}>
                                                                     {mainData
                                                                         ?.approval_status
-                                                                        ?.accounts_approved_at
+                                                                        ?.accounts_approved_at && mainData?.approval_status?.accounts_status === 2
                                                                         ? moment(
-                                                                              mainData
-                                                                                  ?.approval_status
-                                                                                  ?.accounts_approved_at,
-                                                                          ).format(
-                                                                              'hh:mm A - DD MMM Y',
-                                                                          )
+                                                                            mainData
+                                                                                ?.approval_status
+                                                                                ?.accounts_approved_at,
+                                                                        ).format(
+                                                                            'hh:mm A - DD MMM Y',
+                                                                        )
                                                                         : ''}
                                                                 </span>
                                                             </div>
@@ -500,7 +507,7 @@ const RequisitionPrint = forwardRef(
                                                             className={`ml-2`}>
                                                             {mainData
                                                                 ?.approval_status
-                                                                ?.ceo_approved_at
+                                                                ?.ceo_approved_at && mainData?.approval_status?.ceo_status === 2
                                                                 ? 'Neaz Khan'
                                                                 : ''}
                                                         </span>
@@ -508,14 +515,14 @@ const RequisitionPrint = forwardRef(
                                                             className={`ml-2`}>
                                                             {mainData
                                                                 ?.approval_status
-                                                                ?.ceo_approved_at
+                                                                ?.ceo_approved_at && mainData?.approval_status?.ceo_status === 2
                                                                 ? moment(
-                                                                      mainData
-                                                                          ?.approval_status
-                                                                          ?.ceo_approved_at,
-                                                                  ).format(
-                                                                      'hh:mm A - DD MMM Y',
-                                                                  )
+                                                                    mainData
+                                                                        ?.approval_status
+                                                                        ?.ceo_approved_at,
+                                                                ).format(
+                                                                    'hh:mm A - DD MMM Y',
+                                                                )
                                                                 : ''}
                                                         </span>
                                                     </div>
@@ -590,7 +597,7 @@ const RequisitionPrint = forwardRef(
                                 className={`flex flex-row w-full justify-start`}>
                                 <i className={`pr-2`}>Date: </i>
                                 <p className={`underline`}>
-                                    {moment(mainData?.created_at).format(
+                                    {moment( mainData?.created_at ).format(
                                         'DD-MMM-Y',
                                     )}
                                 </p>
@@ -675,7 +682,7 @@ const RequisitionPrint = forwardRef(
                                     <tbody
                                         className={`shadow-none text-gray-800`}>
                                         {requisition_products?.map(
-                                            (rp, index) => (
+                                            ( rp, index ) => (
                                                 <tr
                                                     className={`border text-center bg-white`}
                                                     key={index}>
@@ -689,9 +696,9 @@ const RequisitionPrint = forwardRef(
                                                         {rp?.product_option?.option_name?.includes(
                                                             'N/A',
                                                         ) ||
-                                                        rp?.product_option?.option_value?.includes(
-                                                            'NA',
-                                                        )
+                                                            rp?.product_option?.option_value?.includes(
+                                                                'NA',
+                                                            )
                                                             ? null
                                                             : `- ${rp?.product_option?.option_value}`}
                                                     </td>
@@ -699,10 +706,10 @@ const RequisitionPrint = forwardRef(
                                                         className={`border p-0`}>
                                                         {rp.last_purchase_date
                                                             ? moment(
-                                                                  rp.last_purchase_date,
-                                                              ).format(
-                                                                  'DD-MMM-YY',
-                                                              )
+                                                                rp.last_purchase_date,
+                                                            ).format(
+                                                                'DD-MMM-YY',
+                                                            )
                                                             : ''}
                                                     </td>
                                                     <td
@@ -735,7 +742,7 @@ const RequisitionPrint = forwardRef(
                                                         className={`border p-0 text-right`}>
                                                         {parseFloat(
                                                             rp.unit_price *
-                                                                rp.quantity_to_be_purchase,
+                                                            rp.quantity_to_be_purchase,
                                                         ).toLocaleString()}
                                                     </td>
                                                 </tr>
