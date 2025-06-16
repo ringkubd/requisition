@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
 Route::post('/register', [RegisteredUserController::class, 'store'])
     ->middleware('guest')
     ->name('register');
@@ -82,23 +81,23 @@ Route::get('purchase-requisition-select', [PurchaseAPIController::class, 'purcha
 
 Route::get('last-purchase-information', [InitialRequisitionAPIController::class, 'lastPurchase']);
 
-Route::post('change-organization', function (Request $request) {
-    cache()->forget('select_organization_' . $request->user()->id);
-    cache()->put('select_organization_' . $request->user()->id, $request->organization_id);
-    cache()->forget('select_branch_' . $request->user()->id);
-    cache()->forget('select_department_' . $request->user()->id);
-    return cache()->get('select_organization_' . $request->user()->id);
+Route::post('change-organization', function (Request $request){
+    cache()->forget('select_organization_'.$request->user()->id);
+    cache()->put('select_organization_'.$request->user()->id,$request->organization_id);
+    cache()->forget('select_branch_'.$request->user()->id);
+    cache()->forget('select_department_'.$request->user()->id);
+    return cache()->get('select_organization_'.$request->user()->id);
 });
-Route::post('change-branch', function (Request $request) {
-    cache()->forget('select_branch_' . $request->user()->id);
-    cache()->forget('select_department_' . $request->user()->id);
-    cache()->put('select_branch_' . $request->user()->id, $request->branch_id);
-    return cache()->get('select_branch_' . $request->user()->id);
+Route::post('change-branch', function (Request $request){
+    cache()->forget('select_branch_'.$request->user()->id);
+    cache()->forget('select_department_'.$request->user()->id);
+    cache()->put('select_branch_'.$request->user()->id,$request->branch_id);
+    return cache()->get('select_branch_'.$request->user()->id);
 });
-Route::post('change-departments', function (Request $request) {
-    cache()->forget('select_department_' . $request->user()->id);
-    cache()->put('select_department_' . $request->user()->id, $request->department_id);
-    return cache()->get('select_department_' . $request->user()->id);
+Route::post('change-departments', function (Request $request){
+    cache()->forget('select_department_'.$request->user()->id);
+    cache()->put('select_department_'.$request->user()->id,$request->department_id);
+    return cache()->get('select_department_'.$request->user()->id);
 });
 
 Route::get('navigation-organization', [NavigationAPIController::class, 'organization']);
@@ -166,18 +165,15 @@ Route::resource('cash-requisition-items', App\Http\Controllers\API\CashRequisiti
 Route::get('dashboard-data', [\App\Http\Controllers\API\DashboardAPIController::class, 'index']);
 Route::get('dashboard-cash-data', [\App\Http\Controllers\API\DashboardAPIController::class, 'cash']);
 Route::get('activity', [\App\Http\Controllers\API\ActivityController::class, 'index']);
-Route::get('activity/users', [\App\Http\Controllers\API\ActivityController::class, 'users']);
-Route::get('activity/models', [\App\Http\Controllers\API\ActivityController::class, 'models']);
-Route::get('activity/events', [\App\Http\Controllers\API\ActivityController::class, 'events']);
 
-Route::prefix('report')->group(function () {
+Route::prefix('report')->group(function (){
     Route::get('product', [ProductAPIController::class, 'report']);
     Route::get('daily', [\App\Http\Controllers\API\ReportAPIController::class, 'dailyReport']);
     Route::get('purchase', [\App\Http\Controllers\API\ReportAPIController::class, 'purchaseReport']);
     Route::get('issues', [\App\Http\Controllers\API\ReportAPIController::class, 'issueReport']);
     Route::get('both', [\App\Http\Controllers\API\ReportAPIController::class, 'bothReport']);
     Route::get('product-current-balance', [\App\Http\Controllers\API\ReportAPIController::class, 'currentBalance']);
-    //    Route::get('product-current-balance-option', [\App\Http\Controllers\API\ReportAPIController::class, 'currentBalanceOptionBase']);
+//    Route::get('product-current-balance-option', [\App\Http\Controllers\API\ReportAPIController::class, 'currentBalanceOptionBase']);
 });
 
 Route::put('update_initial_status/{requisition}', [InitialRequisitionAPIController::class, 'changeStatusDepartment']);

@@ -166,9 +166,7 @@ Route::resource('cash-requisition-items', App\Http\Controllers\API\CashRequisiti
 Route::get('dashboard-data', [\App\Http\Controllers\API\DashboardAPIController::class, 'index']);
 Route::get('dashboard-cash-data', [\App\Http\Controllers\API\DashboardAPIController::class, 'cash']);
 Route::get('activity', [\App\Http\Controllers\API\ActivityController::class, 'index']);
-Route::get('activity/users', [\App\Http\Controllers\API\ActivityController::class, 'users']);
-Route::get('activity/models', [\App\Http\Controllers\API\ActivityController::class, 'models']);
-Route::get('activity/events', [\App\Http\Controllers\API\ActivityController::class, 'events']);
+Route::get('activity', [\App\Http\Controllers\API\ActivityController::class, 'index']);
 
 Route::prefix('report')->group(function () {
     Route::get('product', [ProductAPIController::class, 'report']);

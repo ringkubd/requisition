@@ -12,9 +12,9 @@ use OpenApi\Annotations as OA;
 
 /**
  * Class ActivityController
- *
+ * 
  * @package App\Http\Controllers\API
- *
+ * 
  * Controller for managing activity logs using Spatie Activity Log package.
  * Provides endpoints for viewing, filtering, and searching activity logs with pagination.
  */
@@ -138,7 +138,7 @@ class ActivityController extends AppBaseController
      *          description="Unauthorized"
      *      )
      * )
-     *
+     * 
      * Display a listing of the activity logs with comprehensive filtering and pagination.
      *
      * @param Request $request The HTTP request object containing query parameters
@@ -210,37 +210,6 @@ class ActivityController extends AppBaseController
         ]);
     }
 
-    /**
-     * @OA\Get(
-     *      path="/activity-logs/users",
-     *      summary="Get users with activity logs",
-     *      tags={"Activity Logs"},
-     *      description="Retrieve a list of users who have activity logs recorded",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful operation",
-     *          @OA\JsonContent(
-     *              type="array",
-     *              @OA\Items(
-     *                  type="object",
-     *                  @OA\Property(property="id", type="integer", description="User ID"),
-     *                  @OA\Property(property="name", type="string", description="User name")
-     *              )
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=401,
-     *          description="Unauthorized"
-     *      )
-     * )
-     *
-     * Get list of users who have activity logs.
-     *
-     * This endpoint returns all users who have performed actions that were logged,
-     * useful for populating filter dropdowns in the frontend.
-     *
-     * @return \Illuminate\Http\JsonResponse JSON response with array of users
-     */
     public function users()
     {
         // Return users who have activity logs
@@ -252,36 +221,6 @@ class ActivityController extends AppBaseController
         return response()->json($users);
     }
 
-    /**
-     * @OA\Get(
-     *      path="/activity-logs/models",
-     *      summary="Get model types with activity logs",
-     *      tags={"Activity Logs"},
-     *      description="Retrieve a list of unique model types that have activity logs",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful operation",
-     *          @OA\JsonContent(
-     *              type="array",
-     *              @OA\Items(
-     *                  type="string",
-     *                  description="Model class name (e.g., App\\Models\\User)"
-     *              )
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=401,
-     *          description="Unauthorized"
-     *      )
-     * )
-     *
-     * Get list of unique model types from activity logs.
-     *
-     * This endpoint returns all unique subject model types that have activity logs,
-     * useful for filtering activities by model type in the frontend.
-     *
-     * @return \Illuminate\Http\JsonResponse JSON response with array of model types
-     */
     public function models()
     {
         // Return unique model types from activity logs
@@ -293,37 +232,6 @@ class ActivityController extends AppBaseController
         return response()->json($models);
     }
 
-    /**
-     * @OA\Get(
-     *      path="/activity-logs/events",
-     *      summary="Get event types with activity logs",
-     *      tags={"Activity Logs"},
-     *      description="Retrieve a list of unique event types from activity logs",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful operation",
-     *          @OA\JsonContent(
-     *              type="array",
-     *              @OA\Items(
-     *                  type="string",
-     *                  description="Event type (e.g., created, updated, deleted)"
-     *              )
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=401,
-     *          description="Unauthorized"
-     *      )
-     * )
-     *
-     * Get list of unique event types from activity logs.
-     *
-     * This endpoint returns all unique event types that have been logged,
-     * such as 'created', 'updated', 'deleted', etc. Useful for filtering
-     * activities by event type in the frontend.
-     *
-     * @return \Illuminate\Http\JsonResponse JSON response with array of event types
-     */
     public function events()
     {
         // Return unique event types from activity logs

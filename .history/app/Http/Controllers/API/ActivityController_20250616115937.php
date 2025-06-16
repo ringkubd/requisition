@@ -12,9 +12,9 @@ use OpenApi\Annotations as OA;
 
 /**
  * Class ActivityController
- *
+ * 
  * @package App\Http\Controllers\API
- *
+ * 
  * Controller for managing activity logs using Spatie Activity Log package.
  * Provides endpoints for viewing, filtering, and searching activity logs with pagination.
  */
@@ -138,7 +138,7 @@ class ActivityController extends AppBaseController
      *          description="Unauthorized"
      *      )
      * )
-     *
+     * 
      * Display a listing of the activity logs with comprehensive filtering and pagination.
      *
      * @param Request $request The HTTP request object containing query parameters
@@ -233,9 +233,9 @@ class ActivityController extends AppBaseController
      *          description="Unauthorized"
      *      )
      * )
-     *
+     * 
      * Get list of users who have activity logs.
-     *
+     * 
      * This endpoint returns all users who have performed actions that were logged,
      * useful for populating filter dropdowns in the frontend.
      *
@@ -274,9 +274,9 @@ class ActivityController extends AppBaseController
      *          description="Unauthorized"
      *      )
      * )
-     *
+     * 
      * Get list of unique model types from activity logs.
-     *
+     * 
      * This endpoint returns all unique subject model types that have activity logs,
      * useful for filtering activities by model type in the frontend.
      *
@@ -315,9 +315,9 @@ class ActivityController extends AppBaseController
      *          description="Unauthorized"
      *      )
      * )
-     *
+     * 
      * Get list of unique event types from activity logs.
-     *
+     * 
      * This endpoint returns all unique event types that have been logged,
      * such as 'created', 'updated', 'deleted', etc. Useful for filtering
      * activities by event type in the frontend.
