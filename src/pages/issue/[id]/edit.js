@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import Select from 'react-select'
 import { AsyncPaginate } from 'react-select-async-paginate'
+import { toast } from 'react-toastify'
 import * as Yup from 'yup'
 const Edit = props => {
     const router = useRouter()
@@ -22,7 +23,7 @@ const Edit = props => {
         branch_id: user?.selected_branch,
         department_id: user?.selected_department,
     })
-    const [syncProductIssues, { isLoading: isSyncLoading, isError: isSyncError }] = useSyncProductIssuesMutation()
+    const [syncProductIssues, { isLoading: isSyncLoading, isError: isSyncError, isSuccess: isSyncSuccess }] = useSyncProductIssuesMutation()
     const {
         data: issue,
         isLoading: issueISLoading,
@@ -140,6 +141,12 @@ const Edit = props => {
         }
     }, [issueISSuccess, issue])
 
+    useEffect(() => {
+        if (isSyncSuccess && !isSyncError && !isSyncLoading) {
+            toast.success('Issue updated successfully');
+        }
+    }, [isSyncSuccess, isSyncError, isSyncLoading]);
+
      const handleTableInputChange = (row, field, value) => {
         console.log(row);
         setItems(prev => prev.map((item) => row.id === item.id ? { ...item, [field]: value } : item));
@@ -157,6 +164,7 @@ const Edit = props => {
             toast.error('Failed to update product issues');
         }
     };
+
 
     return (
         <>
