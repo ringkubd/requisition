@@ -151,8 +151,10 @@ const Edit = props => {
         try {
             await syncProductIssues({ productIssue: router.query.id, body: items });
             // Optionally, show a success message or refetch data
+            toast.success('Product issues updated successfully');
         } catch (e) {
             // Optionally, handle error
+            toast.error('Failed to update product issues');
         }
     };
 
