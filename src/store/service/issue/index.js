@@ -63,7 +63,7 @@ export const IssueApiService = GeneralBaseAPI.injectEndpoints( {
                 method: 'PUT',
                 body: body,
             } ),
-            invalidatesTags: [ 'issue' ],
+            invalidatesTags: [ 'issue', 'editIssue' ],
             onQueryStarted: onQueryStartedErrorToast,
         } ),
     } ),
