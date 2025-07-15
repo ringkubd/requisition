@@ -241,8 +241,8 @@ class ProductIssueAPIController extends AppBaseController
      */
     public function syncProductIssueItems($uuid, Request $request)
     {
-        $newItems = $request->all();
-        // return $request->all();
+        $newItems = $request->input('items', []);
+        \dd($request->all());
         $productIssue = ProductIssue::where('uuid', $uuid)->first();
         // Assume each item in $newItems has 'id' if updating, or no 'id' if new
         $existingItems = $productIssue->items()->get()->keyBy('id');
@@ -263,10 +263,7 @@ class ProductIssueAPIController extends AppBaseController
         }
 
         // Add new items (those without 'id')
-        $newToAdd = collect($newItems)->filter(fn($item) => empty($item['id']))->map(function ($item) use ($productIssue) {
-            $item['product_issue_id'] = $productIssue->id;
-            return $item;
-        })->all();
+        $newToAdd = collect($newItems)->filter(fn($item) => empty($item['id']))->all();
         if (!empty($newToAdd)) {
             $productIssue->items()->createMany($newToAdd);
         }

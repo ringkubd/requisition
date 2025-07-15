@@ -1,3 +1,36 @@
+    /**
+     * Sync ProductIssue items with a new list: remove, update, or add as needed.
+     *
+     * @param ProductIssue $productIssue
+     * @param array $newItems (each item should have a unique key, e.g., id or product_option_id)
+     * @return void
+     */
+    public function syncProductIssueItems(ProductIssue $productIssue, array $newItems)
+    {
+        // Assume each item in $newItems has 'id' if updating, or no 'id' if new
+        $existingItems = $productIssue->items()->get()->keyBy('id');
+        $newItemsById = collect($newItems)->filter(fn($item) => !empty($item['id']))->keyBy('id');
+
+        // Remove items not present in new list
+        $toDelete = $existingItems->keys()->diff($newItemsById->keys());
+        if ($toDelete->isNotEmpty()) {
+            $productIssue->items()->whereIn('id', $toDelete)->delete();
+        }
+
+        // Update existing items
+        foreach ($newItemsById as $id => $itemData) {
+            $item = $existingItems->get($id);
+            if ($item) {
+                $item->update($itemData);
+            }
+        }
+
+        // Add new items (those without 'id')
+        $newToAdd = collect($newItems)->filter(fn($item) => empty($item['id']))->all();
+        if (!empty($newToAdd)) {
+            $productIssue->items()->createMany($newToAdd);
+        }
+    }
 <?php
 
 namespace App\Http\Controllers\API;
@@ -224,51 +257,6 @@ class ProductIssueAPIController extends AppBaseController
                     }
                 }
             }, 2);
-        }
-        return $this->sendResponse(
-            new ProductIssueResource($productIssue),
-            "Product Issue saved successfully"
-        );
-    }
-
-
-    /**
-     * Sync ProductIssue items with a new list: remove, update, or add as needed.
-     *
-     * @param ProductIssue $productIssue
-     * @param array $newItems (each item should have a unique key, e.g., id or product_option_id)
-     * @return void
-     */
-    public function syncProductIssueItems($uuid, Request $request)
-    {
-        $newItems = $request->all();
-        // return $request->all();
-        $productIssue = ProductIssue::where('uuid', $uuid)->first();
-        // Assume each item in $newItems has 'id' if updating, or no 'id' if new
-        $existingItems = $productIssue->items()->get()->keyBy('id');
-        $newItemsById = collect($newItems)->filter(fn($item) => !empty($item['id']))->keyBy('id');
-
-        // Remove items not present in new list
-        $toDelete = $existingItems->keys()->diff($newItemsById->keys());
-        if ($toDelete->isNotEmpty()) {
-            $productIssue->items()->whereIn('id', $toDelete)->delete();
-        }
-
-        // Update existing items
-        foreach ($newItemsById as $id => $itemData) {
-            $item = $existingItems->get($id);
-            if ($item) {
-                $item->update($itemData);
-            }
-        }
-
-        // Add new items (those without 'id')
-        $newToAdd = collect($newItems)->filter(fn($item) => empty($item['id']))->map(function ($item) use ($productIssue) {
-            $item['product_issue_id'] = $productIssue->id;
-            return $item;
-        })->all();
-        if (!empty($newToAdd)) {
-            $productIssue->items()->createMany($newToAdd);
         }
         return $this->sendResponse(
             new ProductIssueResource($productIssue),
@@ -547,7 +535,7 @@ class ProductIssueAPIController extends AppBaseController
                 $productIssues->items()->delete();
                 $productIssues->delete();
             } catch (\PDOException $exception) {
-                Log::error('product issue update error', ['message' => $exception->getMessage()]);
+                Log::error('product issue update error', $exception->getMessage());
             }
         }, 2);
 

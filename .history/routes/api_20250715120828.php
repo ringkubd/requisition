@@ -4,13 +4,11 @@ use App\Http\Controllers\API\CategoryAPIController;
 use App\Http\Controllers\API\InitialRequisitionAPIController;
 use App\Http\Controllers\API\NavigationAPIController;
 use App\Http\Controllers\API\ProductAPIController;
-use App\Http\Controllers\API\ProductIssueAPIController;
 use App\Http\Controllers\API\PurchaseAPIController;
 use App\Http\Controllers\API\PurchaseRequisitionAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Resources\UserResource;
-use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
@@ -134,8 +132,7 @@ Route::resource('purchases', App\Http\Controllers\API\PurchaseAPIController::cla
 
 Route::resource('product-issues', App\Http\Controllers\API\ProductIssueAPIController::class)
     ->except(['create', 'edit']);
-Route::put('product-issues-quantity-update/{id}', [ProductIssueAPIController::class, 'updateQuantity']);
-Route::put('product-issues/{productIssue}/sync-items', [ProductIssueAPIController::class, 'syncProductIssueItems']);
+Route::put('product-issues-quantity-update/{id}', [\App\Http\Controllers\API\ProductIssueAPIController::class, 'updateQuantity']);
 
 
 Route::resource('brands', App\Http\Controllers\API\BrandAPIController::class)

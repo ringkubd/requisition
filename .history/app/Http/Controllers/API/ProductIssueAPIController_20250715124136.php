@@ -263,10 +263,7 @@ class ProductIssueAPIController extends AppBaseController
         }
 
         // Add new items (those without 'id')
-        $newToAdd = collect($newItems)->filter(fn($item) => empty($item['id']))->map(function ($item) use ($productIssue) {
-            $item['product_issue_id'] = $productIssue->id;
-            return $item;
-        })->all();
+        $newToAdd = collect($newItems)->filter(fn($item) => empty($item['id']))->all();
         if (!empty($newToAdd)) {
             $productIssue->items()->createMany($newToAdd);
         }
