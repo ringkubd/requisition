@@ -57,6 +57,15 @@ export const IssueApiService = GeneralBaseAPI.injectEndpoints( {
             invalidatesTags: [ 'issue', 'editIssue' ],
             onQueryStarted: onQueryStartedErrorToast,
         } ),
+        syncProductIssues: builder.mutation( {
+            query: ( { productIssue, body } ) => ( {
+                url: `product-issues/${productIssue}/sync-items`,
+                method: 'PUT',
+                body: body,
+            } ),
+            invalidatesTags: [ 'issue' ],
+            onQueryStarted: onQueryStartedErrorToast,
+        } ),
     } ),
 } )
 
@@ -67,6 +76,7 @@ export const {
     useStoreIssueMutation,
     useDestroyIssueMutation,
     useUpdateIssueQuantityMutation,
+    useSyncProductIssuesMutation,
     util: { getRunningQueriesThunk },
 } = IssueApiService
 
