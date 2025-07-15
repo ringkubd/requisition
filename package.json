@@ -74,5 +74,5 @@
         "tailwindcss": "^3.3.3",
         "tailwindcss-animate": "^1.0.7"
     },
-    "packageManager": "yarn@1.22.19"
+    "packageManager": "yarn@4.9.2"
 }
