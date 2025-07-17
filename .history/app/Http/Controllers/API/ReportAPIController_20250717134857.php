@@ -478,8 +478,8 @@ class ReportAPIController extends AppBaseController
     public function auditReport(Request $request): JsonResponse
     {
         $startDate = $request->date_from ? Carbon::parse($request->date_from)->toDateString() : Carbon::now()->firstOfMonth()->toDateString();
-        $endDate = $request->date_to ? Carbon::parse($request->date_to)->toDateString() : Carbon::now()->lastOfMonth()->toDateString();
-        $categories = $request->category_id ? (is_array($request->category_id) ? $request->category_id : explode(',', $request->category_id)) : [];
+        $endDate = $request->endDate ? Carbon::parse($request->endDate)->toDateString() : Carbon::now()->lastOfMonth()->toDateString();
+        $categories = $request->category ? (is_array($request->category) ? $request->category : explode(',', $request->category)) : [];
 
         $productsQuery = Product::query();
         if (!empty($categories)) {
@@ -488,7 +488,6 @@ class ReportAPIController extends AppBaseController
         $products = $productsQuery->with(['productOptions' => function ($q) {
             $q->with(['purchaseHistory', 'productApprovedIssue']);
         }])->get();
-
 
         $report = [];
         foreach ($products as $product) {
@@ -551,7 +550,6 @@ class ReportAPIController extends AppBaseController
 
                 $report[] = [
                     'product' => $productName,
-                    'unit' => $option->product?->unit,
                     'openingBalance' => round($openingStock, 2),
                     'rate' => round($openingUnitPrice, 2),
                     'openingValue' => round($openingValue, 2),

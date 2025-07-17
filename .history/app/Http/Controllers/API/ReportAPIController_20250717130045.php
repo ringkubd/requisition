@@ -477,9 +477,9 @@ class ReportAPIController extends AppBaseController
      */
     public function auditReport(Request $request): JsonResponse
     {
-        $startDate = $request->date_from ? Carbon::parse($request->date_from)->toDateString() : Carbon::now()->firstOfMonth()->toDateString();
-        $endDate = $request->date_to ? Carbon::parse($request->date_to)->toDateString() : Carbon::now()->lastOfMonth()->toDateString();
-        $categories = $request->category_id ? (is_array($request->category_id) ? $request->category_id : explode(',', $request->category_id)) : [];
+        $startDate = $request->startDate ? Carbon::parse($request->startDate)->toDateString() : Carbon::now()->firstOfMonth()->toDateString();
+        $endDate = $request->endDate ? Carbon::parse($request->endDate)->toDateString() : Carbon::now()->lastOfMonth()->toDateString();
+        $categories = $request->category ? (is_array($request->category) ? $request->category : explode(',', $request->category)) : [];
 
         $productsQuery = Product::query();
         if (!empty($categories)) {
@@ -489,13 +489,13 @@ class ReportAPIController extends AppBaseController
             $q->with(['purchaseHistory', 'productApprovedIssue']);
         }])->get();
 
-
         $report = [];
         foreach ($products as $product) {
             $productOptions = $product->productOptions;
             foreach ($productOptions as $option) {
                 // Product name as option/variant
                 $productName = $product->title;
+                \dd($productName);
                 if (isset($option->option_value) && $option->option_value !== 'NA' && $option->option_value !== 'N/A') {
                     $productName .= ' - ' . $option->option_value;
                 }
@@ -551,7 +551,6 @@ class ReportAPIController extends AppBaseController
 
                 $report[] = [
                     'product' => $productName,
-                    'unit' => $option->product?->unit,
                     'openingBalance' => round($openingStock, 2),
                     'rate' => round($openingUnitPrice, 2),
                     'openingValue' => round($openingValue, 2),

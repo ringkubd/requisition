@@ -351,135 +351,11 @@ class ReportAPIController extends AppBaseController
      * @param Request $request
      * @return JsonResponse
      */
-    // public function auditReport(Request $request): JsonResponse
-    // {
-    //     $startDate = $request->startDate ? Carbon::parse($request->startDate)->toDateString() : Carbon::now()->firstOfMonth()->toDateString();
-    //     $endDate = $request->endDate ? Carbon::parse($request->endDate)->toDateString() : Carbon::now()->lastOfMonth()->toDateString();
-    //     $categories = $request->category ? (is_array($request->category) ? $request->category : explode(',', $request->category)) : [];
-
-    //     $productsQuery = Product::query();
-    //     if (!empty($categories)) {
-    //         $productsQuery->whereIn('category_id', $categories);
-    //     }
-    //     $products = $productsQuery->with(['productOptions' => function ($q) {
-    //         $q->with(['purchaseHistory', 'productApprovedIssue']);
-    //     }])->get();
-
-    //     $report = [];
-    //     foreach ($products as $product) {
-    //         $productName = $product->title;
-    //         $productOptions = $product->productOptions;
-    //         $openingBalance = 0;
-    //         $openingValue = 0;
-    //         $openingRate = 0;
-    //         $inwards = 0;
-    //         $inwardsValue = 0;
-    //         $inwardsRate = 0;
-    //         $outwards = 0;
-    //         $outwardsValue = 0;
-    //         $outwardsRate = 0;
-    //         $closingBalance = 0;
-    //         $closingValue = 0;
-    //         $closingRate = 0;
-
-    //         foreach ($productOptions as $option) {
-    //             // Opening balance: stock before startDate
-    //             $lastPurchaseBefore = $option->purchaseHistory->where('purchase_date', '<', $startDate)->sortByDesc('purchase_date')->first();
-    //             $lastIssueBefore = $option->productApprovedIssue->where('use_date', '<', $startDate)->sortByDesc('use_date')->first();
-    //             $openingStock = 0;
-    //             $openingUnitPrice = 0;
-    //             if ($lastPurchaseBefore && (!$lastIssueBefore || $lastPurchaseBefore->purchase_date > $lastIssueBefore->use_date)) {
-    //                 $openingStock = ($lastPurchaseBefore->old_balance ?? 0) + ($lastPurchaseBefore->qty ?? 0);
-    //                 $openingUnitPrice = $lastPurchaseBefore->unit_price ?? 0;
-    //             } elseif ($lastIssueBefore) {
-    //                 $openingStock = $lastIssueBefore->balance_after_issue ?? 0;
-    //                 $openingUnitPrice = $lastIssueBefore->rateLog->first()->unit_price ?? 0;
-    //             }
-    //             $openingBalance += $openingStock;
-    //             $openingRate = $openingUnitPrice;
-    //             $openingValue += $openingStock * $openingUnitPrice;
-
-    //             // Inwards: purchases between startDate and endDate
-    //             $inwardPurchases = $option->purchaseHistory->where('purchase_date', '>=', $startDate)->where('purchase_date', '<=', $endDate);
-    //             $inwardQty = $inwardPurchases->sum('qty');
-    //             $inwardValue = $inwardPurchases->sum(function ($p) {
-    //                 return ($p->qty ?? 0) * ($p->unit_price ?? 0);
-    //             });
-    //             $inwardRate = $inwardQty > 0 ? ($inwardValue / $inwardQty) : 0;
-    //             $inwards += $inwardQty;
-    //             $inwardsValue += $inwardValue;
-    //             $inwardsRate = $inwardRate;
-
-    //             // Outwards: issues between startDate and endDate
-    //             $outwardIssues = $option->productApprovedIssue->where('use_date', '>=', $startDate)->where('use_date', '<=', $endDate);
-    //             $outwardQty = $outwardIssues->sum('quantity');
-    //             $outwardValue = 0;
-    //             $outwardRate = 0;
-    //             $outwardRates = [];
-    //             foreach ($outwardIssues as $issue) {
-    //                 $qty = $issue->quantity ?? 0;
-    //                 $rate = $issue->rateLog->first()->unit_price ?? 0;
-    //                 $outwardValue += $qty * $rate;
-    //                 if ($qty > 0) $outwardRates[] = $rate;
-    //             }
-    //             $outwardRate = count($outwardRates) > 0 ? (array_sum($outwardRates) / count($outwardRates)) : 0;
-    //             $outwards += $outwardQty;
-    //             $outwardsValue += $outwardValue;
-    //             $outwardsRate = $outwardRate;
-
-    //             // Closing balance: stock at endDate
-    //             $lastPurchaseAtEnd = $option->purchaseHistory->where('purchase_date', '<=', $endDate)->sortByDesc('purchase_date')->first();
-    //             $lastIssueAtEnd = $option->productApprovedIssue->where('use_date', '<=', $endDate)->sortByDesc('use_date')->first();
-    //             $closingStock = 0;
-    //             $closingUnitPrice = 0;
-    //             if ($lastIssueAtEnd && (!$lastPurchaseAtEnd || $lastIssueAtEnd->use_date > $lastPurchaseAtEnd->purchase_date)) {
-    //                 $closingStock = $lastIssueAtEnd->balance_after_issue ?? 0;
-    //                 $closingUnitPrice = $lastIssueAtEnd->rateLog->first()->unit_price ?? 0;
-    //             } elseif ($lastPurchaseAtEnd) {
-    //                 $closingStock = ($lastPurchaseAtEnd->old_balance ?? 0) + ($lastPurchaseAtEnd->qty ?? 0);
-    //                 $closingUnitPrice = $lastPurchaseAtEnd->unit_price ?? 0;
-    //             }
-    //             $closingBalance += $closingStock;
-    //             $closingRate = $closingUnitPrice;
-    //             $closingValue += $closingStock * $closingUnitPrice;
-    //         }
-
-    //         $report[] = [
-    //             'product' => $productName,
-    //             'openingBalance' => round($openingBalance, 2),
-    //             'rate' => round($openingRate, 2),
-    //             'openingValue' => round($openingValue, 2),
-    //             'inwards' => round($inwards, 2),
-    //             'inwardsRate' => round($inwardsRate, 2),
-    //             'inwardsValue' => round($inwardsValue, 2),
-    //             'outwards' => round($outwards, 2),
-    //             'outwardsRate' => round($outwardsRate, 2),
-    //             'outwardsValue' => round($outwardsValue, 2),
-    //             'closingBalance' => round($closingBalance, 2),
-    //             'closingRate' => round($closingRate, 2),
-    //             'closingValue' => round($closingValue, 2),
-    //         ];
-    //     }
-
-    //     return response()->json([
-    //         'start_date' => $startDate,
-    //         'end_date' => $endDate,
-    //         'report' => $report
-    //     ]);
-    // }
-
-    /**
-     * Generate audit report for products between startDate and endDate, filtered by category.
-     * This method is isolated and does not touch any existing code.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function auditReport(Request $request): JsonResponse
     {
-        $startDate = $request->date_from ? Carbon::parse($request->date_from)->toDateString() : Carbon::now()->firstOfMonth()->toDateString();
-        $endDate = $request->date_to ? Carbon::parse($request->date_to)->toDateString() : Carbon::now()->lastOfMonth()->toDateString();
-        $categories = $request->category_id ? (is_array($request->category_id) ? $request->category_id : explode(',', $request->category_id)) : [];
+        $startDate = $request->startDate ? Carbon::parse($request->startDate)->toDateString() : Carbon::now()->firstOfMonth()->toDateString();
+        $endDate = $request->endDate ? Carbon::parse($request->endDate)->toDateString() : Carbon::now()->lastOfMonth()->toDateString();
+        $categories = $request->category ? (is_array($request->category) ? $request->category : explode(',', $request->category)) : [];
 
         $productsQuery = Product::query();
         if (!empty($categories)) {
@@ -489,6 +365,129 @@ class ReportAPIController extends AppBaseController
             $q->with(['purchaseHistory', 'productApprovedIssue']);
         }])->get();
 
+        $report = [];
+        foreach ($products as $product) {
+            $productName = $product->title;
+            $productOptions = $product->productOptions;
+            $openingBalance = 0;
+            $openingValue = 0;
+            $openingRate = 0;
+            $inwards = 0;
+            $inwardsValue = 0;
+            $inwardsRate = 0;
+            $outwards = 0;
+            $outwardsValue = 0;
+            $outwardsRate = 0;
+            $closingBalance = 0;
+            $closingValue = 0;
+            $closingRate = 0;
+
+            foreach ($productOptions as $option) {
+                // Opening balance: stock before startDate
+                $lastPurchaseBefore = $option->purchaseHistory->where('purchase_date', '<', $startDate)->sortByDesc('purchase_date')->first();
+                $lastIssueBefore = $option->productApprovedIssue->where('use_date', '<', $startDate)->sortByDesc('use_date')->first();
+                $openingStock = 0;
+                $openingUnitPrice = 0;
+                if ($lastPurchaseBefore && (!$lastIssueBefore || $lastPurchaseBefore->purchase_date > $lastIssueBefore->use_date)) {
+                    $openingStock = ($lastPurchaseBefore->old_balance ?? 0) + ($lastPurchaseBefore->qty ?? 0);
+                    $openingUnitPrice = $lastPurchaseBefore->unit_price ?? 0;
+                } elseif ($lastIssueBefore) {
+                    $openingStock = $lastIssueBefore->balance_after_issue ?? 0;
+                    $openingUnitPrice = $lastIssueBefore->rateLog->first()->unit_price ?? 0;
+                }
+                $openingBalance += $openingStock;
+                $openingRate = $openingUnitPrice;
+                $openingValue += $openingStock * $openingUnitPrice;
+
+                // Inwards: purchases between startDate and endDate
+                $inwardPurchases = $option->purchaseHistory->where('purchase_date', '>=', $startDate)->where('purchase_date', '<=', $endDate);
+                $inwardQty = $inwardPurchases->sum('qty');
+                $inwardValue = $inwardPurchases->sum(function ($p) {
+                    return ($p->qty ?? 0) * ($p->unit_price ?? 0);
+                });
+                $inwardRate = $inwardQty > 0 ? ($inwardValue / $inwardQty) : 0;
+                $inwards += $inwardQty;
+                $inwardsValue += $inwardValue;
+                $inwardsRate = $inwardRate;
+
+                // Outwards: issues between startDate and endDate
+                $outwardIssues = $option->productApprovedIssue->where('use_date', '>=', $startDate)->where('use_date', '<=', $endDate);
+                $outwardQty = $outwardIssues->sum('quantity');
+                $outwardValue = 0;
+                $outwardRate = 0;
+                $outwardRates = [];
+                foreach ($outwardIssues as $issue) {
+                    $qty = $issue->quantity ?? 0;
+                    $rate = $issue->rateLog->first()->unit_price ?? 0;
+                    $outwardValue += $qty * $rate;
+                    if ($qty > 0) $outwardRates[] = $rate;
+                }
+                $outwardRate = count($outwardRates) > 0 ? (array_sum($outwardRates) / count($outwardRates)) : 0;
+                $outwards += $outwardQty;
+                $outwardsValue += $outwardValue;
+                $outwardsRate = $outwardRate;
+
+                // Closing balance: stock at endDate
+                $lastPurchaseAtEnd = $option->purchaseHistory->where('purchase_date', '<=', $endDate)->sortByDesc('purchase_date')->first();
+                $lastIssueAtEnd = $option->productApprovedIssue->where('use_date', '<=', $endDate)->sortByDesc('use_date')->first();
+                $closingStock = 0;
+                $closingUnitPrice = 0;
+                if ($lastIssueAtEnd && (!$lastPurchaseAtEnd || $lastIssueAtEnd->use_date > $lastPurchaseAtEnd->purchase_date)) {
+                    $closingStock = $lastIssueAtEnd->balance_after_issue ?? 0;
+                    $closingUnitPrice = $lastIssueAtEnd->rateLog->first()->unit_price ?? 0;
+                } elseif ($lastPurchaseAtEnd) {
+                    $closingStock = ($lastPurchaseAtEnd->old_balance ?? 0) + ($lastPurchaseAtEnd->qty ?? 0);
+                    $closingUnitPrice = $lastPurchaseAtEnd->unit_price ?? 0;
+                }
+                $closingBalance += $closingStock;
+                $closingRate = $closingUnitPrice;
+                $closingValue += $closingStock * $closingUnitPrice;
+            }
+
+            $report[] = [
+                'product' => $productName,
+                'openingBalance' => round($openingBalance, 2),
+                'rate' => round($openingRate, 2),
+                'openingValue' => round($openingValue, 2),
+                'inwards' => round($inwards, 2),
+                'inwardsRate' => round($inwardsRate, 2),
+                'inwardsValue' => round($inwardsValue, 2),
+                'outwards' => round($outwards, 2),
+                'outwardsRate' => round($outwardsRate, 2),
+                'outwardsValue' => round($outwardsValue, 2),
+                'closingBalance' => round($closingBalance, 2),
+                'closingRate' => round($closingRate, 2),
+                'closingValue' => round($closingValue, 2),
+            ];
+        }
+
+        return response()->json([
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'report' => $report
+        ]);
+    }
+
+    /**
+     * Generate audit report for products between startDate and endDate, filtered by category.
+     * This method is isolated and does not touch any existing code.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function auditReportData(Request $request): JsonResponse
+    {
+        $startDate = $request->startDate ? Carbon::parse($request->startDate)->toDateString() : Carbon::now()->firstOfMonth()->toDateString();
+        $endDate = $request->endDate ? Carbon::parse($request->endDate)->toDateString() : Carbon::now()->lastOfMonth()->toDateString();
+        $categories = $request->category ? (is_array($request->category) ? $request->category : explode(',', $request->category)) : [];
+
+        $productsQuery = Product::query();
+        if (!empty($categories)) {
+            $productsQuery->whereIn('category_id', $categories);
+        }
+        $products = $productsQuery->with(['productOptions' => function ($q) {
+            $q->with(['purchaseHistory', 'productApprovedIssue']);
+        }])->get();
 
         $report = [];
         foreach ($products as $product) {
@@ -551,7 +550,6 @@ class ReportAPIController extends AppBaseController
 
                 $report[] = [
                     'product' => $productName,
-                    'unit' => $option->product?->unit,
                     'openingBalance' => round($openingStock, 2),
                     'rate' => round($openingUnitPrice, 2),
                     'openingValue' => round($openingValue, 2),

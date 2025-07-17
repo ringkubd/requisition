@@ -481,6 +481,7 @@ class ReportAPIController extends AppBaseController
         $endDate = $request->date_to ? Carbon::parse($request->date_to)->toDateString() : Carbon::now()->lastOfMonth()->toDateString();
         $categories = $request->category_id ? (is_array($request->category_id) ? $request->category_id : explode(',', $request->category_id)) : [];
 
+        \dd($startDate, $endDate, $categories);
         $productsQuery = Product::query();
         if (!empty($categories)) {
             $productsQuery->whereIn('category_id', $categories);
@@ -488,7 +489,6 @@ class ReportAPIController extends AppBaseController
         $products = $productsQuery->with(['productOptions' => function ($q) {
             $q->with(['purchaseHistory', 'productApprovedIssue']);
         }])->get();
-
 
         $report = [];
         foreach ($products as $product) {
@@ -551,7 +551,6 @@ class ReportAPIController extends AppBaseController
 
                 $report[] = [
                     'product' => $productName,
-                    'unit' => $option->product?->unit,
                     'openingBalance' => round($openingStock, 2),
                     'rate' => round($openingUnitPrice, 2),
                     'openingValue' => round($openingValue, 2),

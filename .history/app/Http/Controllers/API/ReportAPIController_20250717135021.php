@@ -489,6 +489,7 @@ class ReportAPIController extends AppBaseController
             $q->with(['purchaseHistory', 'productApprovedIssue']);
         }])->get();
 
+        \dd($products);
 
         $report = [];
         foreach ($products as $product) {
@@ -551,7 +552,6 @@ class ReportAPIController extends AppBaseController
 
                 $report[] = [
                     'product' => $productName,
-                    'unit' => $option->product?->unit,
                     'openingBalance' => round($openingStock, 2),
                     'rate' => round($openingUnitPrice, 2),
                     'openingValue' => round($openingValue, 2),
