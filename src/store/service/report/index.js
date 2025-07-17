@@ -43,6 +43,13 @@ export const ReportAPI = GeneralBaseAPI.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        auditReport: builder.query({
+            query: arg => ({
+                url: 'report/audit-report',
+                params: arg,
+                method: 'GET',
+            }),
+        }),
     }),
 })
 
@@ -53,4 +60,5 @@ export const {
     useBothReportMutation,
     useProductCurrentBalanceMutation,
     useProductCurrentBalanceOptionMutation,
+    useAuditReportQuery,
 } = ReportAPI
