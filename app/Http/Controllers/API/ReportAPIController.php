@@ -546,6 +546,8 @@ class ReportAPIController extends AppBaseController
                 } elseif ($lastPurchaseAtEnd) {
                     $closingStock = ($lastPurchaseAtEnd->old_balance ?? 0) + ($lastPurchaseAtEnd->qty ?? 0);
                     $closingUnitPrice = $lastPurchaseAtEnd->unit_price ?? 0;
+                } else {
+                    $closingStock = max($option->stock, 0);
                 }
                 $closingValue = $closingStock * $closingUnitPrice;
 
