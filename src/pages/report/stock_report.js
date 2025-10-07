@@ -419,7 +419,7 @@ export default function ProductInOutReport() {
                                 <input
                                     type="range"
                                     min="50"
-                                    max="150"
+                                    max="200"
                                     value={printFontSize}
                                     onChange={(e) =>
                                         setPrintFontSize(Number(e.target.value))
@@ -431,7 +431,7 @@ export default function ProductInOutReport() {
                                 </span>
                             </div>
                             <p className="text-xs text-gray-500 mt-1">
-                                Adjust font size for printing (50% - 150%)
+                                Adjust font size for printing (50% - 200%)
                             </p>
                         </div>
 
@@ -555,6 +555,14 @@ export default function ProductInOutReport() {
                     >
                         {/* Report Header */}
                         <div className="text-center mb-8 p-6">
+                            {/* Logo */}
+                            <div className="mb-4">
+                                <img
+                                    src="/logo.svg"
+                                    alt="Organization Logo"
+                                    className="h-16 mx-auto print:h-12"
+                                />
+                            </div>
                             <h2 className="text-2xl font-bold text-gray-800 mb-2">
                                 Bangladesh Islamic Solidarity Educational Wakf
                             </h2>
@@ -1243,6 +1251,10 @@ export default function ProductInOutReport() {
                         }
                         .print-content .text-lg {
                             font-size: ${subHeaderFontSize} !important;
+                        }
+                        .print-content img {
+                            max-width: 100% !important;
+                            height: auto !important;
                         }
                         @page {
                             margin: 0.5in;
