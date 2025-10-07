@@ -511,6 +511,9 @@ class ReportAPIController extends AppBaseController
                 } elseif ($lastIssueBefore) {
                     $openingStock = $lastIssueBefore->balance_after_issue ?? 0;
                     $openingUnitPrice = $lastIssueBefore->rateLog->first()->unit_price ?? 0;
+                } else {
+                    // $initStock = $option->stock - $option->purchaseHistory->where('purchase_date', '>', $endDate)->sum('qty') + $option->productApprovedIssue->where('use_date', '>', $endDate)->sum('quantity');
+                    $openingStock = $option->stock;
                 }
                 $openingValue = $openingStock * $openingUnitPrice;
 
