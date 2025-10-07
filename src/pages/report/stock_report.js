@@ -33,14 +33,14 @@ export default function ProductInOutReport() {
         value: true,
     });
 
-  // Print orientation
-  const [printOrientation, setPrintOrientation] = useState('landscape');
+    // Print orientation
+    const [printOrientation, setPrintOrientation] = useState("landscape");
 
-  // User-adjustable font size for printing
-  const [printFontSize, setPrintFontSize] = useState(100); // percentage
+    // User-adjustable font size for printing
+    const [printFontSize, setPrintFontSize] = useState(100); // percentage
 
-  // Custom report title for printing
-  const [reportTitle, setReportTitle] = useState('Product In/Out Statement');    // Individual positive values filters
+    // Custom report title for printing
+    const [reportTitle, setReportTitle] = useState("Product In/Out Statement"); // Individual positive values filters
     const [positiveFilters, setPositiveFilters] = useState({
         opening: false,
         inwards: false,
@@ -93,10 +93,10 @@ export default function ProductInOutReport() {
             : `${Math.round(baseLandscape * multiplier)}px`;
     };
 
-    const tableFontSize = getBaseFontSize(10, 8);
-    const cellFontSize = getBaseFontSize(9, 7);
-    const headerFontSize = getBaseFontSize(16, 14);
-    const subHeaderFontSize = getBaseFontSize(14, 12);
+    const tableFontSize = getFontSize(10, 8);
+    const cellFontSize = getFontSize(9, 7);
+    const headerFontSize = getFontSize(16, 14);
+    const subHeaderFontSize = getFontSize(14, 12);
 
     const handlePrint = useReactToPrint({
         content: () => printRef.current,
@@ -421,7 +421,9 @@ export default function ProductInOutReport() {
                                     min="50"
                                     max="150"
                                     value={printFontSize}
-                                    onChange={(e) => setPrintFontSize(Number(e.target.value))}
+                                    onChange={(e) =>
+                                        setPrintFontSize(Number(e.target.value))
+                                    }
                                     className="w-32 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                                 />
                                 <span className="text-sm text-gray-600 min-w-[3rem]">
@@ -445,11 +447,12 @@ export default function ProductInOutReport() {
                                 id="reportTitle"
                                 value={reportTitle}
                                 onChange={(e) => setReportTitle(e.target.value)}
-                                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64"
                                 placeholder="Enter report title..."
                             />
                             <p className="text-xs text-gray-500 mt-1">
-                                Customize the title that appears on the printed report
+                                Customize the title that appears on the printed
+                                report
                             </p>
                         </div>
 
@@ -543,9 +546,13 @@ export default function ProductInOutReport() {
                     )}
 
                     {/* Report Content - Printable Area */}
-                    <div ref={printRef} className="print-content" style={{
-                        fontSize: `${printFontSize}%`
-                    }}>
+                    <div
+                        ref={printRef}
+                        className="print-content"
+                        style={{
+                            fontSize: `${printFontSize}%`,
+                        }}
+                    >
                         {/* Report Header */}
                         <div className="text-center mb-8 p-6">
                             <h2 className="text-2xl font-bold text-gray-800 mb-2">
