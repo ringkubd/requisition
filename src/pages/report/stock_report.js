@@ -569,8 +569,9 @@ export default function ProductInOutReport() {
                                     }}
                                 />
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                                Bangladesh Islamic Solidarity Educational Wakf
+                            <h2 className="text-xl font-bold text-gray-800 mb-2">
+                                IsDB-Bangladesh Islamic Solidarity Educational
+                                Wakf
                             </h2>
                             <div className="text-sm text-gray-600 mb-1">
                                 IDB Bhaban (4th Floor), Rokeya Sharanee, Dhaka
