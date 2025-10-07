@@ -561,6 +561,12 @@ export default function ProductInOutReport() {
                                     src="/logo.svg"
                                     alt="Organization Logo"
                                     className="h-16 mx-auto print:h-12"
+                                    style={{
+                                        maxHeight:
+                                            printOrientation === "portrait"
+                                                ? "50px"
+                                                : "80px",
+                                    }}
                                 />
                             </div>
                             <h2 className="text-2xl font-bold text-gray-800 mb-2">
