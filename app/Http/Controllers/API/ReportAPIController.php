@@ -543,13 +543,37 @@ class ReportAPIController extends AppBaseController
                 $lastIssueAtEnd = $option->productApprovedIssue->where('use_date', '<=', $endDate)->sortByDesc('use_date')->first();
                 $closingStock = 0;
                 $closingUnitPrice = 0;
-                if ($lastIssueAtEnd && (!$lastPurchaseAtEnd || $lastIssueAtEnd->use_date > $lastPurchaseAtEnd->purchase_date)) {
+
+                // If both purchase and issue exist
+                if ($lastPurchaseAtEnd && $lastIssueAtEnd) {
+                    // Compare dates - if issue date is after purchase date, use issue balance
+                    if ($lastIssueAtEnd->use_date > $lastPurchaseAtEnd->purchase_date) {
+                        $closingStock = $lastIssueAtEnd->balance_after_issue ?? 0;
+                        $closingUnitPrice = $lastIssueAtEnd->rateLog->first()->unit_price ?? 0;
+                    }
+                    // If dates are equal, issue happens after purchase, so use issue balance
+                    elseif ($lastIssueAtEnd->use_date == $lastPurchaseAtEnd->purchase_date) {
+                        $closingStock = $lastIssueAtEnd->balance_after_issue ?? 0;
+                        $closingUnitPrice = $lastIssueAtEnd->rateLog->first()->unit_price ?? 0;
+                    }
+                    // If purchase date is after issue date, use purchase balance
+                    else {
+                        $closingStock = ($lastPurchaseAtEnd->old_balance ?? 0) + ($lastPurchaseAtEnd->qty ?? 0);
+                        $closingUnitPrice = $lastPurchaseAtEnd->unit_price ?? 0;
+                    }
+                }
+                // Only issue exists
+                elseif ($lastIssueAtEnd) {
                     $closingStock = $lastIssueAtEnd->balance_after_issue ?? 0;
                     $closingUnitPrice = $lastIssueAtEnd->rateLog->first()->unit_price ?? 0;
-                } elseif ($lastPurchaseAtEnd) {
+                }
+                // Only purchase exists
+                elseif ($lastPurchaseAtEnd) {
                     $closingStock = ($lastPurchaseAtEnd->old_balance ?? 0) + ($lastPurchaseAtEnd->qty ?? 0);
                     $closingUnitPrice = $lastPurchaseAtEnd->unit_price ?? 0;
-                } else {
+                }
+                // No transactions found
+                else {
                     $closingStock = max($option->stock, 0);
                 }
                 $closingValue = $closingStock * $closingUnitPrice;
