@@ -134,7 +134,7 @@ const IssueLog = ({ id }) => {
                             <Table.Row>
                                 <Table.Cell
                                     className={`border border-gray-300 text-right text-black font-bold`}
-                                    colSpan={3}>
+                                    colSpan={5}>
                                     Total
                                 </Table.Cell>
                                 <Table.Cell
