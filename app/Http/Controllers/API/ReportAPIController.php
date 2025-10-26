@@ -483,12 +483,15 @@ class ReportAPIController extends AppBaseController
 
         $productsQuery = Product::query();
         if (!empty($categories)) {
-            $productsQuery->whereIn('category_id', $categories);
+            $productsQuery->whereIn('category_id', $categories)->withoutGlobalScopes();
         }
         $products = $productsQuery->with(['productOptions' => function ($q) {
-            $q->with(['purchaseHistory', 'productApprovedIssue']);
+            $q->with(['purchaseHistory' => function ($p) {
+                $p->orderBy('purchase_date', 'desc')->orderBy('id', 'desc');
+            }, 'productApprovedIssue' => function ($s) {
+                $s->orderBy('use_date', 'desc')->orderBy('id', 'desc');
+            }]);
         }])->get();
-
 
         $report = [];
         foreach ($products as $product) {
@@ -578,6 +581,9 @@ class ReportAPIController extends AppBaseController
                 }
                 $closingValue = $closingStock * $closingUnitPrice;
 
+                // if($product->id == 2605){
+                //     dd($lastPurchaseAtEnd, $lastIssueAtEnd, $closingStock, $closingUnitPrice);
+                // }
                 $report[] = [
                     'product' => $productName,
                     'unit' => $option->product?->unit,
