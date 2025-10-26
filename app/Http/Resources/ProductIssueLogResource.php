@@ -25,6 +25,8 @@ class ProductIssueLogResource extends JsonResource
             'variant_title' => $this->productOption?->option_value,
             'category' => $this->use_in_category ? $this->useInCategory?->title : $this->category?->title,
             'quantity' => $this->quantity,
+            'qty_before_issue' => $this->balance_before_issue,
+            'qty_after_issue' => $this->balance_after_issue,
             'average_rate' => max($this->rateLog->sum('unit_price'), 0) / max($this->rateLog->count(), 1),
             'total_price' =>  round($this->rateLog->sum('total_price')),
             'balance_before_issue' => $this->balance_before_issue,
