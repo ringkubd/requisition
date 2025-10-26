@@ -44,7 +44,15 @@ const IssueLog = ({ id }) => {
                             </Table.HeadCell>
                             <Table.HeadCell
                                 className={`border border-gray-300`}>
-                                Qty
+                                Qty Before Issue
+                            </Table.HeadCell>
+                            <Table.HeadCell
+                                className={`border border-gray-300`}>
+                                Qty After Issue
+                            </Table.HeadCell>
+                            <Table.HeadCell
+                                className={`border border-gray-300`}>
+                                Issued Qty
                             </Table.HeadCell>
                             <Table.HeadCell
                                 className={`border border-gray-300`}>
@@ -88,8 +96,16 @@ const IssueLog = ({ id }) => {
                                         </Table.Cell>
                                         <Table.Cell
                                             className={`border !p-0 text-center`}>
-                                            {iss?.quantity}
-                                            {iss?.unit}
+                                            {iss?.qty_before_issue} {iss?.unit}
+                                        </Table.Cell>
+
+                                        <Table.Cell
+                                            className={`border !p-0 text-center`}>
+                                            {iss?.qty_after_issue} {iss?.unit}
+                                        </Table.Cell>
+                                        <Table.Cell
+                                            className={`border !p-0 text-center`}>
+                                            {iss?.quantity} {iss?.unit}
                                         </Table.Cell>
                                         <Table.Cell
                                             className={`border !p-0 text-center`}>
@@ -118,7 +134,7 @@ const IssueLog = ({ id }) => {
                             <Table.Row>
                                 <Table.Cell
                                     className={`border border-gray-300 text-right text-black font-bold`}
-                                    colSpan={3}>
+                                    colSpan={5}>
                                     Total
                                 </Table.Cell>
                                 <Table.Cell
