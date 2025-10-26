@@ -487,11 +487,14 @@ class ReportAPIController extends AppBaseController
         }
         $products = $productsQuery->with(['productOptions' => function ($q) {
             $q->with(['purchaseHistory' => function ($p) {
-            $p->orderBy('purchase_date', 'desc')->orderBy('id', 'desc');
+                $p->orderBy('purchase_date', 'desc')->orderBy('id', 'desc');
             }, 'productApprovedIssue' => function ($s) {
-            $s->join('product_issues', 'product_issue_items.product_issue_id', '=', 'product_issues.id')->orderBy('product_issues.store_approved_at', 'desc')->orderBy('product_issue_items.id', 'desc');
+                $s->join('product_issues', 'product_issue_items.product_issue_id', '=', 'product_issues.id')
+                    ->orderBy('product_issues.store_approved_at', 'desc')
+                    ->orderBy('product_issue_items.id', 'desc');
             }]);
-        }])->get();
+        }])
+        ->get();
 
         $report = [];
         foreach ($products as $product) {
