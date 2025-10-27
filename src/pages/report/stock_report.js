@@ -1170,13 +1170,15 @@ export default function ProductInOutReport() {
                                                             {data
                                                                 .filter(
                                                                     (row) => {
-                                                                        const hasAnyFilterActive = 
+                                                                        const hasAnyFilterActive =
                                                                             positiveFilters.opening ||
                                                                             positiveFilters.inwards ||
                                                                             positiveFilters.outwards ||
                                                                             positiveFilters.closing;
 
-                                                                        if (!hasAnyFilterActive) {
+                                                                        if (
+                                                                            !hasAnyFilterActive
+                                                                        ) {
                                                                             return true;
                                                                         }
 
