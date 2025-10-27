@@ -738,31 +738,43 @@ export default function ProductInOutReport() {
                                     <tbody>
                                         {data
                                             .filter((row) => {
-                                                // Apply individual positive values filters
-                                                let shouldShow = true;
+                                                // Apply individual positive values filters with OR condition
+                                                // If no filters are selected, show all rows
+                                                const hasAnyFilterActive =
+                                                    positiveFilters.opening ||
+                                                    positiveFilters.inwards ||
+                                                    positiveFilters.outwards ||
+                                                    positiveFilters.closing;
+
+                                                if (!hasAnyFilterActive) {
+                                                    return true; // Show all if no filters active
+                                                }
+
+                                                // Show row if ANY of the active filters match
+                                                let shouldShow = false;
 
                                                 if (positiveFilters.opening) {
                                                     shouldShow =
-                                                        shouldShow &&
+                                                        shouldShow ||
                                                         (Number(
                                                             row.openingBalance
                                                         ) || 0) > 0;
                                                 }
                                                 if (positiveFilters.inwards) {
                                                     shouldShow =
-                                                        shouldShow &&
+                                                        shouldShow ||
                                                         (Number(row.inwards) ||
                                                             0) > 0;
                                                 }
                                                 if (positiveFilters.outwards) {
                                                     shouldShow =
-                                                        shouldShow &&
+                                                        shouldShow ||
                                                         (Number(row.outwards) ||
                                                             0) > 0;
                                                 }
                                                 if (positiveFilters.closing) {
                                                     shouldShow =
-                                                        shouldShow &&
+                                                        shouldShow ||
                                                         (Number(
                                                             row.closingBalance
                                                         ) || 0) > 0;
@@ -903,12 +915,24 @@ export default function ProductInOutReport() {
                                                             {data
                                                                 .filter(
                                                                     (row) => {
-                                                                        let shouldShow = true;
+                                                                        const hasAnyFilterActive =
+                                                                            positiveFilters.opening ||
+                                                                            positiveFilters.inwards ||
+                                                                            positiveFilters.outwards ||
+                                                                            positiveFilters.closing;
+
+                                                                        if (
+                                                                            !hasAnyFilterActive
+                                                                        ) {
+                                                                            return true;
+                                                                        }
+
+                                                                        let shouldShow = false;
                                                                         if (
                                                                             positiveFilters.opening
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.openingBalance
                                                                                 ) ||
@@ -918,7 +942,7 @@ export default function ProductInOutReport() {
                                                                             positiveFilters.inwards
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.inwards
                                                                                 ) ||
@@ -928,7 +952,7 @@ export default function ProductInOutReport() {
                                                                             positiveFilters.outwards
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.outwards
                                                                                 ) ||
@@ -938,7 +962,7 @@ export default function ProductInOutReport() {
                                                                             positiveFilters.closing
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.closingBalance
                                                                                 ) ||
@@ -976,12 +1000,24 @@ export default function ProductInOutReport() {
                                                             {data
                                                                 .filter(
                                                                     (row) => {
-                                                                        let shouldShow = true;
+                                                                        const hasAnyFilterActive =
+                                                                            positiveFilters.opening ||
+                                                                            positiveFilters.inwards ||
+                                                                            positiveFilters.outwards ||
+                                                                            positiveFilters.closing;
+
+                                                                        if (
+                                                                            !hasAnyFilterActive
+                                                                        ) {
+                                                                            return true;
+                                                                        }
+
+                                                                        let shouldShow = false;
                                                                         if (
                                                                             positiveFilters.opening
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.openingBalance
                                                                                 ) ||
@@ -991,7 +1027,7 @@ export default function ProductInOutReport() {
                                                                             positiveFilters.inwards
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.inwards
                                                                                 ) ||
@@ -1001,7 +1037,7 @@ export default function ProductInOutReport() {
                                                                             positiveFilters.outwards
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.outwards
                                                                                 ) ||
@@ -1011,7 +1047,7 @@ export default function ProductInOutReport() {
                                                                             positiveFilters.closing
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.closingBalance
                                                                                 ) ||
@@ -1049,12 +1085,24 @@ export default function ProductInOutReport() {
                                                             {data
                                                                 .filter(
                                                                     (row) => {
-                                                                        let shouldShow = true;
+                                                                        const hasAnyFilterActive =
+                                                                            positiveFilters.opening ||
+                                                                            positiveFilters.inwards ||
+                                                                            positiveFilters.outwards ||
+                                                                            positiveFilters.closing;
+
+                                                                        if (
+                                                                            !hasAnyFilterActive
+                                                                        ) {
+                                                                            return true;
+                                                                        }
+
+                                                                        let shouldShow = false;
                                                                         if (
                                                                             positiveFilters.opening
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.openingBalance
                                                                                 ) ||
@@ -1064,7 +1112,7 @@ export default function ProductInOutReport() {
                                                                             positiveFilters.inwards
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.inwards
                                                                                 ) ||
@@ -1074,7 +1122,7 @@ export default function ProductInOutReport() {
                                                                             positiveFilters.outwards
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.outwards
                                                                                 ) ||
@@ -1084,7 +1132,7 @@ export default function ProductInOutReport() {
                                                                             positiveFilters.closing
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.closingBalance
                                                                                 ) ||
@@ -1122,12 +1170,22 @@ export default function ProductInOutReport() {
                                                             {data
                                                                 .filter(
                                                                     (row) => {
-                                                                        let shouldShow = true;
+                                                                        const hasAnyFilterActive = 
+                                                                            positiveFilters.opening ||
+                                                                            positiveFilters.inwards ||
+                                                                            positiveFilters.outwards ||
+                                                                            positiveFilters.closing;
+
+                                                                        if (!hasAnyFilterActive) {
+                                                                            return true;
+                                                                        }
+
+                                                                        let shouldShow = false;
                                                                         if (
                                                                             positiveFilters.opening
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.openingBalance
                                                                                 ) ||
@@ -1137,7 +1195,7 @@ export default function ProductInOutReport() {
                                                                             positiveFilters.inwards
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.inwards
                                                                                 ) ||
@@ -1147,7 +1205,7 @@ export default function ProductInOutReport() {
                                                                             positiveFilters.outwards
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.outwards
                                                                                 ) ||
@@ -1157,7 +1215,7 @@ export default function ProductInOutReport() {
                                                                             positiveFilters.closing
                                                                         )
                                                                             shouldShow =
-                                                                                shouldShow &&
+                                                                                shouldShow ||
                                                                                 (Number(
                                                                                     row.closingBalance
                                                                                 ) ||
