@@ -485,20 +485,27 @@ class ReportAPIController extends AppBaseController
         if (!empty($categories)) {
             $productsQuery->whereIn('category_id', $categories)->withoutGlobalScopes();
         }
+
+        // Eager load relationships with proper ordering
         $products = $productsQuery->with(['productOptions' => function ($q) {
             $q->with(['purchaseHistory' => function ($p) {
                 $p->orderBy('purchase_date', 'desc')->orderBy('id', 'desc');
             }, 'productApprovedIssue' => function ($s) {
-                $s->join('product_issues', 'product_issue_items.product_issue_id', '=', 'product_issues.id')
-                    ->orderBy('product_issues.store_approved_at', 'desc')
-                    ->orderBy('product_issue_items.id', 'desc');
+                $s->with('rateLog')->orderBy('use_date', 'desc');
             }]);
         }])
-        ->get();
+            ->orderBy('title', 'asc')
+            ->get();
 
         $report = [];
         foreach ($products as $product) {
             $productOptions = $product->productOptions;
+
+            // Skip products without options
+            if ($productOptions->isEmpty()) {
+                continue;
+            }
+
             foreach ($productOptions as $option) {
                 // Product name as option/variant
                 $productName = $product->title;
@@ -506,25 +513,56 @@ class ReportAPIController extends AppBaseController
                     $productName .= ' - ' . $option->option_value;
                 }
 
-                // Opening balance: stock before startDate
-                $lastPurchaseBefore = $option->purchaseHistory->where('purchase_date', '<', $startDate)->sortByDesc('purchase_date')->first();
-                $lastIssueBefore = $option->productApprovedIssue->where('use_date', '<', $startDate)->sortByDesc('use_date')->first();
+                // Ensure collections exist
+                $purchaseHistory = $option->purchaseHistory ?? collect([]);
+                $productApprovedIssue = $option->productApprovedIssue ?? collect([]);
+
+                // Opening balance: stock before startDate (use same logic as closing balance)
+                $lastPurchaseBefore = $purchaseHistory->where('purchase_date', '<', $startDate)->sortByDesc('purchase_date')->first();
+                $lastIssueBefore = $productApprovedIssue->where('use_date', '<', $startDate)->sortByDesc('use_date')->first();
                 $openingStock = 0;
                 $openingUnitPrice = 0;
-                if ($lastPurchaseBefore && (!$lastIssueBefore || $lastPurchaseBefore->purchase_date > $lastIssueBefore->use_date)) {
+
+                // If both purchase and issue exist before start date
+                if ($lastPurchaseBefore && $lastIssueBefore) {
+                    // Compare dates - if issue date is after purchase date, use issue balance
+                    if ($lastIssueBefore->use_date > $lastPurchaseBefore->purchase_date) {
+                        $openingStock = $lastIssueBefore->balance_after_issue ?? 0;
+                        $openingUnitPrice = $lastIssueBefore->rateLog->first()?->unit_price ?? 0;
+                    }
+                    // If dates are equal, issue happens after purchase, so use issue balance
+                    elseif ($lastIssueBefore->use_date == $lastPurchaseBefore->purchase_date) {
+                        $openingStock = $lastIssueBefore->balance_after_issue ?? 0;
+                        $openingUnitPrice = $lastIssueBefore->rateLog->first()?->unit_price ?? 0;
+                    }
+                    // If purchase date is after issue date, use purchase balance
+                    else {
+                        $openingStock = ($lastPurchaseBefore->old_balance ?? 0) + ($lastPurchaseBefore->qty ?? 0);
+                        $openingUnitPrice = $lastPurchaseBefore->unit_price ?? 0;
+                    }
+                }
+                // Only issue exists before start date
+                elseif ($lastIssueBefore) {
+                    $openingStock = $lastIssueBefore->balance_after_issue ?? 0;
+                    $openingUnitPrice = $lastIssueBefore->rateLog->first()?->unit_price ?? 0;
+                }
+                // Only purchase exists before start date
+                elseif ($lastPurchaseBefore) {
                     $openingStock = ($lastPurchaseBefore->old_balance ?? 0) + ($lastPurchaseBefore->qty ?? 0);
                     $openingUnitPrice = $lastPurchaseBefore->unit_price ?? 0;
-                } elseif ($lastIssueBefore) {
-                    $openingStock = $lastIssueBefore->balance_after_issue ?? 0;
-                    $openingUnitPrice = $lastIssueBefore->rateLog->first()->unit_price ?? 0;
-                } else {
-                    // $initStock = $option->stock - $option->purchaseHistory->where('purchase_date', '>', $endDate)->sum('qty') + $option->productApprovedIssue->where('use_date', '>', $endDate)->sum('quantity');
-                    $openingStock = $option->stock;
+                }
+                // No transactions before start date - calculate from current stock
+                else {
+                    // Current stock minus future transactions = opening stock
+                    $futureInwards = $purchaseHistory->where('purchase_date', '>=', $startDate)->sum('qty');
+                    $futureOutwards = $productApprovedIssue->where('use_date', '>=', $startDate)->sum('quantity');
+                    $openingStock = max($option->stock - $futureInwards + $futureOutwards, 0);
+                    $openingUnitPrice = 0; // No rate available for opening stock
                 }
                 $openingValue = $openingStock * $openingUnitPrice;
 
                 // Inwards: purchases between startDate and endDate
-                $inwardPurchases = $option->purchaseHistory->where('purchase_date', '>=', $startDate)->where('purchase_date', '<=', $endDate);
+                $inwardPurchases = $purchaseHistory->where('purchase_date', '>=', $startDate)->where('purchase_date', '<=', $endDate);
                 $inwardQty = $inwardPurchases->sum('qty');
                 $inwardValue = $inwardPurchases->sum(function ($p) {
                     return ($p->qty ?? 0) * ($p->unit_price ?? 0);
@@ -532,35 +570,34 @@ class ReportAPIController extends AppBaseController
                 $inwardRate = $inwardQty > 0 ? ($inwardValue / $inwardQty) : 0;
 
                 // Outwards: issues between startDate and endDate
-                $outwardIssues = $option->productApprovedIssue->where('use_date', '>=', $startDate)->where('use_date', '<=', $endDate);
+                $outwardIssues = $productApprovedIssue->where('use_date', '>=', $startDate)->where('use_date', '<=', $endDate);
                 $outwardQty = $outwardIssues->sum('quantity');
                 $outwardValue = 0;
-                $outwardRates = [];
                 foreach ($outwardIssues as $issue) {
                     $qty = $issue->quantity ?? 0;
-                    $rate = $issue->rateLog->first()->unit_price ?? 0;
+                    $rate = $issue->rateLog->first()?->unit_price ?? 0;
                     $outwardValue += $qty * $rate;
-                    if ($qty > 0) $outwardRates[] = $rate;
                 }
-                $outwardRate = count($outwardRates) > 0 ? (array_sum($outwardRates) / count($outwardRates)) : 0;
+                // Weighted average rate
+                $outwardRate = $outwardQty > 0 ? ($outwardValue / $outwardQty) : 0;
 
                 // Closing balance: stock at endDate
-                $lastPurchaseAtEnd = $option->purchaseHistory->where('purchase_date', '<=', $endDate)->sortByDesc('purchase_date')->first();
-                $lastIssueAtEnd = $option->productApprovedIssue->where('use_date', '<=', $endDate)->sortByDesc('use_date')->first();
+                $lastPurchaseAtEnd = $purchaseHistory->where('purchase_date', '<=', $endDate)->sortByDesc('purchase_date')->first();
+                $lastIssueAtEnd = $productApprovedIssue->where('use_date', '<=', $endDate)->sortByDesc('use_date')->first();
                 $closingStock = 0;
                 $closingUnitPrice = 0;
 
-                // If both purchase and issue exist
+                // If both purchase and issue exist up to end date
                 if ($lastPurchaseAtEnd && $lastIssueAtEnd) {
                     // Compare dates - if issue date is after purchase date, use issue balance
                     if ($lastIssueAtEnd->use_date > $lastPurchaseAtEnd->purchase_date) {
                         $closingStock = $lastIssueAtEnd->balance_after_issue ?? 0;
-                        $closingUnitPrice = $lastIssueAtEnd->rateLog->first()->unit_price ?? 0;
+                        $closingUnitPrice = $lastIssueAtEnd->rateLog->first()?->unit_price ?? 0;
                     }
                     // If dates are equal, issue happens after purchase, so use issue balance
                     elseif ($lastIssueAtEnd->use_date == $lastPurchaseAtEnd->purchase_date) {
                         $closingStock = $lastIssueAtEnd->balance_after_issue ?? 0;
-                        $closingUnitPrice = $lastIssueAtEnd->rateLog->first()->unit_price ?? 0;
+                        $closingUnitPrice = $lastIssueAtEnd->rateLog->first()?->unit_price ?? 0;
                     }
                     // If purchase date is after issue date, use purchase balance
                     else {
@@ -568,28 +605,27 @@ class ReportAPIController extends AppBaseController
                         $closingUnitPrice = $lastPurchaseAtEnd->unit_price ?? 0;
                     }
                 }
-                // Only issue exists
+                // Only issue exists up to end date
                 elseif ($lastIssueAtEnd) {
                     $closingStock = $lastIssueAtEnd->balance_after_issue ?? 0;
-                    $closingUnitPrice = $lastIssueAtEnd->rateLog->first()->unit_price ?? 0;
+                    $closingUnitPrice = $lastIssueAtEnd->rateLog->first()?->unit_price ?? 0;
                 }
-                // Only purchase exists
+                // Only purchase exists up to end date
                 elseif ($lastPurchaseAtEnd) {
                     $closingStock = ($lastPurchaseAtEnd->old_balance ?? 0) + ($lastPurchaseAtEnd->qty ?? 0);
                     $closingUnitPrice = $lastPurchaseAtEnd->unit_price ?? 0;
                 }
-                // No transactions found
+                // No transactions up to end date - use opening balance
                 else {
-                    $closingStock = max($option->stock, 0);
+                    $closingStock = $openingStock;
+                    $closingUnitPrice = $openingUnitPrice;
                 }
                 $closingValue = $closingStock * $closingUnitPrice;
 
-                // if($product->id == 2605){
-                //     dd($lastPurchaseAtEnd, $lastIssueAtEnd, $closingStock, $closingUnitPrice);
-                // }
+                // Add to report
                 $report[] = [
                     'product' => $productName,
-                    'unit' => $option->product?->unit,
+                    'unit' => $option->product?->unit ?? '',
                     'openingBalance' => round($openingStock, 2),
                     'rate' => round($openingUnitPrice, 2),
                     'openingValue' => round($openingValue, 2),
