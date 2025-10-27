@@ -97,24 +97,6 @@ const AppLayout = ({ header, children }) => {
                     console.log("Query Monitor:", event);
                 }
             );
-
-            // Join online presence channel
-            window.Echo.join("online")
-                .here((users) => {
-                    console.log("Users currently online:", users);
-                    dispatch(setAllOnline(users));
-                })
-                .joining((joiningUser) => {
-                    console.log("User joined:", joiningUser);
-                    dispatch(addNewOnline(joiningUser));
-                })
-                .leaving((leavingUser) => {
-                    console.log("User left:", leavingUser);
-                    dispatch(removeOnline(leavingUser));
-                })
-                .error((error) => {
-                    console.error("Presence channel error:", error);
-                });
         } catch (error) {
             console.error("Echo initialization failed:", error);
         }
@@ -123,7 +105,6 @@ const AppLayout = ({ header, children }) => {
         return () => {
             if (window.Echo) {
                 try {
-                    window.Echo.leave("online");
                     window.Echo.private("initial_requisition").stopListening(
                         "InitialRequisitionEvent"
                     );
@@ -139,6 +120,49 @@ const AppLayout = ({ header, children }) => {
             }
         };
     }, [user, echoInitialized, dispatch]);
+
+    // Join online presence channel (separate effect)
+    useEffect(() => {
+        if (!user?.id || !window.Echo) return;
+
+        console.log("Joining online presence channel for user:", user.name);
+
+        try {
+            // Join online presence channel
+            const presenceChannel = window.Echo.join("online")
+                .here((users) => {
+                    console.log("Users currently online:", users);
+                    dispatch(setAllOnline(users));
+                })
+                .joining((joiningUser) => {
+                    console.log("User joined:", joiningUser);
+                    dispatch(addNewOnline(joiningUser));
+                })
+                .leaving((leavingUser) => {
+                    console.log("User left:", leavingUser);
+                    dispatch(removeOnline(leavingUser));
+                })
+                .error((error) => {
+                    console.error("Presence channel error:", error);
+                });
+
+            console.log("Successfully joined presence channel");
+        } catch (error) {
+            console.error("Failed to join presence channel:", error);
+        }
+
+        // Cleanup function
+        return () => {
+            if (window.Echo) {
+                try {
+                    console.log("Leaving online presence channel");
+                    window.Echo.leave("online");
+                } catch (error) {
+                    console.error("Echo leave error:", error);
+                }
+            }
+        };
+    }, [user?.id, dispatch]);
 
     // Listen to user-specific requisition status updates
     useEffect(() => {
@@ -249,16 +273,16 @@ const AppLayout = ({ header, children }) => {
 
     return (
         <div
-            className={`before:content-[''] before:bg-noise relative sm:before:w-[100%] before:h-full before:block before:absolute before:opacity-20 shadow-lg`}
+            className={`before:content-[''] before:bg-noise relative sm:before:w-[100%] before:h-full before:block before:absolute before:opacity-20 shadow-lg overflow-x-hidden`}
         >
             <div
-                className="min-h-screen min-w-fit relative"
+                className="min-h-screen w-full relative overflow-x-hidden"
                 style={{ background: "rgb(67,129,216, .2)" }}
             >
                 <Navigation user={user} />
                 {/* Page Heading */}
-                <header className="bg-white shadow-md flex flex-row before:content-[''] before:bg-noise relative before:w-full before:h-full before:block before:absolute before:opacity-5">
-                    <div className="sm:max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <header className="bg-white shadow-md flex flex-row before:content-[''] before:bg-noise relative before:w-full before:h-full before:block before:absolute before:opacity-5 overflow-x-hidden">
+                    <div className="max-w-7xl w-full mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {header}
                     </div>
                     <OrganizationBranch
@@ -268,7 +292,7 @@ const AppLayout = ({ header, children }) => {
                 </header>
 
                 {/* Page Content */}
-                <main>
+                <main className="overflow-x-hidden w-full">
                     <Suspense fallback={<Loading />} children={children}>
                         {load ? <Loading /> : children}
                         <div className={`fixed bottom-2 right-5 h-fit w-fit`}>
