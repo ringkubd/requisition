@@ -488,16 +488,19 @@ class ReportAPIController extends AppBaseController
 
         // Eager load relationships with proper ordering
         $products = $productsQuery->with(['productOptions' => function ($q) {
-            $q->with(['purchaseHistory' => function ($p) {
-                $p->orderBy('purchase_date', 'desc')->orderBy('id', 'desc');
-            }, 'productApprovedIssue' => function ($s) {
-                $s->with('rateLog')->orderBy('use_date', 'desc');
-            }]);
+            $q->distinct() // Ensure distinct product options
+              ->with(['purchaseHistory' => function ($p) {
+                  $p->orderBy('purchase_date', 'desc')->orderBy('id', 'desc');
+              }, 'productApprovedIssue' => function ($s) {
+                  $s->with('rateLog')->orderBy('use_date', 'desc');
+              }]);
         }])
             ->orderBy('title', 'asc')
             ->get();
 
         $report = [];
+        $processedOptions = []; // Track processed option IDs to prevent duplicates
+        
         foreach ($products as $product) {
             $productOptions = $product->productOptions;
 
@@ -506,22 +509,19 @@ class ReportAPIController extends AppBaseController
                 continue;
             }
 
-            // Initialize product-level aggregates
-            $productName = $product->title;
-            $totalOpeningBalance = 0;
-            $totalOpeningValue = 0;
-            $totalInwards = 0;
-            $totalInwardsValue = 0;
-            $totalOutwards = 0;
-            $totalOutwardsValue = 0;
-            $totalClosingBalance = 0;
-            $totalClosingValue = 0;
-            $averageOpeningRate = 0;
-            $averageInwardsRate = 0;
-            $averageOutwardsRate = 0;
-            $averageClosingRate = 0;
-
             foreach ($productOptions as $option) {
+                // Skip if this option has already been processed (prevents duplicates)
+                if (in_array($option->id, $processedOptions)) {
+                    continue;
+                }
+                $processedOptions[] = $option->id;
+
+                // Product name as option/variant
+                $productName = $product->title;
+                if (isset($option->option_value) && $option->option_value !== 'NA' && $option->option_value !== 'N/A') {
+                    $productName .= ' - ' . $option->option_value;
+                }
+
                 // Ensure collections exist
                 $purchaseHistory = $option->purchaseHistory ?? collect([]);
                 $productApprovedIssue = $option->productApprovedIssue ?? collect([]);
@@ -631,40 +631,25 @@ class ReportAPIController extends AppBaseController
                 }
                 $closingValue = $closingStock * $closingUnitPrice;
 
-                // Add to product totals
-                $totalOpeningBalance += $openingStock;
-                $totalOpeningValue += $openingValue;
-                $totalInwards += $inwardQty;
-                $totalInwardsValue += $inwardValue;
-                $totalOutwards += $outwardQty;
-                $totalOutwardsValue += $outwardValue;
-                $totalClosingBalance += $closingStock;
-                $totalClosingValue += $closingValue;
+                // Add to report
+                $report[] = [
+                    'product' => $productName,
+                    'option_id' => $option->id, // Add option ID for debugging
+                    'unit' => $option->product?->unit ?? '',
+                    'openingBalance' => round($openingStock, 2),
+                    'rate' => round($openingUnitPrice, 2),
+                    'openingValue' => round($openingValue, 2),
+                    'inwards' => round($inwardQty, 2),
+                    'inwardsRate' => round($inwardRate, 2),
+                    'inwardsValue' => round($inwardValue, 2),
+                    'outwards' => round($outwardQty, 2),
+                    'outwardsRate' => round($outwardRate, 2),
+                    'outwardsValue' => round($outwardValue, 2),
+                    'closingBalance' => round($closingStock, 2),
+                    'closingRate' => round($closingUnitPrice, 2),
+                    'closingValue' => round($closingValue, 2),
+                ];
             }
-
-            // Calculate average rates for the product
-            $averageOpeningRate = $totalOpeningBalance > 0 ? ($totalOpeningValue / $totalOpeningBalance) : 0;
-            $averageInwardsRate = $totalInwards > 0 ? ($totalInwardsValue / $totalInwards) : 0;
-            $averageOutwardsRate = $totalOutwards > 0 ? ($totalOutwardsValue / $totalOutwards) : 0;
-            $averageClosingRate = $totalClosingBalance > 0 ? ($totalClosingValue / $totalClosingBalance) : 0;
-
-            // Add single entry per product to report
-            $report[] = [
-                'product' => $productName,
-                'unit' => $product->unit ?? '',
-                'openingBalance' => round($totalOpeningBalance, 2),
-                'rate' => round($averageOpeningRate, 2),
-                'openingValue' => round($totalOpeningValue, 2),
-                'inwards' => round($totalInwards, 2),
-                'inwardsRate' => round($averageInwardsRate, 2),
-                'inwardsValue' => round($totalInwardsValue, 2),
-                'outwards' => round($totalOutwards, 2),
-                'outwardsRate' => round($averageOutwardsRate, 2),
-                'outwardsValue' => round($totalOutwardsValue, 2),
-                'closingBalance' => round($totalClosingBalance, 2),
-                'closingRate' => round($averageClosingRate, 2),
-                'closingValue' => round($totalClosingValue, 2),
-            ];
         }
 
         return response()->json([
