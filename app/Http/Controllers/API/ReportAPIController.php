@@ -569,7 +569,7 @@ class ReportAPIController extends AppBaseController
                     return ($p->qty ?? 0) * ($p->unit_price ?? 0);
                 });
                 $inwardRate = $inwardQty > 0 ? ($inwardValue / $inwardQty) : 0;
-                
+
                 // Check if there are multiple purchase rates
                 $hasMultipleInwardRates = $inwardPurchases->pluck('unit_price')->unique()->count() > 1;
 
@@ -645,18 +645,18 @@ class ReportAPIController extends AppBaseController
                 // Check if there are multiple rates that could affect closing balance
                 $hasMultipleClosingRates = false;
                 $allRatesUpToEnd = collect([]);
-                
+
                 // Get all purchase rates up to end date
                 $purchasesUpToEnd = $purchaseHistory->where('purchase_date', '<=', $endDate);
                 $allRatesUpToEnd = $allRatesUpToEnd->merge($purchasesUpToEnd->pluck('unit_price'));
-                
+
                 // Get all issue rates up to end date (from rate logs)
                 $issuesUpToEnd = $productApprovedIssue->where('use_date', '<=', $endDate);
                 foreach ($issuesUpToEnd as $issue) {
                     $rateLogs = $issue->rateLog ?? collect([]);
                     $allRatesUpToEnd = $allRatesUpToEnd->merge($rateLogs->pluck('unit_price'));
                 }
-                
+
                 // Check if there are multiple unique rates
                 $hasMultipleClosingRates = $allRatesUpToEnd->unique()->count() > 1;
 
@@ -688,5 +688,306 @@ class ReportAPIController extends AppBaseController
             'end_date' => $endDate,
             'report' => $report
         ]);
+    }
+
+    /**
+     * Export historical data for ML training
+     * Provides time-series data of purchases, issues, and stock levels
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function exportMLData(Request $request): JsonResponse
+    {
+        $startDate = $request->start_date ?? Carbon::now()->subYears(2)->toDateString();
+        $endDate = $request->end_date ?? Carbon::now()->toDateString();
+        $categories = $request->category_id ? (is_array($request->category_id) ? $request->category_id : explode(',', $request->category_id)) : [];
+        $productIds = $request->product_id ? (is_array($request->product_id) ? $request->product_id : explode(',', $request->product_id)) : [];
+
+        // Build product query with filters
+        $productsQuery = Product::query();
+        if (!empty($categories)) {
+            $productsQuery->whereIn('category_id', $categories);
+        }
+        if (!empty($productIds)) {
+            $productsQuery->whereIn('id', $productIds);
+        }
+
+        $products = $productsQuery->with([
+            'productOptions.purchaseHistory' => function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('purchase_date', [$startDate, $endDate])
+                    ->orderBy('purchase_date', 'asc');
+            },
+            'productOptions.productApprovedIssue' => function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('use_date', [$startDate, $endDate])
+                    ->orderBy('use_date', 'asc')
+                    ->with('rateLog');
+            }
+        ])->get();
+
+        $mlData = [
+            'purchases' => [],
+            'issues' => [],
+            'monthly_aggregates' => []
+        ];
+
+        foreach ($products as $product) {
+            foreach ($product->productOptions as $option) {
+                $optionKey = $product->id . '_' . $option->id;
+                $productName = $product->title;
+                if ($option->option_value !== 'NA' && $option->option_value !== 'N/A') {
+                    $productName .= ' - ' . $option->option_value;
+                }
+
+                // Export purchase data
+                foreach ($option->purchaseHistory as $purchase) {
+                    $mlData['purchases'][] = [
+                        'product_id' => $product->id,
+                        'product_option_id' => $option->id,
+                        'product_name' => $productName,
+                        'category_id' => $product->category_id,
+                        'category_name' => $product->category?->title ?? '',
+                        'date' => $purchase->purchase_date,
+                        'quantity' => $purchase->qty,
+                        'unit_price' => $purchase->unit_price,
+                        'total_value' => $purchase->qty * $purchase->unit_price,
+                        'unit' => $product->unit,
+                        'year' => Carbon::parse($purchase->purchase_date)->year,
+                        'month' => Carbon::parse($purchase->purchase_date)->month,
+                        'day_of_week' => Carbon::parse($purchase->purchase_date)->dayOfWeek,
+                        'week_of_year' => Carbon::parse($purchase->purchase_date)->weekOfYear,
+                        'quarter' => Carbon::parse($purchase->purchase_date)->quarter,
+                    ];
+                }
+
+                // Export issue data
+                foreach ($option->productApprovedIssue as $issue) {
+                    $mlData['issues'][] = [
+                        'product_id' => $product->id,
+                        'product_option_id' => $option->id,
+                        'product_name' => $productName,
+                        'category_id' => $product->category_id,
+                        'category_name' => $product->category?->title ?? '',
+                        'date' => $issue->use_date,
+                        'quantity' => $issue->quantity,
+                        'balance_after' => $issue->balance_after_issue,
+                        'unit' => $product->unit,
+                        'year' => Carbon::parse($issue->use_date)->year,
+                        'month' => Carbon::parse($issue->use_date)->month,
+                        'day_of_week' => Carbon::parse($issue->use_date)->dayOfWeek,
+                        'week_of_year' => Carbon::parse($issue->use_date)->weekOfYear,
+                        'quarter' => Carbon::parse($issue->use_date)->quarter,
+                    ];
+                }
+            }
+        }
+
+        // Generate monthly aggregates for time-series analysis
+        $monthlyData = [];
+        $startMonth = Carbon::parse($startDate)->startOfMonth();
+        $endMonth = Carbon::parse($endDate)->endOfMonth();
+
+        foreach ($products as $product) {
+            foreach ($product->productOptions as $option) {
+                $currentMonth = $startMonth->copy();
+                
+                while ($currentMonth <= $endMonth) {
+                    $monthStart = $currentMonth->toDateString();
+                    $monthEnd = $currentMonth->copy()->endOfMonth()->toDateString();
+                    
+                    $monthlyPurchases = $option->purchaseHistory
+                        ->whereBetween('purchase_date', [$monthStart, $monthEnd]);
+                    $monthlyIssues = $option->productApprovedIssue
+                        ->whereBetween('use_date', [$monthStart, $monthEnd]);
+                    
+                    $purchaseQty = $monthlyPurchases->sum('qty');
+                    $issueQty = $monthlyIssues->sum('quantity');
+                    $purchaseValue = $monthlyPurchases->sum(function ($p) {
+                        return $p->qty * $p->unit_price;
+                    });
+                    
+                    $productName = $product->title;
+                    if ($option->option_value !== 'NA' && $option->option_value !== 'N/A') {
+                        $productName .= ' - ' . $option->option_value;
+                    }
+                    
+                    $monthlyData[] = [
+                        'product_id' => $product->id,
+                        'product_option_id' => $option->id,
+                        'product_name' => $productName,
+                        'category_id' => $product->category_id,
+                        'category_name' => $product->category?->title ?? '',
+                        'year_month' => $currentMonth->format('Y-m'),
+                        'year' => $currentMonth->year,
+                        'month' => $currentMonth->month,
+                        'quarter' => $currentMonth->quarter,
+                        'purchase_quantity' => $purchaseQty,
+                        'issue_quantity' => $issueQty,
+                        'purchase_value' => $purchaseValue,
+                        'net_change' => $purchaseQty - $issueQty,
+                        'unit' => $product->unit,
+                    ];
+                    
+                    $currentMonth->addMonth();
+                }
+            }
+        }
+
+        $mlData['monthly_aggregates'] = $monthlyData;
+
+        return response()->json([
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'data' => $mlData,
+            'record_counts' => [
+                'purchases' => count($mlData['purchases']),
+                'issues' => count($mlData['issues']),
+                'monthly_records' => count($mlData['monthly_aggregates']),
+            ]
+        ]);
+    }
+
+    /**
+     * Get forecast-ready data for a specific product
+     * Returns structured time-series data optimized for ML models
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getForecastData(Request $request): JsonResponse
+    {
+        $productId = $request->product_id;
+        $optionId = $request->product_option_id;
+        $startDate = $request->start_date ?? Carbon::now()->subYears(2)->toDateString();
+        $endDate = $request->end_date ?? Carbon::now()->toDateString();
+        $aggregation = $request->aggregation ?? 'monthly'; // daily, weekly, monthly
+
+        if (!$productId) {
+            return response()->json(['error' => 'product_id is required'], 400);
+        }
+
+        $product = Product::with([
+            'productOptions.purchaseHistory',
+            'productOptions.productApprovedIssue'
+        ])->find($productId);
+
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        $options = $optionId 
+            ? $product->productOptions->where('id', $optionId)
+            : $product->productOptions;
+
+        $timeSeriesData = [];
+
+        foreach ($options as $option) {
+            $purchases = $option->purchaseHistory
+                ->whereBetween('purchase_date', [$startDate, $endDate])
+                ->sortBy('purchase_date');
+            $issues = $option->productApprovedIssue
+                ->whereBetween('use_date', [$startDate, $endDate])
+                ->sortBy('use_date');
+
+            // Generate time series based on aggregation
+            $series = $this->aggregateTimeSeries(
+                $purchases,
+                $issues,
+                $startDate,
+                $endDate,
+                $aggregation
+            );
+
+            $productName = $product->title;
+            if ($option->option_value !== 'NA' && $option->option_value !== 'N/A') {
+                $productName .= ' - ' . $option->option_value;
+            }
+
+            $timeSeriesData[] = [
+                'product_id' => $product->id,
+                'product_option_id' => $option->id,
+                'product_name' => $productName,
+                'category' => $product->category?->title ?? '',
+                'unit' => $product->unit,
+                'current_stock' => $option->stock,
+                'aggregation' => $aggregation,
+                'time_series' => $series
+            ];
+        }
+
+        return response()->json([
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'forecast_data' => $timeSeriesData
+        ]);
+    }
+
+    /**
+     * Helper method to aggregate time series data
+     *
+     * @param $purchases
+     * @param $issues
+     * @param $startDate
+     * @param $endDate
+     * @param $aggregation
+     * @return array
+     */
+    private function aggregateTimeSeries($purchases, $issues, $startDate, $endDate, $aggregation): array
+    {
+        $series = [];
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+        $current = $start->copy();
+
+        while ($current <= $end) {
+            $periodStart = $current->copy();
+            $periodEnd = match ($aggregation) {
+                'daily' => $current->copy()->endOfDay(),
+                'weekly' => $current->copy()->endOfWeek(),
+                'monthly' => $current->copy()->endOfMonth(),
+                default => $current->copy()->endOfMonth(),
+            };
+
+            $periodPurchases = $purchases->filter(function ($p) use ($periodStart, $periodEnd) {
+                $date = Carbon::parse($p->purchase_date);
+                return $date >= $periodStart && $date <= $periodEnd;
+            });
+
+            $periodIssues = $issues->filter(function ($i) use ($periodStart, $periodEnd) {
+                $date = Carbon::parse($i->use_date);
+                return $date >= $periodStart && $date <= $periodEnd;
+            });
+
+            $purchaseQty = $periodPurchases->sum('qty');
+            $issueQty = $periodIssues->sum('quantity');
+            $purchaseValue = $periodPurchases->sum(function ($p) {
+                return $p->qty * $p->unit_price;
+            });
+
+            $series[] = [
+                'date' => $periodStart->toDateString(),
+                'year' => $periodStart->year,
+                'month' => $periodStart->month,
+                'week' => $periodStart->weekOfYear,
+                'day_of_week' => $periodStart->dayOfWeek,
+                'quarter' => $periodStart->quarter,
+                'purchase_qty' => $purchaseQty,
+                'issue_qty' => $issueQty,
+                'purchase_value' => round($purchaseValue, 2),
+                'net_change' => $purchaseQty - $issueQty,
+                'purchase_count' => $periodPurchases->count(),
+                'issue_count' => $periodIssues->count(),
+            ];
+
+            // Move to next period
+            match ($aggregation) {
+                'daily' => $current->addDay(),
+                'weekly' => $current->addWeek(),
+                'monthly' => $current->addMonth(),
+                default => $current->addMonth(),
+            };
+        }
+
+        return $series;
     }
 }

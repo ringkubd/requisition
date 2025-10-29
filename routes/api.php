@@ -182,6 +182,10 @@ Route::prefix('report')->group(function () {
     Route::get('product-current-balance', [\App\Http\Controllers\API\ReportAPIController::class, 'currentBalance']);
     Route::get('audit-report', [\App\Http\Controllers\API\ReportAPIController::class, 'auditReport']);
     //    Route::get('product-current-balance-option', [\App\Http\Controllers\API\ReportAPIController::class, 'currentBalanceOptionBase']);
+    
+    // ML/Forecasting endpoints
+    Route::get('ml-export', [\App\Http\Controllers\API\ReportAPIController::class, 'exportMLData']);
+    Route::get('forecast-data', [\App\Http\Controllers\API\ReportAPIController::class, 'getForecastData']);
 });
 
 Route::put('update_initial_status/{requisition}', [InitialRequisitionAPIController::class, 'changeStatusDepartment']);
