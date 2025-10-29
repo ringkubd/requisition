@@ -593,6 +593,9 @@ export default function ProductInOutReport() {
                                       )}`
                                     : `As of ${new Date().toLocaleDateString()}`}
                             </div>
+                            <div className="text-xs text-gray-500 mt-2 italic">
+                                <span className="text-red-600 font-bold">*</span> Indicates weighted average rate from multiple purchase batches
+                            </div>
                         </div>
 
                         {/* Data Table */}
@@ -855,6 +858,11 @@ export default function ProductInOutReport() {
                                                                     {
                                                                         row.outwardsRate
                                                                     }
+                                                                    {row.hasMultipleOutwardRates && (
+                                                                        <span className="text-red-600 font-bold ml-1" title="Weighted average of multiple purchase rates">
+                                                                            *
+                                                                        </span>
+                                                                    )}
                                                                 </td>
                                                             )}
                                                             {columns.value && (
