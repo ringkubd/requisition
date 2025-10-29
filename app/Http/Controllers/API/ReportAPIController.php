@@ -574,12 +574,28 @@ class ReportAPIController extends AppBaseController
                 $outwardIssues = $productApprovedIssue->where('use_date', '>=', $startDate)->where('use_date', '<=', $endDate);
                 $outwardQty = $outwardIssues->sum('quantity');
                 $outwardValue = 0;
+                $hasMultipleRates = false; // Track if there are multiple rates
+                
+                // Calculate total value by summing all rate logs for all issues
                 foreach ($outwardIssues as $issue) {
-                    $qty = $issue->quantity ?? 0;
-                    $rate = $issue->rateLog->first()?->unit_price ?? 0;
-                    $outwardValue += $qty * $rate;
+                    // Each issue can have multiple rate logs (different rates for different batches)
+                    $rateLogs = $issue->rateLog ?? collect([]);
+                    
+                    // Check if this issue has multiple rate logs with different rates
+                    if ($rateLogs->count() > 1) {
+                        $uniqueRates = $rateLogs->pluck('unit_price')->unique()->count();
+                        if ($uniqueRates > 1) {
+                            $hasMultipleRates = true;
+                        }
+                    }
+                    
+                    foreach ($rateLogs as $rateLog) {
+                        $qty = $rateLog->qty ?? 0;
+                        $rate = $rateLog->unit_price ?? 0;
+                        $outwardValue += $qty * $rate;
+                    }
                 }
-                // Weighted average rate
+                // Weighted average rate based on actual values from all rate logs
                 $outwardRate = $outwardQty > 0 ? ($outwardValue / $outwardQty) : 0;
 
                 // Closing balance: stock at endDate
@@ -636,6 +652,7 @@ class ReportAPIController extends AppBaseController
                     'outwards' => round($outwardQty, 2),
                     'outwardsRate' => round($outwardRate, 2),
                     'outwardsValue' => round($outwardValue, 2),
+                    'hasMultipleOutwardRates' => $hasMultipleRates, // Indicator for multiple rates
                     'closingBalance' => round($closingStock, 2),
                     'closingRate' => round($closingUnitPrice, 2),
                     'closingValue' => round($closingValue, 2),

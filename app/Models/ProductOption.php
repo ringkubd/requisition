@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 /**
  * @OA\Schema(
  *      schema="ProductOption",
@@ -56,7 +57,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *          format="date-time"
  *      )
  * )
- */class ProductOption extends BaseModel
+ */ class ProductOption extends BaseModel
 {
     use SoftDeletes;
     use HasFactory;
@@ -108,11 +109,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         return $this->hasMany(ProductIssueItems::class);
     }
 
-    public function productApprovedIssue(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function productApprovedIssue()
     {
         return $this->hasMany(ProductIssueItems::class)
             ->with('productIssue')
-            ->whereHas('productIssue', function ($q){
+            ->whereHas('productIssue', function ($q) {
                 $q->where('store_status', 1);
             })->latest('product_issue_items.created_at');
     }
