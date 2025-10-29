@@ -39,4 +39,10 @@ return [
         'webhook_verification_token' => env('WHATSAPP_WEBHOOK_VERIFICATION_TOKEN'),
     ],
 
+    // ML Forecasting Service
+    'ml' => [
+        'url' => env('ML_SERVICE_URL', 'http://localhost:8001'),
+        'timeout' => env('ML_SERVICE_TIMEOUT', 60),
+    ],
+
 ];

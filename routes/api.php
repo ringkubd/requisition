@@ -188,6 +188,16 @@ Route::prefix('report')->group(function () {
     Route::get('forecast-data', [\App\Http\Controllers\API\ReportAPIController::class, 'getForecastData']);
 });
 
+// ML Forecasting routes
+Route::prefix('ml')->group(function () {
+    Route::get('health', [\App\Http\Controllers\API\MLController::class, 'healthCheck']);
+    Route::post('train', [\App\Http\Controllers\API\MLController::class, 'trainModel']);
+    Route::post('forecast', [\App\Http\Controllers\API\MLController::class, 'getForecast']);
+    Route::get('models', [\App\Http\Controllers\API\MLController::class, 'listModels']);
+    Route::delete('models', [\App\Http\Controllers\API\MLController::class, 'deleteModel']);
+    Route::post('batch-train', [\App\Http\Controllers\API\MLController::class, 'batchTrain']);
+});
+
 Route::put('update_initial_status/{requisition}', [InitialRequisitionAPIController::class, 'changeStatusDepartment']);
 Route::put('update_purchase_status/{requisition}', [PurchaseRequisitionAPIController::class, 'changeStatusDepartment']);
 Route::put('update_cash_status/{requisition}', [\App\Http\Controllers\API\CashRequisitionAPIController::class, 'changeStatusDepartment']);
