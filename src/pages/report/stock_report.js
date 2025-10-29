@@ -33,6 +33,9 @@ export default function ProductInOutReport() {
         value: true,
     });
 
+    // Show asterisk for multiple rates
+    const [showMultipleRateIndicator, setShowMultipleRateIndicator] = useState(true);
+
     // Print orientation
     const [printOrientation, setPrintOrientation] = useState("landscape");
 
@@ -353,6 +356,20 @@ export default function ProductInOutReport() {
                                     <Label
                                         htmlFor="value"
                                         value="Value"
+                                        className="text-sm"
+                                    />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Checkbox
+                                        id="multipleRateIndicator"
+                                        checked={showMultipleRateIndicator}
+                                        onChange={(e) =>
+                                            setShowMultipleRateIndicator(e.target.checked)
+                                        }
+                                    />
+                                    <Label
+                                        htmlFor="multipleRateIndicator"
+                                        value="Show * for Multiple Rates"
                                         className="text-sm"
                                     />
                                 </div>
@@ -829,6 +846,14 @@ export default function ProductInOutReport() {
                                                                     {
                                                                         row.inwardsRate
                                                                     }
+                                                                    {row.hasMultipleInwardRates && showMultipleRateIndicator && (
+                                                                        <span
+                                                                            className="text-red-600 font-bold ml-1"
+                                                                            title="Weighted average of multiple purchase rates"
+                                                                        >
+                                                                            *
+                                                                        </span>
+                                                                    )}
                                                                 </td>
                                                             )}
                                                             {columns.value && (
@@ -855,7 +880,7 @@ export default function ProductInOutReport() {
                                                                     {
                                                                         row.outwardsRate
                                                                     }
-                                                                    {row.hasMultipleOutwardRates && (
+                                                                    {row.hasMultipleOutwardRates && showMultipleRateIndicator && (
                                                                         <span
                                                                             className="text-red-600 font-bold ml-1"
                                                                             title="Weighted average of multiple purchase rates"
@@ -889,6 +914,14 @@ export default function ProductInOutReport() {
                                                                     {
                                                                         row.closingRate
                                                                     }
+                                                                    {row.hasMultipleClosingRates && showMultipleRateIndicator && (
+                                                                        <span
+                                                                            className="text-red-600 font-bold ml-1"
+                                                                            title="Multiple transaction rates affected this closing balance"
+                                                                        >
+                                                                            *
+                                                                        </span>
+                                                                    )}
                                                                 </td>
                                                             )}
                                                             {columns.value && (
@@ -1279,10 +1312,10 @@ export default function ProductInOutReport() {
                         ) : null}
 
                         {/* Footer Note - Only show if rate column is enabled and there's data */}
-                        {data.length > 0 && columns.rate && (
+                        {data.length > 0 && columns.rate && showMultipleRateIndicator && (
                             <div className="mt-6 text-center">
                                 <div className="text-xs text-gray-500 italic">
-                                    <span className="text-red-600 font-bold">*</span> Indicates weighted average rate from multiple purchase batches
+                                    <span className="text-red-600 font-bold">*</span> Indicates rates calculated from multiple purchase/issue batches
                                 </div>
                             </div>
                         )}
