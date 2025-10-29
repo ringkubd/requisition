@@ -492,7 +492,7 @@ class ReportAPIController extends AppBaseController
                 $p->orderBy('purchase_date', 'desc')->orderBy('id', 'desc');
             }, 'productApprovedIssue' => function ($s) {
                 $s->with('rateLog')->orderBy('use_date', 'desc');
-            }]);
+            }])->orderBy('option_value', 'asc');
         }])
             ->orderBy('title', 'asc')
             // ->where('id', 1594)
