@@ -483,24 +483,22 @@ class ReportAPIController extends AppBaseController
 
         $productsQuery = Product::query();
         if (!empty($categories)) {
-            $productsQuery->whereIn('category_id', $categories)->withoutGlobalScopes();
+            $productsQuery->whereIn('category_id', $categories);
         }
 
         // Eager load relationships with proper ordering
         $products = $productsQuery->with(['productOptions' => function ($q) {
-            $q->distinct() // Ensure distinct product options
-              ->with(['purchaseHistory' => function ($p) {
-                  $p->orderBy('purchase_date', 'desc')->orderBy('id', 'desc');
-              }, 'productApprovedIssue' => function ($s) {
-                  $s->with('rateLog')->orderBy('use_date', 'desc');
-              }]);
+            $q->with(['purchaseHistory' => function ($p) {
+                $p->orderBy('purchase_date', 'desc')->orderBy('id', 'desc');
+            }, 'productApprovedIssue' => function ($s) {
+                $s->with('rateLog')->orderBy('use_date', 'desc');
+            }]);
         }])
             ->orderBy('title', 'asc')
+            // ->where('id', 1594)
             ->get();
 
         $report = [];
-        $processedOptions = []; // Track processed option IDs to prevent duplicates
-        
         foreach ($products as $product) {
             $productOptions = $product->productOptions;
 
@@ -510,12 +508,6 @@ class ReportAPIController extends AppBaseController
             }
 
             foreach ($productOptions as $option) {
-                // Skip if this option has already been processed (prevents duplicates)
-                if (in_array($option->id, $processedOptions)) {
-                    continue;
-                }
-                $processedOptions[] = $option->id;
-
                 // Product name as option/variant
                 $productName = $product->title;
                 if (isset($option->option_value) && $option->option_value !== 'NA' && $option->option_value !== 'N/A') {
@@ -634,7 +626,6 @@ class ReportAPIController extends AppBaseController
                 // Add to report
                 $report[] = [
                     'product' => $productName,
-                    'option_id' => $option->id, // Add option ID for debugging
                     'unit' => $option->product?->unit ?? '',
                     'openingBalance' => round($openingStock, 2),
                     'rate' => round($openingUnitPrice, 2),
