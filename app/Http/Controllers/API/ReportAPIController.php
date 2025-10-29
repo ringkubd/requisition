@@ -569,18 +569,21 @@ class ReportAPIController extends AppBaseController
                     return ($p->qty ?? 0) * ($p->unit_price ?? 0);
                 });
                 $inwardRate = $inwardQty > 0 ? ($inwardValue / $inwardQty) : 0;
+                
+                // Check if there are multiple purchase rates
+                $hasMultipleInwardRates = $inwardPurchases->pluck('unit_price')->unique()->count() > 1;
 
                 // Outwards: issues between startDate and endDate
                 $outwardIssues = $productApprovedIssue->where('use_date', '>=', $startDate)->where('use_date', '<=', $endDate);
                 $outwardQty = $outwardIssues->sum('quantity');
                 $outwardValue = 0;
                 $hasMultipleRates = false; // Track if there are multiple rates
-                
+
                 // Calculate total value by summing all rate logs for all issues
                 foreach ($outwardIssues as $issue) {
                     // Each issue can have multiple rate logs (different rates for different batches)
                     $rateLogs = $issue->rateLog ?? collect([]);
-                    
+
                     // Check if this issue has multiple rate logs with different rates
                     if ($rateLogs->count() > 1) {
                         $uniqueRates = $rateLogs->pluck('unit_price')->unique()->count();
@@ -588,7 +591,7 @@ class ReportAPIController extends AppBaseController
                             $hasMultipleRates = true;
                         }
                     }
-                    
+
                     foreach ($rateLogs as $rateLog) {
                         $qty = $rateLog->qty ?? 0;
                         $rate = $rateLog->unit_price ?? 0;
@@ -639,6 +642,24 @@ class ReportAPIController extends AppBaseController
                 }
                 $closingValue = $closingStock * $closingUnitPrice;
 
+                // Check if there are multiple rates that could affect closing balance
+                $hasMultipleClosingRates = false;
+                $allRatesUpToEnd = collect([]);
+                
+                // Get all purchase rates up to end date
+                $purchasesUpToEnd = $purchaseHistory->where('purchase_date', '<=', $endDate);
+                $allRatesUpToEnd = $allRatesUpToEnd->merge($purchasesUpToEnd->pluck('unit_price'));
+                
+                // Get all issue rates up to end date (from rate logs)
+                $issuesUpToEnd = $productApprovedIssue->where('use_date', '<=', $endDate);
+                foreach ($issuesUpToEnd as $issue) {
+                    $rateLogs = $issue->rateLog ?? collect([]);
+                    $allRatesUpToEnd = $allRatesUpToEnd->merge($rateLogs->pluck('unit_price'));
+                }
+                
+                // Check if there are multiple unique rates
+                $hasMultipleClosingRates = $allRatesUpToEnd->unique()->count() > 1;
+
                 // Add to report
                 $report[] = [
                     'product' => $productName,
@@ -649,6 +670,7 @@ class ReportAPIController extends AppBaseController
                     'inwards' => round($inwardQty, 2),
                     'inwardsRate' => round($inwardRate, 2),
                     'inwardsValue' => round($inwardValue, 2),
+                    'hasMultipleInwardRates' => $hasMultipleInwardRates,
                     'outwards' => round($outwardQty, 2),
                     'outwardsRate' => round($outwardRate, 2),
                     'outwardsValue' => round($outwardValue, 2),
@@ -656,6 +678,7 @@ class ReportAPIController extends AppBaseController
                     'closingBalance' => round($closingStock, 2),
                     'closingRate' => round($closingUnitPrice, 2),
                     'closingValue' => round($closingValue, 2),
+                    'hasMultipleClosingRates' => $hasMultipleClosingRates,
                 ];
             }
         }
