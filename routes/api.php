@@ -182,7 +182,7 @@ Route::prefix('report')->group(function () {
     Route::get('product-current-balance', [\App\Http\Controllers\API\ReportAPIController::class, 'currentBalance']);
     Route::get('audit-report', [\App\Http\Controllers\API\ReportAPIController::class, 'auditReport']);
     //    Route::get('product-current-balance-option', [\App\Http\Controllers\API\ReportAPIController::class, 'currentBalanceOptionBase']);
-    
+
     // ML/Forecasting endpoints
     Route::get('ml-export', [\App\Http\Controllers\API\ReportAPIController::class, 'exportMLData']);
     Route::get('forecast-data', [\App\Http\Controllers\API\ReportAPIController::class, 'getForecastData']);
@@ -196,6 +196,19 @@ Route::prefix('ml')->group(function () {
     Route::get('models', [\App\Http\Controllers\API\MLController::class, 'listModels']);
     Route::delete('models', [\App\Http\Controllers\API\MLController::class, 'deleteModel']);
     Route::post('batch-train', [\App\Http\Controllers\API\MLController::class, 'batchTrain']);
+
+    // Category-wise operations
+    Route::post('train-category', [\App\Http\Controllers\API\MLController::class, 'trainCategory']);
+    Route::post('train-category-async', [\App\Http\Controllers\API\MLController::class, 'trainCategoryAsync']);
+    Route::post('forecast-category', [\App\Http\Controllers\API\MLController::class, 'forecastCategory']);
+
+    // All products operations
+    Route::post('train-all', [\App\Http\Controllers\API\MLController::class, 'trainAll']);
+    Route::post('train-all-async', [\App\Http\Controllers\API\MLController::class, 'trainAllAsync']);
+    Route::post('forecast-all', [\App\Http\Controllers\API\MLController::class, 'forecastAll']);
+
+    // Job tracking/progress
+    Route::get('training-status/{jobId}', [\App\Http\Controllers\API\MLController::class, 'getTrainingStatus']);
 });
 
 Route::put('update_initial_status/{requisition}', [InitialRequisitionAPIController::class, 'changeStatusDepartment']);

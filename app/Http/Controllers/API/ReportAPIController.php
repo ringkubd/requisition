@@ -544,8 +544,22 @@ class ReportAPIController extends AppBaseController
                 }
                 // Only issue exists before start date
                 elseif ($lastIssueBefore) {
+                    // If issue exists before start date, use its balance_after_issue
                     $openingStock = $lastIssueBefore->balance_after_issue ?? 0;
                     $openingUnitPrice = $lastIssueBefore->rateLog->first()?->unit_price ?? 0;
+                    
+                    // But we also need to add back any subsequent issues before start date (if balance is not being tracked correctly)
+                    // to get accurate opening balance
+                    $issuesBeforeStart = $productApprovedIssue->where('use_date', '<', $startDate);
+                    if ($issuesBeforeStart->count() > 1) {
+                        // Get the earliest issue to find opening before any issues
+                        $firstIssue = $issuesBeforeStart->sortBy('use_date')->first();
+                        if ($firstIssue) {
+                            // Opening = first issue's old_balance + first issue's quantity + subsequent changes
+                            // This is handled by balance_after_issue in the last issue
+                            $openingStock = $lastIssueBefore->balance_after_issue ?? 0;
+                        }
+                    }
                 }
                 // Only purchase exists before start date
                 elseif ($lastPurchaseBefore) {
@@ -625,13 +639,14 @@ class ReportAPIController extends AppBaseController
                         $closingUnitPrice = $lastPurchaseAtEnd->unit_price ?? 0;
                     }
                 }
-                // Only issue exists up to end date
-                elseif ($lastIssueAtEnd) {
+                // Only issue exists up to end date (NO PURCHASE)
+                elseif ($lastIssueAtEnd && !$lastPurchaseAtEnd) {
+                    // Use the balance_after_issue from the last issue
                     $closingStock = $lastIssueAtEnd->balance_after_issue ?? 0;
                     $closingUnitPrice = $lastIssueAtEnd->rateLog->first()?->unit_price ?? 0;
                 }
-                // Only purchase exists up to end date
-                elseif ($lastPurchaseAtEnd) {
+                // Only purchase exists up to end date (NO ISSUE)
+                elseif ($lastPurchaseAtEnd && !$lastIssueAtEnd) {
                     $closingStock = ($lastPurchaseAtEnd->old_balance ?? 0) + ($lastPurchaseAtEnd->qty ?? 0);
                     $closingUnitPrice = $lastPurchaseAtEnd->unit_price ?? 0;
                 }
@@ -790,27 +805,27 @@ class ReportAPIController extends AppBaseController
         foreach ($products as $product) {
             foreach ($product->productOptions as $option) {
                 $currentMonth = $startMonth->copy();
-                
+
                 while ($currentMonth <= $endMonth) {
                     $monthStart = $currentMonth->toDateString();
                     $monthEnd = $currentMonth->copy()->endOfMonth()->toDateString();
-                    
+
                     $monthlyPurchases = $option->purchaseHistory
                         ->whereBetween('purchase_date', [$monthStart, $monthEnd]);
                     $monthlyIssues = $option->productApprovedIssue
                         ->whereBetween('use_date', [$monthStart, $monthEnd]);
-                    
+
                     $purchaseQty = $monthlyPurchases->sum('qty');
                     $issueQty = $monthlyIssues->sum('quantity');
                     $purchaseValue = $monthlyPurchases->sum(function ($p) {
                         return $p->qty * $p->unit_price;
                     });
-                    
+
                     $productName = $product->title;
                     if ($option->option_value !== 'NA' && $option->option_value !== 'N/A') {
                         $productName .= ' - ' . $option->option_value;
                     }
-                    
+
                     $monthlyData[] = [
                         'product_id' => $product->id,
                         'product_option_id' => $option->id,
@@ -827,7 +842,7 @@ class ReportAPIController extends AppBaseController
                         'net_change' => $purchaseQty - $issueQty,
                         'unit' => $product->unit,
                     ];
-                    
+
                     $currentMonth->addMonth();
                 }
             }
@@ -867,15 +882,23 @@ class ReportAPIController extends AppBaseController
         }
 
         $product = Product::with([
-            'productOptions.purchaseHistory',
-            'productOptions.productApprovedIssue'
-        ])->find($productId);
+            'productOptions.purchaseHistory'
+        ])->withoutGlobalScope('branch_organization')->find($productId);
 
         if (!$product) {
             return response()->json(['error' => 'Product not found'], 404);
         }
 
-        $options = $optionId 
+        // Load issue data separately since the relationship might not work due to global scopes
+        $productOptionIds = $product->productOptions->pluck('id')->toArray();
+        $allIssues = \App\Models\ProductIssueItems::withTrashed()
+            ->with('productIssue')
+            ->whereIn('product_option_id', $productOptionIds)
+            ->orderBy('use_date', 'asc')
+            ->get()
+            ->groupBy('product_option_id');
+
+        $options = $optionId
             ? $product->productOptions->where('id', $optionId)
             : $product->productOptions;
 
@@ -885,9 +908,9 @@ class ReportAPIController extends AppBaseController
             $purchases = $option->purchaseHistory
                 ->whereBetween('purchase_date', [$startDate, $endDate])
                 ->sortBy('purchase_date');
-            $issues = $option->productApprovedIssue
-                ->whereBetween('use_date', [$startDate, $endDate])
-                ->sortBy('use_date');
+            $issues = isset($allIssues[$option->id])
+                ? $allIssues[$option->id]->whereBetween('use_date', [$startDate, $endDate])
+                : collect();
 
             // Generate time series based on aggregation
             $series = $this->aggregateTimeSeries(
@@ -937,7 +960,14 @@ class ReportAPIController extends AppBaseController
         $series = [];
         $start = Carbon::parse($startDate);
         $end = Carbon::parse($endDate);
-        $current = $start->copy();
+
+        // For monthly aggregation, start from the beginning of the month
+        if ($aggregation === 'monthly') {
+            $start = $start->copy()->startOfMonth();
+            $current = $start->copy();
+        } else {
+            $current = $start->copy();
+        }
 
         while ($current <= $end) {
             $periodStart = $current->copy();
