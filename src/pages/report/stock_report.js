@@ -34,7 +34,9 @@ export default function ProductInOutReport() {
     });
 
     // Show asterisk for multiple rates
-    const [showMultipleRateIndicator, setShowMultipleRateIndicator] = useState(true);
+    const [showMultipleRateIndicator, setShowMultipleRateIndicator] = useState(
+        true
+    );
 
     // Print orientation
     const [printOrientation, setPrintOrientation] = useState("landscape");
@@ -364,7 +366,9 @@ export default function ProductInOutReport() {
                                         id="multipleRateIndicator"
                                         checked={showMultipleRateIndicator}
                                         onChange={(e) =>
-                                            setShowMultipleRateIndicator(e.target.checked)
+                                            setShowMultipleRateIndicator(
+                                                e.target.checked
+                                            )
                                         }
                                     />
                                     <Label
@@ -846,14 +850,15 @@ export default function ProductInOutReport() {
                                                                     {
                                                                         row.inwardsRate
                                                                     }
-                                                                    {row.hasMultipleInwardRates && showMultipleRateIndicator && (
-                                                                        <span
-                                                                            className="text-red-600 font-bold ml-1"
-                                                                            title="Weighted average of multiple purchase rates"
-                                                                        >
-                                                                            *
-                                                                        </span>
-                                                                    )}
+                                                                    {row.hasMultipleInwardRates &&
+                                                                        showMultipleRateIndicator && (
+                                                                            <span
+                                                                                className="text-red-600 font-bold ml-1"
+                                                                                title="Weighted average of multiple purchase rates"
+                                                                            >
+                                                                                *
+                                                                            </span>
+                                                                        )}
                                                                 </td>
                                                             )}
                                                             {columns.value && (
@@ -880,14 +885,15 @@ export default function ProductInOutReport() {
                                                                     {
                                                                         row.outwardsRate
                                                                     }
-                                                                    {row.hasMultipleOutwardRates && showMultipleRateIndicator && (
-                                                                        <span
-                                                                            className="text-red-600 font-bold ml-1"
-                                                                            title="Weighted average of multiple purchase rates"
-                                                                        >
-                                                                            *
-                                                                        </span>
-                                                                    )}
+                                                                    {row.hasMultipleOutwardRates &&
+                                                                        showMultipleRateIndicator && (
+                                                                            <span
+                                                                                className="text-red-600 font-bold ml-1"
+                                                                                title="Weighted average of multiple purchase rates"
+                                                                            >
+                                                                                *
+                                                                            </span>
+                                                                        )}
                                                                 </td>
                                                             )}
                                                             {columns.value && (
@@ -914,14 +920,15 @@ export default function ProductInOutReport() {
                                                                     {
                                                                         row.closingRate
                                                                     }
-                                                                    {row.hasMultipleClosingRates && showMultipleRateIndicator && (
-                                                                        <span
-                                                                            className="text-red-600 font-bold ml-1"
-                                                                            title="Multiple transaction rates affected this closing balance"
-                                                                        >
-                                                                            *
-                                                                        </span>
-                                                                    )}
+                                                                    {row.hasMultipleClosingRates &&
+                                                                        showMultipleRateIndicator && (
+                                                                            <span
+                                                                                className="text-red-600 font-bold ml-1"
+                                                                                title="Multiple transaction rates affected this closing balance"
+                                                                            >
+                                                                                *
+                                                                            </span>
+                                                                        )}
                                                                 </td>
                                                             )}
                                                             {columns.value && (
@@ -1312,13 +1319,19 @@ export default function ProductInOutReport() {
                         ) : null}
 
                         {/* Footer Note - Only show if rate column is enabled and there's data */}
-                        {data.length > 0 && columns.rate && showMultipleRateIndicator && (
-                            <div className="mt-6 text-center">
-                                <div className="text-xs text-gray-500 italic">
-                                    <span className="text-red-600 font-bold">*</span> Indicates rates calculated from multiple purchase/issue batches
+                        {data.length > 0 &&
+                            columns.rate &&
+                            showMultipleRateIndicator && (
+                                <div className="mt-6 text-center">
+                                    <div className="text-xs text-gray-500 italic">
+                                        <span className="text-red-600 font-bold">
+                                            *
+                                        </span>{" "}
+                                        Indicates rates calculated from multiple
+                                        purchase/issue batches
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
                     </div>
                 </Card>
 
