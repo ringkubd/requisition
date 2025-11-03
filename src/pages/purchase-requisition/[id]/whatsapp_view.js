@@ -70,13 +70,13 @@ export default function WhatsappView(props) {
             <Head>
                 <title>Purchase Requisition</title>
             </Head>
-            <div className="dark:bg-gray-100 md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="dark:bg-gray-100 md:py-8 md:mx-16 mx-auto px-2 sm:px-4 lg:px-8">
                 <Card className="min-h-screen shadow-none dark:bg-gray-100">
-                    <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
+                    <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 gap-2 md:gap-4 border-b-2 shadow-lg p-2 md:p-4 rounded">
                         <Button onClick={() => router.push('/dashboard')}>
                             Back
                         </Button>
-                        <div className={`pt-1`}>
+                        <div className={`pt-0 md:pt-1`}>
                             <Button
                                 onClick={handlePrint}
                                 gradientDuoTone="purpleToBlue"
@@ -102,7 +102,7 @@ export default function WhatsappView(props) {
                             ) : null}
                         </div>
                     </div>
-                    <div className={`mx-auto shadow-none`}>
+                    <div className={`mx-auto shadow-none overflow-x-auto`}>
                         <RequisitionPrintWhatsApp
                             requisition_products={requisition_products}
                             mainData={mainData}

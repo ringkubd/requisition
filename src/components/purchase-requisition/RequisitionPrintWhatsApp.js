@@ -1,58 +1,61 @@
-import React, { forwardRef, useEffect, useRef, useState } from 'react'
-import moment from 'moment/moment'
-import number2wordEnglish from 'number2english_word'
-import './RequisitionPrint.module.css'
-import Image from 'next/image'
+import React, { forwardRef, useEffect, useRef, useState } from "react";
+import moment from "moment/moment";
+import number2wordEnglish from "number2english_word";
+import "./RequisitionPrint.module.css";
+import Image from "next/image";
 
 const RequisitionPrintWhatsApp = forwardRef(
     ({ mainData, requisition_products }, ref) => {
-        const accountsCopy = useRef()
-        const requisitorCopy = useRef()
-        const hrRef = useRef()
-        const [rejected, setRejected] = useState(false)
+        const accountsCopy = useRef();
+        const requisitorCopy = useRef();
+        const hrRef = useRef();
+        const [rejected, setRejected] = useState(false);
 
         useEffect(() => {
-            const accountsCopyHeight = accountsCopy.current.offsetHeight
-            const requisitorCopyHeight = requisitorCopy.current.offsetHeight
-            const totalHeight = accountsCopyHeight + requisitorCopyHeight
+            const accountsCopyHeight = accountsCopy.current.offsetHeight;
+            const requisitorCopyHeight = requisitorCopy.current.offsetHeight;
+            const totalHeight = accountsCopyHeight + requisitorCopyHeight;
 
             if (totalHeight > 1000) {
-                accountsCopy.current.classList.add('break-after-page')
-                requisitorCopy.current.classList.add('mt-4')
-                hrRef.current?.classList?.add('hidden')
+                accountsCopy.current.classList.add("break-after-page");
+                requisitorCopy.current.classList.add("mt-4");
+                hrRef.current?.classList?.add("hidden");
             } else {
-                accountsCopy.current.classList.remove('break-after-page')
-                hrRef.current?.classList?.remove('hidden')
+                accountsCopy.current.classList.remove("break-after-page");
+                hrRef.current?.classList?.remove("hidden");
             }
-        })
+        });
         useEffect(() => {
-            if (mainData?.purchase_current_status?.status === 'Rejected') {
-                setRejected(true)
+            if (mainData?.purchase_current_status?.status === "Rejected") {
+                setRejected(true);
             }
-            if (mainData?.current_status?.status === 'Rejected') {
-                setRejected(true)
+            if (mainData?.current_status?.status === "Rejected") {
+                setRejected(true);
             }
-        }, [mainData])
+        }, [mainData]);
 
         return (
             <div
                 className={`flex flex-col w-full m-2 justify-center justify-items-center p-4 shadow-none dark:bg-white print:m-0 print:p-4`}
-                ref={ref}>
+                ref={ref}
+            >
                 {rejected ? (
                     <Image
-                        src={require('../../../public/rejected.png')}
+                        src={require("../../../public/rejected.png")}
                         alt={`rejected`}
                         className={`absolute opacity-5 top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 print:opacity-5 print:top-[50%] print:left-[35%]`}
                     />
                 ) : (
-                    ''
+                    ""
                 )}
                 <div
-                    className={`flex flex-col w-full justify-center justify-items-center shadow-none printBody`}>
+                    className={`flex flex-col w-full justify-center justify-items-center shadow-none printBody`}
+                >
                     {/*Header*/}
                     <div
                         className={`flex flex-col shadow-none`}
-                        ref={accountsCopy}>
+                        ref={accountsCopy}
+                    >
                         <div className={`text-center font-bold`}>
                             <h2>
                                 IsDB-Bangladesh Islamic Solidarity Educational
@@ -60,32 +63,39 @@ const RequisitionPrintWhatsApp = forwardRef(
                             </h2>
                         </div>
                         <div
-                            className={`flex justify-center items-center justify-items-center text-center`}>
+                            className={`flex justify-center items-center justify-items-center text-center`}
+                        >
                             <p
-                                className={`py-1 px-4 underline bg-gray-300 w-fit`}>
+                                className={`py-1 px-4 underline bg-gray-300 w-fit`}
+                            >
                                 Purchase Requisition Form
                             </p>
                         </div>
                         <div
-                            className={`flex justify-center items-center justify-items-center text-center`}>
+                            className={`flex justify-center items-center justify-items-center text-center`}
+                        >
                             <i
-                                className={`px-4 w-fit font-extralight font-serif`}>
+                                className={`px-4 w-fit font-extralight font-serif`}
+                            >
                                 (Account's Copy)
                             </i>
                         </div>
                         <div
-                            className={`flex flex-row items-stretch justify-between my-2 w-full`}>
+                            className={`flex flex-row items-stretch justify-between my-2 w-full`}
+                        >
                             <div
-                                className={`flex flex-row w-full justify-start`}>
+                                className={`flex flex-row w-full justify-start`}
+                            >
                                 <i className={`pr-4`}>Date: </i>
                                 <p className={`underline`}>
                                     {moment(mainData?.created_at).format(
-                                        'DD-MMM-Y',
+                                        "DD-MMM-Y"
                                     )}
                                 </p>
                             </div>
                             <div
-                                className={`flex flex-row w-full justify-center`}>
+                                className={`flex flex-row w-full justify-center`}
+                            >
                                 <i className={`pr-2`}>I.R. NO. </i>
                                 <p className={`underline`}>
                                     {mainData?.irf_no}
@@ -100,167 +110,194 @@ const RequisitionPrintWhatsApp = forwardRef(
                         </div>
                         <div className={`flex flex-col text-sm shadow-none`}>
                             <div>
-                                Please arrange estimated Tk.{' '}
+                                Please arrange estimated Tk.{" "}
                                 <strong
-                                    className={`underline font-bold italic`}>
+                                    className={`underline font-bold italic`}
+                                >
                                     {Math.round(
-                                        mainData?.estimated_total_amount,
+                                        mainData?.estimated_total_amount
                                     ).toLocaleString()}
                                     /-
-                                </strong>{' '}
-                                (In Words){' '}
+                                </strong>{" "}
+                                (In Words){" "}
                                 <strong
-                                    className={`underline font-bold italic`}>
+                                    className={`underline font-bold italic`}
+                                >
                                     {mainData?.estimated_total_amount === 0
-                                        ? 'Zero'
+                                        ? "Zero"
                                         : number2wordEnglish(
-                                            Math.round(
-                                                mainData?.estimated_total_amount,
-                                            ).toString() ?? 0,
-                                        )}
-
-                                </strong>{' '}
+                                              Math.round(
+                                                  mainData?.estimated_total_amount
+                                              ).toString() ?? 0
+                                          )}
+                                </strong>{" "}
                                 for purchase of the following:
                             </div>
                             <div className="relative overflow-x-auto">
                                 <table
-                                    className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
+                                    className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}
+                                >
                                     <thead
-                                        className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
+                                        className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}
+                                    >
                                         <tr>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                            >
                                                 Sl.#
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 normal-case`}
+                                            >
                                                 Name of the Item
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-24 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-24 normal-case`}
+                                            >
                                                 Last Purchase Date
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 normal-case`}
+                                            >
                                                 Unit
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                            >
                                                 Available Quantity
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                            >
                                                 Required Quantity
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                            >
                                                 Qty to be Purchase
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                            >
                                                 Unit Price
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 normal-case text-justify`}>
+                                                className={`border bg-white leading-3 p-1 normal-case text-justify`}
+                                            >
                                                 Purpose
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-8 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-8 normal-case`}
+                                            >
                                                 Estimated Cost
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody
-                                        className={`shadow-none text-gray-800`}>
+                                        className={`shadow-none text-gray-800`}
+                                    >
                                         {requisition_products?.map(
                                             (rp, index) => (
                                                 <tr
                                                     className={`border text-center bg-white`}
-                                                    key={index}>
+                                                    key={index}
+                                                >
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {index + 1}
                                                     </td>
                                                     <td
-                                                        className={`border p-0 text-left`}>
-                                                        {rp.title}{' '}
+                                                        className={`border p-0 text-left`}
+                                                    >
+                                                        {rp.title}{" "}
                                                         {rp?.product_option?.option_name?.includes(
-                                                            'N/A',
+                                                            "N/A"
                                                         ) ||
                                                         rp?.product_option?.option_value?.includes(
-                                                            'NA',
+                                                            "NA"
                                                         )
                                                             ? null
                                                             : `- ${rp?.product_option?.option_value}`}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {rp.last_purchase_date
                                                             ? moment(
-                                                                  rp.last_purchase_date,
+                                                                  rp.last_purchase_date
                                                               ).format(
-                                                                  'DD-MMM-YY',
+                                                                  "DD-MMM-YY"
                                                               )
-                                                            : ''}
+                                                            : ""}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {rp.product?.unit}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {rp.available_quantity}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {rp.required_quantity}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {
                                                             rp.quantity_to_be_purchase
                                                         }
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {rp.unit_price.toLocaleString()}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {rp.purpose}
                                                     </td>
                                                     <td
-                                                        className={`border p-0 text-right`}>
+                                                        className={`border p-0 text-right`}
+                                                    >
                                                         {Math.round(
                                                             parseFloat(
                                                                 rp.unit_price *
-                                                                    rp.quantity_to_be_purchase,
-                                                            ),
+                                                                    rp.quantity_to_be_purchase
+                                                            )
                                                         ).toLocaleString()}
                                                     </td>
                                                 </tr>
-                                            ),
+                                            )
                                         )}
                                         <tr>
                                             <th
                                                 colSpan={9}
-                                                className={`border py-0 px-2 text-right bg-white`}>
-                                                Total:{' '}
+                                                className={`border py-0 px-2 text-right bg-white`}
+                                            >
+                                                Total:{" "}
                                             </th>
                                             <td
-                                                className={`border py-0 text-right font-bold`}>
+                                                className={`border py-0 text-right font-bold`}
+                                            >
                                                 {Math.round(
-                                                    mainData?.estimated_total_amount,
+                                                    mainData?.estimated_total_amount
                                                 ).toLocaleString()}
                                             </td>
                                         </tr>
@@ -271,16 +308,19 @@ const RequisitionPrintWhatsApp = forwardRef(
                             {/*Table Two*/}
                             <div className="relative overflow-x-auto">
                                 <table
-                                    className={`w-full text-left text-xs shadow-none`}>
+                                    className={`w-full text-left text-xs shadow-none`}
+                                >
                                     <tbody className={`shadow-none`}>
                                         <tr>
                                             <td className={`border px-2 py-2`}>
                                                 <div
-                                                    className={`flex flex-col w-full`}>
+                                                    className={`flex flex-col w-full`}
+                                                >
                                                     <div
-                                                        className={`flex flex-row items-center w-full`}>
-                                                        Requisitioned by{' '}
-                                                        <div className={'ml-1'}>
+                                                        className={`flex flex-row items-center w-full`}
+                                                    >
+                                                        Requisitioned by{" "}
+                                                        <div className={"ml-1"}>
                                                             <div>
                                                                 {
                                                                     mainData
@@ -289,14 +329,15 @@ const RequisitionPrintWhatsApp = forwardRef(
                                                                 }
                                                             </div>
                                                             <div
-                                                                className={`underline w-full`}>
+                                                                className={`underline w-full`}
+                                                            >
                                                                 {mainData?.created_at
                                                                     ? moment(
-                                                                          mainData?.created_at,
+                                                                          mainData?.created_at
                                                                       ).format(
-                                                                          'hh:mm A - DD MMM Y',
+                                                                          "hh:mm A - DD MMM Y"
                                                                       )
-                                                                    : ''}
+                                                                    : ""}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -307,15 +348,19 @@ const RequisitionPrintWhatsApp = forwardRef(
                                                     {/*        className={`min-w-max border-b border-black w-full`}></div>*/}
                                                     {/*</div>*/}
                                                     <div
-                                                        className={`flex flex-row my-4  items-center`}>
+                                                        className={`flex flex-row my-4  items-center`}
+                                                    >
                                                         <div
-                                                            className={`min-w-fit`}>
+                                                            className={`min-w-fit`}
+                                                        >
                                                             Section Head
                                                         </div>
                                                         <div
-                                                            className={`border-b border-black w-full flex flex-col`}>
+                                                            className={`border-b border-black w-full flex flex-col`}
+                                                        >
                                                             <span
-                                                                className={`ml-2`}>
+                                                                className={`ml-2`}
+                                                            >
                                                                 {mainData
                                                                     ?.approval_status
                                                                     ?.department_approved_at
@@ -323,28 +368,29 @@ const RequisitionPrintWhatsApp = forwardRef(
                                                                           ?.approval_status
                                                                           ?.departmentApprovedBy
                                                                           ?.name
-                                                                    : ''}
+                                                                    : ""}
                                                             </span>
                                                             <span
-                                                                className={`ml-2`}>
+                                                                className={`ml-2`}
+                                                            >
                                                                 {mainData
                                                                     ?.approval_status
                                                                     ?.department_approved_at
                                                                     ? moment(
                                                                           mainData
                                                                               ?.approval_status
-                                                                              ?.department_approved_at,
+                                                                              ?.department_approved_at
                                                                       ).format(
-                                                                          'hh:mm A - DD MMM Y',
+                                                                          "hh:mm A - DD MMM Y"
                                                                       )
-                                                                    : ''}
+                                                                    : ""}
                                                             </span>
                                                         </div>
                                                     </div>
                                                     <div className={`mt-4`}>
                                                         <input
                                                             type="checkbox"
-                                                            className={'mx-4'}
+                                                            className={"mx-4"}
                                                         />
                                                         <label>
                                                             Urgent Nature
@@ -353,11 +399,14 @@ const RequisitionPrintWhatsApp = forwardRef(
                                                 </div>
                                             </td>
                                             <td
-                                                className={`border text-xs px-2`}>
+                                                className={`border text-xs px-2`}
+                                            >
                                                 <div
-                                                    className={`flex flex-col`}>
+                                                    className={`flex flex-col`}
+                                                >
                                                     <div
-                                                        className={`flex flex-row justify-between`}>
+                                                        className={`flex flex-row justify-between`}
+                                                    >
                                                         <div>
                                                             <input
                                                                 type="checkbox"
@@ -402,9 +451,11 @@ const RequisitionPrintWhatsApp = forwardRef(
                                                         </div>
                                                     </div>
                                                     <div
-                                                        className={`flex flex-row my-4`}>
+                                                        className={`flex flex-row my-4`}
+                                                    >
                                                         <div
-                                                            className={`w-5/12 mr-0 pr-0`}>
+                                                            className={`w-5/12 mr-0 pr-0`}
+                                                        >
                                                             <input
                                                                 type="checkbox"
                                                                 className={`form-checkbox mr-2`}
@@ -419,7 +470,8 @@ const RequisitionPrintWhatsApp = forwardRef(
                                                             </label>
                                                         </div>
                                                         <div
-                                                            className={`flex flex-row ml-0 pl-0`}>
+                                                            className={`flex flex-row ml-0 pl-0`}
+                                                        >
                                                             <div className={``}>
                                                                 <input
                                                                     type="checkbox"
@@ -436,21 +488,26 @@ const RequisitionPrintWhatsApp = forwardRef(
                                                                 on
                                                             </div>
                                                             <div
-                                                                className={`border-b border-black ml-0 pl-0 w-20`}></div>
+                                                                className={`border-b border-black ml-0 pl-0 w-20`}
+                                                            ></div>
                                                         </div>
                                                     </div>
                                                     <div
-                                                        className={`flex flex-col`}>
+                                                        className={`flex flex-col`}
+                                                    >
                                                         <div
-                                                            className={`flex flex-row my-4 items-center`}>
+                                                            className={`flex flex-row my-4 items-center`}
+                                                        >
                                                             <div>
                                                                 Accounts Officer
                                                             </div>
 
                                                             <div
-                                                                className={`w-1/2 border-b border-black flex flex-col`}>
+                                                                className={`w-1/2 border-b border-black flex flex-col`}
+                                                            >
                                                                 <span
-                                                                    className={`ml-2`}>
+                                                                    className={`ml-2`}
+                                                                >
                                                                     {mainData
                                                                         ?.approval_status
                                                                         ?.accounts_approved_at
@@ -458,26 +515,28 @@ const RequisitionPrintWhatsApp = forwardRef(
                                                                               ?.approval_status
                                                                               ?.accountsApprovedBy
                                                                               ?.name
-                                                                        : ''}
+                                                                        : ""}
                                                                 </span>
                                                                 <span
-                                                                    className={`ml-2`}>
+                                                                    className={`ml-2`}
+                                                                >
                                                                     {mainData
                                                                         ?.approval_status
                                                                         ?.accounts_approved_at
                                                                         ? moment(
                                                                               mainData
                                                                                   ?.approval_status
-                                                                                  ?.accounts_approved_at,
+                                                                                  ?.accounts_approved_at
                                                                           ).format(
-                                                                              'hh:mm A - DD MMM Y',
+                                                                              "hh:mm A - DD MMM Y"
                                                                           )
-                                                                        : ''}
+                                                                        : ""}
                                                                 </span>
                                                             </div>
                                                         </div>
                                                         <div
-                                                            className={`text-center`}>
+                                                            className={`text-center`}
+                                                        >
                                                             [Requisitor to
                                                             initiate follow-up
                                                             action]
@@ -487,38 +546,44 @@ const RequisitionPrintWhatsApp = forwardRef(
                                             </td>
                                             <td className={`border px-2`}>
                                                 <div
-                                                    className={`flex flex-col justify-items-between items-baseline justify-between min-h-full h-36`}>
+                                                    className={`flex flex-col justify-items-between items-baseline justify-between min-h-full h-36`}
+                                                >
                                                     <div
-                                                        className={`text-center w-full`}>
+                                                        className={`text-center w-full`}
+                                                    >
                                                         Approved for payment
                                                     </div>
                                                     <div
-                                                        className={`w-full flex flex-col`}>
+                                                        className={`w-full flex flex-col`}
+                                                    >
                                                         <span
-                                                            className={`ml-2`}>
+                                                            className={`ml-2`}
+                                                        >
                                                             {mainData
                                                                 ?.approval_status
                                                                 ?.ceo_approved_at
-                                                                ? 'Neaz Khan'
-                                                                : ''}
+                                                                ? "Neaz Khan"
+                                                                : ""}
                                                         </span>
                                                         <span
-                                                            className={`ml-2`}>
+                                                            className={`ml-2`}
+                                                        >
                                                             {mainData
                                                                 ?.approval_status
                                                                 ?.ceo_approved_at
                                                                 ? moment(
                                                                       mainData
                                                                           ?.approval_status
-                                                                          ?.ceo_approved_at,
+                                                                          ?.ceo_approved_at
                                                                   ).format(
-                                                                      'hh:mm A - DD MMM Y',
+                                                                      "hh:mm A - DD MMM Y"
                                                                   )
-                                                                : ''}
+                                                                : ""}
                                                         </span>
                                                     </div>
                                                     <div
-                                                        className={`text-center border-t border-black w-full`}>
+                                                        className={`text-center border-t border-black w-full`}
+                                                    >
                                                         Chief Executive Officer
                                                     </div>
                                                 </div>
@@ -531,17 +596,20 @@ const RequisitionPrintWhatsApp = forwardRef(
                                 <div className={`flex flex-row w-1/4 text-sm`}>
                                     <div>Received Tk.</div>
                                     <div
-                                        className={`border-b border-black w-24`}></div>
+                                        className={`border-b border-black w-24`}
+                                    ></div>
                                 </div>
                                 <div className={`flex flex-row w-2/4 text-sm`}>
                                     <div>Name</div>
                                     <div
-                                        className={`border-b border-black w-80`}></div>
+                                        className={`border-b border-black w-80`}
+                                    ></div>
                                 </div>
                                 <div className={`flex flex-row w-1/4 text-sm`}>
                                     <div>Signature</div>
                                     <div
-                                        className={`border-b border-black w-32`}></div>
+                                        className={`border-b border-black w-32`}
+                                    ></div>
                                 </div>
                             </div>
                             <div className={`flex flex-row`}>
@@ -550,12 +618,14 @@ const RequisitionPrintWhatsApp = forwardRef(
                                         Authorized Signature (Accounts Dept.)
                                     </div>
                                     <div
-                                        className={`border-b border-black w-80`}></div>
+                                        className={`border-b border-black w-80`}
+                                    ></div>
                                 </div>
                                 <div className={`flex flex-row w-1/4 text-sm`}>
                                     <div>Date</div>
                                     <div
-                                        className={`border-b border-black w-40`}></div>
+                                        className={`border-b border-black w-40`}
+                                    ></div>
                                 </div>
                             </div>
                         </div>
@@ -567,29 +637,36 @@ const RequisitionPrintWhatsApp = forwardRef(
                     />
                     <div
                         className={`flex flex-col shadow-none`}
-                        ref={requisitorCopy}>
+                        ref={requisitorCopy}
+                    >
                         <div
-                            className={`flex justify-center items-center justify-items-center text-center`}>
+                            className={`flex justify-center items-center justify-items-center text-center`}
+                        >
                             <h2
-                                className={`py-1 px-4 underline bg-gray-300 w-fit`}>
+                                className={`py-1 px-4 underline bg-gray-300 w-fit`}
+                            >
                                 Purchase Requisition Form
                             </h2>
                         </div>
                         <div
-                            className={`flex justify-center items-center justify-items-center text-center`}>
+                            className={`flex justify-center items-center justify-items-center text-center`}
+                        >
                             <i
-                                className={`py-1 px-4 w-fit font-extralight font-serif`}>
+                                className={`py-1 px-4 w-fit font-extralight font-serif`}
+                            >
                                 (Requisitor's Copy)
                             </i>
                         </div>
                         <div
-                            className={`flex flex-row items-stretch justify-between mt-2 w-full`}>
+                            className={`flex flex-row items-stretch justify-between mt-2 w-full`}
+                        >
                             <div
-                                className={`flex flex-row w-full justify-start`}>
+                                className={`flex flex-row w-full justify-start`}
+                            >
                                 <i className={`pr-2`}>Date: </i>
                                 <p className={`underline`}>
                                     {moment(mainData?.created_at).format(
-                                        'DD-MMM-Y',
+                                        "DD-MMM-Y"
                                     )}
                                 </p>
                             </div>
@@ -598,7 +675,8 @@ const RequisitionPrintWhatsApp = forwardRef(
                                 <p className={`border-b border-black w-20`}></p>
                             </div>
                             <div
-                                className={`flex flex-row w-full justify-center`}>
+                                className={`flex flex-row w-full justify-center`}
+                            >
                                 <i className={`pr-2`}>I.R. NO. </i>
                                 <p className={`underline`}>
                                     {mainData?.irf_no}
@@ -614,141 +692,167 @@ const RequisitionPrintWhatsApp = forwardRef(
                         <div className={`flex flex-col text-sm shadow-none`}>
                             <div className="relative overflow-x-auto">
                                 <table
-                                    className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
+                                    className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}
+                                >
                                     <thead
-                                        className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
+                                        className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}
+                                    >
                                         <tr>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                            >
                                                 Sl.#
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 normal-case`}
+                                            >
                                                 Name of the Item
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-24 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-24 normal-case`}
+                                            >
                                                 Last Purchase Date
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 normal-case`}
+                                            >
                                                 Unit
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                            >
                                                 Available Quantity
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                            >
                                                 Required Quantity
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                            >
                                                 Qty to be Purchase
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                            >
                                                 Unit Price
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 normal-case`}
+                                            >
                                                 Purpose
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-8 normal-case`}>
+                                                className={`border bg-white leading-3 p-1 w-8 normal-case`}
+                                            >
                                                 Estimated Cost
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody
-                                        className={`shadow-none text-gray-800`}>
+                                        className={`shadow-none text-gray-800`}
+                                    >
                                         {requisition_products?.map(
                                             (rp, index) => (
                                                 <tr
                                                     className={`border text-center bg-white`}
-                                                    key={index}>
+                                                    key={index}
+                                                >
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {index + 1}
                                                     </td>
                                                     <td
-                                                        className={`border p-0 text-left`}>
-                                                        {rp.title}{' '}
+                                                        className={`border p-0 text-left`}
+                                                    >
+                                                        {rp.title}{" "}
                                                         {rp?.product_option?.option_name?.includes(
-                                                            'N/A',
+                                                            "N/A"
                                                         ) ||
                                                         rp?.product_option?.option_value?.includes(
-                                                            'NA',
+                                                            "NA"
                                                         )
                                                             ? null
                                                             : `- ${rp?.product_option?.option_value}`}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {rp.last_purchase_date
                                                             ? moment(
-                                                                  rp.last_purchase_date,
+                                                                  rp.last_purchase_date
                                                               ).format(
-                                                                  'DD-MMM-YY',
+                                                                  "DD-MMM-YY"
                                                               )
-                                                            : ''}
+                                                            : ""}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {rp.product?.unit}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {rp.available_quantity}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {rp.required_quantity}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {
                                                             rp.quantity_to_be_purchase
                                                         }
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}>
+                                                        className={`border p-0`}
+                                                    >
                                                         {rp.unit_price.toLocaleString()}
                                                     </td>
                                                     <td
-                                                        className={`border p-0 text-justify`}>
+                                                        className={`border p-0 text-justify`}
+                                                    >
                                                         {rp.purpose}
                                                     </td>
                                                     <td
-                                                        className={`border p-0 text-right`}>
+                                                        className={`border p-0 text-right`}
+                                                    >
                                                         {parseFloat(
                                                             rp.unit_price *
-                                                                rp.quantity_to_be_purchase,
+                                                                rp.quantity_to_be_purchase
                                                         ).toLocaleString()}
                                                     </td>
                                                 </tr>
-                                            ),
+                                            )
                                         )}
                                         <tr>
                                             <th
                                                 colSpan={9}
-                                                className={`border py-0 px-2 text-right bg-white`}>
-                                                Total:{' '}
+                                                className={`border py-0 px-2 text-right bg-white`}
+                                            >
+                                                Total:{" "}
                                             </th>
                                             <td
-                                                className={`border py-0 text-right font-bold`}>
+                                                className={`border py-0 text-right font-bold`}
+                                            >
                                                 {Math.round(
-                                                    mainData?.estimated_total_amount,
+                                                    mainData?.estimated_total_amount
                                                 ).toLocaleString()}
                                             </td>
                                         </tr>
@@ -759,7 +863,7 @@ const RequisitionPrintWhatsApp = forwardRef(
                     </div>
                 </div>
             </div>
-        )
-    },
-)
-export default RequisitionPrintWhatsApp
+        );
+    }
+);
+export default RequisitionPrintWhatsApp;
