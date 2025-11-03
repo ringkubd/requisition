@@ -110,7 +110,7 @@ export default function WhatsappView(props) {
                             ) : null}
                         </div>
                     </div>
-                    <div className="w-full overflow-x-auto">
+                    <div className="w-full overflow-x-auto p-0 m-0">
                         <RequisitionPrintWhatsApp
                             requisition_products={requisition_products}
                             mainData={mainData}

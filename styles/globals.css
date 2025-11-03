@@ -393,11 +393,17 @@ a{
         -webkit-overflow-scrolling: touch;
         width: 100%;
         display: block;
+        justify-content: flex-start !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 
     .printBody > div {
         min-width: 900px;
         display: block;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 0 !important;
     }
 
     /* Ensure smooth scrolling on all mobile browsers */
@@ -409,6 +415,19 @@ a{
     .dark\:bg-gray-100 .w-full.overflow-x-auto {
         padding: 0 !important;
         margin: 0 !important;
+        position: relative;
+        left: 0;
+    }
+
+    /* Ensure tables start from left edge */
+    .printBody table {
+        margin-left: 0 !important;
+    }
+
+    /* Override any Card component padding on mobile */
+    .min-h-screen.shadow-none.dark\:bg-gray-100 {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 }
 
