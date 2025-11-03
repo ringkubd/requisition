@@ -37,7 +37,7 @@ const RequisitionPrintWhatsApp = forwardRef(
 
         return (
             <div
-                className={`flex flex-col w-full m-0 md:m-2 justify-center justify-items-center p-0 md:p-4 shadow-none print:m-0 print:p-4`}
+                className={`flex flex-col w-full m-0 md:m-2 justify-center justify-items-center p-0 md:p-4 shadow-none print:m-2 print:p-4`}
                 ref={ref}>
                 {rejected ? (
                     <Image
@@ -48,7 +48,7 @@ const RequisitionPrintWhatsApp = forwardRef(
                 ) : (
                     ''
                 )}
-                <div className={`flex flex-col w-full justify-start md:justify-center justify-items-start md:justify-items-center shadow-none printBody`}>
+                <div className={`flex flex-col w-full justify-start md:justify-center justify-items-start md:justify-items-center shadow-none printBody print:justify-center print:justify-items-center`}>
                     <div className={`w-full`}>
                 {/*Header*/}
                 <div className={`flex flex-col shadow-none`} ref={accountsCopy}>
