@@ -440,4 +440,15 @@ a{
     .printBody > div {
         min-width: auto !important;
     }
+
+    /* Page break support */
+    .break-after-page {
+        page-break-after: always;
+        break-after: page;
+    }
+
+    /* Hide the hr when page break is active */
+    hr.hidden {
+        display: none !important;
+    }
 }
