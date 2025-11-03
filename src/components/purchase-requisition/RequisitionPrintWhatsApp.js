@@ -36,7 +36,7 @@ const RequisitionPrintWhatsApp = forwardRef(
 
         return (
             <div
-                className={`flex flex-col w-full m-2 justify-center justify-items-center p-4 shadow-none dark:bg-white print:m-0 print:p-4`}
+                className={`flex flex-col w-full m-0 md:m-2 justify-center justify-items-center p-0 md:p-4 shadow-none dark:bg-white print:m-0 print:p-4`}
                 ref={ref}
             >
                 {rejected ? (
