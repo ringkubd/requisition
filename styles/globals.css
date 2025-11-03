@@ -392,10 +392,17 @@ a{
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch;
         width: 100%;
+        display: block;
     }
 
     .printBody > div {
         min-width: 900px;
+        display: block;
+    }
+
+    /* Ensure smooth scrolling on all mobile browsers */
+    body {
+        overflow-x: hidden;
     }
 }
 
