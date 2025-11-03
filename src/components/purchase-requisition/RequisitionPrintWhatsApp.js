@@ -2,7 +2,6 @@ import React, { forwardRef, useEffect, useRef, useState } from 'react'
 import moment from 'moment/moment'
 import number2wordEnglish from 'number2english_word'
 import './RequisitionPrint.module.css'
-import './RequisitionPrintResponsive.css'
 import Image from 'next/image'
 
 const RequisitionPrintWhatsApp = forwardRef(
