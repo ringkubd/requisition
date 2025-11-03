@@ -404,6 +404,12 @@ a{
     body {
         overflow-x: hidden;
     }
+
+    /* Remove all padding/margin on mobile for WhatsApp view */
+    .dark\:bg-gray-100 .w-full.overflow-x-auto {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 }
 
 /* Print styles - ensure normal layout when printing */
