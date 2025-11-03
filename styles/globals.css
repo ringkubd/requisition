@@ -385,101 +385,27 @@ a{
     @apply text-violet-500
 }
 
-/* Mobile responsive styles for RequisitionPrintWhatsApp - MOBILE ONLY */
+/* Mobile responsive styles for RequisitionPrintWhatsApp */
+/* Simple horizontal scroll for small devices - NO layout changes */
 @media screen and (max-width: 768px) {
-    /* Make the print container scrollable on mobile */
     .printBody {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch;
         width: 100%;
-        padding: 0.5rem;
     }
 
-    /* Scale down entire content for mobile viewing */
     .printBody > div {
-        min-width: 800px;
-        transform-origin: top left;
-        transform: scale(0.85);
-    }
-
-    /* Ensure tables are scrollable */
-    .printBody table {
-        width: 100% !important;
-        font-size: 0.7rem !important;
-    }
-
-    .printBody th,
-    .printBody td {
-        font-size: 0.65rem !important;
-        padding: 0.25rem !important;
-        white-space: normal !important;
-    }
-
-    /* Adjust text sizes for mobile */
-    .printBody h2 {
-        font-size: 1rem !important;
-    }
-
-    .printBody p,
-    .printBody i,
-    .printBody div {
-        font-size: 0.75rem !important;
-    }
-
-    /* Make input checkboxes visible on mobile */
-    .printBody input[type="checkbox"] {
-        width: 12px !important;
-        height: 12px !important;
+        min-width: 900px;
     }
 }
 
-/* Tablet responsive styles - TABLET ONLY */
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-    .printBody {
-        padding: 1rem;
-    }
-
-    .printBody table {
-        font-size: 0.85rem !important;
-    }
-
-    .printBody th,
-    .printBody td {
-        font-size: 0.8rem !important;
-        padding: 0.4rem !important;
-    }
-}
-
-/* Print styles - disable all responsive modifications when printing */
+/* Print styles - ensure normal layout when printing */
 @media print {
     .printBody {
         overflow: visible !important;
-        padding: 0 !important;
     }
 
     .printBody > div {
         min-width: auto !important;
-        transform: none !important;
-    }
-
-    .printBody table {
-        display: table !important;
-        overflow: visible !important;
-        font-size: inherit !important;
-        width: 100% !important;
-    }
-
-    .printBody th,
-    .printBody td {
-        padding: 0.5rem !important;
-        font-size: inherit !important;
-        white-space: normal !important;
-    }
-
-    .printBody h2,
-    .printBody p,
-    .printBody i,
-    .printBody div {
-        font-size: inherit !important;
     }
 }
