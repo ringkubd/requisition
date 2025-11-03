@@ -49,7 +49,7 @@ const RequisitionPrintWhatsApp = forwardRef(
                     ""
                 )}
                 <div
-                    className={`flex flex-col w-full justify-center justify-items-center shadow-none printBody`}
+                    className={`flex flex-col w-full justify-start md:justify-center justify-items-start md:justify-items-center shadow-none printBody`}
                 >
                     {/*Header*/}
                     <div
