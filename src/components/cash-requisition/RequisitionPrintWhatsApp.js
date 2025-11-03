@@ -49,6 +49,7 @@ const RequisitionPrintWhatsApp = forwardRef(
                     ''
                 )}
                 <div className={`flex flex-col w-full justify-start md:justify-center justify-items-start md:justify-items-center shadow-none printBody`}>
+                    <div className={`w-full`}>
                 {/*Header*/}
                 <div className={`flex flex-col shadow-none`} ref={accountsCopy}>
                     <div className={`text-center font-bold`}>
@@ -601,6 +602,7 @@ const RequisitionPrintWhatsApp = forwardRef(
                         </div>
                     </div>
                 </div>
+                    </div>
                 </div>
             </div>
         )
