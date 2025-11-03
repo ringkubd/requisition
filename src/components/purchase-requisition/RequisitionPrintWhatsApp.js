@@ -36,13 +36,13 @@ const RequisitionPrintWhatsApp = forwardRef(
 
         return (
             <div
-                className={`flex flex-col w-full m-2 justify-center justify-items-center p-4 shadow-none dark:bg-white`}
+                className={`flex flex-col w-full m-2 justify-center justify-items-center p-4 shadow-none dark:bg-white print:m-0 print:p-4`}
                 ref={ref}>
                 {rejected ? (
                     <Image
                         src={require('../../../public/rejected.png')}
                         alt={`rejected`}
-                        className={`absolute opacity-5 top-[50%] left-[35%]`}
+                        className={`absolute opacity-5 top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 print:opacity-5 print:top-[50%] print:left-[35%]`}
                     />
                 ) : (
                     ''
