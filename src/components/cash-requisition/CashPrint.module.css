@@ -13,6 +13,18 @@
     .drop-shadow-md {
         @apply shadow-none;
     }
+
+    /* Page break after first section */
+    .break-after-page {
+        page-break-after: always !important;
+        break-after: page !important;
+    }
+
+    /* Hide hr when there's a page break */
+    hr.hidden {
+        display: none !important;
+        visibility: hidden !important;
+    }
 }
 .shadow-md,
 .shadow-sm,
@@ -27,4 +39,9 @@
 }
 .drop-shadow-md {
     @apply shadow-none;
+}
+
+@page {
+    margin-top: 50cm;
+    margin-bottom: 50cm;
 }
