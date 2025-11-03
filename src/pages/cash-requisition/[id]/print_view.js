@@ -42,16 +42,20 @@ const PrintView = props => {
             }>
             <Head>
                 <title>Cash Requisition</title>
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+                />
             </Head>
-            <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
-                <Card className="min-h-screen">
-                    <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
+            <div className="py-0 md:py-8 px-0 md:mx-16 mx-0">
+                <Card className="min-h-screen shadow-none rounded-none md:rounded-lg p-0 md:p-6">
+                    <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 gap-2 md:gap-4 border-b-2 shadow-lg p-2 md:p-4 rounded-none md:rounded mb-0">
                         <Button
                             onClick={() => router.back()}
                             gradientDuoTone="purpleToBlue">
                             Back
                         </Button>
-                        <div className={`pt-1`}>
+                        <div className={`pt-0 md:pt-1`}>
                             <Button
                                 onClick={handlePrint}
                                 gradientDuoTone="purpleToBlue"
@@ -59,7 +63,7 @@ const PrintView = props => {
                                 Print
                             </Button>
                         </div>
-                        <div className={`flex flex-row items-center`}>
+                        <div className={`flex flex-row items-center w-full md:w-auto`}>
                             {mainData ? (
                                 <Status
                                     type={`cash`}
@@ -78,7 +82,7 @@ const PrintView = props => {
                         </div>
                     </div>
 
-                    <div className={`mx-auto shadow-none`}>
+                    <div className="w-full overflow-x-auto p-0 m-0">
                         {!isLoading && !isError && data ? (
                             <CashPrint
                                 mainData={mainData}
