@@ -19,11 +19,10 @@ const RequisitionPrintWhatsApp = forwardRef(
             if (totalHeight > 1000) {
                 accountsCopy.current.classList.add('break-after-page')
                 requisitorCopy.current.classList.add('mt-4')
-                if (hrRef.current) {
-                    hrRef.current.style.display = 'none'
-                }
+                hrRef.current?.classList?.add('hidden')
             } else {
                 accountsCopy.current.classList.remove('break-after-page')
+                hrRef.current?.classList?.remove('hidden')
             }
         })
 
@@ -38,17 +37,18 @@ const RequisitionPrintWhatsApp = forwardRef(
 
         return (
             <div
-                className={`flex flex-col w-[21cm] m-2 justify-center justify-items-center p-4 shadow-none`}
+                className={`flex flex-col w-full m-0 md:m-2 justify-center justify-items-center p-0 md:p-4 shadow-none print:m-0 print:p-4`}
                 ref={ref}>
                 {rejected ? (
                     <Image
                         src={require('../../../public/rejected.png')}
                         alt={`rejected`}
-                        className={`absolute opacity-5 top-[50%] left-[35%]`}
+                        className={`absolute opacity-5 top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 print:opacity-5 print:top-[50%] print:left-[35%]`}
                     />
                 ) : (
                     ''
                 )}
+                <div className={`flex flex-col w-full justify-start md:justify-center justify-items-start md:justify-items-center shadow-none printBody`}>
                 {/*Header*/}
                 <div className={`flex flex-col shadow-none`} ref={accountsCopy}>
                     <div className={`text-center font-bold`}>
@@ -600,6 +600,7 @@ const RequisitionPrintWhatsApp = forwardRef(
                             </table>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
         )
