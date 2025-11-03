@@ -31,14 +31,15 @@ const View = () => {
                 <Head>
                     <title>Purchase Management.</title>
                 </Head>
-                <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
+                <div className="md:py-8 md:mx-16 mx-0 px-2 md:px-4 sm:px-6 lg:px-8">
                     <Card>
-                        <div className="flex flex-row space-x-4 space-y-4  shadow-lg py-4 px-4">
+                        <div className="flex flex-row space-x-4 shadow-lg py-2 md:py-4 px-2 md:px-4">
                             <Button onClick={() => router.back()}>Back</Button>
                         </div>
                         {item && isSuccess ? (
-                            <Table>
-                                <Table.Head>
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <Table.Head>
                                     <Table.HeadCell>Label</Table.HeadCell>
                                     <Table.HeadCell>Value</Table.HeadCell>
                                 </Table.Head>
@@ -144,6 +145,7 @@ const View = () => {
                                     </Table.Row>
                                 </Table.Body>
                             </Table>
+                            </div>
                         ) : (
                             'Data loading....'
                         )}
