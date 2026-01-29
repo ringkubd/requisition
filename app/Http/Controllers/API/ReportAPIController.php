@@ -543,10 +543,10 @@ class ReportAPIController extends AppBaseController
                         $purchasesAfterLastIssue = $purchaseHistory
                             ->where('purchase_date', '>', $lastIssueBefore->use_date)
                             ->where('purchase_date', '<', $startDate);
-                        
+
                         // Opening stock = balance after last issue + subsequent purchases
                         $openingStock = ($lastIssueBefore->balance_after_issue ?? 0) + $purchasesAfterLastIssue->sum('qty');
-                        
+
                         // Calculate weighted average rate
                         if ($openingStock > 0) {
                             $lastIssueValue = ($lastIssueBefore->balance_after_issue ?? 0) * ($lastIssueBefore->rateLog->first()?->unit_price ?? 0);
@@ -583,7 +583,7 @@ class ReportAPIController extends AppBaseController
                     // Calculate total stock from all purchases before start date
                     $purchasesBeforeStart = $purchaseHistory->where('purchase_date', '<', $startDate);
                     $openingStock = $purchasesBeforeStart->sum('qty');
-                    
+
                     // Calculate weighted average rate for opening stock
                     $totalValue = $purchasesBeforeStart->sum(function ($p) {
                         return ($p->qty ?? 0) * ($p->unit_price ?? 0);
@@ -642,28 +642,28 @@ class ReportAPIController extends AppBaseController
                 // Closing balance: Use mathematical formula (Opening + Inwards - Outwards)
                 // This is the most accurate method as it accounts for all stock movements
                 $closingStock = $openingStock + $inwardQty - $outwardQty;
-                
+
                 // Determine closing rate using weighted average based on available stock
                 $closingUnitPrice = 0;
-                
+
                 // Calculate weighted average rate based on opening balance + purchases - issues
                 if ($closingStock > 0) {
                     // Start with opening balance value
                     $totalValue = $openingValue;
-                    
+
                     // Add value of all purchases in the period
                     $totalValue += $inwardValue;
-                    
+
                     // Subtract value of all issues in the period
                     $totalValue -= $outwardValue;
-                    
+
                     // Weighted average rate = Total Value / Closing Stock
                     $closingUnitPrice = $totalValue / $closingStock;
                 } else {
                     // No stock remaining - use the last available rate
                     $lastPurchaseAtEnd = $purchaseHistory->where('purchase_date', '<=', $endDate)->sortByDesc('purchase_date')->first();
                     $lastIssueAtEnd = $productApprovedIssue->where('use_date', '<=', $endDate)->sortByDesc('use_date')->first();
-                    
+
                     if ($lastPurchaseAtEnd && $lastIssueAtEnd) {
                         if ($lastIssueAtEnd->use_date > $lastPurchaseAtEnd->purchase_date) {
                             $closingUnitPrice = $lastIssueAtEnd->rateLog->first()?->unit_price ?? 0;
@@ -680,7 +680,7 @@ class ReportAPIController extends AppBaseController
                         $closingUnitPrice = $openingUnitPrice;
                     }
                 }
-                
+
                 $closingValue = $closingStock * $closingUnitPrice;
 
                 // Check if there are multiple rates that could affect closing balance
