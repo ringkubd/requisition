@@ -67,5 +67,5 @@ Route::get('pusher_test', function () {
 });
 Route::get('auto-login/{user}', function (\App\Models\User $user) {
     Auth::guard('web')->setUser($user);
-    Auth::guard('api')->setUser($user);
+    $user = Auth::guard('web')->setUser($user);
 });
