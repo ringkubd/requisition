@@ -151,11 +151,28 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
         }
 
         // Try to derive a human-friendly recipient number from metadata if available
-        $recipient_number = $value['metadata']['display_phone_number'] ?? $value['metadata']['phone_number'] ?? $value['metadata']['phone_number_id'] ?? null;
+        $recipient_number = null;
+        if (is_array($value) && isset($value['metadata'])) {
+            $recipient_number = $value['metadata']['display_phone_number'] ?? $value['metadata']['phone_number'] ?? $value['metadata']['phone_number_id'] ?? null;
+        }
 
+        $result = [];
+        foreach ($messages as $m) {
+            $type = $m['type'] ?? null;
+            $from = $m['from'] ?? $m['author'] ?? null;
+            $to = $m['to'] ?? $m['recipient_id'] ?? $m['wa_id'] ?? null;
+            $timestamp = $m['timestamp'] ?? null;
+            $text = null;
+
+            if ($type && isset($m[$type])) {
+                $candidate = $m[$type];
+                if (is_array($candidate)) {
                     $text = $candidate['body'] ?? $candidate['caption'] ?? null;
+                } elseif (is_string($candidate)) {
+                    $text = $candidate;
                 }
             }
+
             if (!$text && isset($m['text']['body'])) {
                 $text = $m['text']['body'];
             }
@@ -166,12 +183,15 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
                 $text = $m['interactive']['button_reply']['title'] ?? $m['interactive']['button_reply']['id'] ?? null;
             }
 
+            // Prefer recipient from metadata but fall back to message fields
+            $local_recipient = $recipient_number ?? ($m['recipient_id'] ?? $m['to'] ?? $m['wa_id'] ?? null);
+
             $result[] = [
                 'id' => $m['id'] ?? null,
                 'type' => $type,
                 'from' => $from,
                 'to' => $to,
-                'recipient_number' => $recipient_number,
+                'recipient_number' => $local_recipient,
                 'timestamp' => $timestamp,
                 'text' => $text,
                 'raw' => $m,
