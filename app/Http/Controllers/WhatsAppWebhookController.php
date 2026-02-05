@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Models\WhatsAppWebhookLog;
 use NotificationChannels\WhatsApp\Component;
 use stdClass;
 
@@ -43,8 +44,21 @@ class WhatsAppWebhookController extends Controller
      */
     public function verify(Request $request)
     {
-        // Store raw webhook data for debugging
-        Storage::put("whatsapp_" . uniqid() . '.txt', json_encode($request->all()));
+        // Store raw webhook data in database for debugging
+        try {
+            $log = WhatsAppWebhookLog::create([
+                'payload' => $request->all(),
+                'headers' => $request->headers->all(),
+                'method' => $request->method(),
+                'path' => $request->path(),
+                'signature' => $request->header('X-Hub-Signature-256', null),
+            ]);
+            Log::info('Stored WhatsApp webhook in DB', ['id' => $log->id]);
+        } catch (\Throwable $e) {
+            // Fallback to file storage if DB unavailable
+            Log::error('Failed to store webhook in DB: ' . $e->getMessage());
+            Storage::put("whatsapp_" . uniqid() . '.txt', json_encode($request->all()));
+        }
 
         // Handle webhook verification from WhatsApp
         if ($this->isVerificationRequest($request)) {
