@@ -67,7 +67,7 @@ export default function WhatsAppLogIndex() {
     { name: 'ID', selector: row => row.id, sortable: true, width: '80px' },
     { name: 'From', selector: row => row.from || '-', sortable: true },
     { name: 'Type', selector: row => row.message_type || '-', sortable: true },
-    { name: 'Recipient', selector: row => row.to || '-', sortable: true },
+    { name: 'Recipient', selector: row => row.recipient_id || '-', sortable: true },
     { name: 'Preview', selector: row => row.message_preview || '-', wrap: true, grow: 3 },
     { name: 'Created', selector: row => moment(row.created_at).format('YYYY-MM-DD HH:mm:ss'), sortable: true },
     {
