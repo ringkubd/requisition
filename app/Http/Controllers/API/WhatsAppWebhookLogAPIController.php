@@ -59,7 +59,8 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
                 'path' => $log->path,
                 'signature' => $log->signature,
                 'from' => $firstMessage['from'] ?? null,
-                'recipient_id' => $firstMessage['recipient_id'] ?? null,
+                // Recipient (either id or human phone number if available)
+                'recipient' => $firstMessage['recipient_number'] ?? $firstMessage['to'] ?? null,
                 'message_type' => $firstMessage['type'] ?? null,
                 'message_preview' => isset($firstMessage['text']) ? mb_strimwidth($firstMessage['text'], 0, 200, '...') : null,
                 'created_at' => $log->created_at->toDateTimeString(),
@@ -149,17 +150,9 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
             $messages = $payload['messages'];
         }
 
-        $result = [];
-        foreach ($messages as $m) {
-            $type = $m['type'] ?? null;
-            $from = $m['from'] ?? $m['author'] ?? null;
-            $to = $m['to'] ?? $m['recipient_id'] ?? $m['wa_id'] ?? null;
-            $timestamp = $m['timestamp'] ?? null;
-            $text = null;
+        // Try to derive a human-friendly recipient number from metadata if available
+        $recipient_number = $value['metadata']['display_phone_number'] ?? $value['metadata']['phone_number'] ?? $value['metadata']['phone_number_id'] ?? null;
 
-            if ($type && isset($m[$type])) {
-                $candidate = $m[$type];
-                if (is_array($candidate)) {
                     $text = $candidate['body'] ?? $candidate['caption'] ?? null;
                 }
             }
@@ -178,6 +171,7 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
                 'type' => $type,
                 'from' => $from,
                 'to' => $to,
+                'recipient_number' => $recipient_number,
                 'timestamp' => $timestamp,
                 'text' => $text,
                 'raw' => $m,
