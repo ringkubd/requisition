@@ -59,6 +59,7 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
                 'path' => $log->path,
                 'signature' => $log->signature,
                 'from' => $firstMessage['from'] ?? null,
+                'to' => $firstMessage['to'] ?? null,
                 'message_type' => $firstMessage['type'] ?? null,
                 'message_preview' => isset($firstMessage['text']) ? mb_strimwidth($firstMessage['text'], 0, 200, '...') : null,
                 'created_at' => $log->created_at->toDateTimeString(),
@@ -105,12 +106,26 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
 
         $type = $first['type'] ?? null;
         $from = $first['from'] ?? $first['author'] ?? null;
+        $to = $first['to'] ?? $first['recipient_id'] ?? $first['wa_id'] ?? $value['metadata']['phone_number_id'] ?? ($value['contacts'][0]['wa_id'] ?? null) ?? null;
         $timestamp = $first['timestamp'] ?? null;
-        $text = $first[$type]['body'] ?? $first['text']['body'] ?? null;
+
+        // Try many places for text/preview depending on message type
+        $text = null;
+        if ($type && isset($first[$type])) {
+            // Common structures like 'text' => ['body' => '...']
+            $possible = $first[$type];
+            if (is_array($possible)) {
+                $text = $possible['body'] ?? $possible['caption'] ?? null;
+            }
+        }
+        $text = $text ?? ($first['text']['body'] ?? null);
+        $text = $text ?? ($first['button']['text'] ?? $first['button']['payload'] ?? null);
+        $text = $text ?? ($first['interactive']['button_reply']['id'] ?? $first['interactive']['button_reply']['title'] ?? null);
 
         return [
             'type' => $type,
             'from' => $from,
+            'to' => $to,
             'timestamp' => $timestamp,
             'text' => $text,
             'raw' => $first,
@@ -137,21 +152,32 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
         $result = [];
         foreach ($messages as $m) {
             $type = $m['type'] ?? null;
-            $from = $m['from'] ?? $m['recipient_id'] ?? $m['wa_id'] ?? null;
+            $from = $m['from'] ?? $m['author'] ?? null;
+            $to = $m['to'] ?? $m['recipient_id'] ?? $m['wa_id'] ?? null;
             $timestamp = $m['timestamp'] ?? null;
             $text = null;
 
             if ($type && isset($m[$type])) {
-                $text = $m[$type]['body'] ?? null;
+                $candidate = $m[$type];
+                if (is_array($candidate)) {
+                    $text = $candidate['body'] ?? $candidate['caption'] ?? null;
+                }
             }
             if (!$text && isset($m['text']['body'])) {
                 $text = $m['text']['body'];
+            }
+            if (!$text && isset($m['button']['text'])) {
+                $text = $m['button']['text'];
+            }
+            if (!$text && isset($m['interactive']['button_reply'])) {
+                $text = $m['interactive']['button_reply']['title'] ?? $m['interactive']['button_reply']['id'] ?? null;
             }
 
             $result[] = [
                 'id' => $m['id'] ?? null,
                 'type' => $type,
                 'from' => $from,
+                'to' => $to,
                 'timestamp' => $timestamp,
                 'text' => $text,
                 'raw' => $m,
