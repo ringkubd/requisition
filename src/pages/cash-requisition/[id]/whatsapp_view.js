@@ -1,23 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react'
-import AppLayout from '@/components/Layouts/AppLayout'
-import { useRouter } from 'next/router'
-import Head from 'next/head'
-import { Button, Card } from 'flowbite-react'
-import { useReactToPrint } from 'react-to-print'
-import Status from '@/components/requisition/status'
-import { useOneTimeLoginMutation } from '@/store/service/user/management'
-import GuestLayout from '@/components/Layouts/GuestLayout'
-import RequisitionPrintWhatsApp from '@/components/cash-requisition/RequisitionPrintWhatsApp'
-import { useGetSingleCashRequisitionQuery } from '@/store/service/cash/Index'
+import React, { useEffect, useRef, useState } from "react";
+import AppLayout from "@/components/Layouts/AppLayout";
+import { useRouter } from "next/router";
+import Head from "next/head";
+import { Button, Card } from "flowbite-react";
+import { useReactToPrint } from "react-to-print";
+import Status from "@/components/requisition/status";
+import { useOneTimeLoginMutation } from "@/store/service/user/management";
+import GuestLayout from "@/components/Layouts/GuestLayout";
+import RequisitionPrintWhatsApp from "@/components/cash-requisition/RequisitionPrintWhatsApp";
+import { useGetSingleCashRequisitionQuery } from "@/store/service/cash/Index";
 
 export default function WhatsappView(props) {
-    const printPageRef = useRef()
-    const router = useRouter()
-    const [loggedIn, setLoggedIn] = useState(false)
+    const printPageRef = useRef();
+    const router = useRouter();
+    const [loggedIn, setLoggedIn] = useState(false);
     const [
         onetimeLogin,
         { data: LoginData, isSuccess: loginSuccess },
-    ] = useOneTimeLoginMutation()
+    ] = useOneTimeLoginMutation();
     const {
         data,
         isLoading,
@@ -25,39 +25,39 @@ export default function WhatsappView(props) {
         refetch,
     } = useGetSingleCashRequisitionQuery(router.query.id, {
         skip: !router.query.id || !loggedIn,
-    })
+    });
     const [statusKey, setStatusKey] = useState(
-        Math.round(Math.random() * 100000),
-    )
+        Math.round(Math.random() * 100000)
+    );
 
     useEffect(() => {
         if (router?.query?.auth_key) {
             onetimeLogin({
                 auth_key: router?.query?.auth_key,
-            })
+            });
         }
-    }, [router?.query?.auth_key])
+    }, [router?.query?.auth_key]);
 
     useEffect(() => {
         if (loginSuccess) {
-            setLoggedIn(loginSuccess)
+            setLoggedIn(loginSuccess);
         }
-    }, [loginSuccess])
+    }, [loginSuccess]);
 
-    const requisition_products = data?.data?.items
-    const mainData = data?.data
+    const requisition_products = data?.data?.items;
+    const mainData = data?.data;
 
     const handlePrint = useReactToPrint({
         content: () => printPageRef.current,
-        onBeforePrint: a => console.log(a),
-    })
+        onBeforePrint: (a) => console.log(a),
+    });
 
     if (!loggedIn) {
         return (
             <GuestLayout>
                 <title>Logged in</title>
             </GuestLayout>
-        )
+        );
     }
 
     return (
@@ -66,7 +66,8 @@ export default function WhatsappView(props) {
                 <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                     Purchase Requisition
                 </h2>
-            }>
+            }
+        >
             <Head>
                 <title>Purchase Requisition</title>
                 <meta
@@ -77,28 +78,31 @@ export default function WhatsappView(props) {
             <div className="dark:bg-gray-100 py-0 md:py-8 px-0 md:mx-16 mx-0">
                 <Card className="min-h-screen shadow-none dark:bg-gray-100 rounded-none md:rounded-lg p-0 md:p-6">
                     <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 gap-2 md:gap-4 border-b-2 shadow-lg p-2 md:p-4 rounded-none md:rounded mb-0">
-                        <Button onClick={() => router.push('/dashboard')}>
+                        <Button onClick={() => router.push("/dashboard")}>
                             Back
                         </Button>
                         <div className={`pt-0 md:pt-1`}>
                             <Button
                                 onClick={handlePrint}
                                 gradientDuoTone="purpleToBlue"
-                                outline>
+                                outline
+                            >
                                 Print
                             </Button>
                         </div>
-                        <div className={`flex flex-row items-center w-full md:w-auto`}>
+                        <div
+                            className={`flex flex-row items-center w-full md:w-auto`}
+                        >
                             {mainData ? (
                                 <Status
                                     key={statusKey}
                                     type={`cash`}
-                                    changeStatus={a => {
-                                        refetch()
+                                    changeStatus={(a) => {
+                                        refetch();
                                         setStatusKey(
-                                            Math.round(Math.random() * 100000),
-                                        )
-                                        router.reload()
+                                            Math.round(Math.random() * 100000)
+                                        );
+                                        router.reload();
                                     }}
                                     requisition={mainData}
                                     from={`print_view`}
@@ -116,5 +120,5 @@ export default function WhatsappView(props) {
                 </Card>
             </div>
         </AppLayout>
-    )
+    );
 }

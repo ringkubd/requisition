@@ -533,6 +533,14 @@ const Navigation = ({ user }) => {
                                             >
                                                 Permissions
                                             </DropdownLink>
+                                             <DropdownLink
+                                                href="/whatsapplog"
+                                                active={router.pathname
+                                                    .includes("whatsapplog")
+                                                    .toString()}
+                                            >
+                                                WhatsApp Log
+                                            </DropdownLink>
                                         </Dropdown>
                                     </>
                                 ) : null}
