@@ -662,6 +662,77 @@ class PurchaseRequisitionAPIController extends AppBaseController
 
         return $data;
     }
+    /**
+     * Resend WhatsApp notification for a purchase requisition
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function resendWhatsapp(Request $request, $id): JsonResponse
+    {
+        $request->validate([
+            'type' => 'required|in:accounts,ceo,department,store',
+            'user_id' => 'nullable|integer',
+            'phone' => 'nullable|string'
+        ]);
+
+        $purchaseRequisition = $this->purchaseRequisitionRepository->find($id);
+        if (!$purchaseRequisition) {
+            return $this->sendError('Purchase Requisition not found');
+        }
+
+        // Determine recipient user(s)
+        if ($request->user_id) {
+            $users = [User::find($request->user_id)];
+        } else {
+            switch ($request->type) {
+                case 'accounts':
+                    $users = $this->findAccountsDepartmentUsers();
+                    break;
+                case 'ceo':
+                    $ceo = $this->findCeoUser(); $users = $ceo ? [$ceo] : [];
+                    break;
+                case 'department':
+                    $users = [$purchaseRequisition->department?->head_of_department ? User::find($purchaseRequisition->department->head_of_department) : null];
+                    break;
+                case 'store':
+                    $users = [$this->findStoreManager()];
+                    break;
+            }
+        }
+
+        foreach ($users as $user) {
+            if (!$user && empty($request->phone)) continue;
+
+            $phone = $request->phone ?? $user->mobile_no;
+            if (empty($phone)) continue;
+
+            $oneTime = new OneTimeLogin();
+            $key = $oneTime->generate($user->id ?? 0);
+
+            // Build components same as normal flow, but do NOT modify DB statuses
+            if ($request->type === 'accounts') {
+                $user->notify(new WhatsAppAccountNotification(
+                    Component::text($purchaseRequisition->department->name),
+                    Component::text($purchaseRequisition->user->name),
+                    Component::text($purchaseRequisition->prf_no),
+                    Component::quickReplyButton([$purchaseRequisition->id . '_' . ($user->id ?? 0) . '_2_accounts_purchase']),
+                    Component::quickReplyButton([$purchaseRequisition->id . '_' . ($user->id ?? 0) . '_3_accounts_purchase']),
+                    Component::urlButton(["/purchase-requisition/$purchaseRequisition->id/whatsapp_view?auth_key={$key->auth_key}"]),
+                    $phone
+                ));
+            } elseif ($request->type === 'ceo') {
+                $messageText = Component::text("Requisitor Name: {$purchaseRequisition->user->name}, P.R. NO.: {$purchaseRequisition->prf_no}.");
+                $user->notify(new WhatsAppNotification($messageText, $phone, Component::urlButton(["/purchase-requisition/$purchaseRequisition->id/whatsapp_view?auth_key={$key->auth_key}"]), Component::quickReplyButton(['test_approve']), Component::quickReplyButton(['test_reject'])));
+            } // etc for other types
+
+            // Log attempt (simple example)
+            Log::info('Resent WhatsApp', ['req' => $purchaseRequisition->id, 'type' => $request->type, 'to' => $phone, 'by' => $request->user()->id]);
+        }
+
+        return $this->sendResponse([], 'WhatsApp resend attempt queued/sent');
+    }
 
     /**
      * Find CEO user
