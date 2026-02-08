@@ -49,9 +49,10 @@ class WhatsAppNotification extends Notification
      */
     public function toWhatsApp(object $notifiable)
     {
+        // new inventory_approval_notice_marketing  old inventory_approval_notice
         return WhatsAppTemplate::create()
             ->language('en')
-            ->name('inventory_approval_notice')
+            ->name('inventory_approval_notice_marketing')
             ->body($this->body)
             ->buttons($this->approve)
             ->buttons($this->reject)
