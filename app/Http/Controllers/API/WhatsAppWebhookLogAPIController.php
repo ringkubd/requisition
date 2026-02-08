@@ -60,7 +60,7 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
                 'signature' => $log->signature,
                 'from' => $firstMessage['from'] ?? null,
                 // Recipient (either id or human phone number if available)
-                'recipient' => $firstMessage['recipient_number'] ?? $firstMessage['to'] ?? null,
+                'recipient' => $firstMessage['recipient_id'] ?? $firstMessage['to'] ?? null,
                 'message_type' => $firstMessage['type'] ?? null,
                 'message_preview' => isset($firstMessage['text']) ? mb_strimwidth($firstMessage['text'], 0, 200, '...') : null,
                 'created_at' => $log->created_at->toDateTimeString(),
