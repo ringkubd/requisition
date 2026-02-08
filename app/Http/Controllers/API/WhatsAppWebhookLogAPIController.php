@@ -98,6 +98,8 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
         $messages = (array) ($this->safeGet($value, ['messages']) ?? []);
         $first = $messages[0] ?? null;
 
+        dd($payload, $value, $messages);
+
         if (!$first) {
             // Try top-level messages
             $first = $payload['messages'][0] ?? null;
