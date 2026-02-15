@@ -155,7 +155,7 @@ const IssueStatus = ( { row } ) =>
     }
     return (
         <div>
-            {( ( isStoreManager && row?.department_status ) ||
+            {( ( isStoreManager && row?.department_status == 1 ) ||
                 ( isReceiverDepartment && isDepartmentHead ) ) &&
                 selectedDropdown !== 'Approved' ? (
                 <div className="flex flex-wrap">
@@ -195,16 +195,23 @@ const IssueStatus = ( { row } ) =>
             ) : (
                 <div className={`flex flex-col`}>
                     <div>
-                        {!row?.department_status
+                        {row?.department_status == 0
                             ? 'Pending in department.'
-                            : null}
+                            : row?.department_status == 2
+                                ? 'Rejected by Department.'
+                                : null}
                     </div>
                     <div>
-                        {row?.department_status ? (
-                            row?.store_status ? (
+                        {row?.department_status == 1 ? (
+                            row?.store_status == 1 ? (
                                 <span className={`text-green-800`}>
                                     {' '}
                                     Approved & Issued.{' '}
+                                </span>
+                            ) : row?.store_status == 2 ? (
+                                <span className={`text-red-800`}>
+                                    {' '}
+                                    Rejected from store.{' '}
                                 </span>
                             ) : (
                                 'Pending in store.'
