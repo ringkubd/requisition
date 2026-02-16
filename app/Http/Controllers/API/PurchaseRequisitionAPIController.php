@@ -558,7 +558,6 @@ class PurchaseRequisitionAPIController extends AppBaseController
         if (empty($phoneNumber)) {
             return;
         }
-
         // Generate one-time login key
         $one_time_key = new OneTimeLogin();
         $key = $one_time_key->generate($user->id);
@@ -807,6 +806,13 @@ class PurchaseRequisitionAPIController extends AppBaseController
         // if (config('app.debug')) {
         //     return;
         // }
+        $requisition = $requisition->load(['user', 'department', 'purchaseRequisitionProducts.product']);
+
+        $most_used_category = $requisition->purchaseRequisitionProducts->groupBy('product.category.title')->sortByDesc(function ($group) {
+            return $group->count();
+        })->keys()->first();
+
+
 
         if (NotificationTestHelper::isTestModeEnabled()) {
             $testUser = NotificationTestHelper::getTestUser();
@@ -814,7 +820,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
 
             $one_time_key = new OneTimeLogin();
             $key = $one_time_key->generate($testUser->id);
-            $messageText = Component::text("Requisitor Name: {$requisition->user->name}, P.R. NO.: {$requisition->prf_no}.");
+            $messageText = Component::text("Requisitor's: {$requisition->user->name}, NO.: {$requisition->prf_no}.");
             $viewUrl = Component::urlButton(["/purchase-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]);
             $approveButton = Component::quickReplyButton([$requisition->id . '_' . $ceo->id . '_2_ceo_purchase']);
             $rejectButton = Component::quickReplyButton([$requisition->id . '_' . $ceo->id . '_3_ceo_purchase']);
@@ -838,7 +844,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $requisitor_name = $requisition->user;
         $one_time_key = new OneTimeLogin();
         $key = $one_time_key->generate($ceo->id);
-        $messageText = Component::text("Requisitor Name: $requisitor_name->name,  P.R. NO.: $requisition->prf_no.");
+        // Category label will be add
+        $messageText = Component::text($most_used_category." Requisitor's: $requisitor_name->name, NO.: $requisition->prf_no.");
         $viewUrl = Component::urlButton(["/purchase-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]);
         $approveButton = Component::quickReplyButton([$requisition->id . '_' . $ceo->id . '_2_ceo_purchase']);
         $rejectButton = Component::quickReplyButton([$requisition->id . '_' . $ceo->id . '_3_ceo_purchase']);
