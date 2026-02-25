@@ -44,7 +44,7 @@ class WhatsAppCommonNotification extends Notification
     {
         return WhatsAppTemplate::create()
             ->language('en')
-            ->name('inventory_approval_notice')
+            ->name('inventory_approval_notice_marketing')
             ->body($this->body)
             ->to($this->to);
     }

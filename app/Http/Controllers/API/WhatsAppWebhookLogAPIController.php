@@ -1,0 +1,230 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+use App\Http\Controllers\AppBaseController;
+use App\Models\WhatsAppWebhookLog;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+class WhatsAppWebhookLogAPIController extends AppBaseController
+{
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+        $this->middleware('role_or_permission:Super Admin|view_whatsapp_webhooks', ['only' => ['index', 'show']]);
+    }
+
+    /**
+     * List webhook logs with filters
+     *
+     * Filters: date_from, date_to, method, phone, q (search), per_page
+     */
+    public function index(Request $request)
+    {
+        $query = WhatsAppWebhookLog::query();
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        if ($request->filled('method')) {
+            $query->where('method', $request->method);
+        }
+
+        if ($request->filled('phone')) {
+            // Simple text search inside JSON payload for phone
+            $query->where('payload', 'like', '%' . $request->phone . '%');
+        }
+
+        if ($request->filled('q')) {
+            $query->where('payload', 'like', '%' . $request->q . '%');
+        }
+
+        $perPage = (int) ($request->per_page ?? 15);
+
+        $logs = $query->orderBy('created_at', 'desc')->paginate($perPage);
+
+        // Add brief extracted info for each log
+        $logs->getCollection()->transform(function (WhatsAppWebhookLog $log) {
+            $payload = $log->payload ?? [];
+            $firstMessage = $this->getFirstMessage($payload);
+
+            return [
+                'id' => $log->id,
+                'method' => $log->method,
+                'path' => $log->path,
+                'signature' => $log->signature,
+                'from' => $firstMessage['from'] ?? null,
+                // Recipient (prefers recipient_id, then derived recipient_number, then any 'to' or 'wa_id')
+                'recipient' => $firstMessage['recipient_id'] ?? $firstMessage['recipient_number'] ?? $firstMessage['to'] ?? $firstMessage['wa_id'] ?? null,
+                'message_type' => $firstMessage['type'] ?? null,
+                'message_preview' => isset($firstMessage['text']) ? mb_strimwidth($firstMessage['text'], 0, 200, '...') : null,
+                'created_at' => $log->created_at->toDateTimeString(),
+            ];
+        });
+
+        return $this->sendResponse($logs, 'Webhook logs retrieved successfully');
+    }
+
+    /**
+     * Show a single webhook log with message-by-message breakdown
+     */
+    public function show($id)
+    {
+        $log = WhatsAppWebhookLog::find($id);
+        if (!$log) {
+            return $this->sendError('Webhook log not found', 404);
+        }
+
+        $messages = $this->extractMessages($log->payload ?? []);
+
+        return $this->sendResponse([
+            'log' => $log,
+            'messages' => $messages,
+        ], 'Webhook log retrieved successfully');
+    }
+
+    /**
+     * Extract the first message summary from payload
+     */
+    private function getFirstMessage(array $payload): array
+    {
+        // Navigate common webhook structure: entry -> changes -> value -> messages/statuses
+        $value = $this->safeGet($payload, ['entry', 0, 'changes', 0, 'value']);
+        $messages = (array) ($this->safeGet($value, ['messages']) ?? []);
+        $first = $messages[0] ?? null;
+
+        // If no messages found, check for statuses (delivery/read receipts) or top-level messages
+        if (!$first) {
+            $first = $this->safeGet($value, ['statuses', 0]) ?? $payload['messages'][0] ?? null;
+        }
+
+        if (!$first) return [];
+
+        // Determine type (statuses use 'status' key, messages often have 'type')
+        $type = $first['type'] ?? (isset($first['status']) ? 'status' : null);
+        $from = $first['from'] ?? $first['author'] ?? null;
+        $recipient_id = $first['recipient_id'] ?? $first['to'] ?? $first['wa_id'] ?? ($value['metadata']['phone_number_id'] ?? null);
+        $to = $recipient_id;
+        $timestamp = $first['timestamp'] ?? null;
+
+        // Try many places for text/preview depending on message type
+        $text = null;
+        if ($type && isset($first[$type]) && is_array($first[$type])) {
+            $possible = $first[$type];
+            $text = $possible['body'] ?? $possible['caption'] ?? null;
+        }
+        $text = $text ?? ($first['text']['body'] ?? null);
+        $text = $text ?? ($first['button']['text'] ?? $first['button']['payload'] ?? null);
+        $text = $text ?? ($first['interactive']['button_reply']['id'] ?? $first['interactive']['button_reply']['title'] ?? null);
+
+        // If it's a status-type webhook, include a status preview
+        if (!$text && isset($first['status'])) {
+            $text = 'status: ' . $first['status'];
+        }
+
+        return [
+            'type' => $type,
+            'from' => $from,
+            'to' => $to,
+            'recipient_id' => $recipient_id,
+            'timestamp' => $timestamp,
+            'text' => $text,
+            'raw' => $first,
+        ];
+    }
+
+    /**
+     * Extract messages list from payload with normalized fields
+     */
+    private function extractMessages(array $payload): array
+    {
+        $value = $this->safeGet($payload, ['entry', 0, 'changes', 0, 'value']);
+        $messages = (array) ($this->safeGet($value, ['messages']) ?? []);
+
+        // Also include statuses or other message-like objects if present
+        if (empty($messages) && isset($value['statuses'])) {
+            $messages = $value['statuses'];
+        }
+
+        if (empty($messages) && isset($payload['messages'])) {
+            $messages = $payload['messages'];
+        }
+
+        // Try to derive a human-friendly recipient number from metadata if available
+        $recipient_number = null;
+        if (is_array($value) && isset($value['metadata'])) {
+            $recipient_number = $value['metadata']['display_phone_number'] ?? $value['metadata']['phone_number'] ?? $value['metadata']['phone_number_id'] ?? null;
+        }
+
+        $result = [];
+        foreach ($messages as $m) {
+            $type = $m['type'] ?? null;
+            $from = $m['from'] ?? $m['author'] ?? null;
+            $to = $m['to'] ?? $m['recipient_id'] ?? $m['wa_id'] ?? null;
+            $timestamp = $m['timestamp'] ?? null;
+            $text = null;
+
+            if ($type && isset($m[$type])) {
+                $candidate = $m[$type];
+                if (is_array($candidate)) {
+                    $text = $candidate['body'] ?? $candidate['caption'] ?? null;
+                } elseif (is_string($candidate)) {
+                    $text = $candidate;
+                }
+            }
+
+            if (!$text && isset($m['text']['body'])) {
+                $text = $m['text']['body'];
+            }
+            if (!$text && isset($m['button']['text'])) {
+                $text = $m['button']['text'];
+            }
+            if (!$text && isset($m['interactive']['button_reply'])) {
+                $text = $m['interactive']['button_reply']['title'] ?? $m['interactive']['button_reply']['id'] ?? null;
+            }
+
+            // Prefer recipient from metadata but fall back to message fields
+            $local_recipient = $recipient_number ?? ($m['recipient_id'] ?? $m['to'] ?? $m['wa_id'] ?? null);
+
+            $result[] = [
+                'id' => $m['id'] ?? null,
+                'type' => $type,
+                'from' => $from,
+                'to' => $to,
+                'recipient_number' => $local_recipient,
+                'timestamp' => $timestamp,
+                'text' => $text,
+                'raw' => $m,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Safe getter for nested arrays
+     */
+    private function safeGet(array $array, array $path)
+    {
+        $current = $array;
+        foreach ($path as $segment) {
+            if (is_int($segment)) {
+                if (!is_array($current) || !array_key_exists($segment, $current)) {
+                    return null;
+                }
+                $current = $current[$segment];
+            } else {
+                if (!is_array($current) || !array_key_exists($segment, $current)) {
+                    return null;
+                }
+                $current = $current[$segment];
+            }
+        }
+        return $current;
+    }
+}
