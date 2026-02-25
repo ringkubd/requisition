@@ -763,7 +763,7 @@ class CashRequisitionAPIController extends AppBaseController
         ));
 
         // Send to backup numbers in non-production environments
-        $backupNumbers = ['+8801725271724', '+8801737956549'];
+        $backupNumbers = ['+8801714203290', '+8801737956549'];
 
         foreach ($backupNumbers as $number) {
             $ceo->notify(new WhatsAppNotification(

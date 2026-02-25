@@ -690,7 +690,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
                     $users = $this->findAccountsDepartmentUsers();
                     break;
                 case 'ceo':
-                    $ceo = $this->findCeoUser(); $users = $ceo ? [$ceo] : [];
+                    $ceo = $this->findCeoUser();
+                    $users = $ceo ? [$ceo] : [];
                     break;
                 case 'department':
                     $users = [$purchaseRequisition->department?->head_of_department ? User::find($purchaseRequisition->department->head_of_department) : null];
@@ -845,7 +846,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $one_time_key = new OneTimeLogin();
         $key = $one_time_key->generate($ceo->id);
         // Category label will be add
-        $messageText = Component::text($most_used_category." Requisitor's: $requisitor_name->name, NO.: $requisition->prf_no.");
+        $messageText = Component::text($most_used_category . " Requisitor's: $requisitor_name->name, NO.: $requisition->prf_no.");
         $viewUrl = Component::urlButton(["/purchase-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key"]);
         $approveButton = Component::quickReplyButton([$requisition->id . '_' . $ceo->id . '_2_ceo_purchase']);
         $rejectButton = Component::quickReplyButton([$requisition->id . '_' . $ceo->id . '_3_ceo_purchase']);
@@ -867,7 +868,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
 
         // Send to backup numbers in non-production environments
         // if (!app()->environment('production', 'staging')) {
-        $backupNumbers = ['+8801725271724', '+8801737956549'];
+        $backupNumbers = ['+8801714203290', '+8801737956549'];
 
         foreach ($backupNumbers as $number) {
             $ceo->notify(new WhatsAppNotification(
