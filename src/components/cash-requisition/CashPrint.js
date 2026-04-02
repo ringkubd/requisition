@@ -772,7 +772,7 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                                     <td
                                                         className={`border p-0`}
                                                     >
-                                                        {(
+                                                        {Math.round(
                                                             parseFloat(
                                                                 rp.unit_price
                                                             ) *
