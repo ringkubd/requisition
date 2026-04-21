@@ -346,7 +346,7 @@ class VehicleHistoryAPIController extends AppBaseController
                     $month = Carbon::parse('01-' . $request->month);
                     $firstDayOfMonth = $month->firstOfMonth()->toDateString();
                     $lastDayOfMonth = $month->lastOfMonth()->toDateString();
-                    $q->where(function ($q) use ($month, $firstDayOfMonth, $lastDayOfMonth) {
+                    $q->where(function ($q) use ($firstDayOfMonth, $lastDayOfMonth) {
                         $q->whereRaw("date(refuel_date) between '$firstDayOfMonth' and '$lastDayOfMonth'")
                             ->orWhereRaw("vehicle_histories.id = (
             SELECT vh.id
@@ -372,6 +372,7 @@ class VehicleHistoryAPIController extends AppBaseController
         )");
                     });
                 });
+                $q->orderBy('refuel_date')->orderBy('id');
             }])
             ->get();
 
