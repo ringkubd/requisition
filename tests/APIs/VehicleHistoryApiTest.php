@@ -173,4 +173,120 @@ class VehicleHistoryApiTest extends TestCase
         $this->assertSame('0.00', $report['quantity']);
         $this->assertSame(0, $report['cost']);
     }
+
+    /**
+     * @test
+     */
+    public function test_yearly_report_returns_year_scoped_totals()
+    {
+        $organization = Organization::query()->create([
+            'name' => 'Yearly Test Org',
+            'email' => 'yearly-org@example.com',
+        ]);
+
+        $branch = Branch::query()->create([
+            'organization_id' => $organization->id,
+            'name' => 'Yearly Branch',
+            'email' => 'yearly-branch@example.com',
+        ]);
+
+        $department = Department::query()->create([
+            'organization_id' => $organization->id,
+            'branch_id' => $branch->id,
+            'name' => 'Yearly Operations',
+        ]);
+
+        $user = User::query()->create([
+            'name' => 'Yearly Reporter',
+            'email' => 'yearly.reporter@example.com',
+            'password' => 'secret',
+        ]);
+
+        $cashProduct = CashProduct::query()->create([
+            'title' => 'Octane',
+        ]);
+
+        $vehicle = Vehicle::query()->create([
+            'brand' => 'Toyota',
+            'model' => 'Land Cruiser',
+            'reg_no' => 'DM GHA 11-9000',
+            'cash_product_id' => $cashProduct->id,
+            'ownership' => false,
+        ]);
+
+        $cashRequisition = CashRequisition::query()->create([
+            'user_id' => $user->id,
+            'branch_id' => $branch->id,
+            'department_id' => $department->id,
+            'irf_no' => 'YIRF-001',
+            'ir_no' => 'YIR-001',
+            'total_cost' => 10000,
+        ]);
+
+        $cashRequisitionItem = CashRequisitionItem::query()->create([
+            'cash_requisition_id' => $cashRequisition->id,
+            'item' => $cashProduct->title,
+            'unit' => 'ltr',
+            'required_unit' => 100,
+            'unit_price' => 100,
+            'purpose' => 'Yearly fuel purchase',
+        ]);
+
+        VehicleHistory::query()->create([
+            'vehicle_id' => $vehicle->id,
+            'cash_requisition_id' => $cashRequisition->id,
+            'cash_requisition_item_id' => $cashRequisitionItem->id,
+            'refuel_date' => '2024-01-15',
+            'unit' => 'ltr',
+            'quantity' => 40,
+            'rate' => 100,
+            'bill_no' => 'YBILL-001',
+            'last_mileage' => 1000,
+            'current_mileage' => 1100,
+            'user_id' => $user->id,
+        ]);
+
+        VehicleHistory::query()->create([
+            'vehicle_id' => $vehicle->id,
+            'cash_requisition_id' => $cashRequisition->id,
+            'cash_requisition_item_id' => $cashRequisitionItem->id,
+            'refuel_date' => '2024-11-12',
+            'unit' => 'ltr',
+            'quantity' => 35,
+            'rate' => 120,
+            'bill_no' => 'YBILL-002',
+            'last_mileage' => 1100,
+            'current_mileage' => 1250,
+            'user_id' => $user->id,
+        ]);
+
+        // This row should be excluded because it belongs to a different year.
+        VehicleHistory::query()->create([
+            'vehicle_id' => $vehicle->id,
+            'cash_requisition_id' => $cashRequisition->id,
+            'cash_requisition_item_id' => $cashRequisitionItem->id,
+            'refuel_date' => '2025-02-01',
+            'unit' => 'ltr',
+            'quantity' => 50,
+            'rate' => 200,
+            'bill_no' => 'YBILL-003',
+            'last_mileage' => 1250,
+            'current_mileage' => 1400,
+            'user_id' => $user->id,
+        ]);
+
+        $this->response = $this->json('GET', '/api/vehicles_yearly_report?year=2024');
+        $this->response->assertStatus(200);
+
+        $report = collect(json_decode($this->response->getContent(), true)['data'])
+            ->firstWhere('vehicle', 'Toyota (DM GHA 11-9000)');
+
+        $this->assertNotNull($report);
+        $this->assertSame('2024', $report['year']);
+        $this->assertSame('75.00', $report['quantity']);
+        $this->assertSame(8200, $report['cost']);
+        $this->assertSame('109.33', $report['average_rate']);
+        $this->assertSame('683.33', $report['average_monthly_cost']);
+        $this->assertSame(250, $report['millage']);
+    }
 }

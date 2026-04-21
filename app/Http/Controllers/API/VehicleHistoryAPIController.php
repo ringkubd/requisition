@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateVehicleHistoryAPIRequest;
 use App\Http\Requests\API\UpdateVehicleHistoryAPIRequest;
 use App\Http\Resources\CashRequisitionResource;
+use App\Http\Resources\VehicleYearlyReportResource;
 use App\Http\Resources\VehicleReportResource;
 use App\Models\CashRequisition;
 use App\Models\CashRequisitionItem;
@@ -378,6 +379,27 @@ class VehicleHistoryAPIController extends AppBaseController
 
         return response()->json([
             'data' => VehicleReportResource::collection($vehicle_report)->collection,
+            "message" => __('messages.retrieved', ['model' => __('models/vehicleHistories.plural')]),
+        ]);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function yearlyReport(Request $request): JsonResponse
+    {
+        $year = $request->year ?: Carbon::now()->format('Y');
+
+        $vehicleReport = Vehicle::query()
+            ->with(['vehicleHistories' => function ($q) use ($year) {
+                $q->whereYear('refuel_date', $year)
+                    ->orderBy('refuel_date')
+                    ->orderBy('id');
+            }])
+            ->get();
+
+        return response()->json([
+            'data' => VehicleYearlyReportResource::collection($vehicleReport)->collection,
             "message" => __('messages.retrieved', ['model' => __('models/vehicleHistories.plural')]),
         ]);
     }
