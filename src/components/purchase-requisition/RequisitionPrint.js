@@ -37,7 +37,7 @@ const RequisitionPrint = forwardRef(
 
         return (
             <div
-                className={`flex flex-col w-full sm:w-auto sm:min-w-[21cm] mx-auto p-2 sm:p-4 shadow-none print:w-[21cm] print:m-5`}
+                className={`flex flex-col w-max min-w-[21cm] sm:mx-auto p-2 sm:p-4 shadow-none print:w-[21cm] print:m-5`}
                 ref={ref}
             >
                 {rejected ? (

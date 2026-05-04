@@ -35,20 +35,20 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
 
     return (
         <div
-            className={`flex flex-col w-full m-0 md:m-2 justify-center justify-items-center p-0 md:p-4 shadow-none print:m-2 print:p-4`}
+            className={`flex flex-col w-max min-w-[21cm] sm:mx-auto p-2 sm:p-4 shadow-none print:w-[21cm] print:m-5`}
             ref={ref}
         >
             {rejected ? (
                 <Image
                     src={require("../../../public/rejected.png")}
                     alt={`rejected`}
-                    className={`absolute opacity-5 top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 print:opacity-5 print:top-[50%] print:left-[35%]`}
+                    className={`absolute opacity-5 top-[50%] left-[35%]`}
                 />
             ) : (
                 ""
             )}
             <div
-                className={`flex flex-col w-full justify-start md:justify-center justify-items-start md:justify-items-center shadow-none printBody print:justify-center print:justify-items-center`}
+                className={`flex flex-col w-full justify-center justify-items-center shadow-none printBody`}
             >
                 <div className={`w-full`}>
                     {/*Header*/}
@@ -168,7 +168,7 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 py-0 px-2 normal-case`}
+                                                className={`border bg-white leading-3 py-0 px-2 normal-case w-80`}
                                             >
                                                 Purpose
                                             </th>
@@ -226,7 +226,7 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                                         {rp.unit_price}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}
+                                                        className={`border p-0 text-left whitespace-normal break-words max-w-[20rem]`}
                                                     >
                                                         {rp.purpose}
                                                     </td>
@@ -707,7 +707,7 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 py-0 px-2 normal-case`}
+                                                className={`border bg-white leading-3 py-0 px-2 normal-case w-80`}
                                             >
                                                 Purpose
                                             </th>
@@ -765,7 +765,7 @@ const CashPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                                                         {rp.unit_price}
                                                     </td>
                                                     <td
-                                                        className={`border p-0`}
+                                                        className={`border p-0 text-left whitespace-normal break-words max-w-[20rem]`}
                                                     >
                                                         {rp.purpose}
                                                     </td>

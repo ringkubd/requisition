@@ -29,8 +29,8 @@ export default function PrintView(props) {
             <Head>
                 <title>Issue Form</title>
             </Head>
-            <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
-                <Card className="min-h-screen shadow-none">
+            <div className="md:py-8 md:mx-16 mx-auto px-0 sm:px-6 lg:px-8">
+                <Card className="min-h-screen shadow-none rounded-none md:rounded-lg p-0 md:p-6">
                     <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
                         <Button onClick={() => router.back()}>Back</Button>
                         <div className={`pt-1`}>
@@ -45,7 +45,7 @@ export default function PrintView(props) {
                             {data?.data ? <Status row={data?.data} /> : null}
                         </div>
                     </div>
-                    <div className={`mx-auto shadow-none`}>
+                    <div className="w-full overflow-x-auto">
                         <IssuePrint
                             products={data?.data ?? []}
                             ref={printPageRef}
