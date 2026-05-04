@@ -9,6 +9,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class CeoMailNotification extends Notification implements ShouldQueue
 {
@@ -31,7 +33,7 @@ class CeoMailNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', WebPushChannel::class];
     }
 
     /**
@@ -56,6 +58,29 @@ class CeoMailNotification extends Notification implements ShouldQueue
             ->line("Requisitor Name: $requisitor->name ")
             ->line("P.R. No.: $requisition->prf_no")
             ->action('View', "$frontend_url/$requisition_type-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key");
+    }
+
+    public function toWebPush($notifiable, $notification): WebPushMessage
+    {
+        $one_time_key = new OneTimeLogin();
+        $key = $one_time_key->generate($notifiable->id);
+        $requisition = $this->requisition;
+        $requisition_type = 'purchase';
+        if ($requisition instanceof CashRequisition){
+            $requisition_type = "cash";
+        }
+        $message = "A requisition has been submitted for your approval.";
+        $frontend_url = config('app.frontend_url');
+        $actionUrl = "$frontend_url/$requisition_type-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key";
+
+        return (new WebPushMessage())
+            ->title('Requisition Update')
+            ->icon('/logo.svg')
+            ->body($message)
+            ->data(['url' => $actionUrl])
+            ->vibrate([200, 100, 200])
+            ->requireInteraction(true)
+            ->options(['TTL' => 1000]);
     }
 
     /**

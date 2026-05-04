@@ -11,6 +11,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class RequisitionStatusNotification extends Notification implements ShouldQueue
 {
@@ -32,7 +34,7 @@ class RequisitionStatusNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', WebPushChannel::class];
     }
 
 
@@ -69,5 +71,36 @@ class RequisitionStatusNotification extends Notification implements ShouldQueue
             ->line("Requisitor Name: $requisitor->name ")
             ->line($proNo)
             ->action('View', "$frontend_url/$requisition_type-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key");
+    }
+
+    public function toWebPush($notifiable, $notification): WebPushMessage
+    {
+        $one_time_key = new OneTimeLogin();
+        $key = $one_time_key->generate($notifiable->id);
+        $requisition = $this->requisition;
+        $requisition_type = 'purchase';
+        if ($requisition instanceof CashRequisition){
+            $requisition_type = "cash";
+        }elseif ($requisition instanceof InitialRequisition){
+            $requisition_type = "initial";
+        }
+        $message = "A requisition has been submitted for your approval.";
+        if ($notifiable->hasRole('Store Manager')){
+            $message = "A submitted requisition has been approved by the authority.";
+        }
+        if ($requisition->user->id === $notifiable->id && $requisition->approval_status?->ceo_status == 2){
+            $message = "Your requisition is approved by the authority. Please contact with Procurement Officer.";
+        }
+        $frontend_url = config('app.frontend_url');
+        $actionUrl = "$frontend_url/$requisition_type-requisition/$requisition->id/whatsapp_view?auth_key=$key->auth_key";
+
+        return (new WebPushMessage())
+            ->title('Requisition Update')
+            ->icon('/logo.svg')
+            ->body($message)
+            ->data(['url' => $actionUrl])
+            ->vibrate([200, 100, 200])
+            ->requireInteraction(true)
+            ->options(['TTL' => 1000]);
     }
 }
