@@ -42,9 +42,9 @@ export default function PrintView(props) {
             <Head>
                 <title>Purchase Requisition</title>
             </Head>
-            <div className="py-2 md:py-8 w-full overflow-x-hidden">
-                <div className="w-full max-w-full mx-auto px-2 sm:px-4 lg:px-8 overflow-x-hidden">
-                    <Card className="min-h-screen shadow-none overflow-x-hidden">
+            <div className="py-0 md:py-8 w-full">
+                <div className="w-full max-w-full mx-auto px-0 sm:px-4 lg:px-8">
+                    <Card className="min-h-screen shadow-none rounded-none md:rounded-lg p-0 md:p-6">
                         <div className="flex flex-row flex-wrap space-x-2 sm:space-x-4 gap-2 sm:gap-4 border-b-2 shadow-lg p-2 sm:p-4 rounded">
                             <Button onClick={() => router.back()}>Back</Button>
                             <div className={`pt-1`}>
@@ -76,7 +76,7 @@ export default function PrintView(props) {
                                 ) : null}
                             </div>
                         </div>
-                        <div className={`w-full overflow-x-auto`}>
+                        <div className="w-full overflow-x-auto p-0 m-0">
                             <RequisitionPrint
                                 requisition_products={requisition_products}
                                 mainData={mainData}

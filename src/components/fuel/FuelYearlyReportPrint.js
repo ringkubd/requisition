@@ -188,22 +188,23 @@ const FuelYearlyReportPrint = forwardRef(({ reports, year }, ref) => {
                                         {(() => {
                                             const totalQuantity = reports.reduce(
                                                 (o, n) =>
-                                                    o + parseFloat(n.quantity || 0),
-                                                0,
-                                            )
+                                                    o +
+                                                    parseFloat(n.quantity || 0),
+                                                0
+                                            );
                                             const totalCost = reports.reduce(
                                                 (o, n) =>
                                                     o + parseFloat(n.cost || 0),
-                                                0,
-                                            )
+                                                0
+                                            );
 
                                             return (totalQuantity > 0
                                                 ? totalCost / totalQuantity
                                                 : 0
-                                            ).toLocaleString('en', {
+                                            ).toLocaleString("en", {
                                                 maximumFractionDigits: 2,
                                                 minimumFractionDigits: 2,
-                                            })
+                                            });
                                         })()}
                                     </td>
                                     <td className={`border p-1`}>
@@ -211,16 +212,16 @@ const FuelYearlyReportPrint = forwardRef(({ reports, year }, ref) => {
                                             const totalCost = reports.reduce(
                                                 (o, n) =>
                                                     o + parseFloat(n.cost || 0),
-                                                0,
-                                            )
+                                                0
+                                            );
 
                                             return (reports.length > 0
                                                 ? totalCost / 12
                                                 : 0
-                                            ).toLocaleString('en', {
+                                            ).toLocaleString("en", {
                                                 maximumFractionDigits: 2,
                                                 minimumFractionDigits: 2,
-                                            })
+                                            });
                                         })()}
                                     </td>
                                     <td className={`border p-1`}>

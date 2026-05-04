@@ -48,57 +48,59 @@ const PrintView = (props) => {
                     content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
                 />
             </Head>
-            <div className="py-0 md:py-8 px-0 md:mx-16 mx-0">
-                <Card className="min-h-screen shadow-none rounded-none md:rounded-lg p-0 md:p-6">
-                    <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 gap-2 md:gap-4 border-b-2 shadow-lg p-2 md:p-4 rounded-none md:rounded mb-0">
-                        <Button
-                            onClick={() => router.back()}
-                            gradientDuoTone="purpleToBlue"
-                        >
-                            Back
-                        </Button>
-                        <div className={`pt-0 md:pt-1`}>
+            <div className="py-0 md:py-8 w-full">
+                <div className="w-full max-w-full mx-auto px-0 sm:px-4 lg:px-8">
+                    <Card className="min-h-screen shadow-none rounded-none md:rounded-lg p-0 md:p-6">
+                        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 gap-2 md:gap-4 border-b-2 shadow-lg p-2 md:p-4 rounded-none md:rounded mb-0">
                             <Button
-                                onClick={handlePrint}
+                                onClick={() => router.back()}
                                 gradientDuoTone="purpleToBlue"
-                                outline
                             >
-                                Print
+                                Back
                             </Button>
+                            <div className={`pt-0 md:pt-1`}>
+                                <Button
+                                    onClick={handlePrint}
+                                    gradientDuoTone="purpleToBlue"
+                                    outline
+                                >
+                                    Print
+                                </Button>
+                            </div>
+                            <div
+                                className={`flex flex-row items-center w-full md:w-auto`}
+                            >
+                                {mainData ? (
+                                    <Status
+                                        type={`cash`}
+                                        requisition={mainData}
+                                        from={`print_view`}
+                                        key={statusKey}
+                                        changeStatus={(a) => {
+                                            setStatusKey(
+                                                Math.round(Math.random() * 100000)
+                                            );
+                                            refetch();
+                                            router.reload();
+                                        }}
+                                    />
+                                ) : null}
+                            </div>
                         </div>
-                        <div
-                            className={`flex flex-row items-center w-full md:w-auto`}
-                        >
-                            {mainData ? (
-                                <Status
-                                    type={`cash`}
-                                    requisition={mainData}
-                                    from={`print_view`}
-                                    key={statusKey}
-                                    changeStatus={(a) => {
-                                        setStatusKey(
-                                            Math.round(Math.random() * 100000)
-                                        );
-                                        refetch();
-                                        router.reload();
-                                    }}
-                                />
-                            ) : null}
-                        </div>
-                    </div>
 
-                    <div className="w-full overflow-x-auto p-0 m-0">
-                        {!isLoading && !isError && data ? (
-                            <CashPrint
-                                mainData={mainData}
-                                requisition_products={requisition_products}
-                                ref={printPageRef}
-                            />
-                        ) : (
-                            <h2>Data loading or error.</h2>
-                        )}
-                    </div>
-                </Card>
+                        <div className="w-full overflow-x-auto p-0 m-0">
+                            {!isLoading && !isError && data ? (
+                                <CashPrint
+                                    mainData={mainData}
+                                    requisition_products={requisition_products}
+                                    ref={printPageRef}
+                                />
+                            ) : (
+                                <h2>Data loading or error.</h2>
+                            )}
+                        </div>
+                    </Card>
+                </div>
             </div>
         </AppLayout>
     );

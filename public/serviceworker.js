@@ -32,6 +32,16 @@ self.addEventListener("push", (event) => {
 });
 
 self.addEventListener('notificationclick', function(event) {
-    var doge = event.notification.data;
-    console.log(doge);
+    event.notification.close();
+    const url = event.notification.data?.url || '/';
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+            for (const client of windowClients) {
+                if (client.url === url && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            return clients.openWindow(url);
+        })
+    );
 });

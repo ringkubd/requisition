@@ -93,6 +93,7 @@ const View = props => {
                             <h2 className={`w-full border-b pb-2 font-bold`}>
                                 Basic Information
                             </h2>
+                            <div className="overflow-x-auto">
                             {!isLoading && !isError && data ? (
                                 <Table>
                                     <Table.Head>
@@ -152,6 +153,7 @@ const View = props => {
                             ) : (
                                 <h2>Data loading or error.</h2>
                             )}
+                            </div>
                         </div>
                         <div className={`w-full shadow-md  p-2 space-y-4`}>
                             <h2 className={`w-full border-b pb-2 font-bold`}>
