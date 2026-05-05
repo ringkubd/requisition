@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WhatsApp\Component\Component;
-use NotificationChannels\WhatsApp\WhatsAppChannel;
+use App\Channels\ThrottledWhatsAppChannel;
 use NotificationChannels\WhatsApp\WhatsAppTemplate;
 
 class WhatsAppIssueNotification extends Notification
@@ -40,7 +40,7 @@ class WhatsAppIssueNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return [WhatsAppChannel::class];
+        return [ThrottledWhatsAppChannel::class];
     }
 
     /**

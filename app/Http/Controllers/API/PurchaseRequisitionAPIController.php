@@ -734,6 +734,53 @@ class PurchaseRequisitionAPIController extends AppBaseController
         return $this->sendResponse([], 'WhatsApp resend attempt queued/sent');
     }
 
+    public function resendNotifications($id): JsonResponse
+    {
+        $purchaseRequisition = $this->purchaseRequisitionRepository->find($id);
+        if (!$purchaseRequisition) {
+            return $this->sendError('Purchase Requisition not found');
+        }
+
+        $status = $purchaseRequisition->approval_status;
+        if (!$status) {
+            return $this->sendError('No approval status found');
+        }
+
+        $stage = $status->current_stage;
+
+        switch ($stage) {
+            case 'department':
+                $this->notifyHeadOfDepartment($purchaseRequisition, $purchaseRequisition->user->name, $purchaseRequisition->prf_no);
+                break;
+
+            case 'accounts':
+                $accountsUsers = $this->findAccountsDepartmentUsers();
+                foreach ($accountsUsers as $user) {
+                    $user->notify(new PushNotification(
+                        "Purchase requisition needs accounts approval.",
+                        "P.R. No. {$purchaseRequisition->prf_no} from {$purchaseRequisition->department->name} has been approved by department. Please review."
+                    ));
+                    $this->notifyAccountsUser($user, $purchaseRequisition);
+                }
+                break;
+
+            case 'ceo':
+                $ceo = $this->findCeoUser();
+                if ($ceo) {
+                    $ceo->notify(new PushNotification(
+                        "Purchase requisition needs CEO approval.",
+                        "P.R. No. {$purchaseRequisition->prf_no} has been approved by accounts. Please review."
+                    ));
+                    $this->notifyCeoUser($ceo, $purchaseRequisition, auth()->user());
+                }
+                break;
+        }
+
+        Log::info('Resent notifications', ['req' => $purchaseRequisition->id, 'stage' => $stage, 'by' => auth()->id()]);
+
+        return $this->sendResponse([], 'Notifications resent successfully');
+    }
+
     /**
      * Find CEO user
      *

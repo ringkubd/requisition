@@ -220,6 +220,11 @@ Route::get('initial_requisition/{id}/copy', [InitialRequisitionAPIController::cl
 Route::post('subscribe-push', [NavigationAPIController::class, 'subscribeWebPush']);
 Route::post('one_time_login', [\App\Http\Controllers\API\UserAPIController::class, 'oneTimeLogin']);
 
+Route::post('resend-notification/purchase/{id}', [PurchaseRequisitionAPIController::class, 'resendNotifications']);
+Route::post('resend-notification/cash/{id}', [\App\Http\Controllers\API\CashRequisitionAPIController::class, 'resendNotifications']);
+Route::post('resend-notification/initial/{id}', [InitialRequisitionAPIController::class, 'resendNotifications']);
+Route::post('resend-notification/issue/{id}', [\App\Http\Controllers\API\ProductIssueAPIController::class, 'resendNotifications']);
+
 
 Route::resource('product-issue-items', App\Http\Controllers\API\ProductIssueItemsAPIController::class)
     ->except(['create', 'edit']);

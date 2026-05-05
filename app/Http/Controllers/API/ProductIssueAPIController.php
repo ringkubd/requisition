@@ -8,6 +8,8 @@ use App\Models\ProductIssueItems;
 use App\Models\ProductOption;
 use App\Models\Purchase;
 use App\Models\User;
+use App\Notifications\PushNotification;
+use App\Notifications\RequisitionStatusNotification;
 use App\Repositories\ProductIssueRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -638,5 +640,52 @@ class ProductIssueAPIController extends AppBaseController
             new ProductIssueItemsResource($issue),
             "Product Issue updated successfully"
         );
+    }
+
+    public function resendNotifications($uuid): JsonResponse
+    {
+        $productIssue = ProductIssue::where('uuid', $uuid)->first();
+        if (!$productIssue) {
+            return $this->sendError('Product Issue not found');
+        }
+
+        $stage = 'department';
+        if ($productIssue->department_status == 1 && $productIssue->store_status == 0) {
+            $stage = 'store';
+        }
+
+        if ($stage === 'department') {
+            $department_autority = User::whereHas('departments', function ($q) use ($productIssue) {
+                $q->where('id', \auth_department_id());
+            })->whereHas('permissions', function ($q) {
+                $q->where('name', 'approve_department_issue');
+            })->get();
+
+            $uuid = $productIssue->uuid;
+            foreach ($department_autority as $authority) {
+                $authority->notify(new PushNotification(
+                    "A product issue requires approval.",
+                    "Product issue {$productIssue->id} for {$productIssue->receiver?->name} requires your approval."
+                ));
+
+                if (!empty($authority->mobile_no)) {
+                    $no = \auth_department_name() . '/' . $productIssue->id;
+                    $one_time_key = new OneTimeLogin();
+                    $key = $one_time_key->generate($authority->id);
+                    $authority->notify(new WhatsAppIssueButtonNotification(
+                        Component::text($productIssue->receiver?->name ?? 'N/A'),
+                        Component::text($no),
+                        Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_1_department_issue']),
+                        Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_2_department_issue']),
+                        Component::urlButton(["/issue/$uuid/whatsapp_view?auth_key=$key->auth_key"]),
+                        $authority->mobile_no
+                    ));
+                }
+            }
+        }
+
+        Log::info('Resent notifications', ['issue' => $productIssue->id, 'stage' => $stage, 'by' => auth()->id()]);
+
+        return $this->sendResponse([], 'Notifications resent successfully');
     }
 }

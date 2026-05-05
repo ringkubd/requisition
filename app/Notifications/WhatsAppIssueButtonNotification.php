@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WhatsApp\Component\QuickReplyButton;
-use NotificationChannels\WhatsApp\WhatsAppChannel;
+use App\Channels\ThrottledWhatsAppChannel;
 use NotificationChannels\WhatsApp\WhatsAppTemplate;
 use NotificationChannels\WhatsApp\Component\Component;
 use NotificationChannels\WhatsApp\Component\UrlButton;
@@ -43,7 +43,7 @@ class WhatsAppIssueButtonNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return [WhatsAppChannel::class];
+        return [ThrottledWhatsAppChannel::class];
     }
 
     public function toWhatsApp(object $notifiable)
