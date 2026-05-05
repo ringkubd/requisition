@@ -1,12 +1,16 @@
 import { useAuth } from '@/hooks/auth'
 import { Button, Tooltip } from 'flowbite-react'
 import { useEffect, useState } from 'react'
-import { AiFillCheckSquare, AiFillDelete } from 'react-icons/ai'
+import { AiFillCheckSquare, AiFillDelete, AiOutlineSend } from 'react-icons/ai'
+import { toast } from 'react-toastify'
 import
 {
     useUpdateCashStatusMutation,
     useUpdateInitialStatusMutation,
     useUpdatePurchaseStatusMutation,
+    useResendPurchaseNotificationMutation,
+    useResendCashNotificationMutation,
+    useResendInitialNotificationMutation,
 } from '@/store/service/dashboard'
 const Status = ( {
     requisition,
@@ -52,6 +56,44 @@ const Status = ( {
         },
     ] = useUpdateCashStatusMutation()
     const [ rowID, setRowID ] = useState( requisition.id )
+
+    const [
+        resendPurchase,
+        { isLoading: resendPurchaseLoading },
+    ] = useResendPurchaseNotificationMutation()
+    const [
+        resendCash,
+        { isLoading: resendCashLoading },
+    ] = useResendCashNotificationMutation()
+    const [
+        resendInitial,
+        { isLoading: resendInitialLoading },
+    ] = useResendInitialNotificationMutation()
+
+    const handleResend = async () =>
+    {
+        if ( !confirm( 'Resend notification to the current approval stage?' ) ) return
+        try
+        {
+            const id = type === 'purchase' ? rowID : requisition.id
+            switch ( type )
+            {
+                case 'purchase':
+                    await resendPurchase( { id } ).unwrap()
+                    break
+                case 'cash':
+                    await resendCash( { id } ).unwrap()
+                    break
+                case 'initial':
+                    await resendInitial( { id } ).unwrap()
+                    break
+            }
+            toast.success( 'Notifications resent successfully' )
+        } catch ( e )
+        {
+            toast.error( e?.data?.message || 'Failed to resend notifications' )
+        }
+    }
 
     useEffect( () =>
     {
@@ -200,21 +242,55 @@ const Status = ( {
                             {from === 'print_view' ? 'Reject' : ''}
                         </Button>
                     </Tooltip>
+                    <Tooltip content={`Resend notification to current stage`}>
+                        <Button
+                            size="sm"
+                            className="ml-2"
+                            color="gray"
+                            onClick={handleResend}
+                            isProcessing={
+                                resendPurchaseLoading ||
+                                resendCashLoading ||
+                                resendInitialLoading
+                            }>
+                            <AiOutlineSend className="mr-1" />
+                            Resend
+                        </Button>
+                    </Tooltip>
                 </div>
             ) : (
-                ( currentStatus?.stage
-                    ? ( currentStatus?.status === 'Pending'
-                        ? 'Pending in '
-                        : currentStatus?.status + ' by ' ) +
-                    ( currentStatus?.stage === 'department'
-                        ? requisition?.department?.name
-                        : currentStatus?.stage?.charAt( 0 )?.toUpperCase() +
-                        currentStatus?.stage?.slice( 1 ) ) +
-                    ' Department'
-                    : ''
-                )
-                    .replace( 'Ceo Department', 'CEO' )
-                    .replace( 'dept.', ' ' )
+                <div className="flex items-center gap-2">
+                <span
+                    className={`text-slate-700 dark:text-slate-100`}>
+                    {( currentStatus?.stage
+                        ? ( currentStatus?.status === 'Pending'
+                            ? 'Pending in '
+                            : currentStatus?.status + ' by ' ) +
+                        ( currentStatus?.stage === 'department'
+                            ? requisition?.department?.name
+                            : currentStatus?.stage?.charAt( 0 )?.toUpperCase() +
+                            currentStatus?.stage?.slice( 1 ) ) +
+                        ' Department'
+                        : ''
+                    )
+                        .replace( 'Ceo Department', 'CEO' )
+                        .replace( 'dept.', ' ' )}
+                </span>
+                <Tooltip content={`Resend notification to current stage`}>
+                    <Button
+                        size="xs"
+                        color="gray"
+                        onClick={handleResend}
+                        isProcessing={
+                            resendPurchaseLoading ||
+                            resendCashLoading ||
+                            resendInitialLoading
+                        }>
+                        <AiOutlineSend className="mr-1" />
+                        Resend
+                    </Button>
+                </Tooltip>
+                </div>
             )}
         </div>
     )

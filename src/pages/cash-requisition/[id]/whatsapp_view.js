@@ -63,7 +63,7 @@ export default function WhatsappView(props) {
     return (
         <AppLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <h2 className="font-semibold text-xl text-gray-800 dark:text-slate-200 leading-tight">
                     Purchase Requisition
                 </h2>
             }
@@ -75,8 +75,8 @@ export default function WhatsappView(props) {
                     content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
                 />
             </Head>
-            <div className="dark:bg-gray-100 py-0 md:py-8 px-0 md:mx-16 mx-0">
-                <Card className="min-h-screen shadow-none dark:bg-gray-100 rounded-none md:rounded-lg p-0 md:p-6">
+            <div className="dark:bg-slate-800 py-0 md:py-8 px-0 md:mx-16 mx-0">
+                <Card className="min-h-screen shadow-none dark:bg-slate-800 rounded-none md:rounded-lg p-0 md:p-6">
                     <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 gap-2 md:gap-4 border-b-2 shadow-lg p-2 md:p-4 rounded-none md:rounded mb-0">
                         <Button onClick={() => router.push("/dashboard")}>
                             Back

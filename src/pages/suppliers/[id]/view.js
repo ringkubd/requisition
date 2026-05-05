@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { Button, Card, Table } from 'flowbite-react'
 import Image from 'next/image'
 import { useEditSuppliersQuery } from '@/store/service/suppliers'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 
 const View = () => {
     const router = useRouter()

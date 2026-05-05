@@ -13,7 +13,7 @@ import { useStorePurchaseRequisitionMutation } from '@/store/service/requisition
 import Head from 'next/head'
 import NavLink from '@/components/navLink'
 import { Button, Card, Label, Radio } from 'flowbite-react'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 
 export default function create_purchase(props) {
     const router = useRouter()

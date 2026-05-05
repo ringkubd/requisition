@@ -35,7 +35,7 @@ const InitialPrint = forwardRef(({ mainData, requisition_products }, ref) => {
 
     return (
         <div
-            className={`flex flex-col w-full sm:w-auto sm:min-w-[21cm] mx-auto p-2 sm:p-4 shadow-none print:w-[21cm] print:m-5`}
+            className={`flex flex-col w-full sm:w-auto sm:min-w-[21cm] mx-auto p-2 sm:p-4 shadow-none bg-white text-black dark:invert dark:hue-rotate-180 dark:brightness-110 dark:contrast-90 print:invert-0 print:hue-rotate-0 print:brightness-100 print:contrast-100 print:w-[21cm] print:m-5`}
             ref={ref}
         >
             {/*Header*/}
@@ -104,63 +104,63 @@ const InitialPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                             className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}
                         >
                             <thead
-                                className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}
+                                className={`text-center italic border bg-white dark:bg-white text-xs text-gray-700 dark:text-gray-700 uppercase`}
                             >
                                 <tr>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-4 px-2 w-6 normal-case text-xs`}
+                                        className={`border bg-white dark:bg-white leading-3 py-4 px-2 w-6 normal-case text-xs`}
                                     >
                                         Sl.#
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 normal-case`}
                                     >
                                         Name of the Item
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-0 w-24 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-0 w-24 normal-case`}
                                     >
                                         Last Purchase Date
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-0 w-24 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-0 w-24 normal-case`}
                                     >
                                         Unit
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 w-6 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 w-6 normal-case`}
                                     >
                                         Available Quantity
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 w-6 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 w-6 normal-case`}
                                     >
                                         Required Quantity
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 w-6 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 w-6 normal-case`}
                                     >
                                         Qty to be Purchase
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 normal-case`}
                                     >
                                         Purpose
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className={`shadow-none text-gray-800`}>
+                            <tbody className={`shadow-none text-gray-800 dark:text-gray-800`}>
                                 {requisition_products?.map((rp, index) => (
                                     <tr
-                                        className={`border text-center bg-white`}
+                                        className={`border text-center bg-white dark:bg-white`}
                                         key={index}
                                     >
                                         <td className={`border p-0`}>
@@ -359,63 +359,63 @@ const InitialPrint = forwardRef(({ mainData, requisition_products }, ref) => {
                             className={`mb-2 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}
                         >
                             <thead
-                                className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}
+                                className={`text-center italic border bg-white dark:bg-white text-xs text-gray-700 dark:text-gray-700 uppercase`}
                             >
                                 <tr>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-4 px-2 w-6 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-4 px-2 w-6 normal-case`}
                                     >
                                         Sl.#
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 normal-case`}
                                     >
                                         Name of the Item
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 w-24 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 w-24 normal-case`}
                                     >
                                         Last Purchase Date
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-0 w-24 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-0 w-24 normal-case`}
                                     >
                                         Unit
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 w-6 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 w-6 normal-case`}
                                     >
                                         Available Quantity
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 w-6 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 w-6 normal-case`}
                                     >
                                         Required Quantity
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 w-6 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 w-6 normal-case`}
                                     >
                                         Qty to be Purchase
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 normal-case`}
                                     >
                                         Purpose
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className={`shadow-none text-gray-800`}>
+                            <tbody className={`shadow-none text-gray-800 dark:text-gray-800`}>
                                 {requisition_products?.map((rp, index) => (
                                     <tr
-                                        className={`border text-center bg-white`}
+                                        className={`border text-center bg-white dark:bg-white`}
                                         key={index}
                                     >
                                         <td className={`border p-0`}>

@@ -66,6 +66,13 @@ export const IssueApiService = GeneralBaseAPI.injectEndpoints( {
             invalidatesTags: [ 'issue', 'editIssue' ],
             onQueryStarted: onQueryStartedErrorToast,
         } ),
+        resendIssueNotification: builder.mutation( {
+            query: ( { id } ) => ( {
+                url: `resend-notification/issue/${id}`,
+                method: 'POST',
+            } ),
+            onQueryStarted: onQueryStartedErrorToast,
+        } ),
     } ),
 } )
 
@@ -77,6 +84,7 @@ export const {
     useDestroyIssueMutation,
     useUpdateIssueQuantityMutation,
     useSyncProductIssuesMutation,
+    useResendIssueNotificationMutation,
     util: { getRunningQueriesThunk },
 } = IssueApiService
 

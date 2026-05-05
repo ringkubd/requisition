@@ -2,7 +2,7 @@ import Head from 'next/head'
 import AppLayout from '@/components/Layouts/AppLayout'
 import { dispatch, wrapper } from '@/store'
 import { Button, Card, Datepicker, TextInput } from 'flowbite-react'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import NavLink from '@/components/navLink'
 import { useRouter } from 'next/router'
 import Actions from '@/components/actions'
@@ -50,7 +50,7 @@ const PurchaseRequisition = () => {
                     name: 'P.R.F. NO.',
                     selector: row => (
                         <Link
-                            className={`text-black`}
+                            className={`text-black dark:text-white`}
                             href={`purchase-requisition/${row.id}/report`}>
                             {row.prf_no}
                         </Link>
@@ -120,9 +120,8 @@ const PurchaseRequisition = () => {
         {
             when: row => row?.current_status?.status == 'Rejected',
             style: row => ({
-                backgroundColor: '#f5e6f1',
-                boxShadow: '10px 10px red',
-                textShadow: 'text-shadow: 2px 2px red',
+                backgroundColor: 'rgba(244, 114, 182, 0.18)',
+                color: '#f8fafc',
             }),
         },
     ]
@@ -133,7 +132,7 @@ const PurchaseRequisition = () => {
             </Head>
             <AppLayout
                 header={
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-slate-100 leading-tight">
                         Purchase Requisition.
                     </h2>
                 }>
@@ -141,8 +140,8 @@ const PurchaseRequisition = () => {
                     <title>Purchase Requisition.</title>
                 </Head>
                 <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
-                    <Card>
-                        <div className="flex flex-row space-x-4 space-y-4 shadow-lg py-4 px-4">
+                    <Card className="dark:bg-slate-800 dark:border-slate-700">
+                        <div className="flex flex-row space-x-4 space-y-4 shadow-lg py-4 px-4 rounded-lg bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700">
                             <NavLink
                                 active={
                                     router.pathname ===
@@ -153,6 +152,7 @@ const PurchaseRequisition = () => {
                             </NavLink>
                             <div>
                                 <Datepicker
+                                    className="dark:[&_*]:text-slate-100"
                                     onSelectedDateChanged={date =>
                                         setSearchParams({
                                             search: searchParams.search,
@@ -165,6 +165,7 @@ const PurchaseRequisition = () => {
                             </div>
                             <div>
                                 <TextInput
+                                    className="dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100"
                                     icon={AiOutlineSearch}
                                     onBlur={e => {
                                         setSearchParams({

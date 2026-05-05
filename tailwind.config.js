@@ -8,7 +8,7 @@ module.exports = {
         './styles/globals.css',
         "./node_modules/react-tailwindcss-datepicker/dist/index.esm.js",
     ],
-    darkMode: 'media',
+    darkMode: 'class',
     theme: {
         extend: {
             fontFamily: {

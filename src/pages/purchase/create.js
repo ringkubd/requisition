@@ -25,7 +25,7 @@ import {
     useGetSuppliersQuery,
     useStoreSuppliersMutation,
 } from '@/store/service/suppliers'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import Actions from '@/components/actions'
 const create = props => {
     const router = useRouter()

@@ -4,7 +4,7 @@ import Head from 'next/head'
 import { Button, Card, Table } from 'flowbite-react'
 import NavLink from '@/components/navLink'
 import { useEditInitialRequisitionQuery } from '@/store/service/requisitions/initial'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import React, { useEffect, useState } from 'react'
 
 const View = props => {
@@ -65,7 +65,7 @@ const View = props => {
     return (
         <AppLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <h2 className="font-semibold text-xl text-gray-800 dark:text-slate-200 leading-tight">
                     Initial Requisition
                 </h2>
             }>

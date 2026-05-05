@@ -5,8 +5,8 @@ const NavLink = ({ active = false, children, ...props }) => (
         {...props}
         className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out ${
             active
-                ? 'border-indigo-400 text-gray-900 focus:border-indigo-700'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300'
+                ? 'border-blue-500 text-slate-900 dark:text-slate-100 focus:border-blue-400'
+                : 'border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:border-slate-300 dark:hover:border-slate-600 focus:text-slate-800 dark:focus:text-slate-100 focus:border-slate-300 dark:focus:border-slate-600'
         }`}>
         {children}
     </Link>

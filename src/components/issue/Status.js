@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Tooltip } from 'flowbite-react'
 import { useAuth } from '@/hooks/auth'
-import { useUpdateIssueMutation } from '@/store/service/issue'
-import { AiFillCheckSquare, AiFillDelete } from 'react-icons/ai'
+import { useUpdateIssueMutation, useResendIssueNotificationMutation } from '@/store/service/issue'
+import { AiFillCheckSquare, AiFillDelete, AiOutlineSend } from 'react-icons/ai'
+import { toast } from 'react-toastify'
 
 // Create ErrorBoundary for this component
 class StatusErrorBoundary extends React.Component
@@ -68,6 +69,23 @@ const IssueStatus = ( { row } ) =>
         updateIssue,
         { data, isLoading, isSuccess, isError },
     ] = useUpdateIssueMutation()
+    const [
+        resendIssue,
+        { isLoading: resendIssueLoading },
+    ] = useResendIssueNotificationMutation()
+
+    const handleResend = async () =>
+    {
+        if ( !confirm( 'Resend notification to the current stage?' ) ) return
+        try
+        {
+            await resendIssue( { id: row.uuid } ).unwrap()
+            toast.success( 'Notifications resent successfully' )
+        } catch ( e )
+        {
+            toast.error( e?.data?.message || 'Failed to resend notifications' )
+        }
+    }
 
     useEffect( () =>
     {
@@ -191,8 +209,20 @@ const IssueStatus = ( { row } ) =>
                             <AiFillDelete />
                         </Button>
                     </Tooltip>
+                    <Tooltip content={`Resend notification`}>
+                        <Button
+                            size="sm"
+                            className="ml-2"
+                            color="gray"
+                            onClick={handleResend}
+                            isProcessing={resendIssueLoading}>
+                            <AiOutlineSend className="mr-1" />
+                            Resend
+                        </Button>
+                    </Tooltip>
                 </div>
             ) : (
+                <div className={`flex items-center gap-2`}>
                 <div className={`flex flex-col`}>
                     <div>
                         {row?.department_status == 0
@@ -218,6 +248,16 @@ const IssueStatus = ( { row } ) =>
                             )
                         ) : null}
                     </div>
+                </div>
+                <Tooltip content={`Resend notification`}>
+                    <Button
+                        size="xs"
+                        color="gray"
+                        onClick={handleResend}
+                        isProcessing={resendIssueLoading}>
+                        <AiOutlineSend />
+                    </Button>
+                </Tooltip>
                 </div>
             )}
         </div>
