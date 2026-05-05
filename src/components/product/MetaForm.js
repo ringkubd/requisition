@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import { Button, Label, TextInput } from 'flowbite-react'
 import { ErrorMessage, Formik } from 'formik'
 import { setProductMeta } from '@/store/service/product/productMetaSlice'

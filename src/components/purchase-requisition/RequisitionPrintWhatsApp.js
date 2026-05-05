@@ -138,78 +138,78 @@ const RequisitionPrintWhatsApp = forwardRef(
                                     className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}
                                 >
                                     <thead
-                                        className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}
+                                        className={`text-center italic border bg-white dark:bg-white text-xs text-gray-700 dark:text-gray-700 uppercase`}
                                     >
                                         <tr>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-6 normal-case`}
                                             >
                                                 Sl.#
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 normal-case`}
                                             >
                                                 Name of the Item
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-24 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-24 normal-case`}
                                             >
                                                 Last Purchase Date
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 normal-case`}
                                             >
                                                 Unit
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-6 normal-case`}
                                             >
                                                 Available Quantity
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-6 normal-case`}
                                             >
                                                 Required Quantity
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-6 normal-case`}
                                             >
                                                 Qty to be Purchase
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-6 normal-case`}
                                             >
                                                 Unit Price
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 normal-case text-justify`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 normal-case text-justify`}
                                             >
                                                 Purpose
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-8 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-8 normal-case`}
                                             >
                                                 Estimated Cost
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody
-                                        className={`shadow-none text-gray-800`}
+                                        className={`shadow-none text-gray-800 dark:text-gray-800`}
                                     >
                                         {requisition_products?.map(
                                             (rp, index) => (
                                                 <tr
-                                                    className={`border text-center bg-white`}
+                                                    className={`border text-center bg-white dark:bg-white`}
                                                     key={index}
                                                 >
                                                     <td
@@ -289,7 +289,7 @@ const RequisitionPrintWhatsApp = forwardRef(
                                         <tr>
                                             <th
                                                 colSpan={9}
-                                                className={`border py-0 px-2 text-right bg-white`}
+                                                className={`border py-0 px-2 text-right bg-white dark:bg-white`}
                                             >
                                                 Total:{" "}
                                             </th>
@@ -695,78 +695,78 @@ const RequisitionPrintWhatsApp = forwardRef(
                                     className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}
                                 >
                                     <thead
-                                        className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}
+                                        className={`text-center italic border bg-white dark:bg-white text-xs text-gray-700 dark:text-gray-700 uppercase`}
                                     >
                                         <tr>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-6 normal-case`}
                                             >
                                                 Sl.#
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 normal-case`}
                                             >
                                                 Name of the Item
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-24 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-24 normal-case`}
                                             >
                                                 Last Purchase Date
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 normal-case`}
                                             >
                                                 Unit
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-6 normal-case`}
                                             >
                                                 Available Quantity
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-6 normal-case`}
                                             >
                                                 Required Quantity
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-6 normal-case`}
                                             >
                                                 Qty to be Purchase
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-6 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-6 normal-case`}
                                             >
                                                 Unit Price
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 normal-case`}
                                             >
                                                 Purpose
                                             </th>
                                             <th
                                                 scope="col"
-                                                className={`border bg-white leading-3 p-1 w-8 normal-case`}
+                                                className={`border bg-white dark:bg-white leading-3 p-1 w-8 normal-case`}
                                             >
                                                 Estimated Cost
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody
-                                        className={`shadow-none text-gray-800`}
+                                        className={`shadow-none text-gray-800 dark:text-gray-800`}
                                     >
                                         {requisition_products?.map(
                                             (rp, index) => (
                                                 <tr
-                                                    className={`border text-center bg-white`}
+                                                    className={`border text-center bg-white dark:bg-white`}
                                                     key={index}
                                                 >
                                                     <td
@@ -844,7 +844,7 @@ const RequisitionPrintWhatsApp = forwardRef(
                                         <tr>
                                             <th
                                                 colSpan={9}
-                                                className={`border py-0 px-2 text-right bg-white`}
+                                                className={`border py-0 px-2 text-right bg-white dark:bg-white`}
                                             >
                                                 Total:{" "}
                                             </th>

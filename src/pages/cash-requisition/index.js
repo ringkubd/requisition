@@ -12,7 +12,7 @@ import {
 } from '@/store/service/cash/Index'
 import { toast } from 'react-toastify'
 import Actions from '@/components/actions'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import { useAuth } from '@/hooks/auth'
 
 const CashRequisition = () => {
@@ -107,7 +107,7 @@ const CashRequisition = () => {
     return (
         <AppLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <h2 className="font-semibold text-xl text-gray-800 dark:text-slate-100 leading-tight">
                     Cash Requisition.
                 </h2>
             }>
@@ -115,8 +115,8 @@ const CashRequisition = () => {
                 <title>Cash Requisitions</title>
             </Head>
             <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
-                <Card>
-                    <div className="flex flex-row space-x-4 shadow-lg py-4 px-4">
+                <Card className="dark:bg-slate-800 dark:border-slate-700">
+                    <div className="flex flex-row space-x-4 shadow-lg py-4 px-4 rounded-lg bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700">
                         <NavLink
                             active={
                                 router.pathname === 'cash-requisition/create'
@@ -127,6 +127,7 @@ const CashRequisition = () => {
                         <div className={`flex flex-row px-1 leading-5`}>
                             <div>
                                 <Datepicker
+                                    className="dark:[&_*]:text-slate-100"
                                     onSelectedDateChanged={date =>
                                         setSearch({
                                             ...search,
@@ -140,6 +141,7 @@ const CashRequisition = () => {
                             </div>
                             <div>
                                 <TextInput
+                                    className="dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100"
                                     icon={AiOutlineSearch}
                                     onBlur={changeSearchInput}
                                 />

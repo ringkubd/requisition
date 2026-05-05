@@ -22,12 +22,14 @@ import { Badge, ListGroup, Tooltip } from "flowbite-react";
 import { DashboardAPI } from "@/store/service/dashboard";
 import { useSubscribePushNotificationMutation } from "@/store/service/navigation";
 import { GeneralBaseAPI } from "@/store/generalBaseAPI";
+import { useTheme } from "@/context/ThemeContext";
 
 const AppLayout = ({ header, children }) => {
     const router = useRouter();
     const dispatch = useDispatch();
     const { user } = useAuth({ middleware: "auth" });
     const online_users = useSelector((state) => state.active_users);
+    const { dark } = useTheme();
     const [
         subscribePush,
         { data, isLoading },
@@ -273,15 +275,14 @@ const AppLayout = ({ header, children }) => {
 
     return (
         <div
-            className={`before:content-[''] before:bg-noise relative sm:before:w-[100%] before:h-full before:block before:absolute before:opacity-20 shadow-lg overflow-x-hidden`}
+            className={`before:content-[''] before:bg-noise relative sm:before:w-[100%] before:h-full before:block before:absolute before:opacity-15 dark:before:opacity-10 shadow-lg overflow-x-hidden`}
         >
             <div
-                className="min-h-screen w-full relative overflow-x-hidden"
-                style={{ background: "rgb(67,129,216, .2)" }}
+                className="min-h-screen w-full relative overflow-x-hidden bg-gradient-to-b from-slate-100 via-blue-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
             >
                 <Navigation user={user} />
                 {/* Page Heading */}
-                <header className="bg-white shadow-md flex flex-row before:content-[''] before:bg-noise relative before:w-full before:h-full before:block before:absolute before:opacity-5 overflow-x-hidden">
+                <header className="bg-white/85 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200/80 dark:border-slate-700/70 shadow-md flex flex-row before:content-[''] before:bg-noise relative before:w-full before:h-full before:block before:absolute before:opacity-5 dark:before:opacity-10 overflow-x-hidden">
                     <div className="max-w-7xl w-full mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {header}
                     </div>
@@ -335,7 +336,7 @@ const AppLayout = ({ header, children }) => {
                     pauseOnFocusLoss
                     draggable
                     pauseOnHover
-                    theme="light"
+                    theme={dark ? "dark" : "light"}
                 />
             </div>
         </div>

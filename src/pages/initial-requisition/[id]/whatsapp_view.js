@@ -68,8 +68,8 @@ export default function WhatsappView(props) {
             <Head>
                 <title>Initial Requisition</title>
             </Head>
-            <div className="dark:bg-gray-100 md:py-8 md:mx-16 mx-auto px-0 sm:px-6 lg:px-8">
-                <Card className="min-h-screen shadow-none dark:bg-gray-100 rounded-none md:rounded-lg p-0 md:p-6">
+            <div className="dark:bg-slate-800 md:py-8 md:mx-16 mx-auto px-0 sm:px-6 lg:px-8">
+                <Card className="min-h-screen shadow-none dark:bg-slate-800 rounded-none md:rounded-lg p-0 md:p-6">
                     <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
                         <Button onClick={() => router.back()}>Back</Button>
                         <div className={`pt-1`}>

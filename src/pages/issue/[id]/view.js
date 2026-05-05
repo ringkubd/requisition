@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { useEditIssueQuery } from '@/store/service/issue'
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import Status from '@/components/issue/Status'
 
 const IssueView = () => {
@@ -75,7 +75,7 @@ const IssueView = () => {
     return (
         <AppLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <h2 className="font-semibold text-xl text-gray-800 dark:text-slate-200 leading-tight">
                     Product Issue Details.
                 </h2>
             }>

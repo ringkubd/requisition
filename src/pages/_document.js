@@ -1,4 +1,5 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
+
 class MyDocument extends Document {
     static async getInitialProps(ctx) {
         const initialProps = await Document.getInitialProps(ctx);
@@ -33,7 +34,25 @@ class MyDocument extends Document {
                         color="#5bbad5"
                     />
                     <meta name="msapplication-TileColor" content="#da532c" />
-                    <meta name="theme-color" content="#ffffff" />
+                    <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
+                    <script
+                        dangerouslySetInnerHTML={{
+                            __html: `
+                                (function() {
+                                    try {
+                                        var theme = localStorage.getItem('theme');
+                                        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                                            document.documentElement.classList.add('dark');
+                                            document.getElementById('theme-color-meta').content = '#111827';
+                                        } else {
+                                            document.documentElement.classList.remove('dark');
+                                            document.getElementById('theme-color-meta').content = '#ffffff';
+                                        }
+                                    } catch(e) {}
+                                })();
+                            `,
+                        }}
+                    />
                 </Head>
                 <body className="antialiased">
                     <Main />

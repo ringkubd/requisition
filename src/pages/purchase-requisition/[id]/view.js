@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import { Button, Card, Table } from 'flowbite-react'
 import NavLink from '@/components/navLink'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import React, { useEffect, useRef, useState } from 'react'
 import { useEditPurchaseRequisitionQuery } from '@/store/service/requisitions/purchase'
 import { useReactToPrint } from 'react-to-print'
@@ -102,7 +102,7 @@ const View = props => {
     return (
         <AppLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <h2 className="font-semibold text-xl text-gray-800 dark:text-slate-200 leading-tight">
                     Purchase Requisition
                 </h2>
             }>

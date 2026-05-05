@@ -2,7 +2,7 @@ import React from 'react'
 const Loading = () => {
     return (
         <div
-            className={`flex flex-col min-h-screen min-w-full justify-center items-center justify-items-center`}>
+			className={`flex flex-col min-h-screen min-w-full justify-center items-center justify-items-center bg-gradient-to-b from-slate-100 via-blue-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-700 dark:text-slate-200`}>
             <svg
                 version="1.1"
                 id="Layer_1"

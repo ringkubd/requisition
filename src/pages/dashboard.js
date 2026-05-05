@@ -1,8 +1,8 @@
 import AppLayout from "@/components/Layouts/AppLayout";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Badge, Card } from "flowbite-react";
-import DataTable from "react-data-table-component";
+import DataTable from '@/components/ui/AppDataTable';
 import Status from "@/components/requisition/status";
 import {
     getDashboardCashData,
@@ -18,9 +18,11 @@ import moment from "moment";
 import { wrapper } from "@/store";
 import Link from "next/link";
 import { isMobile } from "react-device-detect";
+import { useTheme } from "@/context/ThemeContext";
 
 const Dashboard = () => {
     const { user } = useAuth();
+    const { dark } = useTheme();
     const [initialColumns, setInitialColumns] = useState([]);
     const [cashColumns, setCashColumns] = useState([]);
     const [searchParams, setSearchParams] = useState({});
@@ -300,17 +302,78 @@ const Dashboard = () => {
                 row?.current_status?.status === "Rejected" ||
                 row?.purchase_current_status?.status === "Rejected",
             style: (row) => ({
-                backgroundColor: "#f5e6f1",
-                boxShadow: "10px 10px red",
-                textShadow: "text-shadow: 2px 2px red",
+                backgroundColor: dark ? "rgba(127, 29, 29, 0.30)" : "#f5e6f1",
             }),
         },
     ];
 
+    const tableStyles = useMemo(
+        () => ({
+            table: {
+                style: {
+                    backgroundColor: dark ? "#0f172a" : "#ffffff",
+                    color: dark ? "#cbd5e1" : "#1f2937",
+                },
+            },
+            headRow: {
+                style: {
+                    backgroundColor: dark ? "#111827" : "#f8fafc",
+                    color: dark ? "#e2e8f0" : "#0f172a",
+                    fontSize: isMobile ? "9px" : "14px",
+                    fontWeight: "600",
+                    minHeight: isMobile ? "36px" : "48px",
+                    paddingLeft: isMobile ? "4px" : "16px",
+                    paddingRight: isMobile ? "4px" : "16px",
+                    borderBottom: dark
+                        ? "1px solid rgba(71, 85, 105, 0.7)"
+                        : "1px solid #e5e7eb",
+                },
+            },
+            rows: {
+                style: {
+                    backgroundColor: dark ? "#0f172a" : "#ffffff",
+                    color: dark ? "#cbd5e1" : "#374151",
+                    fontSize: isMobile ? "10px" : "13px",
+                    minHeight: isMobile ? "40px" : "56px",
+                    paddingLeft: isMobile ? "4px" : "16px",
+                    paddingRight: isMobile ? "4px" : "16px",
+                    borderBottom: dark
+                        ? "1px solid rgba(51, 65, 85, 0.7)"
+                        : "1px solid #e5e7eb",
+                },
+                highlightOnHoverStyle: {
+                    backgroundColor: dark
+                        ? "rgba(30, 41, 59, 0.85)"
+                        : "#eff6ff",
+                },
+            },
+            cells: {
+                style: {
+                    paddingLeft: isMobile ? "2px" : "8px",
+                    paddingRight: isMobile ? "2px" : "8px",
+                },
+            },
+            pagination: {
+                style: {
+                    backgroundColor: dark ? "#111827" : "#ffffff",
+                    color: dark ? "#cbd5e1" : "#374151",
+                    borderTop: dark
+                        ? "1px solid rgba(71, 85, 105, 0.7)"
+                        : "1px solid #e5e7eb",
+                },
+                pageButtonsStyle: {
+                    color: dark ? "#cbd5e1" : "#374151",
+                    fill: dark ? "#cbd5e1" : "#374151",
+                },
+            },
+        }),
+        [dark]
+    );
+
     return (
         <AppLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                     Dashboard
                 </h2>
             }
@@ -325,15 +388,15 @@ const Dashboard = () => {
 
             <div className="py-2 sm:py-4 md:py-12 w-full">
                 <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-1 sm:p-4 bg-white border-b border-gray-200">
-                            <Card className={`shadow-none border-0`}>
+                    <div className="bg-white/90 dark:bg-slate-900/90 overflow-hidden shadow-sm sm:rounded-lg border border-slate-200 dark:border-slate-700">
+                        <div className="p-1 sm:p-4 bg-white/80 dark:bg-slate-900/70 border-b border-slate-200 dark:border-slate-700">
+                            <Card className={`shadow-none border-0 bg-transparent dark:bg-transparent`}>
                                 <Tabs.Group
                                     aria-label={
                                         "Requisition Status and Approval Management"
                                     }
                                     style={`fullWidth`}
-                                    className="text-xs sm:text-sm"
+                                    className="text-xs sm:text-sm dark:text-slate-200"
                                 >
                                     <Tabs.Item
                                         title={
@@ -413,52 +476,7 @@ const Dashboard = () => {
                                                         conditionalRowStyles={
                                                             conditionalRowStyles
                                                         }
-                                                        customStyles={{
-                                                            headRow: {
-                                                                style: {
-                                                                    fontSize: isMobile
-                                                                        ? "9px"
-                                                                        : "14px",
-                                                                    fontWeight:
-                                                                        "600",
-                                                                    minHeight: isMobile
-                                                                        ? "36px"
-                                                                        : "48px",
-                                                                    paddingLeft: isMobile
-                                                                        ? "4px"
-                                                                        : "16px",
-                                                                    paddingRight: isMobile
-                                                                        ? "4px"
-                                                                        : "16px",
-                                                                },
-                                                            },
-                                                            rows: {
-                                                                style: {
-                                                                    fontSize: isMobile
-                                                                        ? "10px"
-                                                                        : "13px",
-                                                                    minHeight: isMobile
-                                                                        ? "40px"
-                                                                        : "56px",
-                                                                    paddingLeft: isMobile
-                                                                        ? "4px"
-                                                                        : "16px",
-                                                                    paddingRight: isMobile
-                                                                        ? "4px"
-                                                                        : "16px",
-                                                                },
-                                                            },
-                                                            cells: {
-                                                                style: {
-                                                                    paddingLeft: isMobile
-                                                                        ? "2px"
-                                                                        : "8px",
-                                                                    paddingRight: isMobile
-                                                                        ? "2px"
-                                                                        : "8px",
-                                                                },
-                                                            },
-                                                        }}
+                                                        customStyles={tableStyles}
                                                     />
                                                 </div>
                                             </div>
@@ -546,52 +564,7 @@ const Dashboard = () => {
                                                         conditionalRowStyles={
                                                             conditionalRowStyles
                                                         }
-                                                        customStyles={{
-                                                            headRow: {
-                                                                style: {
-                                                                    fontSize: isMobile
-                                                                        ? "9px"
-                                                                        : "14px",
-                                                                    fontWeight:
-                                                                        "600",
-                                                                    minHeight: isMobile
-                                                                        ? "36px"
-                                                                        : "48px",
-                                                                    paddingLeft: isMobile
-                                                                        ? "4px"
-                                                                        : "16px",
-                                                                    paddingRight: isMobile
-                                                                        ? "4px"
-                                                                        : "16px",
-                                                                },
-                                                            },
-                                                            rows: {
-                                                                style: {
-                                                                    fontSize: isMobile
-                                                                        ? "10px"
-                                                                        : "13px",
-                                                                    minHeight: isMobile
-                                                                        ? "40px"
-                                                                        : "56px",
-                                                                    paddingLeft: isMobile
-                                                                        ? "4px"
-                                                                        : "16px",
-                                                                    paddingRight: isMobile
-                                                                        ? "4px"
-                                                                        : "16px",
-                                                                },
-                                                            },
-                                                            cells: {
-                                                                style: {
-                                                                    paddingLeft: isMobile
-                                                                        ? "2px"
-                                                                        : "8px",
-                                                                    paddingRight: isMobile
-                                                                        ? "2px"
-                                                                        : "8px",
-                                                                },
-                                                            },
-                                                        }}
+                                                        customStyles={tableStyles}
                                                     />
                                                 </div>
                                             </div>

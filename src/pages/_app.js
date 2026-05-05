@@ -4,6 +4,7 @@ import { Provider } from 'react-redux'
 import { PersistGate } from 'reduxjs-toolkit-persist/integration/react'
 import '../../styles/globals.css'
 import Loading from '@/components/loading'
+import { ThemeProvider } from '@/context/ThemeContext'
 import { Iceland } from 'next/font/google'
 const roboto = Iceland({
     weight: ['400'],
@@ -18,9 +19,11 @@ const App = ({ Component, ...rest }) => {
     return (
         <Provider store={store}>
             <PersistGate loading={<Loading />} persistor={perStore}>
-                <main className={roboto}>
-                    <Component {...pageProps} />
-                </main>
+                <ThemeProvider>
+                    <main className={roboto}>
+                        <Component {...pageProps} />
+                    </main>
+                </ThemeProvider>
             </PersistGate>
         </Provider>
     )

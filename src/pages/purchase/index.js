@@ -2,7 +2,7 @@ import Head from 'next/head'
 import AppLayout from '@/components/Layouts/AppLayout'
 import { wrapper } from '@/store'
 import { Button, Card, Label, Select, TextInput } from 'flowbite-react'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import NavLink from '@/components/navLink'
 import { useRouter } from 'next/router'
 import Actions from '@/components/actions'
@@ -206,10 +206,10 @@ const Purchase = () => {
                                 {departments ? (
                                     <label
                                         htmlFor={`department_id`}
-                                        className={`flex flex-col sm:flex-row sm:items-center dark:text-black`}>
+                                        className={`flex flex-col sm:flex-row sm:items-center dark:text-gray-200`}>
                                         Departments
                                         <Select
-                                            className={`dark:text-black`}
+                                            className={`dark:text-gray-300`}
                                             id={`department_id`}
                                             onChange={e => {
                                                 changeSearchParams(

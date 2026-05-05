@@ -8,7 +8,7 @@ import {
 import AppLayout from '@/components/Layouts/AppLayout'
 import { wrapper } from '@/store'
 import { Button, Card } from 'flowbite-react'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import NavLink from '@/components/navLink'
 import { useRouter } from 'next/router'
 import Actions from '@/components/actions'

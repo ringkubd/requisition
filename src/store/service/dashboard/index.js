@@ -49,6 +49,30 @@ export const DashboardAPI = GeneralBaseAPI.injectEndpoints({
                 'dashboard_cash_requisition',
             ],
         }),
+        resendPurchaseNotification: builder.mutation({
+            query: ({ id }) => ({
+                url: `resend-notification/purchase/${id}`,
+                method: 'POST',
+            }),
+        }),
+        resendCashNotification: builder.mutation({
+            query: ({ id }) => ({
+                url: `resend-notification/cash/${id}`,
+                method: 'POST',
+            }),
+        }),
+        resendInitialNotification: builder.mutation({
+            query: ({ id }) => ({
+                url: `resend-notification/initial/${id}`,
+                method: 'POST',
+            }),
+        }),
+        resendIssueNotification: builder.mutation({
+            query: ({ id }) => ({
+                url: `resend-notification/issue/${id}`,
+                method: 'POST',
+            }),
+        }),
     }),
 })
 
@@ -58,6 +82,10 @@ export const {
     useUpdateInitialStatusMutation,
     useUpdatePurchaseStatusMutation,
     useUpdateCashStatusMutation,
+    useResendPurchaseNotificationMutation,
+    useResendCashNotificationMutation,
+    useResendInitialNotificationMutation,
+    useResendIssueNotificationMutation,
     util: { getRunningQueriesThunk },
 } = DashboardAPI
 

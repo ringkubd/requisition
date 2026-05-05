@@ -2,7 +2,7 @@ import Head from 'next/head'
 import AppLayout from '@/components/Layouts/AppLayout'
 import { wrapper } from '@/store'
 import { Button, Card, Label, Select, TextInput } from 'flowbite-react'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import NavLink from '@/components/navLink'
 import { useRouter } from 'next/router'
 import Actions from '@/components/actions'
@@ -164,7 +164,7 @@ const ProductIssue = () =>
             </Head>
             <AppLayout
                 header={
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-slate-100 leading-tight">
                         Product Issue Management.
                     </h2>
                 }>
@@ -172,7 +172,7 @@ const ProductIssue = () =>
                     <title>Product Issue Management.</title>
                 </Head>
                 <div className="md:py-8 md:mx-16 mx-0 md:px-4 sm:px-6 lg:px-8">
-                    <Card>
+                    <Card className="dark:bg-slate-800 dark:border-slate-700">
                         <div className="flex sm:flex-row flex-col space-x-4 space-y-4  shadow-lg py-4 px-4">
                             {hasPermission( 'create_product-issues', user ) ? (
                                 <NavLink
@@ -201,10 +201,10 @@ const ProductIssue = () =>
                                 {departments && isStoreManager ? (
                                     <label
                                         htmlFor={`user_department_id`}
-                                        className={`flex flex-col sm:flex-row sm:items-center dark:text-black`}>
+                                        className={`flex flex-col sm:flex-row sm:items-center dark:text-slate-200`}>
                                         Departments
                                         <Select
-                                            className={`dark:text-black`}
+                                            className={`dark:text-slate-300`}
                                             id={`user_department_id`}
                                             onChange={e =>
                                             {

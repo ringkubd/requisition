@@ -9,6 +9,7 @@ import DropdownLink, { DropdownButton } from "@/components/dropdownLink";
 import { useAuth } from "@/hooks/auth";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
+import { useTheme } from "@/context/ThemeContext";
 import {
     AiOutlineClose,
     AiOutlineMenu,
@@ -99,8 +100,8 @@ const Navigation = ({ user }) => {
                         onClick={() => setOpen(false)}
                         className={`flex items-center px-5 py-3.5 text-base font-medium transition-all duration-200 active:scale-[0.98] ${
                             active
-                                ? "bg-blue-50 text-blue-600 border-r-4 border-blue-600"
-                                : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                ? "bg-blue-50 text-blue-700 border-r-4 border-blue-600 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-400"
+                                : "text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/70 active:bg-slate-100 dark:active:bg-slate-700/70"
                         }`}
                     >
                         <div className="mr-3 text-lg flex-shrink-0">{icon}</div>
@@ -112,8 +113,8 @@ const Navigation = ({ user }) => {
                     onClick={onClick}
                     className={`flex items-center px-5 py-3.5 text-base font-medium transition-all duration-200 cursor-pointer active:scale-[0.98] ${
                         activeDropdown === title
-                            ? "bg-blue-50 text-blue-600"
-                            : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                            ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                            : "text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/70 active:bg-slate-100 dark:active:bg-slate-700/70"
                     }`}
                 >
                     <div className="mr-3 text-lg flex-shrink-0">{icon}</div>
@@ -126,7 +127,7 @@ const Navigation = ({ user }) => {
                 </div>
             )}
             {children && activeDropdown === title && (
-                <div className="bg-gray-50 border-t border-gray-200">
+                <div className="bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
                     {children}
                 </div>
             )}
@@ -139,8 +140,8 @@ const Navigation = ({ user }) => {
                 onClick={() => setOpen(false)}
                 className={`px-11 py-2.5 text-sm transition-all duration-200 active:scale-[0.98] ${
                     active
-                        ? "bg-blue-100 text-blue-600 font-medium border-r-2 border-blue-400"
-                        : "text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+                        ? "bg-blue-100 text-blue-700 font-medium border-r-2 border-blue-400 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-500"
+                        : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 active:bg-slate-200 dark:active:bg-slate-700"
                 }`}
             >
                 <span className="truncate block">{title}</span>
@@ -148,8 +149,10 @@ const Navigation = ({ user }) => {
         </Link>
     );
 
+    const { dark, toggle } = useTheme();
+
     return (
-        <nav className="bg-white border-b border-gray-100 shadow-lg relative z-50">
+        <nav className="bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-700 shadow-lg relative z-50">
             <div
                 className={`before:content-[''] before:bg-noise relative before:w-full before:h-full before:block  before:opacity-10`}
             >
@@ -160,7 +163,7 @@ const Navigation = ({ user }) => {
                             {/* Logo */}
                             <div className="flex-shrink-0 flex items-center">
                                 <Link href="/dashboard">
-                                    <ApplicationLogo className="block h-10 w-auto fill-current text-gray-600" />
+                                    <ApplicationLogo className="block h-10 w-auto fill-current text-slate-700 dark:text-slate-200" />
                                 </Link>
                             </div>
 
@@ -186,7 +189,7 @@ const Navigation = ({ user }) => {
                                         align="right"
                                         width="48"
                                         trigger={
-                                            <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
+                                            <button className="flex items-center text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 focus:outline-none transition duration-150 ease-in-out">
                                                 <div>Requisition</div>
                                                 <div className="ml-1">
                                                     <AiOutlineCaretDown />
@@ -270,9 +273,9 @@ const Navigation = ({ user }) => {
                                     <Dropdown
                                         align="left"
                                         width="48"
-                                        contentClasses={`px-1 py-0 bg-gray-200`}
+                                        contentClasses={`px-1 py-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700`}
                                         trigger={
-                                            <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
+                                            <button className="flex items-center text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 focus:outline-none transition duration-150 ease-in-out">
                                                 <div>Inventory</div>
                                                 <div className="ml-1">
                                                     <AiOutlineCaretDown />
@@ -363,9 +366,9 @@ const Navigation = ({ user }) => {
                                     <Dropdown
                                         align="left"
                                         width="48"
-                                        contentClasses={`px-1 py-0 bg-gray-200`}
+                                        contentClasses={`px-1 py-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700`}
                                         trigger={
-                                            <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
+                                            <button className="flex items-center text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 focus:outline-none transition duration-150 ease-in-out">
                                                 <div>Product Management</div>
                                                 <div className="ml-1">
                                                     <AiOutlineCaretDown />
@@ -467,9 +470,9 @@ const Navigation = ({ user }) => {
                                         <Dropdown
                                             align="left"
                                             width="48"
-                                            contentClasses={`px-1 py-0 bg-gray-200`}
+                                            contentClasses={`px-1 py-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700`}
                                             trigger={
-                                                <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out z-40 overflow-hidden">
+                                                <button className="flex items-center text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 focus:outline-none transition duration-150 ease-in-out z-40 overflow-hidden">
                                                     <div>Organization</div>
                                                     <div className="ml-1">
                                                         <AiOutlineCaretDown />
@@ -547,13 +550,24 @@ const Navigation = ({ user }) => {
                             </div>
                         </div>
 
-                        {/* Settings Dropdown */}
+                        {/* Theme Toggle & Settings Dropdown */}
                         <div className="hidden sm:flex sm:items-center sm:ml-6">
+                            <button
+                                onClick={toggle}
+                                className="mr-3 p-2 rounded-lg text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                                title={dark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                            >
+                                {dark ? (
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                                ) : (
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                                )}
+                            </button>
                             <Dropdown
                                 align="right"
                                 width="48"
                                 trigger={
-                                    <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
+                                    <button className="flex items-center text-sm font-medium text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 focus:outline-none transition duration-150 ease-in-out">
                                         <div>{user?.name}</div>
 
                                         <div className="ml-1">
@@ -582,7 +596,7 @@ const Navigation = ({ user }) => {
                         <div className="flex items-center sm:hidden">
                             <button
                                 onClick={() => setOpen((open) => !open)}
-                                className="relative inline-flex items-center justify-center p-2 rounded-lg text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-200 ease-in-out"
+                                className="relative inline-flex items-center justify-center p-2 rounded-lg text-slate-500 dark:text-slate-300 hover:text-slate-700 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:bg-slate-100 dark:focus:bg-slate-800 focus:text-slate-700 dark:focus:text-slate-100 transition duration-200 ease-in-out"
                                 aria-label="Toggle menu"
                             >
                                 <div className="w-6 h-6 relative">
@@ -621,7 +635,7 @@ const Navigation = ({ user }) => {
                         />
 
                         {/* Mobile Navigation Panel */}
-                        <div className="mobile-nav fixed top-0 right-0 h-full w-80 max-w-[90vw] bg-white shadow-2xl z-50 sm:hidden transform transition-transform duration-300 ease-in-out overflow-y-auto">
+                        <div className="mobile-nav fixed top-0 right-0 h-full w-80 max-w-[90vw] bg-white dark:bg-slate-800 shadow-2xl z-50 sm:hidden transform transition-transform duration-300 ease-in-out overflow-y-auto">
                             {/* Mobile Header */}
                             <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-5 sticky top-0 z-10 shadow-md">
                                 <div className="flex items-center justify-between">
@@ -971,7 +985,20 @@ const Navigation = ({ user }) => {
                             </div>
 
                             {/* Mobile Footer Actions - Sticky at bottom */}
-                            <div className="fixed bottom-0 right-0 w-80 max-w-[90vw] bg-white border-t border-gray-200 px-6 py-4 shadow-lg">
+                            <div className="fixed bottom-0 right-0 w-80 max-w-[90vw] bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 px-6 py-4 shadow-lg">
+                                <button
+                                    onClick={toggle}
+                                className="flex items-center w-full px-4 py-3 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-lg transition-colors duration-200 mb-2"
+                                    >
+                                    {dark ? (
+                                        <svg className="mr-3 text-xl flex-shrink-0 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                                    ) : (
+                                        <svg className="mr-3 text-xl flex-shrink-0 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                                    )}
+                                    <span className="text-base font-medium">
+                                        {dark ? 'Light Mode' : 'Dark Mode'}
+                                    </span>
+                                </button>
                                 <button
                                     onClick={() => {
                                         router.push(
@@ -979,7 +1006,7 @@ const Navigation = ({ user }) => {
                                         );
                                         setOpen(false);
                                     }}
-                                    className="flex items-center w-full px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200 mb-2"
+                                    className="flex items-center w-full px-4 py-3 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-lg transition-colors duration-200 mb-2"
                                 >
                                     <AiOutlineSetting className="mr-3 text-xl flex-shrink-0" />
                                     <span className="text-base font-medium">
@@ -991,7 +1018,7 @@ const Navigation = ({ user }) => {
                                         logout();
                                         setOpen(false);
                                     }}
-                                    className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                                    className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
                                 >
                                     <AiOutlineLogout className="mr-3 text-xl flex-shrink-0" />
                                     <span className="text-base font-medium">

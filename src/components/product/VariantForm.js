@@ -1,4 +1,4 @@
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import { Button, Label, TextInput } from 'flowbite-react'
 import { ErrorMessage, Formik } from 'formik'
 import { setProductOptionsLocal } from '@/store/service/options/optionSlice'

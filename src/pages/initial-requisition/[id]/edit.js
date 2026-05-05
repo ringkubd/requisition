@@ -11,7 +11,7 @@ import {
     useUpdateInitialRequisitionMutation,
 } from '@/store/service/requisitions/initial'
 import Actions from '@/components/actions'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import moment from 'moment/moment'
 import UpdateVariantForm from '@/components/initial-requisition/updateVariantForm'
 import axios from '@/lib/axios'
@@ -280,7 +280,7 @@ const Edit = props => {
         <>
             <AppLayout
                 header={
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-slate-100 leading-tight">
                         Update Initial Requisition.
                     </h2>
                 }>
@@ -288,7 +288,7 @@ const Edit = props => {
                     <title>Update Initial Requisition.</title>
                 </Head>
                 <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
-                    <Card className="min-h-screen">
+                    <Card className="min-h-screen dark:bg-slate-800 dark:border-slate-700">
                         <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
                             <NavLink
                                 active={
@@ -328,10 +328,11 @@ const Edit = props => {
                                                 <div className="flex flex-row w-full gap-4">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="product_id"
-                                                                value="Product"
-                                                            />
+                                                        <Label
+                                                            htmlFor="product_id"
+                                                            value="Product"
+                                                            className="dark:text-slate-200"
+                                                        />
                                                         </div>
                                                         <AsyncPaginate
                                                             defaultOptions
@@ -392,10 +393,11 @@ const Edit = props => {
                                                 <div className="flex flex-row w-full lg:w-1/2 gap-4">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="unit"
-                                                                value="Unit"
-                                                            />
+                                                        <Label
+                                                            htmlFor="unit"
+                                                            value="Unit"
+                                                            className="dark:text-slate-200"
+                                                        />
                                                         </div>
                                                         <TextInput
                                                             value={productUnit}
@@ -418,10 +420,11 @@ const Edit = props => {
                                                 <div className="flex flex-row w-full lg:w-1/2 gap-4">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="product_option_id"
-                                                                value="Varient"
-                                                            />
+                                                        <Label
+                                                            htmlFor="product_option_id"
+                                                            value="Varient"
+                                                            className="dark:text-slate-200"
+                                                        />
                                                         </div>
                                                         <Select
                                                             value={productOptions
@@ -477,10 +480,11 @@ const Edit = props => {
                                                 <div className="flex flex-row w-full lg:w-1/2 gap-4">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="required_quantity"
-                                                                value="Required Quantity"
-                                                            />
+                                                        <Label
+                                                            htmlFor="required_quantity"
+                                                            value="Required Quantity"
+                                                            className="dark:text-slate-200"
+                                                        />
                                                         </div>
                                                         <TextInput
                                                             value={
@@ -518,10 +522,11 @@ const Edit = props => {
                                                 <div className="flex flex-row w-full lg:w-1/2 gap-4">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="available_quantity"
-                                                                value="Available Quantity"
-                                                            />
+                                                        <Label
+                                                            htmlFor="available_quantity"
+                                                            value="Available Quantity"
+                                                            className="dark:text-slate-200"
+                                                        />
                                                         </div>
                                                         <TextInput
                                                             value={
@@ -550,10 +555,11 @@ const Edit = props => {
                                                 <div className="flex flex-row  w-full lg:w-1/2 gap-4">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="quantity_to_be_purchase"
-                                                                value="Qty to be purchase"
-                                                            />
+                                                        <Label
+                                                            htmlFor="quantity_to_be_purchase"
+                                                            value="Qty to be purchase"
+                                                            className="dark:text-slate-200"
+                                                        />
                                                         </div>
                                                         <TextInput
                                                             value={
@@ -579,10 +585,11 @@ const Edit = props => {
                                                 <div className="flex flex-row w-full gap-4">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="purpose"
-                                                                value="Purpose"
-                                                            />
+                                                        <Label
+                                                            htmlFor="purpose"
+                                                            value="Purpose"
+                                                            className="dark:text-slate-200"
+                                                        />
                                                         </div>
                                                         <TextInput
                                                             value={

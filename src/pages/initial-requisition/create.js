@@ -10,7 +10,7 @@ import {
     useGetPurposeSuggestionQuery,
     useStoreInitialRequisitionMutation,
 } from '@/store/service/requisitions/initial'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import Actions from '@/components/actions'
 import moment from 'moment'
 import { CSSTransition, SwitchTransition } from 'react-transition-group'
@@ -238,7 +238,7 @@ const InitialRequisitionCreate = props => {
         <>
             <AppLayout
                 header={
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-slate-100 leading-tight">
                         Add new requisition.
                     </h2>
                 }>
@@ -246,7 +246,7 @@ const InitialRequisitionCreate = props => {
                     <title>Add new requisition</title>
                 </Head>
                 <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
-                    <Card className="min-h-screen">
+                    <Card className="min-h-screen dark:bg-slate-800 dark:border-slate-700">
                         <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
                             <NavLink
                                 active={
@@ -286,7 +286,7 @@ const InitialRequisitionCreate = props => {
                                             <>
                                                 {
                                                     !departmentISLoading && ! departmentISError && departments && (
-                                                        <label htmlFor={`department_id`} className={`font-bold flex flex-row justify-end mb-2 space-x-3 items-center`}>
+                                                        <label htmlFor={`department_id`} className={`font-bold flex flex-row justify-end mb-2 space-x-3 items-center dark:text-slate-200`}>
                                                             <span>Department</span>
                                                             <Select
                                                                 id={`department_id`}
@@ -325,6 +325,7 @@ const InitialRequisitionCreate = props => {
                                                         <Label
                                                             htmlFor="category_id"
                                                             value="Category"
+                                                            className="dark:text-slate-200"
                                                         />
                                                     </div>
                                                     <AsyncPaginate
@@ -367,6 +368,7 @@ const InitialRequisitionCreate = props => {
                                                         <Label
                                                             htmlFor="product_id"
                                                             value="Product"
+                                                            className="dark:text-slate-200"
                                                         />
                                                     </div>
                                                     <AsyncPaginate
@@ -418,6 +420,7 @@ const InitialRequisitionCreate = props => {
                                                         <Label
                                                             htmlFor="product_option_id"
                                                             value="Varient"
+                                                            className="dark:text-slate-200"
                                                         />
                                                     </div>
                                                     <Select
@@ -497,6 +500,7 @@ const InitialRequisitionCreate = props => {
                                                         <Label
                                                             htmlFor="unit"
                                                             value="Unit"
+                                                            className="dark:text-slate-200"
                                                         />
                                                     </div>
                                                     <TextInput
@@ -519,6 +523,7 @@ const InitialRequisitionCreate = props => {
                                                         <Label
                                                             htmlFor="required_quantity"
                                                             value="Required Quantity"
+                                                            className="dark:text-slate-200"
                                                         />
                                                     </div>
                                                     <TextInput
@@ -558,6 +563,7 @@ const InitialRequisitionCreate = props => {
                                                         <Label
                                                             htmlFor="available_quantity"
                                                             value="Available Quantity"
+                                                            className="dark:text-slate-200"
                                                         />
                                                     </div>
                                                     <TextInput
@@ -585,6 +591,7 @@ const InitialRequisitionCreate = props => {
                                                         <Label
                                                             htmlFor="quantity_to_be_purchase"
                                                             value="Qty to be purchase"
+                                                            className="dark:text-slate-200"
                                                         />
                                                     </div>
                                                     <TextInput
@@ -614,6 +621,7 @@ const InitialRequisitionCreate = props => {
                                                         <Label
                                                             htmlFor="purpose"
                                                             value="Purpose"
+                                                            className="dark:text-slate-200"
                                                         />
                                                     </div>
                                                     <div>

@@ -34,7 +34,7 @@ export default function PrintView(props) {
     return (
         <AppLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <h2 className="font-semibold text-xl text-gray-800 dark:text-slate-200 leading-tight">
                     Purchase Requisition
                 </h2>
             }
@@ -44,8 +44,8 @@ export default function PrintView(props) {
             </Head>
             <div className="py-0 md:py-8 w-full">
                 <div className="w-full max-w-full mx-auto px-0 sm:px-4 lg:px-8">
-                    <Card className="min-h-screen shadow-none rounded-none md:rounded-lg p-0 md:p-6">
-                        <div className="flex flex-row flex-wrap space-x-2 sm:space-x-4 gap-2 sm:gap-4 border-b-2 shadow-lg p-2 sm:p-4 rounded">
+                    <Card className="min-h-screen shadow-none rounded-none md:rounded-lg p-0 md:p-6 dark:bg-slate-800/70 dark:border-slate-700">
+                        <div className="flex flex-row flex-wrap space-x-2 sm:space-x-4 gap-2 sm:gap-4 border-b-2 border-slate-200 dark:border-slate-700 shadow-none p-2 sm:p-4 rounded bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-100">
                             <Button onClick={() => router.back()}>Back</Button>
                             <div className={`pt-1`}>
                                 <Button
@@ -76,7 +76,7 @@ export default function PrintView(props) {
                                 ) : null}
                             </div>
                         </div>
-                        <div className="w-full overflow-x-auto p-0 m-0">
+                        <div className="w-full overflow-x-auto p-0 m-0 bg-slate-100 dark:bg-slate-800/70 rounded-md print:bg-white print:text-black">
                             <RequisitionPrint
                                 requisition_products={requisition_products}
                                 mainData={mainData}

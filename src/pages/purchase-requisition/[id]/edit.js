@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import { Button, Card, Table, TextInput } from 'flowbite-react'
 import NavLink from '@/components/navLink'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import React, { useEffect, useRef, useState } from 'react'
 import {
     useEditPurchaseRequisitionQuery,
@@ -154,7 +154,7 @@ const Edit = props => {
     return (
         <AppLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <h2 className="font-semibold text-xl text-gray-800 dark:text-slate-100 leading-tight">
                     Purchase Requisition
                 </h2>
             }>
@@ -162,7 +162,7 @@ const Edit = props => {
                 <title>Purchase Requisition</title>
             </Head>
             <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
-                <Card className="min-h-screen">
+                <Card className="min-h-screen dark:bg-slate-800 dark:border-slate-700">
                     <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
                         <NavLink
                             active={router.pathname === 'initial-requisition'}

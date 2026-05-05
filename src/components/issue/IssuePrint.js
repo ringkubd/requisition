@@ -45,71 +45,71 @@ const IssuePrint = forwardRef(({ products }, ref) => {
                         <table
                             className={`mb-3 shadow-none w-full text-sm text-left text-gray-500 dark:text-gray-400`}>
                             <thead
-                                className={`text-center italic border bg-white text-xs text-gray-700 uppercase`}>
+                                className={`text-center italic border bg-white dark:bg-white text-xs text-gray-700 dark:text-gray-700 uppercase`}>
                                 <tr>
                                     <th
                                         scope="col"
                                         rowSpan={2}
-                                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                                        className={`border bg-white dark:bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                                         Sl.#
                                     </th>
                                     <th
                                         scope="col"
                                         rowSpan={2}
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 normal-case`}>
                                         Name of the Item
                                     </th>
                                     <th
                                         scope="col"
                                         rowSpan={2}
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 normal-case`}>
                                         Use Date
                                     </th>
                                     <th
                                         scope="col"
                                         rowSpan={2}
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 normal-case`}>
                                         Purpose
                                     </th>
                                     <th
                                         scope="col"
                                         rowSpan={2}
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 normal-case`}>
                                         Uses Area
                                     </th>
                                     <th
                                         scope="col"
                                         rowSpan={2}
-                                        className={`border bg-white leading-3 py-0 px-2 normal-case`}>
+                                        className={`border bg-white dark:bg-white leading-3 py-0 px-2 normal-case`}>
                                         Note
                                     </th>
                                     <th
                                         scope="col"
                                         colSpan={3}
-                                        className={`border bg-white leading-3 py-4 px-2 normal-case text-xs`}>
+                                        className={`border bg-white dark:bg-white leading-3 py-4 px-2 normal-case text-xs`}>
                                         Stock Status
                                     </th>
                                 </tr>
                                 <tr>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-2 px-2 normal-case`}>
+                                        className={`border bg-white dark:bg-white leading-3 py-2 px-2 normal-case`}>
                                         Stock
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-2 px-2 normal-case`}>
+                                        className={`border bg-white dark:bg-white leading-3 py-2 px-2 normal-case`}>
                                         Issued
                                     </th>
                                     <th
                                         scope="col"
-                                        className={`border bg-white leading-3 py-2 px-2 normal-case`}>
+                                        className={`border bg-white dark:bg-white leading-3 py-2 px-2 normal-case`}>
                                         Balance
                                     </th>
                                 </tr>
                             </thead>
                             <tbody
-                                className={`shadow-none text-gray-800 text-center p-2`}>
+                                className={`shadow-none text-gray-800 dark:text-gray-800 text-center p-2`}>
                                 {products.products?.map((p, i) => (
                                     <tr>
                                         <td className={`border p-1`}>

@@ -2,7 +2,7 @@ import AppLayout from '@/components/Layouts/AppLayout'
 import Head from 'next/head'
 import NavLink from '@/components/navLink'
 import { Button, Card } from 'flowbite-react'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import { useEffect, useState } from 'react'
 import {
     getUnits,

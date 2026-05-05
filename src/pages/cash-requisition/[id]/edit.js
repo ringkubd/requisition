@@ -8,7 +8,7 @@ import * as Yup from 'yup'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import Actions from '@/components/actions'
-import DataTable from 'react-data-table-component'
+import DataTable from '@/components/ui/AppDataTable'
 import {
     useGetCashProductQuery,
     useGetSingleCashRequisitionQuery,
@@ -190,7 +190,7 @@ const Edit = props => {
         <>
             <AppLayout
                 header={
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-slate-100 leading-tight">
                         Update Cash Requisition.
                     </h2>
                 }>
@@ -198,7 +198,7 @@ const Edit = props => {
                     <title>Update Cash Requisition.</title>
                 </Head>
                 <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
-                    <Card className="min-h-screen">
+                    <Card className="min-h-screen dark:bg-slate-800 dark:border-slate-700">
                         <div className="flex flex-row space-x-4 gap-4 border-b-2 shadow-lg p-4 rounded">
                             <NavLink
                                 active={router.pathname === 'cash-requisition'}
@@ -236,10 +236,11 @@ const Edit = props => {
                                                 <div className="flex flex-row w-full gap-4">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="product_id"
-                                                                value="Product"
-                                                            />
+                                                        <Label
+                                                            htmlFor="product_id"
+                                                            value="Product"
+                                                            className="dark:text-slate-200"
+                                                        />
                                                         </div>
                                                         <CreatableSelect
                                                             className={'select'}
@@ -296,10 +297,11 @@ const Edit = props => {
                                                 <div className="flex flex-row w-full lg:w-1/2 gap-4">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="unit"
-                                                                value="Unit"
-                                                            />
+                                                        <Label
+                                                            htmlFor="unit"
+                                                            value="Unit"
+                                                            className="dark:text-slate-200"
+                                                        />
                                                         </div>
                                                         <CreatableSelect
                                                             className={'select'}
@@ -349,10 +351,11 @@ const Edit = props => {
                                                 <div className="flex flex-row w-full lg:w-1/2 gap-4">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="required_unit"
-                                                                value="Required Quantity"
-                                                            />
+                                                        <Label
+                                                            htmlFor="required_unit"
+                                                            value="Required Quantity"
+                                                            className="dark:text-slate-200"
+                                                        />
                                                         </div>
                                                         <TextInput
                                                             value={
@@ -379,10 +382,11 @@ const Edit = props => {
                                                 <div className="flex flex-row  w-full lg:w-1/2 gap-4">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="unit_price"
-                                                                value="Price"
-                                                            />
+                                                        <Label
+                                                            htmlFor="unit_price"
+                                                            value="Price"
+                                                            className="dark:text-slate-200"
+                                                        />
                                                         </div>
                                                         <TextInput
                                                             value={
@@ -407,10 +411,11 @@ const Edit = props => {
                                                 <div className="flex flex-row w-full gap-4 relative">
                                                     <div className="w-full">
                                                         <div className="mb-2 block">
-                                                            <Label
-                                                                htmlFor="purpose"
-                                                                value="Purpose"
-                                                            />
+                                                        <Label
+                                                            htmlFor="purpose"
+                                                            value="Purpose"
+                                                            className="dark:text-slate-200"
+                                                        />
                                                         </div>
                                                         <div>
                                                             <div className="flex">
