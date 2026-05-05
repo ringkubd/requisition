@@ -1190,4 +1190,51 @@ class CashRequisitionAPIController extends AppBaseController
         }
         // }
     }
+
+    public function resendNotifications($id): JsonResponse
+    {
+        $cashRequisition = $this->cashRequisitionRepository->find($id);
+        if (!$cashRequisition) {
+            return $this->sendError('Cash Requisition not found');
+        }
+
+        $status = $cashRequisition->approval_status;
+        if (!$status) {
+            return $this->sendError('No approval status found');
+        }
+
+        $stage = $status->current_stage;
+
+        switch ($stage) {
+            case 'department':
+                $this->notifyHeadOfDepartment($cashRequisition, $cashRequisition->user->name, $cashRequisition->prf_no);
+                break;
+
+            case 'accounts':
+                $accountsUsers = $this->findAccountsDepartmentUsers();
+                foreach ($accountsUsers as $user) {
+                    $user->notify(new PushNotification(
+                        "Cash requisition needs accounts approval.",
+                        "P.R. No. {$cashRequisition->prf_no} from {$cashRequisition->department->name} has been approved by department. Please review."
+                    ));
+                    $this->notifyAccountsUser($user, $cashRequisition);
+                }
+                break;
+
+            case 'ceo':
+                $ceo = $this->findCeoUser();
+                if ($ceo) {
+                    $ceo->notify(new PushNotification(
+                        "Cash requisition needs CEO approval.",
+                        "P.R. No. {$cashRequisition->prf_no} has been approved by accounts. Please review."
+                    ));
+                    $this->notifyCeoUser($ceo, $cashRequisition, auth()->user());
+                }
+                break;
+        }
+
+        Log::info('Resent notifications', ['req' => $cashRequisition->id, 'stage' => $stage, 'by' => auth()->id()]);
+
+        return $this->sendResponse([], 'Notifications resent successfully');
+    }
 }

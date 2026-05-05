@@ -16,6 +16,7 @@ use App\Models\PurchaseRequisitionProduct;
 use App\Models\User;
 use App\Notifications\PushNotification;
 use App\Notifications\RequisitionStatusNotification;
+use App\Models\OneTimeLogin;
 use App\Repositories\InitialRequisitionRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -23,6 +24,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\InitialRequisitionResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use OpenApi\Annotations as OA;
 
 /**
@@ -619,5 +621,36 @@ class InitialRequisitionAPIController extends AppBaseController
            $initialRequisition,
             __('messages.saved', ['model' => __('models/initialRequisitions.singular')])
         );
+    }
+
+    public function resendNotifications($id): JsonResponse
+    {
+        $initialRequisition = $this->initialRequisitionRepository->find($id);
+        if (!$initialRequisition) {
+            return $this->sendError('Initial Requisition not found');
+        }
+
+        $status = $initialRequisition->approval_status;
+        if (!$status) {
+            return $this->sendError('No approval status found');
+        }
+
+        $stage = $status->current_stage;
+
+        if ($stage === 'department') {
+            $head_of_department = User::find($initialRequisition->department?->head_of_department);
+            if ($head_of_department) {
+                $head_of_department->notify(new PushNotification(
+                    "An initial requisition is initiated.",
+                    "{$initialRequisition->user->name} generated an initial requisition I.R.F. No. {$initialRequisition->irf_no}. Please approve or reject it.",
+                    $initialRequisition
+                ));
+                $head_of_department->notify(new RequisitionStatusNotification($initialRequisition));
+            }
+        }
+
+        Log::info('Resent notifications', ['req' => $initialRequisition->id, 'stage' => $stage, 'by' => auth()->id()]);
+
+        return $this->sendResponse([], 'Notifications resent successfully');
     }
 }
