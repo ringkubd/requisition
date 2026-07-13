@@ -182,6 +182,63 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
     }
 
     /**
+     * Extract the first message summary from payload
+     */
+    private function getFirstMessage(array $payload): array
+    {
+        $value = $payload['entry'][0]['changes'][0]['value'] ?? [];
+        if (!$value) return [];
+
+        $metadata = $value['metadata'] ?? [];
+
+        $msgs = $value['messages'] ?? [];
+        if (!empty($msgs)) {
+            $first = $msgs[0];
+            $type = $first['type'] ?? null;
+            $from = $first['from'] ?? null;
+            $text = $this->extractMessageTextFromMsg($first);
+            return [
+                'type' => $type,
+                'from' => $from,
+                'to' => $metadata['display_phone_number'] ?? null,
+                'recipient_id' => $metadata['phone_number_id'] ?? null,
+                'recipient_number' => $metadata['display_phone_number'] ?? null,
+                'timestamp' => $first['timestamp'] ?? null,
+                'text' => $text,
+            ];
+        }
+
+        $statuses = $value['statuses'] ?? [];
+        if (!empty($statuses)) {
+            $st = $statuses[0];
+            return [
+                'type' => 'status',
+                'from' => $st['recipient_id'] ?? null,
+                'to' => $metadata['display_phone_number'] ?? null,
+                'recipient_id' => $st['recipient_id'] ?? null,
+                'recipient_number' => $metadata['display_phone_number'] ?? null,
+                'timestamp' => $st['timestamp'] ?? null,
+                'text' => 'status: ' . ($st['status'] ?? 'unknown'),
+            ];
+        }
+
+        return [];
+    }
+
+    private function extractMessageTextFromMsg(array $msg): ?string
+    {
+        $type = $msg['type'] ?? null;
+        if ($type && isset($msg[$type])) {
+            $c = $msg[$type];
+            if (is_array($c)) {
+                return $c['body'] ?? $c['caption'] ?? $c['text'] ?? $c['payload'] ?? $c['title'] ?? null;
+            }
+            return (string) $c;
+        }
+        return $msg['text']['body'] ?? $msg['button']['text'] ?? $msg['button']['payload'] ?? null;
+    }
+
+    /**
      * Send a WhatsApp message to a phone number
      */
     public function send(Request $request)
