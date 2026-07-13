@@ -234,6 +234,9 @@ Route::resource('product-issue-items', App\Http\Controllers\API\ProductIssueItem
 // WhatsApp webhook logs
 Route::get('whatsapp-webhook-logs', [App\Http\Controllers\API\WhatsAppWebhookLogAPIController::class, 'index']);
 Route::get('whatsapp-webhook-logs/{id}', [App\Http\Controllers\API\WhatsAppWebhookLogAPIController::class, 'show']);
+Route::get('whatsapp-conversations', [App\Http\Controllers\API\WhatsAppWebhookLogAPIController::class, 'conversations']);
+Route::get('whatsapp-messages', [App\Http\Controllers\API\WhatsAppWebhookLogAPIController::class, 'messages']);
+Route::post('whatsapp-send', [App\Http\Controllers\API\WhatsAppWebhookLogAPIController::class, 'send']);
 
 
 Route::resource('vehicles', App\Http\Controllers\API\VehicleAPIController::class)

@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Channels\ThrottledWhatsAppChannel;
 use App\Http\Controllers\AppBaseController;
+use App\Models\User;
 use App\Models\WhatsAppWebhookLog;
+use App\Notifications\WhatsAppCommonNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use NotificationChannels\WhatsApp\Component\Component;
 
 class WhatsAppWebhookLogAPIController extends AppBaseController
 {
     public function __construct()
     {
         $this->middleware('auth:sanctum');
-        $this->middleware('role_or_permission:Super Admin|view_whatsapp_webhooks', ['only' => ['index', 'show']]);
+        $this->middleware('role_or_permission:Super Admin|view_whatsapp_webhooks', ['only' => ['index', 'show', 'conversations', 'messages']]);
+        $this->middleware('role_or_permission:Super Admin|send_whatsapp_message', ['only' => ['send']]);
     }
 
     /**
@@ -86,6 +91,192 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
             'log' => $log,
             'messages' => $messages,
         ], 'Webhook log retrieved successfully');
+    }
+
+    /**
+     * Get conversations (unique contacts grouped by phone)
+     */
+    public function conversations(Request $request)
+    {
+        $search = $request->search;
+        $limit = (int) ($request->limit ?? 50);
+
+        $logs = WhatsAppWebhookLog::query()
+            ->when($search, function ($q) use ($search) {
+                $q->where('payload', 'like', '%' . $search . '%');
+            })
+            ->orderBy('created_at', 'desc')
+            ->limit(500)
+            ->get();
+
+        $contacts = [];
+        foreach ($logs as $log) {
+            $payload = $log->payload ?? [];
+            $firstMsg = $this->getFirstMessage($payload);
+            $phone = $firstMsg['from'] ?? $firstMsg['to'] ?? $firstMsg['recipient_id'] ?? 'unknown';
+
+            if ($phone === 'unknown') continue;
+
+            // Find contact name from the payload contacts array
+            $contactName = null;
+            $contactsArr = $this->safeGet($payload, ['entry', 0, 'changes', 0, 'value', 'contacts']);
+            if (is_array($contactsArr)) {
+                foreach ($contactsArr as $c) {
+                    $cPhone = $c['wa_id'] ?? null;
+                    if ($cPhone === $phone || !$contactName) {
+                        $name = $c['profile']['name'] ?? $c['name']['formatted_name'] ?? null;
+                        if ($name) $contactName = $name;
+                    }
+                }
+            }
+
+            $key = $phone;
+            if (!isset($contacts[$key]) || $log->created_at->gt($contacts[$key]['last_message_at'])) {
+                $contacts[$key] = [
+                    'phone' => $phone,
+                    'name' => $contactName ?? $phone,
+                    'last_message' => $firstMsg['text'] ?? null,
+                    'last_message_at' => $log->created_at->toDateTimeString(),
+                    'last_message_type' => $firstMsg['type'] ?? null,
+                    'unread' => 0,
+                ];
+            }
+        }
+
+        $values = array_values($contacts);
+        usort($values, fn($a, $b) => strtotime($b['last_message_at']) - strtotime($a['last_message_at']));
+        $values = array_slice($values, 0, $limit);
+
+        return $this->sendResponse($values, 'Conversations retrieved successfully');
+    }
+
+    /**
+     * Get messages for a specific phone number
+     */
+    public function messages(Request $request)
+    {
+        $request->validate(['phone' => 'required|string']);
+
+        $phone = $request->phone;
+        $page = (int) ($request->page ?? 1);
+        $perPage = (int) ($request->per_page ?? 50);
+
+        $logs = WhatsAppWebhookLog::query()
+            ->where('payload', 'like', '%' . $phone . '%')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        $allMessages = [];
+        foreach ($logs as $log) {
+            $msgList = $this->extractMessages($log->payload ?? []);
+            foreach ($msgList as $m) {
+                $matched = false;
+                foreach (['from', 'to', 'recipient_number'] as $field) {
+                    if (isset($m[$field]) && str_contains($m[$field], $phone)) {
+                        $matched = true;
+                        break;
+                    }
+                }
+                if (!$matched && empty($m['from']) && empty($m['to'])) {
+                    continue;
+                }
+                $allMessages[] = [
+                    'id' => $m['id'] ?? 'log_' . $log->id,
+                    'from' => $m['from'] ?? null,
+                    'to' => $m['to'] ?? $m['recipient_number'] ?? null,
+                    'text' => $m['text'] ?? null,
+                    'type' => $m['type'] ?? null,
+                    'timestamp' => $m['timestamp'] ?? $log->created_at->toDateTimeString(),
+                    'direction' => $this->isOutbound($m, $log) ? 'outbound' : 'inbound',
+                    'log_id' => $log->id,
+                    'created_at' => $log->created_at->toDateTimeString(),
+                ];
+            }
+
+            // Also include outbound logs sent to this number
+            if ($log->method === 'OUTBOUND') {
+                $payload = $log->payload ?? [];
+                $sentTo = $payload['sent_to'] ?? null;
+                $sentMsg = $payload['message'] ?? null;
+                if ($sentTo && str_contains($sentTo, $phone)) {
+                    $allMessages[] = [
+                        'id' => 'out_' . $log->id,
+                        'from' => 'System',
+                        'to' => $sentTo,
+                        'text' => $sentMsg,
+                        'type' => 'text',
+                        'timestamp' => $log->created_at->toDateTimeString(),
+                        'direction' => 'outbound',
+                        'log_id' => $log->id,
+                        'created_at' => $log->created_at->toDateTimeString(),
+                    ];
+                }
+            }
+        }
+
+        usort($allMessages, fn($a, $b) => strtotime($a['timestamp']) - strtotime($b['timestamp']));
+
+        return $this->sendResponse([
+            'messages' => array_values($allMessages),
+            'total' => count($allMessages),
+            'page' => $page,
+            'per_page' => $perPage,
+        ], 'Messages retrieved successfully');
+    }
+
+    /**
+     * Send a WhatsApp message to a phone number
+     */
+    public function send(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'message' => 'required|string|max:1000',
+        ]);
+
+        try {
+            $user = $request->user();
+
+            $user->notify(new WhatsAppCommonNotification(
+                Component::text($request->message),
+                $request->phone
+            ));
+
+            WhatsAppWebhookLog::create([
+                'payload' => [
+                    'sent_to' => $request->phone,
+                    'message' => $request->message,
+                    'sent_by' => $user->id,
+                    'sent_by_name' => $user->name,
+                ],
+                'method' => 'OUTBOUND',
+                'path' => 'manual_send',
+                'headers' => [],
+            ]);
+
+            return $this->sendResponse([], 'Message sent successfully');
+        } catch (\Exception $e) {
+            Log::error('WhatsApp send failed', ['error' => $e->getMessage()]);
+            return $this->sendError('Failed to send message: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Determine if a message is outbound based on log method and payload
+     */
+    private function isOutbound(array $message, WhatsAppWebhookLog $log): bool
+    {
+        if ($log->method === 'OUTBOUND') return true;
+
+        $payload = $log->payload ?? [];
+        $metadata = $this->safeGet($payload, ['entry', 0, 'changes', 0, 'value', 'metadata']);
+        $ourPhoneId = $metadata['phone_number_id'] ?? null;
+
+        if ($ourPhoneId && isset($message['to']) && $message['to'] === $ourPhoneId) {
+            return true; // message was sent TO us, so it's inbound from our perspective
+        }
+
+        return false;
     }
 
     /**
