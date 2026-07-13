@@ -103,7 +103,7 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
 
         $logs = WhatsAppWebhookLog::query()
             ->where(function ($q) {
-                $q->where('payload', 'like', '%"messages"%')
+                $q->where('payload', 'like', '%"contacts"%')
                   ->orWhere('method', 'OUTBOUND');
             })
             ->when($search, function ($q) use ($search) {
@@ -134,40 +134,76 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
                 continue;
             }
 
-            // For webhook payloads, get phone from messages or statuses
             $value = $this->safeGet($payload, ['entry', 0, 'changes', 0, 'value']);
             if (!$value) continue;
 
-            // Try messages first
-            $msgs = $value['messages'] ?? [];
-            if (empty($msgs)) continue;
+            // Extract phone + name from contacts array
+            $contactsArr = $value['contacts'] ?? [];
+            $contactByWaId = [];
+            foreach ($contactsArr as $c) {
+                $waId = $c['wa_id'] ?? null;
+                if ($waId) {
+                    $contactByWaId[$waId] = $c['profile']['name'] ?? $c['name']['formatted_name'] ?? $waId;
+                }
+            }
 
+            // Process messages (inbound)
+            $msgs = $value['messages'] ?? [];
             foreach ($msgs as $msg) {
                 $phone = $msg['from'] ?? null;
                 if (!$phone) continue;
 
-                $contactName = null;
-                $contactsArr = $value['contacts'] ?? [];
-                foreach ($contactsArr as $c) {
-                    $cPhone = $c['wa_id'] ?? null;
-                    if ($cPhone === $phone) {
-                        $contactName = $c['profile']['name'] ?? $c['name']['formatted_name'] ?? null;
-                        break;
-                    }
-                }
-
                 $text = $this->extractMessageText($msg);
+                $name = $contactByWaId[$phone] ?? $phone;
 
                 $key = $phone;
                 if (!isset($contacts[$key]) || $log->created_at->gt($contacts[$key]['last_message_at'])) {
                     $contacts[$key] = [
                         'phone' => $phone,
-                        'name' => $contactName ?? $phone,
+                        'name' => $name,
                         'last_message' => $text,
                         'last_message_at' => $log->created_at->toDateTimeString(),
                         'last_message_type' => $msg['type'] ?? null,
                         'unread' => 0,
                     ];
+                }
+            }
+
+            // Process statuses — extract recipient phone
+            $statuses = $value['statuses'] ?? [];
+            foreach ($statuses as $st) {
+                $phone = $st['recipient_id'] ?? null;
+                if (!$phone) continue;
+
+                $name = $contactByWaId[$phone] ?? $phone;
+
+                $key = $phone;
+                if (!isset($contacts[$key]) || $log->created_at->gt($contacts[$key]['last_message_at'])) {
+                    $contacts[$key] = [
+                        'phone' => $phone,
+                        'name' => $name,
+                        'last_message' => 'status: ' . ($st['status'] ?? 'delivered'),
+                        'last_message_at' => $log->created_at->toDateTimeString(),
+                        'last_message_type' => 'status',
+                        'unread' => 0,
+                    ];
+                }
+            }
+
+            // If we have contacts but no messages/statuses, still add them
+            if (empty($msgs) && empty($statuses)) {
+                foreach ($contactByWaId as $waId => $name) {
+                    $key = $waId;
+                    if (!isset($contacts[$key])) {
+                        $contacts[$key] = [
+                            'phone' => $waId,
+                            'name' => $name,
+                            'last_message' => null,
+                            'last_message_at' => $log->created_at->toDateTimeString(),
+                            'last_message_type' => null,
+                            'unread' => 0,
+                        ];
+                    }
                 }
             }
         }
