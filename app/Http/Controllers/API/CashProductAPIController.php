@@ -55,11 +55,17 @@ class CashProductAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $cashProducts = $this->cashProductRepository->all(
+        $cashProducts = $this->cashProductRepository->allQuery(
             $request->except(['skip', 'limit']),
             $request->get('skip'),
             $request->get('limit')
-        );
+        )
+            ->with(['last_purchase' => function ($q) {
+                $q->whereHas('cashRequisition.approval_status', function ($q) {
+                    $q->where('ceo_status', 2);
+                });
+            }])
+            ->get();
 
         return $this->sendResponse(
             CashProductResource::collection($cashProducts),

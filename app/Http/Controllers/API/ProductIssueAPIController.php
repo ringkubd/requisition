@@ -85,6 +85,7 @@ class ProductIssueAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
+            ->with(['items.product', 'items.productOption', 'items.useInCategory', 'items.rateLog', 'receiver', 'receiverDepartment', 'issuer', 'issuerDepartment', 'departmentApprovedBY', 'storeApprovedBY'])
             ->where(function ($q) use ($request, $storeManager) {
                 $q->where(function ($q) use ($request) {
                     $q->whereHas('receiverBranch', function ($branch) use ($request) {
@@ -317,7 +318,7 @@ class ProductIssueAPIController extends AppBaseController
     public function show($uuid): JsonResponse
     {
         /** @var ProductIssue $productIssue */
-        $productIssue = $this->productIssueRepository->allQuery()->where('uuid', $uuid)->first();
+        $productIssue = $this->productIssueRepository->allQuery()->with(['items.product', 'items.productOption', 'items.useInCategory', 'items.rateLog', 'receiver', 'receiverDepartment', 'issuer', 'issuerDepartment', 'departmentApprovedBY', 'storeApprovedBY'])->where('uuid', $uuid)->first();
 
         if (empty($productIssue)) {
             return $this->sendError(
@@ -376,7 +377,7 @@ class ProductIssueAPIController extends AppBaseController
         $input = $request->all();
 
         /** @var ProductIssue $productIssues */
-        $productIssues = ProductIssue::where('uuid', $uuid)->first();
+        $productIssues = ProductIssue::where('uuid', $uuid)->with('items')->first();
 
         if (empty($productIssues)) {
             return $this->sendError(
@@ -517,7 +518,7 @@ class ProductIssueAPIController extends AppBaseController
     {
         /** @var ProductIssue $productIssues */
         $productIssues = ProductIssue::query()
-            ->with('items')
+            ->with('items.rateLog')
             ->where('uuid', $uuid)
             ->first();
         if (empty($productIssues)) {
@@ -568,7 +569,7 @@ class ProductIssueAPIController extends AppBaseController
 
     public function updateQuantity($id, Request $request): JsonResponse
     {
-        $issue =  ProductIssueItems::find($id);
+        $issue =  ProductIssueItems::with('rateLog', 'productIssue')->find($id);
         if (empty($issue)) {
             return $this->sendError(
                 "Product Issue not found"

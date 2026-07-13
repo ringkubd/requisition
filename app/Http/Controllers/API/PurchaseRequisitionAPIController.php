@@ -86,6 +86,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
+            ->with(['user', 'department', 'approval_status', 'purchaseRequisitionProducts.product.category'])
             ->when($request->date, function ($q, $date) {
                 $q->whereRaw("date(created_at) = '$date'");
             })
@@ -248,6 +249,8 @@ class PurchaseRequisitionAPIController extends AppBaseController
                 'Purchase Requisition not found'
             );
         }
+
+        $purchaseRequisition->load(['user', 'department', 'approval_status', 'purchaseRequisitionProducts.product.category', 'purchaseRequisitionProducts.purchase', 'purchaseRequisitionProducts.product_variant']);
 
         return $this->sendResponse(
             new PurchaseRequisitionResource($purchaseRequisition),
@@ -854,7 +857,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
         // if (config('app.debug')) {
         //     return;
         // }
-        $requisition = $requisition->load(['user', 'department', 'purchaseRequisitionProducts.product']);
+        $requisition = $requisition->load(['user', 'department', 'purchaseRequisitionProducts.product.category']);
 
         $most_used_category = $requisition->purchaseRequisitionProducts->groupBy('product.category.title')->sortByDesc(function ($group) {
             return $group->count();
@@ -939,9 +942,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
      */
     private function notifyStoreManager(User $storeManager, PurchaseRequisition $requisition, User $currentUser): void
     {
-        if (config('app.debug')) {
-            return;
-        }
+        $requisition->loadMissing('user', 'department');
 
         if (NotificationTestHelper::isTestModeEnabled()) {
             $testUser = NotificationTestHelper::getTestUser();
@@ -1016,9 +1017,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
      */
     private function notifyDepartmentUser(User $user, PurchaseRequisition $requisition, User $currentUser): void
     {
-        if (config('app.debug')) {
-            return;
-        }
+        $requisition->loadMissing('user', 'department');
 
         if (NotificationTestHelper::isTestModeEnabled()) {
             $testUser = NotificationTestHelper::getTestUser();
@@ -1099,9 +1098,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
      */
     private function notifyAccountsUser(User $currentUser, PurchaseRequisition $requisition): void
     {
-        // if (config('app.debug')) {
-        //     return;
-        // }
+        $requisition->loadMissing('user', 'department');
 
         if (NotificationTestHelper::isTestModeEnabled()) {
             $testUser = NotificationTestHelper::getTestUser();

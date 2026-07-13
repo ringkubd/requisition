@@ -78,6 +78,7 @@ class PurchaseAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
+            ->with(['product.category', 'productOption', 'supplier', 'purchaseRequisition.department', 'rateLog'])
             ->when($request->department_id, function ($q, $v){
                 $q->whereHas('purchaseRequisition', function ($r) use ($v){
                     $r->where('department_id', $v);
@@ -392,7 +393,7 @@ class PurchaseAPIController extends AppBaseController
                     ->whereRaw("date(created_at) <= '$day_before_15_days'");
             })
 
-            ->with(['purchaseRequisitionProducts' => function ($q) {
+            ->with(['user', 'department', 'approval_status', 'purchaseRequisitionProducts' => function ($q) {
                 $q->whereRaw('`actual_purchase` < `quantity_to_be_purchase`');
             }])
             ->whereHas('purchaseRequisitionProducts', function ($q) {

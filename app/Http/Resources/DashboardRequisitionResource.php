@@ -25,7 +25,7 @@ class DashboardRequisitionResource extends JsonResource
             'irf_no' => $this->irf_no,
             'ir_no' => $this->ir_no,
             'estimated_cost' => $this->estimated_cost,
-            'category' => $this->initialRequisitionProducts->load('product.category')->first()?->product?->category?->title,
+            'category' => $this->initialRequisitionProducts->first()?->product?->category?->title,
             'required_item' => $this->initialRequisitionProducts->count(),
             'is_purchase_requisition_generated' => $this->is_purchase_requisition_generated,
             'purchase_requisitions' => $this->purchaseRequisitions,

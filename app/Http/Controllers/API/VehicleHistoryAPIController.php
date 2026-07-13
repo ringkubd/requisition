@@ -68,6 +68,7 @@ class VehicleHistoryAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
+            ->with(['vehicle', 'cashRequisition', 'pump', 'user'])
             ->when($request->month && !$request->date, function ($q) use ($request) {
                 $q->when($request->month, function ($q) use ($request) {
                     $month = Carbon::parse('01-' . $request->month);

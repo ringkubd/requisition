@@ -72,6 +72,7 @@ class ProductAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
+            ->with(['category', 'productMetas', 'productOptions.option', 'productOptions.purchaseHistory', 'productOptions.productApprovedIssue'])
             ->when($request->search, function ($q, $v){
                 $q->where('title', 'like', "%$v%")
                     ->orWhereHas('category', function ($q) use($v){
@@ -437,6 +438,7 @@ class ProductAPIController extends AppBaseController
     public function productIssueLog($id, Request $request): JsonResponse
     {
         $issues = ProductIssueItems::query()
+            ->with(['product', 'productOption', 'productIssue.issuerDepartment', 'useInCategory', 'rateLog'])
             ->whereHas('productIssue', function ($q) use ($id){
                 $q->where('store_status', 1);
             })
@@ -491,6 +493,7 @@ class ProductAPIController extends AppBaseController
     public function productPurchaseLog($id, Request $request): JsonResponse
     {
         $issues = Purchase::query()
+            ->with(['product.category', 'productOption', 'supplier', 'purchaseRequisition.department', 'rateLog'])
             ->where('product_id', $id)
             ->latest()
             ->paginate();

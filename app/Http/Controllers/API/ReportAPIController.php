@@ -84,6 +84,23 @@ class ReportAPIController extends AppBaseController
         $report_format = $request->report_format;
         $product_options = explode(',', $request->product_option_id);
         $issues = ProductIssueItemReportResource::collection(ProductIssueItems::query()
+            ->with([
+                'productIssue',
+                'productIssue.items.product',
+                'productIssue.items.productOption',
+                'productIssue.items.useInCategory',
+                'productIssue.items.rateLog',
+                'productIssue.receiver',
+                'productIssue.receiverDepartment',
+                'productIssue.issuer',
+                'productIssue.issuerDepartment',
+                'productIssue.departmentApprovedBY',
+                'productIssue.storeApprovedBY',
+                'product',
+                'productOption',
+                'useInCategory',
+                'rateLog',
+            ])
             ->when(!empty($request->category), function ($q) use ($categories) {
                 $q->whereHas('product', function ($query) use ($categories) {
                     $query->whereIn('category_id', $categories)->orWhereIn('use_in_category', $categories);
@@ -97,8 +114,7 @@ class ReportAPIController extends AppBaseController
                     $q->where('issuer_department_id', $v);
                 });
             })
-            ->whereHas('productIssue', function ($q) use ($first, $last) {
-                //->whereRaw("date(store_approved_at) between '$first' and '$last'")
+            ->whereHas('productIssue', function ($q) {
                 $q->where('store_status', 1);
             })
             ->when($request->product_option_id, function ($q, $v) use ($product_options) {
@@ -106,7 +122,7 @@ class ReportAPIController extends AppBaseController
                     $p->whereIn('id', $product_options);
                 });
             })
-            ->whereRaw("date(use_date) between '$first' and '$last'")
+            ->whereBetween('use_date', [$first, $last])
             ->latest('updated_at')
             ->get());
         return  response()->json([
@@ -125,12 +141,13 @@ class ReportAPIController extends AppBaseController
     {
         $categories = explode(',', $request->category);
         $products = explode(',', $request->product);
-        $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
-        $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
+        $first = $request->start_date ? Carbon::parse($request->start_date)->toDateString() : Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
+        $last = $request->end_date ? Carbon::parse($request->end_date)->toDateString() : Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
         $report_format = $request->report_format;
         $product_options = explode(',', $request->product_option_id);
 
         $purchase = PurchaseResource::collection(Purchase::query()
+            ->with(['product.category', 'productOption.option', 'productOption.purchaseHistory', 'productOption.productApprovedIssue.productIssue.receiver', 'productOption.productApprovedIssue.productIssue.issuer', 'productOption.productApprovedIssue.rateLog', 'supplier', 'purchaseRequisition.department', 'rateLog'])
             ->when(!empty($request->category), function ($q) use ($categories) {
                 $q->whereHas('product', function ($query) use ($categories) {
                     $query->whereIn('category_id', $categories);
@@ -150,7 +167,7 @@ class ReportAPIController extends AppBaseController
                 });
             })
             ->whereBetween('purchase_date', ["$first", "$last"])
-            ->latest()
+            ->orderBy('purchase_date', 'desc')
             ->get());
         return response()->json([
             'purchase' =>  $report_format === "category_base" ? $purchase : $purchase->collection->groupBy('product.title'),
@@ -168,8 +185,8 @@ class ReportAPIController extends AppBaseController
     {
         $categories = explode(',', $request->category);
         $products = explode(',', $request->product);
-        $first = $request->start_date ?? Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
-        $last = $request->end_date ?? Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
+        $first = $request->start_date ? Carbon::parse($request->start_date)->toDateString() : Carbon::now()->subMonth(1)->firstOfMonth()->toDateString();
+        $last = $request->end_date ? Carbon::parse($request->end_date)->toDateString() : Carbon::now()->subMonth(1)->lastOfMonth()->toDateString();
         $product_options = explode(',', $request->product_option_id);
 
         $product_report = ProductResource::collection(Product::query()
@@ -197,10 +214,9 @@ class ReportAPIController extends AppBaseController
                     $p->whereIn('id', $product_options);
                 });
             })
-            ->with(['productOptions.purchaseHistory' => function ($q) use ($first, $last) {
+            ->with(['category', 'productMetas', 'productOptions.option', 'productOptions.purchaseHistory' => function ($q) use ($first, $last) {
                 $q->whereBetween('purchase_date',  ["$first", "$last"]);
-            }])
-            ->with(['productOptions.productApprovedIssue' => function ($q) use ($first, $last) {
+            }, 'productOptions.productApprovedIssue' => function ($q) use ($first, $last) {
                 $q->whereBetween('use_date',  ["$first", "$last"]);
             }])
             ->get());
@@ -225,7 +241,20 @@ class ReportAPIController extends AppBaseController
         $last = $request->end_date ?? Carbon::now()->toDateString();
         $product_options_id = explode(',', $request->product_option_id);
 
+        $firstDate = Carbon::parse($first);
+        $endOfDay = $firstDate->endOfDay();
+        $dateWindowStart = $firstDate->subYears(5)->toDateString();
+        $dateWindowEnd = $firstDate->copy()->addYear()->toDateString();
+
         $product_options = ProductOption::query()
+            ->with(['purchaseHistory' => function ($q) use ($dateWindowStart, $dateWindowEnd) {
+                $q->whereBetween('purchase_date', [$dateWindowStart, $dateWindowEnd]);
+            }, 'productApprovedIssue' => function ($q) use ($dateWindowStart, $dateWindowEnd, $endOfDay) {
+                $q->where('use_date', '>=', $dateWindowStart)
+                    ->whereHas('productIssue', function ($q) use ($dateWindowEnd) {
+                        $q->where('store_approved_at', '<=', $dateWindowEnd);
+                    });
+            }, 'product.category'])
             ->when($request->category, function ($q) use ($categories) {
                 $q->whereHas('product', function ($b) use ($categories) {
                     $b->whereIn('category_id', $categories);
@@ -245,20 +274,20 @@ class ReportAPIController extends AppBaseController
         $report = [];
 
         foreach ($product_options as $po) {
-            $lastPurchase = $po->purchaseHistory->where('purchase_date', '<=', $first)->first();
-            $lastIssue = $po->productApprovedIssue->filter(function ($q) use ($first) {
-                return $q->productIssue?->store_approved_at && Carbon::parse($first)->endOfDay()->greaterThanOrEqualTo($q->productIssue?->store_approved_at);
+            $lastPurchase = $po->purchaseHistory->where('purchase_date', '<=', $first)->sortByDesc('purchase_date')->first();
+            $lastIssue = $po->productApprovedIssue->filter(function ($q) use ($endOfDay) {
+                return $q->productIssue?->store_approved_at && $endOfDay->greaterThanOrEqualTo($q->productIssue?->store_approved_at);
             })->first();
 
-            if ($lastPurchase && isNull($lastIssue)) {
+            if ($lastPurchase && is_null($lastIssue)) {
                 $stock = $lastPurchase->oldBalance + $lastPurchase->qty;
-            } elseif (isNull($lastPurchase) && $lastIssue) {
+            } elseif (is_null($lastPurchase) && $lastIssue) {
                 $stock = $lastIssue->balance_after_issue;
             } elseif ($lastPurchase && $lastIssue) {
                 $stock = Carbon::parse($lastPurchase->purchase_date)->endOfDay()->greaterThanOrEqualTo($lastIssue->productIssue?->store_approved_at) ? $lastPurchase->old_balance + $lastPurchase->qty : $lastIssue->balance_after_issue;
             } else {
-                $initStock = $po->stock - $po->purchaseHistory->where('purchase_date', '>', $first)->sum('qty') + $po->productApprovedIssue->filter(function ($q) use ($first) {
-                    return $q->productIssue?->store_approved_at && Carbon::parse($first)->endOfDay()->lessThan($q->productIssue?->store_approved_at);
+                $initStock = $po->stock - $po->purchaseHistory->where('purchase_date', '>', $first)->sum('qty') + $po->productApprovedIssue->filter(function ($q) use ($endOfDay) {
+                    return $q->productIssue?->store_approved_at && $endOfDay->lessThan($q->productIssue?->store_approved_at);
                 })->sum('quantity');
                 $stock = max($initStock, 0);
             }
@@ -486,17 +515,21 @@ class ReportAPIController extends AppBaseController
             $productsQuery->whereIn('category_id', $categories);
         }
 
-        // Eager load relationships with proper ordering
-        $products = $productsQuery->with(['productOptions' => function ($q) {
-            $q->with(['purchaseHistory' => function ($p) {
-                $p->orderBy('purchase_date', 'desc')
+        $auditWindowStart = Carbon::parse($startDate)->subYears(5)->toDateString();
+        $auditWindowEnd = Carbon::now()->toDateString();
+
+        // Eager load relationships with proper ordering within date window
+        $products = $productsQuery->with(['productOptions' => function ($q) use ($auditWindowStart, $auditWindowEnd) {
+            $q->with(['purchaseHistory' => function ($p) use ($auditWindowStart, $auditWindowEnd) {
+                $p->where('purchase_date', '>=', $auditWindowStart)
+                    ->orderBy('purchase_date', 'desc')
                     ->orderBy('id', 'desc');
-            }, 'productApprovedIssue' => function ($s) {
-                $s->with('rateLog')->orderBy('use_date', 'desc');
-            }])->orderBy('option_value', 'asc');
+            }, 'productApprovedIssue' => function ($s) use ($auditWindowStart, $auditWindowEnd) {
+                $s->where('use_date', '>=', $auditWindowStart)
+                    ->with('rateLog')->orderBy('use_date', 'desc');
+            }, 'product'])->orderBy('option_value', 'asc');
         }])
             ->orderBy('title', 'asc')
-            // ->where('id', 1594)
             ->get();
 
         $report = [];
@@ -755,6 +788,7 @@ class ReportAPIController extends AppBaseController
         }
 
         $products = $productsQuery->with([
+            'category',
             'productOptions.purchaseHistory' => function ($q) use ($startDate, $endDate) {
                 $q->whereBetween('purchase_date', [$startDate, $endDate])
                     ->orderBy('purchase_date', 'asc');
@@ -908,7 +942,10 @@ class ReportAPIController extends AppBaseController
         }
 
         $product = Product::with([
-            'productOptions.purchaseHistory'
+            'category',
+            'productOptions.purchaseHistory' => function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('purchase_date', [$startDate, $endDate]);
+            }
         ])->withoutGlobalScope('branch_organization')->find($productId);
 
         if (!$product) {
@@ -920,6 +957,7 @@ class ReportAPIController extends AppBaseController
         $allIssues = \App\Models\ProductIssueItems::withTrashed()
             ->with('productIssue')
             ->whereIn('product_option_id', $productOptionIds)
+            ->whereBetween('use_date', [$startDate, $endDate])
             ->orderBy('use_date', 'asc')
             ->get()
             ->groupBy('product_option_id');

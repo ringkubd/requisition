@@ -55,11 +55,13 @@ class ProductIssueItemsAPIController extends AppBaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $productIssueItems = $this->productIssueItemsRepository->all(
+        $productIssueItems = $this->productIssueItemsRepository->allQuery(
             $request->except(['skip', 'limit']),
             $request->get('skip'),
             $request->get('limit')
-        );
+        )
+            ->with(['product', 'productOption', 'useInCategory', 'rateLog'])
+            ->get();
 
         return $this->sendResponse(
             ProductIssueItemsResource::collection($productIssueItems),

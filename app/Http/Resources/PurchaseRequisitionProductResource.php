@@ -22,7 +22,7 @@ class PurchaseRequisitionProductResource extends JsonResource
             'product_id' => $this->product_id,
             'title' => $this->product?->title,
             'stock' => $this->product_variant?->stock,
-            'product' => $this->product->load('category'),
+            'product' => $this->product,
             'product_option_id' => $this->product_option_id,
             'product_option' => new ProductOptionResource($this->product_variant),
             'last_purchase_date' => $this->last_purchase_date,

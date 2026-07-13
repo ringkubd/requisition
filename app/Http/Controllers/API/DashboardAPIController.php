@@ -20,6 +20,7 @@ class DashboardAPIController extends AppBaseController
     public function index(Request $request): JsonResponse
     {
         $initialRequisition = InitialRequisition::query()
+            ->with(['user', 'branch', 'department', 'initialRequisitionProducts.product.category', 'purchaseRequisitions.approval_status', 'approval_status'])
             ->where('branch_id', auth_branch_id())
             ->when($request->user()?->hasRole('CEO') || $request->user()?->hasRole('Accounts'), function ($query) use ($request) {
                 if ($request->user()?->hasRole('CEO')) {
@@ -58,6 +59,7 @@ class DashboardAPIController extends AppBaseController
     public function cash(Request $request): JsonResponse
     {
         $cashRequisition = CashRequisition::query()
+            ->with(['user', 'branch', 'department', 'cashRequisitionItems', 'approval_status'])
             ->where('branch_id', auth_branch_id())
             ->when($request->user()?->hasRole('CEO') || $request->user()?->hasRole('Accounts'), function ($query) use ($request) {
                 if ($request->user()?->hasRole('CEO')) {

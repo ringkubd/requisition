@@ -29,7 +29,7 @@ class PurchaseRequisitionIndexResource extends JsonResource
             'received_amount' => $this->received_amount,
             'payment_type' => $this->payment_type,
             'total_required_unit' => $this->purchaseRequisitionProducts?->sum('required_quantity'),
-            'category' => $this->purchaseRequisitionProducts->load('product.category')->first()?->product?->category?->title,
+            'category' => $this->purchaseRequisitionProducts->first()?->product?->category?->title,
             'no_of_item' => $this->purchaseRequisitionProducts?->count(),
             'approval_status' => new RequisitionStatusResource($this->approval_status),
             'current_status' => $this->approval_status?->current_status,

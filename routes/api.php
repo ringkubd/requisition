@@ -110,6 +110,7 @@ Route::get('navigation-department', [NavigationAPIController::class, 'department
 
 Route::get('initial_requisition_for_initiate_purchase', [PurchaseRequisitionAPIController::class, 'getInitialRequisition']);
 Route::get('initial_requisition_product_suggestions', [InitialRequisitionAPIController::class, 'purposeSuggestions']);
+Route::get('cash_requisition_purpose_suggestions', [CashRequisitionAPIController::class, 'purposeSuggestions']);
 Route::post('update_purchase_requisition_product_price', [PurchaseRequisitionAPIController::class, 'updateProductPrice']);
 
 Route::get('sub-category/{parent}', [CategoryAPIController::class, 'subCategory']);

@@ -82,6 +82,7 @@ class InitialRequisitionAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
+            ->with(['user', 'department', 'approval_status', 'initialRequisitionProducts.product.category'])
             ->when($request->date, function ($q, $date){
                 $q->whereRaw("date(created_at) = '$date'");
             })
@@ -234,6 +235,8 @@ class InitialRequisitionAPIController extends AppBaseController
                 __('messages.not_found', ['model' => __('models/initialRequisitions.singular')])
             );
         }
+
+        $initialRequisition->load(['user', 'branch', 'department', 'approval_status', 'purchaseRequisitions.approval_status', 'initialRequisitionProducts.product.category', 'initialRequisitionProducts.product_variant']);
 
         return $this->sendResponse(
             new InitialRequisitionResource($initialRequisition),
@@ -564,6 +567,7 @@ class InitialRequisitionAPIController extends AppBaseController
         $irf_no = $this->newIRFNO();
         $baseRequisition = $this->initialRequisitionRepository->find($id);
 
+        $baseRequisition->load('initialRequisitionProducts.product_variant.purchaseHistory');
         $products = $baseRequisition->initialRequisitionProducts;
 
         $initialRequisition = InitialRequisition::create([

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Events\RequisitionStatusEvent;
 use App\Helper\NotificationTestHelper;
 use App\Models\CashRequisition;
+use App\Models\CashRequisitionItem;
 use App\Models\Department;
 use App\Models\OneTimeLogin;
 use App\Models\User;
@@ -84,6 +85,7 @@ class CashRequisitionAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         )
+            ->with(['user', 'branch', 'department', 'cashRequisitionItems', 'approval_status'])
             ->when($request->date, function ($q, $date) {
                 $q->whereRaw("date(created_at) = ?", [$date]);
             })
@@ -325,6 +327,8 @@ class CashRequisitionAPIController extends AppBaseController
                 'Cash Requisition not found'
             );
         }
+
+        $cashRequisition->load(['user', 'branch', 'department', 'cashRequisitionItems', 'approval_status']);
 
         return $this->sendResponse(
             new CashRequisitionResource($cashRequisition),
@@ -710,10 +714,7 @@ class CashRequisitionAPIController extends AppBaseController
      */
     private function notifyCeoUser(User $ceo, CashRequisition $requisition, User $currentUser): void
     {
-        // if (config('app.debug')) {
-        //     return;
-        // }
-
+        $requisition->loadMissing('user', 'department');
         $requisitor_name = $requisition->user;
         $one_time_key = new OneTimeLogin();
 
@@ -786,10 +787,7 @@ class CashRequisitionAPIController extends AppBaseController
      */
     private function notifyDepartmentUser(User $user, CashRequisition $requisition, User $currentUser): void
     {
-        // if (config('app.debug')) {
-        //     return;
-        // }
-
+        $requisition->loadMissing('user', 'department');
         $requisitor_name = $requisition->user;
         $one_time_key = new OneTimeLogin();
 
@@ -866,10 +864,7 @@ class CashRequisitionAPIController extends AppBaseController
      */
     private function notifyAccountsUser(User $currentUser, CashRequisition $requisition): void
     {
-        // if (config('app.debug')) {
-        //     return;
-        // }
-
+        $requisition->loadMissing('user', 'department');
         $requisitor_name = $requisition->user;
         $one_time_key = new OneTimeLogin();
 
@@ -1006,6 +1001,33 @@ class CashRequisitionAPIController extends AppBaseController
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function purposeSuggestions(Request $request): JsonResponse
+    {
+        $suggestions = CashRequisitionItem::query()
+            ->selectRaw('purpose, MAX(created_at) as last_used, COUNT(*) as frequency')
+            ->when($request->item, function ($q, $item) {
+                $q->where('item', $item);
+            })
+            ->when($request->search, function ($q, $search) {
+                $q->where('purpose', 'like', "%{$search}%");
+            })
+            ->whereNotNull('purpose')
+            ->where('purpose', '!=', '')
+            ->groupBy('purpose')
+            ->orderByDesc('last_used')
+            ->limit($request->limit ?? 20)
+            ->get();
+
+        return $this->sendResponse(
+            $suggestions,
+            __('messages.retrieved', ['model' => __('models/products.plural')])
+        );
+    }
+
+    /**
      * Send status notifications to relevant users
      *
      * @param array $users
@@ -1014,6 +1036,7 @@ class CashRequisitionAPIController extends AppBaseController
      */
     private function sendStatusNotifications(array $users, CashRequisition $requisition): void
     {
+        $requisition->load('user', 'department');
         foreach ($users as $user) {
             if (!$user) {
                 continue;
@@ -1124,9 +1147,7 @@ class CashRequisitionAPIController extends AppBaseController
      */
     private function notifyStoreManager(User $storeManager, CashRequisition $requisition, User $currentUser): void
     {
-        // if (config('app.debug')) {
-        //     return;
-        // }
+        $requisition->loadMissing('user', 'department');
 
         if (NotificationTestHelper::isTestModeEnabled()) {
             $testUser = NotificationTestHelper::getTestUser();
@@ -1211,6 +1232,7 @@ class CashRequisitionAPIController extends AppBaseController
                 break;
 
             case 'accounts':
+                $cashRequisition->load('department');
                 $accountsUsers = $this->findAccountsDepartmentUsers();
                 foreach ($accountsUsers as $user) {
                     $user->notify(new PushNotification(
