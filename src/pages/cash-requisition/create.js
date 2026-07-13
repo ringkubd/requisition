@@ -442,10 +442,10 @@ const CashRequisitionCreate = props => {
                                                                         !suggestionQuery.isLoading &&
                                                                         !suggestionQuery.isError &&
                                                                         suggestionQuery.data ? (
-                                                                            <ul
-                                                                                className="py-1 mt-1 space-y-2 bg-green-100 px-1 z-50 absolute w-full"
-                                                                                ref={suggestRef}
-                                                                            >
+                                                                    <ul
+                                                                        className="py-1 mt-1 space-y-2 bg-green-100 px-1 z-50 absolute w-full max-h-40 overflow-y-auto"
+                                                                        ref={suggestRef}
+                                                                    >
                                                                                 {suggestionQuery.data.data.map((s, i) => (
                                                                                     <li
                                                                                         key={i}
