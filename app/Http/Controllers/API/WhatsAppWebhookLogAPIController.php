@@ -102,6 +102,10 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
         $limit = (int) ($request->limit ?? 50);
 
         $logs = WhatsAppWebhookLog::query()
+            ->where(function ($q) {
+                $q->where('payload', 'like', '%"messages"%')
+                  ->orWhere('method', 'OUTBOUND');
+            })
             ->when($search, function ($q) use ($search) {
                 $q->where('payload', 'like', '%' . $search . '%');
             })
@@ -112,34 +116,59 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
         $contacts = [];
         foreach ($logs as $log) {
             $payload = $log->payload ?? [];
-            $firstMsg = $this->getFirstMessage($payload);
-            $phone = $firstMsg['from'] ?? $firstMsg['to'] ?? $firstMsg['recipient_id'] ?? 'unknown';
 
-            if ($phone === 'unknown') continue;
-
-            // Find contact name from the payload contacts array
-            $contactName = null;
-            $contactsArr = $this->safeGet($payload, ['entry', 0, 'changes', 0, 'value', 'contacts']);
-            if (is_array($contactsArr)) {
-                foreach ($contactsArr as $c) {
-                    $cPhone = $c['wa_id'] ?? null;
-                    if ($cPhone === $phone || !$contactName) {
-                        $name = $c['profile']['name'] ?? $c['name']['formatted_name'] ?? null;
-                        if ($name) $contactName = $name;
-                    }
+            if ($log->method === 'OUTBOUND') {
+                $sentTo = $payload['sent_to'] ?? null;
+                if (!$sentTo) continue;
+                $key = $sentTo;
+                if (!isset($contacts[$key]) || $log->created_at->gt($contacts[$key]['last_message_at'])) {
+                    $contacts[$key] = [
+                        'phone' => $sentTo,
+                        'name' => $sentTo,
+                        'last_message' => $payload['message'] ?? null,
+                        'last_message_at' => $log->created_at->toDateTimeString(),
+                        'last_message_type' => 'text',
+                        'unread' => 0,
+                    ];
                 }
+                continue;
             }
 
-            $key = $phone;
-            if (!isset($contacts[$key]) || $log->created_at->gt($contacts[$key]['last_message_at'])) {
-                $contacts[$key] = [
-                    'phone' => $phone,
-                    'name' => $contactName ?? $phone,
-                    'last_message' => $firstMsg['text'] ?? null,
-                    'last_message_at' => $log->created_at->toDateTimeString(),
-                    'last_message_type' => $firstMsg['type'] ?? null,
-                    'unread' => 0,
-                ];
+            // For webhook payloads, get phone from messages or statuses
+            $value = $this->safeGet($payload, ['entry', 0, 'changes', 0, 'value']);
+            if (!$value) continue;
+
+            // Try messages first
+            $msgs = $value['messages'] ?? [];
+            if (empty($msgs)) continue;
+
+            foreach ($msgs as $msg) {
+                $phone = $msg['from'] ?? null;
+                if (!$phone) continue;
+
+                $contactName = null;
+                $contactsArr = $value['contacts'] ?? [];
+                foreach ($contactsArr as $c) {
+                    $cPhone = $c['wa_id'] ?? null;
+                    if ($cPhone === $phone) {
+                        $contactName = $c['profile']['name'] ?? $c['name']['formatted_name'] ?? null;
+                        break;
+                    }
+                }
+
+                $text = $this->extractMessageText($msg);
+
+                $key = $phone;
+                if (!isset($contacts[$key]) || $log->created_at->gt($contacts[$key]['last_message_at'])) {
+                    $contacts[$key] = [
+                        'phone' => $phone,
+                        'name' => $contactName ?? $phone,
+                        'last_message' => $text,
+                        'last_message_at' => $log->created_at->toDateTimeString(),
+                        'last_message_type' => $msg['type'] ?? null,
+                        'unread' => 0,
+                    ];
+                }
             }
         }
 
@@ -167,35 +196,12 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
             ->paginate($perPage, ['*'], 'page', $page);
 
         $allMessages = [];
-        foreach ($logs as $log) {
-            $msgList = $this->extractMessages($log->payload ?? []);
-            foreach ($msgList as $m) {
-                $matched = false;
-                foreach (['from', 'to', 'recipient_number'] as $field) {
-                    if (isset($m[$field]) && str_contains($m[$field], $phone)) {
-                        $matched = true;
-                        break;
-                    }
-                }
-                if (!$matched && empty($m['from']) && empty($m['to'])) {
-                    continue;
-                }
-                $allMessages[] = [
-                    'id' => $m['id'] ?? 'log_' . $log->id,
-                    'from' => $m['from'] ?? null,
-                    'to' => $m['to'] ?? $m['recipient_number'] ?? null,
-                    'text' => $m['text'] ?? null,
-                    'type' => $m['type'] ?? null,
-                    'timestamp' => $m['timestamp'] ?? $log->created_at->toDateTimeString(),
-                    'direction' => $this->isOutbound($m, $log) ? 'outbound' : 'inbound',
-                    'log_id' => $log->id,
-                    'created_at' => $log->created_at->toDateTimeString(),
-                ];
-            }
 
-            // Also include outbound logs sent to this number
+        foreach ($logs as $log) {
+            $payload = $log->payload ?? [];
+
+            // Handle outbound (sent) messages
             if ($log->method === 'OUTBOUND') {
-                $payload = $log->payload ?? [];
                 $sentTo = $payload['sent_to'] ?? null;
                 $sentMsg = $payload['message'] ?? null;
                 if ($sentTo && str_contains($sentTo, $phone)) {
@@ -211,6 +217,56 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
                         'created_at' => $log->created_at->toDateTimeString(),
                     ];
                 }
+                continue;
+            }
+
+            // Handle inbound webhook messages
+            $value = $this->safeGet($payload, ['entry', 0, 'changes', 0, 'value']);
+            if (!$value) continue;
+
+            // Get our business phone number to determine direction
+            $ourPhoneId = $value['metadata']['phone_number_id'] ?? null;
+            $ourDisplayPhone = $value['metadata']['display_phone_number'] ?? null;
+
+            // Process messages
+            $msgs = $value['messages'] ?? [];
+            foreach ($msgs as $msg) {
+                $msgPhone = $msg['from'] ?? null;
+                if (!$msgPhone || !str_contains($msgPhone, $phone)) continue;
+
+                $text = $this->extractMessageText($msg);
+
+                // Direction: if the message is FROM the contact, it's inbound
+                $allMessages[] = [
+                    'id' => $msg['id'] ?? 'log_' . $log->id,
+                    'from' => $msgPhone,
+                    'to' => $ourDisplayPhone ?? $ourPhoneId ?? 'System',
+                    'text' => $text,
+                    'type' => $msg['type'] ?? null,
+                    'timestamp' => $msg['timestamp'] ?? $log->created_at->timestamp,
+                    'direction' => 'inbound',
+                    'log_id' => $log->id,
+                    'created_at' => $log->created_at->toDateTimeString(),
+                ];
+            }
+
+            // Process statuses (read receipts etc.) - extract the phone
+            $statuses = $value['statuses'] ?? [];
+            foreach ($statuses as $st) {
+                $recipientId = $st['recipient_id'] ?? null;
+                if (!$recipientId || !str_contains($recipientId, $phone)) continue;
+
+                $allMessages[] = [
+                    'id' => 'status_' . ($st['id'] ?? $log->id),
+                    'from' => $recipientId,
+                    'to' => $ourDisplayPhone ?? $ourPhoneId ?? 'System',
+                    'text' => '✓ ' . ($st['status'] ?? 'delivered'),
+                    'type' => 'status',
+                    'timestamp' => $st['timestamp'] ?? $log->created_at->timestamp,
+                    'direction' => 'inbound',
+                    'log_id' => $log->id,
+                    'created_at' => $log->created_at->toDateTimeString(),
+                ];
             }
         }
 
@@ -262,21 +318,20 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
     }
 
     /**
-     * Determine if a message is outbound based on log method and payload
+     * Extract text from a message array regardless of type
      */
-    private function isOutbound(array $message, WhatsAppWebhookLog $log): bool
+    private function extractMessageText(array $msg): ?string
     {
-        if ($log->method === 'OUTBOUND') return true;
-
-        $payload = $log->payload ?? [];
-        $metadata = $this->safeGet($payload, ['entry', 0, 'changes', 0, 'value', 'metadata']);
-        $ourPhoneId = $metadata['phone_number_id'] ?? null;
-
-        if ($ourPhoneId && isset($message['to']) && $message['to'] === $ourPhoneId) {
-            return true; // message was sent TO us, so it's inbound from our perspective
+        $type = $msg['type'] ?? null;
+        if ($type && isset($msg[$type])) {
+            $candidate = $msg[$type];
+            if (is_array($candidate)) {
+                return $candidate['body'] ?? $candidate['caption'] ?? $candidate['text'] ?? $candidate['payload'] ?? $candidate['title'] ?? null;
+            } elseif (is_string($candidate)) {
+                return $candidate;
+            }
         }
-
-        return false;
+        return $msg['text']['body'] ?? $msg['button']['text'] ?? $msg['button']['payload'] ?? null;
     }
 
     /**
@@ -284,49 +339,45 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
      */
     private function getFirstMessage(array $payload): array
     {
-        // Navigate common webhook structure: entry -> changes -> value -> messages/statuses
         $value = $this->safeGet($payload, ['entry', 0, 'changes', 0, 'value']);
-        $messages = (array) ($this->safeGet($value, ['messages']) ?? []);
-        $first = $messages[0] ?? null;
+        if (!$value) return [];
 
-        // If no messages found, check for statuses (delivery/read receipts) or top-level messages
-        if (!$first) {
-            $first = $this->safeGet($value, ['statuses', 0]) ?? $payload['messages'][0] ?? null;
+        $metadata = $value['metadata'] ?? [];
+
+        // Try messages first
+        $msgs = $value['messages'] ?? [];
+        if (!empty($msgs)) {
+            $first = $msgs[0];
+            $type = $first['type'] ?? null;
+            $from = $first['from'] ?? null;
+            $text = $this->extractMessageText($first);
+            return [
+                'type' => $type,
+                'from' => $from,
+                'to' => $metadata['display_phone_number'] ?? null,
+                'recipient_id' => $metadata['phone_number_id'] ?? null,
+                'timestamp' => $first['timestamp'] ?? null,
+                'text' => $text,
+                'raw' => $first,
+            ];
         }
 
-        if (!$first) return [];
-
-        // Determine type (statuses use 'status' key, messages often have 'type')
-        $type = $first['type'] ?? (isset($first['status']) ? 'status' : null);
-        $from = $first['from'] ?? $first['author'] ?? null;
-        $recipient_id = $first['recipient_id'] ?? $first['to'] ?? $first['wa_id'] ?? ($value['metadata']['phone_number_id'] ?? null);
-        $to = $recipient_id;
-        $timestamp = $first['timestamp'] ?? null;
-
-        // Try many places for text/preview depending on message type
-        $text = null;
-        if ($type && isset($first[$type]) && is_array($first[$type])) {
-            $possible = $first[$type];
-            $text = $possible['body'] ?? $possible['caption'] ?? null;
-        }
-        $text = $text ?? ($first['text']['body'] ?? null);
-        $text = $text ?? ($first['button']['text'] ?? $first['button']['payload'] ?? null);
-        $text = $text ?? ($first['interactive']['button_reply']['id'] ?? $first['interactive']['button_reply']['title'] ?? null);
-
-        // If it's a status-type webhook, include a status preview
-        if (!$text && isset($first['status'])) {
-            $text = 'status: ' . $first['status'];
+        // Fall back to statuses
+        $statuses = $value['statuses'] ?? [];
+        if (!empty($statuses)) {
+            $st = $statuses[0];
+            return [
+                'type' => 'status',
+                'from' => $st['recipient_id'] ?? null,
+                'to' => $metadata['display_phone_number'] ?? null,
+                'recipient_id' => $st['recipient_id'] ?? null,
+                'timestamp' => $st['timestamp'] ?? null,
+                'text' => 'status: ' . ($st['status'] ?? 'unknown'),
+                'raw' => $st,
+            ];
         }
 
-        return [
-            'type' => $type,
-            'from' => $from,
-            'to' => $to,
-            'recipient_id' => $recipient_id,
-            'timestamp' => $timestamp,
-            'text' => $text,
-            'raw' => $first,
-        ];
+        return [];
     }
 
     /**
@@ -335,62 +386,50 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
     private function extractMessages(array $payload): array
     {
         $value = $this->safeGet($payload, ['entry', 0, 'changes', 0, 'value']);
-        $messages = (array) ($this->safeGet($value, ['messages']) ?? []);
+        if (!$value) return [];
 
-        // Also include statuses or other message-like objects if present
-        if (empty($messages) && isset($value['statuses'])) {
-            $messages = $value['statuses'];
+        $messages = $value['messages'] ?? [];
+        $statuses = $value['statuses'] ?? [];
+        $metadata = $value['metadata'] ?? [];
+        $contactsList = $value['contacts'] ?? [];
+
+        // Build a phone-to-name map from contacts
+        $nameMap = [];
+        foreach ($contactsList as $c) {
+            $waId = $c['wa_id'] ?? null;
+            if ($waId) {
+                $nameMap[$waId] = $c['profile']['name'] ?? $c['name']['formatted_name'] ?? null;
+            }
         }
 
-        if (empty($messages) && isset($payload['messages'])) {
-            $messages = $payload['messages'];
-        }
-
-        // Try to derive a human-friendly recipient number from metadata if available
-        $recipient_number = null;
-        if (is_array($value) && isset($value['metadata'])) {
-            $recipient_number = $value['metadata']['display_phone_number'] ?? $value['metadata']['phone_number'] ?? $value['metadata']['phone_number_id'] ?? null;
-        }
+        $recipient_number = $metadata['display_phone_number'] ?? $metadata['phone_number'] ?? $metadata['phone_number_id'] ?? null;
 
         $result = [];
         foreach ($messages as $m) {
-            $type = $m['type'] ?? null;
-            $from = $m['from'] ?? $m['author'] ?? null;
-            $to = $m['to'] ?? $m['recipient_id'] ?? $m['wa_id'] ?? null;
-            $timestamp = $m['timestamp'] ?? null;
-            $text = null;
-
-            if ($type && isset($m[$type])) {
-                $candidate = $m[$type];
-                if (is_array($candidate)) {
-                    $text = $candidate['body'] ?? $candidate['caption'] ?? null;
-                } elseif (is_string($candidate)) {
-                    $text = $candidate;
-                }
-            }
-
-            if (!$text && isset($m['text']['body'])) {
-                $text = $m['text']['body'];
-            }
-            if (!$text && isset($m['button']['text'])) {
-                $text = $m['button']['text'];
-            }
-            if (!$text && isset($m['interactive']['button_reply'])) {
-                $text = $m['interactive']['button_reply']['title'] ?? $m['interactive']['button_reply']['id'] ?? null;
-            }
-
-            // Prefer recipient from metadata but fall back to message fields
-            $local_recipient = $recipient_number ?? ($m['recipient_id'] ?? $m['to'] ?? $m['wa_id'] ?? null);
-
             $result[] = [
                 'id' => $m['id'] ?? null,
-                'type' => $type,
-                'from' => $from,
-                'to' => $to,
-                'recipient_number' => $local_recipient,
-                'timestamp' => $timestamp,
-                'text' => $text,
+                'type' => $m['type'] ?? null,
+                'from' => $m['from'] ?? null,
+                'to' => $recipient_number,
+                'recipient_number' => $recipient_number,
+                'from_name' => $nameMap[$m['from'] ?? ''] ?? null,
+                'timestamp' => $m['timestamp'] ?? null,
+                'text' => $this->extractMessageText($m),
                 'raw' => $m,
+            ];
+        }
+
+        foreach ($statuses as $st) {
+            $result[] = [
+                'id' => $st['id'] ?? null,
+                'type' => 'status',
+                'from' => $st['recipient_id'] ?? null,
+                'to' => $recipient_number,
+                'recipient_number' => $recipient_number,
+                'from_name' => $nameMap[$st['recipient_id'] ?? ''] ?? null,
+                'timestamp' => $st['timestamp'] ?? null,
+                'text' => '✓ ' . ($st['status'] ?? 'delivered'),
+                'raw' => $st,
             ];
         }
 
