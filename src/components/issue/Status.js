@@ -171,6 +171,11 @@ const IssueStatus = ( { row } ) =>
         } )
         setSelectedDropdown( selected )
     }
+    const isIssueDeadlock =
+        row?.department_status == 2 ||
+        row?.store_status == 2 ||
+        (row?.department_status == 1 && row?.store_status == 1)
+
     return (
         <div>
             {( ( isStoreManager && row?.department_status == 1 ) ||
@@ -209,17 +214,19 @@ const IssueStatus = ( { row } ) =>
                             <AiFillDelete />
                         </Button>
                     </Tooltip>
-                    <Tooltip content={`Resend notification`}>
-                        <Button
-                            size="sm"
-                            className="ml-2"
-                            color="gray"
-                            onClick={handleResend}
-                            isProcessing={resendIssueLoading}>
-                            <AiOutlineSend className="mr-1" />
-                            Resend
-                        </Button>
-                    </Tooltip>
+                    {!isIssueDeadlock && (
+                        <Tooltip content={`Resend notification`}>
+                            <Button
+                                size="sm"
+                                className="ml-2"
+                                color="gray"
+                                onClick={handleResend}
+                                isProcessing={resendIssueLoading}>
+                                <AiOutlineSend className="mr-1" />
+                                Resend
+                            </Button>
+                        </Tooltip>
+                    )}
                 </div>
             ) : (
                 <div className={`flex items-center gap-2`}>
@@ -249,15 +256,17 @@ const IssueStatus = ( { row } ) =>
                         ) : null}
                     </div>
                 </div>
-                <Tooltip content={`Resend notification`}>
-                    <Button
-                        size="xs"
-                        color="gray"
-                        onClick={handleResend}
-                        isProcessing={resendIssueLoading}>
-                        <AiOutlineSend />
-                    </Button>
-                </Tooltip>
+                {!isIssueDeadlock && (
+                    <Tooltip content={`Resend notification`}>
+                        <Button
+                            size="xs"
+                            color="gray"
+                            onClick={handleResend}
+                            isProcessing={resendIssueLoading}>
+                            <AiOutlineSend />
+                        </Button>
+                    </Tooltip>
+                )}
                 </div>
             )}
         </div>

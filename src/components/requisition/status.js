@@ -56,6 +56,7 @@ const Status = ( {
         },
     ] = useUpdateCashStatusMutation()
     const [ rowID, setRowID ] = useState( requisition.id )
+    const isDeadlock = currentStatus?.status === 'Approved' || currentStatus?.status === 'Rejected'
 
     const [
         resendPurchase,
@@ -242,21 +243,23 @@ const Status = ( {
                             {from === 'print_view' ? 'Reject' : ''}
                         </Button>
                     </Tooltip>
-                    <Tooltip content={`Resend notification to current stage`}>
-                        <Button
-                            size="sm"
-                            className="ml-2"
-                            color="gray"
-                            onClick={handleResend}
-                            isProcessing={
-                                resendPurchaseLoading ||
-                                resendCashLoading ||
-                                resendInitialLoading
-                            }>
-                            <AiOutlineSend className="mr-1" />
-                            Resend
-                        </Button>
-                    </Tooltip>
+                    {!isDeadlock && (
+                        <Tooltip content={`Resend notification to current stage`}>
+                            <Button
+                                size="sm"
+                                className="ml-2"
+                                color="gray"
+                                onClick={handleResend}
+                                isProcessing={
+                                    resendPurchaseLoading ||
+                                    resendCashLoading ||
+                                    resendInitialLoading
+                                }>
+                                <AiOutlineSend className="mr-1" />
+                                Resend
+                            </Button>
+                        </Tooltip>
+                    )}
                 </div>
             ) : (
                 <div className="flex items-center gap-2">
@@ -276,20 +279,22 @@ const Status = ( {
                         .replace( 'Ceo Department', 'CEO' )
                         .replace( 'dept.', ' ' )}
                 </span>
-                <Tooltip content={`Resend notification to current stage`}>
-                    <Button
-                        size="xs"
-                        color="gray"
-                        onClick={handleResend}
-                        isProcessing={
-                            resendPurchaseLoading ||
-                            resendCashLoading ||
-                            resendInitialLoading
-                        }>
-                        <AiOutlineSend className="mr-1" />
-                        Resend
-                    </Button>
-                </Tooltip>
+                {!isDeadlock && (
+                    <Tooltip content={`Resend notification to current stage`}>
+                        <Button
+                            size="xs"
+                            color="gray"
+                            onClick={handleResend}
+                            isProcessing={
+                                resendPurchaseLoading ||
+                                resendCashLoading ||
+                                resendInitialLoading
+                            }>
+                            <AiOutlineSend className="mr-1" />
+                            Resend
+                        </Button>
+                    </Tooltip>
+                )}
                 </div>
             )}
         </div>
