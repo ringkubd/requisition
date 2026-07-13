@@ -85,6 +85,14 @@ export const CashRequisitionAPIService = GeneralBaseAPI.injectEndpoints({
                 'cash-requisition-select-vehicle',
             ],
         }),
+        getCashPurposeSuggestion: build.query({
+            query: arg => ({
+                url: 'cash_requisition_purpose_suggestions',
+                method: 'GET',
+                params: arg,
+            }),
+            onQueryStarted: onQueryStartedErrorToast,
+        }),
     }),
 })
 export const {
@@ -96,6 +104,7 @@ export const {
     useGetCashProductQuery,
     useStoreCashProductMutation,
     useDeleteCashProductMutation,
+    useGetCashPurposeSuggestionQuery,
     util: { getRunningQueriesThunk },
 } = CashRequisitionAPIService
 export const { getCashRequisition } = CashRequisitionAPIService.endpoints

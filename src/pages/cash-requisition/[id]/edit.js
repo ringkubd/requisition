@@ -9,8 +9,10 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import Actions from '@/components/actions'
 import DataTable from '@/components/ui/AppDataTable'
+import { CSSTransition, SwitchTransition } from 'react-transition-group'
 import {
     useGetCashProductQuery,
+    useGetCashPurposeSuggestionQuery,
     useGetSingleCashRequisitionQuery,
     useStoreCashProductMutation,
     useUpdateCashRequisitionMutation,
@@ -49,7 +51,27 @@ const Edit = props => {
 
     const [requisitionData, setRequisitionData] = useState([])
     const [submitRemoveProcessing, setSubmitRemoveProcessing] = useState(false)
+    const [suggestState, setSuggestState] = useState(false)
+    const [selectedItem, setSelectedItem] = useState('')
     const purposRef = useRef(false)
+    const suggestRef = useRef()
+
+    const suggestionQuery = useGetCashPurposeSuggestionQuery(
+        {
+            item: selectedItem,
+        },
+        {
+            skip: !selectedItem,
+        },
+    )
+
+    useEffect(() => {
+        if (suggestRef.current) {
+            suggestRef.current.addEventListener('click', e => {
+                formikForm.current.setFieldValue('purpose', e.target.innerText)
+            })
+        }
+    }, [suggestRef.current])
 
     useEffect(() => {
         if (!isLoading && !isError && data) {
@@ -435,10 +457,46 @@ const Edit = props => {
                                                                                 e,
                                                                             )
                                                                         }}
+                                                                        onFocus={() => {
+                                                                            setSelectedItem(values.item)
+                                                                            setSuggestState(true)
+                                                                        }}
+                                                                        onBlur={() => setSuggestState(false)}
                                                                         autoComplete={`off`}
                                                                     />
                                                                 </div>
                                                             </div>
+                                                            <SwitchTransition>
+                                                                <CSSTransition key={suggestState} timeout={200} classNames="fade">
+                                                                    <div>
+                                                                        {suggestState ? (
+                                                                            !suggestionQuery.isLoading &&
+                                                                            !suggestionQuery.isError &&
+                                                                            suggestionQuery.data ? (
+                                                                                <ul
+                                                                                    className="py-1 mt-1 space-y-2 bg-green-100 px-1 z-50 absolute w-full"
+                                                                                    ref={suggestRef}
+                                                                                >
+                                                                                    {suggestionQuery.data.data.map((s, i) => (
+                                                                                        <li
+                                                                                            key={i}
+                                                                                            className="bg-gray-300 px-2 rounded hover:drop-shadow-md hover:cursor-pointer hover:bg-gray-400"
+                                                                                        >
+                                                                                            {s.purpose}
+                                                                                        </li>
+                                                                                    ))}
+                                                                                </ul>
+                                                                            ) : suggestionQuery.isLoading ? (
+                                                                                'Loading...'
+                                                                            ) : (
+                                                                                ''
+                                                                            )
+                                                                        ) : (
+                                                                            <div></div>
+                                                                        )}
+                                                                    </div>
+                                                                </CSSTransition>
+                                                            </SwitchTransition>
                                                         </div>
                                                         <ErrorMessage
                                                             name="purpose"
