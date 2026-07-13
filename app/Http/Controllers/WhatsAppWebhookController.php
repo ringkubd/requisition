@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Models\WhatsAppMessage;
 use App\Models\WhatsAppWebhookLog;
 use NotificationChannels\WhatsApp\Component;
 use stdClass;
@@ -54,6 +55,13 @@ class WhatsAppWebhookController extends Controller
                 'signature' => $request->header('X-Hub-Signature-256', null),
             ]);
             Log::info('Stored WhatsApp webhook in DB', ['id' => $log->id]);
+
+            // Parse and store normalized messages
+            try {
+                $this->storeParsedMessages($request->all(), $log->id);
+            } catch (\Throwable $e) {
+                Log::error('Failed to parse webhook messages', ['error' => $e->getMessage(), 'log_id' => $log->id]);
+            }
         } catch (\Throwable $e) {
             // Fallback to file storage if DB unavailable
             Log::error('Failed to store webhook in DB: ' . $e->getMessage());
@@ -85,6 +93,81 @@ class WhatsAppWebhookController extends Controller
      * @param Request $request
      * @return bool
      */
+    /**
+     * Parse webhook payload and store normalized messages
+     */
+    private function storeParsedMessages(array $payload, int $logId): void
+    {
+        $value = $payload['entry'][0]['changes'][0]['value'] ?? [];
+        if (!$value) return;
+
+        $metadata = $value['metadata'] ?? [];
+        $ourDisplayPhone = $metadata['display_phone_number'] ?? null;
+
+        // Build name map from contacts
+        $nameMap = [];
+        foreach ($value['contacts'] ?? [] as $c) {
+            $waId = $c['wa_id'] ?? null;
+            if ($waId) {
+                $nameMap[$waId] = $c['profile']['name'] ?? $c['name']['formatted_name'] ?? null;
+            }
+        }
+
+        $now = now();
+
+        // Process messages
+        foreach ($value['messages'] ?? [] as $msg) {
+            $type = $msg['type'] ?? null;
+            $from = $msg['from'] ?? null;
+            $msgId = $msg['id'] ?? null;
+            $ts = isset($msg['timestamp']) ? date('Y-m-d H:i:s', (int)$msg['timestamp']) : $now;
+            $text = null;
+
+            if ($type && isset($msg[$type])) {
+                $c = $msg[$type];
+                if (is_array($c)) {
+                    $text = $c['body'] ?? $c['caption'] ?? $c['text'] ?? $c['payload'] ?? $c['title'] ?? null;
+                } elseif (is_string($c)) {
+                    $text = $c;
+                }
+            }
+            if (!$text) $text = $msg['text']['body'] ?? $msg['button']['text'] ?? null;
+
+            WhatsAppMessage::create([
+                'webhook_log_id' => $logId,
+                'wa_message_id' => $msgId,
+                'from_phone' => $from,
+                'to_phone' => $ourDisplayPhone,
+                'type' => $type ?? 'unknown',
+                'text' => $text,
+                'contact_name' => $nameMap[$from ?? ''] ?? null,
+                'payload' => $msg,
+                'msg_timestamp' => $ts,
+            ]);
+        }
+
+        // Process statuses
+        foreach ($value['statuses'] ?? [] as $st) {
+            $recipientId = $st['recipient_id'] ?? null;
+            $statusText = $st['status'] ?? 'unknown';
+            $msgId = $st['id'] ?? null;
+            $ts = isset($st['timestamp']) ? date('Y-m-d H:i:s', (int)$st['timestamp']) : $now;
+
+            WhatsAppMessage::create([
+                'webhook_log_id' => $logId,
+                'wa_message_id' => $msgId,
+                'from_phone' => $recipientId,
+                'to_phone' => $ourDisplayPhone,
+                'type' => 'status',
+                'text' => '✓ ' . $statusText,
+                'status_event' => $statusText,
+                'contact_name' => $nameMap[$recipientId ?? ''] ?? null,
+                'payload' => $st,
+                'msg_timestamp' => $ts,
+            ]);
+        }
+    }
+
     private function isVerificationRequest(Request $request): bool
     {
         return $request->isMethod('GET') &&
