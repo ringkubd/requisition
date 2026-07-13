@@ -86,7 +86,22 @@ class WhatsAppWebhookLogAPIController extends AppBaseController
             return $this->sendError('Webhook log not found', 404);
         }
 
-        $messages = $this->extractMessages($log->payload ?? []);
+        $messages = WhatsAppMessage::where('webhook_log_id', $id)
+            ->orderBy('msg_timestamp')
+            ->get()
+            ->map(function ($msg) {
+                return [
+                    'id' => $msg->wa_message_id,
+                    'type' => $msg->type,
+                    'from' => $msg->from_phone,
+                    'to' => $msg->to_phone,
+                    'text' => $msg->text,
+                    'contact_name' => $msg->contact_name,
+                    'status_event' => $msg->status_event,
+                    'timestamp' => $msg->msg_timestamp ? $msg->msg_timestamp->timestamp : null,
+                    'raw' => $msg->payload,
+                ];
+            });
 
         return $this->sendResponse([
             'log' => $log,
