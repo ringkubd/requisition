@@ -8,6 +8,11 @@ const WHATSAPP_GREEN = '#075E54'
 const WHATSAPP_TEAL = '#128C7E'
 const WHATSAPP_LIGHT = '#DCF8C6'
 
+function extractPhone(str) {
+  if (!str) return str
+  return str.replace(/[^0-9]/g, '')
+}
+
 export default function WhatsAppMessenger() {
   const [contacts, setContacts] = useState([])
   const [activePhone, setActivePhone] = useState(null)
@@ -44,7 +49,8 @@ export default function WhatsAppMessenger() {
       const res = await axios.get('/api/whatsapp-messages', {
         params: { phone, per_page: 200 }
       })
-      setMessages(res.data?.data?.messages || [])
+      const msgs = res.data?.data?.messages || []
+      setMessages(msgs)
     } catch (e) {
       console.error('Failed to load messages', e)
     } finally {
@@ -65,6 +71,15 @@ export default function WhatsAppMessenger() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // Auto-refresh messages every 10 seconds for the active contact
+  useEffect(() => {
+    if (!activePhone) return
+    const interval = setInterval(() => {
+      fetchMessages(activePhone)
+    }, 10000)
+    return () => clearInterval(interval)
+  }, [activePhone, fetchMessages])
 
   const handleSend = async () => {
     if (!messageText.trim() || !activePhone || sending) return
@@ -91,7 +106,17 @@ export default function WhatsAppMessenger() {
     }
   }
 
-  const activeContact = contacts.find(c => c.phone === activePhone)
+  const activeContact = contacts.find(c => extractPhone(c.phone) === extractPhone(activePhone))
+
+  // Format a readable timestamp
+  const formatTime = (ts) => {
+    if (!ts) return ''
+    const d = moment(ts)
+    const now = moment()
+    if (d.isSame(now, 'day')) return d.format('h:mm A')
+    if (d.isSame(now, 'year')) return d.format('MMM D')
+    return d.format('MM/DD/YY')
+  }
 
   return (
     <AppLayout>
@@ -101,7 +126,7 @@ export default function WhatsAppMessenger() {
       <div className="h-[calc(100vh-8rem)] flex flex-col">
         <div className="flex-1 flex overflow-hidden rounded-lg shadow-lg border border-gray-200">
           {/* Left Sidebar - Contacts */}
-          <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+          <div className="w-80 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
             <div
               className="px-4 py-3 text-white font-semibold text-lg"
               style={{ backgroundColor: WHATSAPP_GREEN }}
@@ -130,43 +155,46 @@ export default function WhatsAppMessenger() {
               {!loadingContacts && contacts.length === 0 && (
                 <div className="p-4 text-center text-gray-400 text-sm">No conversations yet</div>
               )}
-              {contacts.map((contact) => (
-                <div
-                  key={contact.phone}
-                  onClick={() => setActivePhone(contact.phone)}
-                  className={`flex items-center px-4 py-3 cursor-pointer border-b border-gray-100 hover:bg-gray-50 transition ${
-                    activePhone === contact.phone ? 'bg-gray-100' : ''
-                  }`}
-                >
+              {contacts.map((contact) => {
+                const isActive = extractPhone(contact.phone) === extractPhone(activePhone)
+                return (
                   <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
-                    style={{ backgroundColor: WHATSAPP_TEAL }}
+                    key={contact.phone}
+                    onClick={() => setActivePhone(contact.phone)}
+                    className={`flex items-center px-4 py-3 cursor-pointer border-b border-gray-100 hover:bg-gray-50 transition ${
+                      isActive ? 'bg-gray-100' : ''
+                    }`}
                   >
-                    {(contact.name || '?')[0].toUpperCase()}
-                  </div>
-                  <div className="ml-3 flex-1 min-w-0">
-                    <div className="flex justify-between items-baseline">
-                      <span className="font-medium text-sm truncate">{contact.name || contact.phone}</span>
-                      <span className="text-xs text-gray-400 flex-shrink-0 ml-2">
-                        {contact.last_message_at ? moment(contact.last_message_at).format('DD/MM/YY') : ''}
-                      </span>
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
+                      style={{ backgroundColor: WHATSAPP_TEAL }}
+                    >
+                      {(contact.name || '?')[0].toUpperCase()}
                     </div>
-                    <div className="text-xs text-gray-500 truncate mt-0.5">
-                      {contact.last_message || 'No messages'}
+                    <div className="ml-3 flex-1 min-w-0">
+                      <div className="flex justify-between items-baseline">
+                        <span className="font-medium text-sm truncate">{contact.name || contact.phone}</span>
+                        <span className="text-xs text-gray-400 flex-shrink-0 ml-2">
+                          {contact.last_message_at ? moment(contact.last_message_at).format('DD/MM/YY') : ''}
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-500 truncate mt-0.5">
+                        {contact.last_message || 'No messages'}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 
           {/* Right Side - Chat */}
-          <div className="flex-1 flex flex-col bg-gray-100">
+          <div className="flex-1 flex flex-col bg-gray-100 min-w-0">
             {activePhone ? (
               <>
                 {/* Chat Header */}
                 <div
-                  className="px-4 py-2.5 text-white flex items-center"
+                  className="px-4 py-2.5 text-white flex items-center flex-shrink-0"
                   style={{ backgroundColor: WHATSAPP_GREEN }}
                 >
                   <div
@@ -186,32 +214,55 @@ export default function WhatsAppMessenger() {
                   className="flex-1 overflow-y-auto p-4 space-y-1"
                   style={{ backgroundColor: '#e5ddd5' }}
                 >
-                  {loadingMessages && <div className="text-center text-gray-400 text-sm py-4">Loading messages...</div>}
+                  {loadingMessages && messages.length === 0 && <div className="text-center text-gray-400 text-sm py-4">Loading messages...</div>}
                   {!loadingMessages && messages.length === 0 && (
                     <div className="text-center text-gray-400 text-sm py-4">No messages yet. Send your first message below.</div>
                   )}
                   {messages.map((msg, idx) => {
                     const isOutbound = msg.direction === 'outbound'
-                    const isFirstBySender = idx === 0 || messages[idx - 1]?.direction !== msg.direction
+                    const isStatus = msg.type === 'status'
+                    const prevMsg = idx > 0 ? messages[idx - 1] : null
+                    const showDate = !prevMsg || !moment(msg.timestamp).isSame(moment(prevMsg.timestamp), 'day')
+
+                    if (isStatus) {
+                      return (
+                        <div key={msg.id || idx} className="flex justify-center">
+                          <span className="text-[10px] text-gray-400 bg-white/60 px-2 py-0.5 rounded-full">
+                            {msg.text}
+                          </span>
+                        </div>
+                      )
+                    }
+
                     return (
-                      <div key={msg.id || idx} className={`flex ${isOutbound ? 'justify-end' : 'justify-start'}`}>
-                        <div
-                          className={`max-w-xs md:max-w-md lg:max-w-lg px-3 py-2 rounded-lg text-sm shadow-sm ${
-                            isOutbound
-                              ? 'rounded-br-sm'
-                              : 'rounded-bl-sm'
-                          }`}
-                          style={{
-                            backgroundColor: isOutbound ? WHATSAPP_LIGHT : '#ffffff',
-                            borderBottomRightRadius: isOutbound && !isFirstBySender ? '4px' : undefined,
-                            borderBottomLeftRadius: !isOutbound && !isFirstBySender ? '4px' : undefined,
-                          }}
-                        >
-                          <div className="text-gray-800 whitespace-pre-wrap break-words">{msg.text || '(no text)'}</div>
-                          <div className={`text-right mt-1 ${isOutbound ? 'text-gray-500' : 'text-gray-400'}`}>
-                            <span className="text-[10px]">
-                              {msg.timestamp ? moment(msg.timestamp).format('h:mm A') : ''}
+                      <div key={msg.id || idx}>
+                        {showDate && (
+                          <div className="flex justify-center my-2">
+                            <span className="text-[11px] text-gray-500 bg-white/70 px-3 py-1 rounded shadow-sm">
+                              {moment(msg.timestamp).format('dddd, MMMM D, YYYY')}
                             </span>
+                          </div>
+                        )}
+                        <div className={`flex ${isOutbound ? 'justify-end' : 'justify-start'} mb-0.5`}>
+                          <div
+                            className={`max-w-xs md:max-w-md lg:max-w-lg px-3 py-2 text-sm shadow-sm ${
+                              isOutbound ? 'rounded-tl-lg rounded-tr-lg rounded-bl-lg' : 'rounded-tl-lg rounded-tr-lg rounded-br-lg'
+                            }`}
+                            style={{
+                              backgroundColor: isOutbound ? WHATSAPP_LIGHT : '#ffffff',
+                            }}
+                          >
+                            <div className="text-gray-800 whitespace-pre-wrap break-words">{msg.text || '(no text)'}</div>
+                            <div className={`text-right mt-1 flex items-center justify-end gap-1`}>
+                              <span className="text-[10px] text-gray-500">
+                                {msg.timestamp ? moment.unix(msg.timestamp).format('h:mm A') : moment(msg.timestamp).format('h:mm A')}
+                              </span>
+                              {isOutbound && (
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 11" className="w-[14px] h-[10px] fill-gray-400">
+                                  <path d="M11.071.653a.457.457 0 0 0-.304-.102H7.497a.457.457 0 0 0-.406.254.457.457 0 0 0 .076.483l2.187 2.69a.457.457 0 0 0 .355.168h.025a.457.457 0 0 0 .35-.193l2.53-3.126a.457.457 0 0 0-.102-.64.47.47 0 0 0-.285-.11zM8.86 6.083a.457.457 0 0 0-.356-.167h-.025a.457.457 0 0 0-.35.192L5.599 9.234 3.898 7.166a.457.457 0 0 0-.355-.168h-.025a.457.457 0 0 0-.35.193L.637 10.316a.456.456 0 0 0 .103.64.456.456 0 0 0 .64-.102L3.36 8.5l1.7 2.068a.457.457 0 0 0 .355.168h.025a.457.457 0 0 0 .35-.193l2.787-3.44a.456.456 0 0 0 .076-.483.457.457 0 0 0-.406-.254z"/>
+                                </svg>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -221,7 +272,7 @@ export default function WhatsAppMessenger() {
                 </div>
 
                 {/* Message Input */}
-                <div className="px-4 py-3 bg-gray-200 flex items-center gap-3">
+                <div className="px-4 py-3 bg-gray-200 flex items-center gap-3 flex-shrink-0">
                   <textarea
                     className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
                     rows={1}
@@ -233,7 +284,7 @@ export default function WhatsAppMessenger() {
                   <button
                     onClick={handleSend}
                     disabled={!messageText.trim() || sending}
-                    className="w-12 h-12 rounded-full flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed transition hover:opacity-90"
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed transition hover:opacity-90 flex-shrink-0"
                     style={{ backgroundColor: WHATSAPP_TEAL }}
                   >
                     {sending ? (
