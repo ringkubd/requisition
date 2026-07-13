@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\CashRequisitionAPIController;
 use App\Http\Controllers\API\CategoryAPIController;
 use App\Http\Controllers\API\InitialRequisitionAPIController;
 use App\Http\Controllers\API\NavigationAPIController;
