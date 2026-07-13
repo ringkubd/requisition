@@ -47,7 +47,7 @@ export default function WhatsAppMessenger() {
     setLoadingMessages(true)
     try {
       const res = await axios.get('/api/whatsapp-messages', {
-        params: { phone, per_page: 200 }
+        params: { phone: extractPhone(phone), per_page: 200 }
       })
       const msgs = res.data?.data?.messages || []
       setMessages(msgs)
@@ -86,7 +86,7 @@ export default function WhatsAppMessenger() {
     setSending(true)
     try {
       await axios.post('/api/whatsapp-send', {
-        phone: activePhone,
+        phone: extractPhone(activePhone),
         message: messageText.trim(),
       })
       setMessageText('')
