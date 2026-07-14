@@ -689,4 +689,74 @@ class ProductIssueAPIController extends AppBaseController
 
         return $this->sendResponse([], 'Notifications resent successfully');
     }
+
+    public function changeDepartment($uuid, Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user->email !== 'ajr.jahid@gmail.com') {
+            return $this->sendError('Unauthorized. Only specific user can change department.', 403);
+        }
+
+        $request->validate([
+            'department_id' => 'required|exists:departments,id',
+        ]);
+
+        $productIssue = ProductIssue::where('uuid', $uuid)->first();
+        if (!$productIssue) {
+            return $this->sendError('Product Issue not found');
+        }
+
+        if ($productIssue->department_status != 0) {
+            return $this->sendError('Department can only be changed when issue is pending in department.');
+        }
+
+        $newDepartmentId = $request->department_id;
+        $newDepartment = Department::find($newDepartmentId);
+
+        DB::transaction(function () use ($productIssue, $newDepartmentId, $newDepartment, $uuid, $user) {
+            $productIssue->update([
+                'issuer_department_id' => $newDepartmentId,
+                'receiver_department_id' => $newDepartmentId,
+                'department_status' => 0,
+                'department_approved_by' => null,
+                'department_approved_at' => null,
+            ]);
+
+            $department_autority = User::query()
+                ->whereHas('departments', function ($q) use ($newDepartmentId) {
+                    $q->where('id', $newDepartmentId);
+                })
+                ->whereHas('roles.permissions', function ($q) {
+                    $q->where('name', 'approve_department_issue');
+                })
+                ->where('id', '!=', $user->id)
+                ->get();
+
+            $requisitor_name = $user->name;
+            $no = $newDepartment->name . '/' . $productIssue->id;
+
+            foreach ($department_autority as $authority) {
+                if (!empty($authority->mobile_no)) {
+                    $one_time_key = new OneTimeLogin();
+                    $key = $one_time_key->generate($authority->id);
+                    $authority->notify(new WhatsAppIssueButtonNotification(
+                        Component::text($requisitor_name),
+                        Component::text($no),
+                        Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_1_department_issue']),
+                        Component::quickReplyButton([$productIssue->id . '_' . $authority->id . '_2_department_issue']),
+                        Component::urlButton(["/issue/$uuid/whatsapp_view?auth_key=$key->auth_key"]),
+                        $authority->mobile_no
+                    ));
+                }
+            }
+        });
+
+        $productIssue->refresh();
+
+        return $this->sendResponse(
+            new ProductIssueResource($productIssue),
+            'Department changed successfully'
+        );
+    }
 }

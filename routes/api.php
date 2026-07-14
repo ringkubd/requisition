@@ -226,6 +226,7 @@ Route::post('resend-notification/purchase/{id}', [PurchaseRequisitionAPIControll
 Route::post('resend-notification/cash/{id}', [\App\Http\Controllers\API\CashRequisitionAPIController::class, 'resendNotifications']);
 Route::post('resend-notification/initial/{id}', [InitialRequisitionAPIController::class, 'resendNotifications']);
 Route::post('resend-notification/issue/{id}', [\App\Http\Controllers\API\ProductIssueAPIController::class, 'resendNotifications']);
+Route::post('product-issues/{uuid}/change-department', [\App\Http\Controllers\API\ProductIssueAPIController::class, 'changeDepartment']);
 
 
 Route::resource('product-issue-items', App\Http\Controllers\API\ProductIssueItemsAPIController::class)
