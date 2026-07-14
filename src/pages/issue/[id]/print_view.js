@@ -45,7 +45,7 @@ export default function PrintView(props) {
                             {data?.data ? <Status row={data?.data} /> : null}
                         </div>
                     </div>
-                    <div className="w-full overflow-x-auto">
+                    <div className="w-full flex justify-center">
                         <IssuePrint
                             products={data?.data ?? []}
                             ref={printPageRef}
