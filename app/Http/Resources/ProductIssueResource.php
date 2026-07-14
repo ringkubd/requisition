@@ -36,6 +36,7 @@ class ProductIssueResource extends JsonResource
             'storeApprovedBY' => $this->storeApprovedBY,
             'store_approved_at' => $this->store_approved_at,
             'store_status' => $this->store_status,
+            'department_change_note' => $this->department_change_note,
             'deleted_at' => $this->deleted_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at

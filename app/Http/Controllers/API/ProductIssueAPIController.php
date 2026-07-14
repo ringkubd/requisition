@@ -700,6 +700,7 @@ class ProductIssueAPIController extends AppBaseController
 
         $request->validate([
             'department_id' => 'required|exists:departments,id',
+            'note' => 'required|string|max:500',
         ]);
 
         $productIssue = ProductIssue::where('uuid', $uuid)->first();
@@ -714,13 +715,22 @@ class ProductIssueAPIController extends AppBaseController
         $newDepartmentId = $request->department_id;
         $newDepartment = Department::find($newDepartmentId);
 
-        DB::transaction(function () use ($productIssue, $newDepartmentId, $newDepartment, $uuid, $user) {
+        $oldDepartment = $productIssue->issuerDepartment;
+        $oldDeptName = $oldDepartment?->name ?? 'Unknown';
+        $newDeptName = $newDepartment->name;
+
+        $noteEntry = now()->format('d M Y H:i') . " by {$user->name} ({$user->email}): {$request->note} (From: {$oldDeptName} → To: {$newDeptName})";
+        $existingNote = $productIssue->department_change_note;
+        $fullNote = $existingNote ? $existingNote . "\n" . $noteEntry : $noteEntry;
+
+        DB::transaction(function () use ($productIssue, $newDepartmentId, $fullNote, $uuid, $user) {
             $productIssue->update([
                 'issuer_department_id' => $newDepartmentId,
                 'receiver_department_id' => $newDepartmentId,
                 'department_status' => 0,
                 'department_approved_by' => null,
                 'department_approved_at' => null,
+                'department_change_note' => $fullNote,
             ]);
 
             $department_autority = User::query()

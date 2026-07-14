@@ -82,6 +82,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
         'department_approved_at',
         'store_approved_at',
         'use_in_category',
+        'department_change_note',
     ];
 
     public static array $rules = [
