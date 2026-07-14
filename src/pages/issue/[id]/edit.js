@@ -160,10 +160,12 @@ const Edit = props => {
         setItems(prev => prev.map((item) => row.id === item.id ? { ...item, [field]: value } : item));
     };
 
+    const [deptChangeNote, setDeptChangeNote] = useState('')
+
     const handleChangeDepartment = async () => {
-        if (!selectedDept || !router.query.id) return
+        if (!selectedDept || !deptChangeNote.trim() || !router.query.id) return
         try {
-            await changeIssueDepartment({ uuid: router.query.id, department_id: selectedDept }).unwrap()
+            await changeIssueDepartment({ uuid: router.query.id, department_id: selectedDept, note: deptChangeNote.trim() }).unwrap()
             toast.success('Department changed successfully')
             setDeptChanged(true)
         } catch (e) {
@@ -218,27 +220,41 @@ const Edit = props => {
                                         <span className="text-gray-700">{issue?.data?.receiver_department?.name || '-'}</span>
                                     </div>
                                     {user?.email === 'ajr.jahid@gmail.com' && issue?.data?.department_status == 0 && !deptChanged && (
-                                        <div className="flex flex-row items-center gap-2 col-span-2 mt-2 p-3 bg-yellow-50 rounded border">
-                                            <span className="font-bold w-40 text-sm">Change Department:</span>
-                                            <select
-                                                className="border rounded px-3 py-1.5 text-sm flex-1"
-                                                value={selectedDept || ''}
-                                                onChange={e => setSelectedDept(parseInt(e.target.value))}
-                                            >
-                                                <option value="">Select department...</option>
-                                                {departments?.data?.map(d => (
-                                                    <option key={d.id} value={d.id}>{d.name}</option>
-                                                ))}
-                                            </select>
-                                            <Button
-                                                size="xs"
-                                                color="warning"
-                                                onClick={handleChangeDepartment}
-                                                isProcessing={isChangingDept}
-                                                disabled={!selectedDept || isChangingDept}
-                                            >
-                                                Change
-                                            </Button>
+                                        <div className="flex flex-col gap-2 col-span-2 mt-2 p-3 bg-yellow-50 rounded border">
+                                            <div className="flex flex-row items-center gap-2">
+                                                <span className="font-bold w-40 text-sm">Change Department:</span>
+                                                <select
+                                                    className="border rounded px-3 py-1.5 text-sm flex-[2]"
+                                                    value={selectedDept || ''}
+                                                    onChange={e => setSelectedDept(parseInt(e.target.value))}
+                                                >
+                                                    <option value="">Select department...</option>
+                                                    {departments?.data?.map(d => (
+                                                        <option key={d.id} value={d.id}>{d.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="flex flex-row items-start gap-2">
+                                                <span className="font-bold w-40 text-sm pt-1">Note:</span>
+                                                <textarea
+                                                    className="border rounded px-3 py-1.5 text-sm flex-[2] resize-none"
+                                                    rows={2}
+                                                    placeholder="Why is the department being changed? (required)"
+                                                    value={deptChangeNote}
+                                                    onChange={e => setDeptChangeNote(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="flex justify-end">
+                                                <Button
+                                                    size="xs"
+                                                    color="warning"
+                                                    onClick={handleChangeDepartment}
+                                                    isProcessing={isChangingDept}
+                                                    disabled={!selectedDept || !deptChangeNote.trim() || isChangingDept}
+                                                >
+                                                    Change Department
+                                                </Button>
+                                            </div>
                                         </div>
                                     )}
                                     <div className="flex flex-row items-center gap-2">

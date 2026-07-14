@@ -8,9 +8,11 @@ import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import DataTable from '@/components/ui/AppDataTable'
 import Status from '@/components/issue/Status'
+import { useAuth } from '@/hooks/auth'
 
 const IssueView = () => {
     const router = useRouter()
+    const { user } = useAuth()
     const {
         data: issue,
         isLoading: issueISLoading,
@@ -119,6 +121,14 @@ const IssueView = () => {
                                 </h2>
                                 <h4>{issue?.data?.issuer_department?.name}</h4>
                             </div>
+                            {user?.email === 'ajr.jahid@gmail.com' && issue?.data?.department_change_note && (
+                                <div className="flex flex-col space-y-1 mt-4 p-3 bg-yellow-50 rounded border">
+                                    <h2 className="font-bold text-sm">Department Change History</h2>
+                                    {issue.data.department_change_note.split('\n').map((line, i) => (
+                                        <p key={i} className="text-sm text-gray-700">{line}</p>
+                                    ))}
+                                </div>
+                            )}
                             <div className={`flex flex-row space-x-8 mt-4`}>
                                 <h2 className={`font-bold`}>Issue Time</h2>
                                 <h4>
