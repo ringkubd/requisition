@@ -73,6 +73,15 @@ export const IssueApiService = GeneralBaseAPI.injectEndpoints( {
             } ),
             onQueryStarted: onQueryStartedErrorToast,
         } ),
+        changeIssueDepartment: builder.mutation( {
+            query: ( { uuid, department_id } ) => ( {
+                url: `product-issues/${uuid}/change-department`,
+                method: 'POST',
+                body: { department_id },
+            } ),
+            invalidatesTags: [ 'issue', 'editIssue' ],
+            onQueryStarted: onQueryStartedErrorToast,
+        } ),
     } ),
 } )
 
@@ -85,6 +94,7 @@ export const {
     useUpdateIssueQuantityMutation,
     useSyncProductIssuesMutation,
     useResendIssueNotificationMutation,
+    useChangeIssueDepartmentMutation,
     util: { getRunningQueriesThunk },
 } = IssueApiService
 

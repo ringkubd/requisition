@@ -4,7 +4,8 @@ import AppLayout from '@/components/Layouts/AppLayout'
 import NavLink from '@/components/navLink'
 import { useAuth } from '@/hooks/auth'
 import axios from '@/lib/axios'
-import { useEditIssueQuery, useSyncProductIssuesMutation } from '@/store/service/issue'
+import { useEditIssueQuery, useSyncProductIssuesMutation, useChangeIssueDepartmentMutation } from '@/store/service/issue'
+import { useGetDepartmentByOrganizationBranchQuery } from '@/store/service/deparment'
 import { useGetUsersQuery } from '@/store/service/user/management'
 import { Button, Card, Label, Textarea, TextInput } from 'flowbite-react'
 import { ErrorMessage, Formik } from 'formik'
@@ -24,6 +25,13 @@ const Edit = props => {
         department_id: user?.selected_department,
     })
     const [syncProductIssues, { isLoading: isSyncLoading, isError: isSyncError, isSuccess: isSyncSuccess }] = useSyncProductIssuesMutation()
+    const [changeIssueDepartment, { isLoading: isChangingDept }] = useChangeIssueDepartmentMutation()
+    const [selectedDept, setSelectedDept] = useState(null)
+    const [deptChanged, setDeptChanged] = useState(false)
+    const { data: departments } = useGetDepartmentByOrganizationBranchQuery(
+        { branch_id: user?.selected_branch },
+        { skip: !user?.selected_branch },
+    )
     const {
         data: issue,
         isLoading: issueISLoading,
@@ -152,6 +160,17 @@ const Edit = props => {
         setItems(prev => prev.map((item) => row.id === item.id ? { ...item, [field]: value } : item));
     };
 
+    const handleChangeDepartment = async () => {
+        if (!selectedDept || !router.query.id) return
+        try {
+            await changeIssueDepartment({ uuid: router.query.id, department_id: selectedDept }).unwrap()
+            toast.success('Department changed successfully')
+            setDeptChanged(true)
+        } catch (e) {
+            toast.error(e?.data?.message || 'Failed to change department')
+        }
+    }
+
     // Update handler for syncing product issues
     const handleUpdate = async () => {
         if (!router.query.id) return;
@@ -198,6 +217,30 @@ const Edit = props => {
                                         <span className="font-bold w-40">Receiver Department:</span>
                                         <span className="text-gray-700">{issue?.data?.receiver_department?.name || '-'}</span>
                                     </div>
+                                    {user?.email === 'ajr.jahid@gmail.com' && issue?.data?.department_status == 0 && !deptChanged && (
+                                        <div className="flex flex-row items-center gap-2 col-span-2 mt-2 p-3 bg-yellow-50 rounded border">
+                                            <span className="font-bold w-40 text-sm">Change Department:</span>
+                                            <select
+                                                className="border rounded px-3 py-1.5 text-sm flex-1"
+                                                value={selectedDept || ''}
+                                                onChange={e => setSelectedDept(parseInt(e.target.value))}
+                                            >
+                                                <option value="">Select department...</option>
+                                                {departments?.data?.map(d => (
+                                                    <option key={d.id} value={d.id}>{d.name}</option>
+                                                ))}
+                                            </select>
+                                            <Button
+                                                size="xs"
+                                                color="warning"
+                                                onClick={handleChangeDepartment}
+                                                isProcessing={isChangingDept}
+                                                disabled={!selectedDept || isChangingDept}
+                                            >
+                                                Change
+                                            </Button>
+                                        </div>
+                                    )}
                                     <div className="flex flex-row items-center gap-2">
                                         <span className="font-bold w-40">Issuer:</span>
                                         <span className="text-gray-700">{issue?.data?.issuer?.name || '-'}</span>
