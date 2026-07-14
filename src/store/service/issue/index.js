@@ -74,10 +74,10 @@ export const IssueApiService = GeneralBaseAPI.injectEndpoints( {
             onQueryStarted: onQueryStartedErrorToast,
         } ),
         changeIssueDepartment: builder.mutation( {
-            query: ( { uuid, department_id } ) => ( {
+            query: ( { uuid, department_id, note } ) => ( {
                 url: `product-issues/${uuid}/change-department`,
                 method: 'POST',
-                body: { department_id },
+                body: { department_id, note },
             } ),
             invalidatesTags: [ 'issue', 'editIssue' ],
             onQueryStarted: onQueryStartedErrorToast,
