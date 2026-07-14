@@ -722,8 +722,9 @@ class ProductIssueAPIController extends AppBaseController
         $noteEntry = now()->format('d M Y H:i') . " by {$user->name} ({$user->email}): {$request->note} (From: {$oldDeptName} → To: {$newDeptName})";
         $existingNote = $productIssue->department_change_note;
         $fullNote = $existingNote ? $existingNote . "\n" . $noteEntry : $noteEntry;
+        $notificationNo = $newDepartment->name . '/' . $productIssue->id;
 
-        DB::transaction(function () use ($productIssue, $newDepartmentId, $fullNote, $uuid, $user) {
+        DB::transaction(function () use ($productIssue, $newDepartmentId, $fullNote, $uuid, $user, $notificationNo) {
             $productIssue->update([
                 'issuer_department_id' => $newDepartmentId,
                 'receiver_department_id' => $newDepartmentId,
@@ -744,7 +745,7 @@ class ProductIssueAPIController extends AppBaseController
                 ->get();
 
             $requisitor_name = $user->name;
-            $no = $newDepartment->name . '/' . $productIssue->id;
+            $no = $notificationNo;
 
             foreach ($department_autority as $authority) {
                 if (!empty($authority->mobile_no)) {
