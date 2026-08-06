@@ -650,24 +650,18 @@ class ProductIssueAPIController extends AppBaseController
             return $this->sendError('Product Issue not found');
         }
 
-        if ($productIssue->department_status == 2 || $productIssue->store_status == 2 || ($productIssue->department_status == 1 && $productIssue->store_status == 1)) {
-            return $this->sendError('Cannot resend for approved or rejected issues');
-        }
-
         $stage = 'department';
         if ($productIssue->department_status == 1 && $productIssue->store_status == 0) {
             $stage = 'store';
         }
 
         if ($stage === 'department') {
-            $departmentId = $productIssue->receiver_department_id ?? \auth_department_id();
-            $department_autority = User::whereHas('departments', function ($q) use ($departmentId) {
-                $q->where('id', $departmentId);
+            $department_autority = User::whereHas('departments', function ($q) use ($productIssue) {
+                $q->where('id', \auth_department_id());
             })->whereHas('permissions', function ($q) {
                 $q->where('name', 'approve_department_issue');
             })->get();
 
-            $departmentName = $productIssue->issuerDepartment?->name ?? \auth_department_name();
             $uuid = $productIssue->uuid;
             foreach ($department_autority as $authority) {
                 $authority->notify(new PushNotification(
@@ -676,8 +670,7 @@ class ProductIssueAPIController extends AppBaseController
                 ));
 
                 if (!empty($authority->mobile_no)) {
-                    \App\Helper\WhatsappRateLimiter::forget($authority->mobile_no);
-                    $no = $departmentName . '/' . $productIssue->id;
+                    $no = \auth_department_name() . '/' . $productIssue->id;
                     $one_time_key = new OneTimeLogin();
                     $key = $one_time_key->generate($authority->id);
                     $authority->notify(new WhatsAppIssueButtonNotification(

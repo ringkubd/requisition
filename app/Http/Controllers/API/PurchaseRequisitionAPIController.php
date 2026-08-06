@@ -487,7 +487,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
      * @param string $prfNo
      * @return void
      */
-    private function notifyHeadOfDepartment(PurchaseRequisition $purchaseRequisition, string $requisitorName, string $prfNo, bool $bypassRateLimit = false): void
+    private function notifyHeadOfDepartment(PurchaseRequisition $purchaseRequisition, string $requisitorName, string $prfNo): void
     {
         if (NotificationTestHelper::isTestModeEnabled()) {
             $testUser = NotificationTestHelper::getTestUser();
@@ -503,7 +503,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
             $testUser->notify(new RequisitionStatusNotification($purchaseRequisition));
 
             // Send WhatsApp notifications if mobile number exists
-            $this->sendWhatsAppNotification($testUser, $purchaseRequisition, $requisitorName, $prfNo, $testPhone, $bypassRateLimit);
+            $this->sendWhatsAppNotification($testUser, $purchaseRequisition, $requisitorName, $prfNo, $testPhone);
 
             return;
         }
@@ -533,14 +533,14 @@ class PurchaseRequisitionAPIController extends AppBaseController
 
             // Send WhatsApp notifications if mobile number exists
             if (!empty($autority->mobile_no)) {
-                $this->sendWhatsAppNotification($autority, $purchaseRequisition, $requisitorName, $prfNo, null, $bypassRateLimit);
+                $this->sendWhatsAppNotification($autority, $purchaseRequisition, $requisitorName, $prfNo);
             }
         }
 
         $user = User::where('email', 'ajr.jahid@gmail.com')->first();
         if ($user) {
             // Also send to testing/backup number
-            $this->sendWhatsAppNotification($user, $purchaseRequisition, $requisitorName, $prfNo, '+8801737956549', $bypassRateLimit);
+            $this->sendWhatsAppNotification($user, $purchaseRequisition, $requisitorName, $prfNo, '+8801737956549');
         }
     }
 
@@ -554,16 +554,12 @@ class PurchaseRequisitionAPIController extends AppBaseController
      * @param string|null $overridePhone Optional phone number to override the user's phone
      * @return void
      */
-    private function sendWhatsAppNotification(User $user, PurchaseRequisition $purchaseRequisition, string $requisitorName, string $prfNo, ?string $overridePhone = null, bool $bypassRateLimit = false): void
+    private function sendWhatsAppNotification(User $user, PurchaseRequisition $purchaseRequisition, string $requisitorName, string $prfNo, ?string $overridePhone = null): void
     {
         $phoneNumber = $overridePhone ?? $user->mobile_no;
 
         if (empty($phoneNumber)) {
             return;
-        }
-
-        if ($bypassRateLimit) {
-            \App\Helper\WhatsappRateLimiter::forget($phoneNumber);
         }
         // Generate one-time login key
         $one_time_key = new OneTimeLogin();
@@ -753,16 +749,11 @@ class PurchaseRequisitionAPIController extends AppBaseController
             return $this->sendError('No approval status found');
         }
 
-        $currentStatus = $status->current_status;
-        if (in_array($currentStatus['status'], ['Approved', 'Rejected'])) {
-            return $this->sendError('Cannot resend for approved or rejected requisitions');
-        }
-
-        $stage = $currentStatus['stage'] ?? null;
+        $stage = $status->current_stage;
 
         switch ($stage) {
             case 'department':
-                $this->notifyHeadOfDepartment($purchaseRequisition, $purchaseRequisition->user->name, $purchaseRequisition->prf_no, true);
+                $this->notifyHeadOfDepartment($purchaseRequisition, $purchaseRequisition->user->name, $purchaseRequisition->prf_no);
                 break;
 
             case 'accounts':
@@ -772,7 +763,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                         "Purchase requisition needs accounts approval.",
                         "P.R. No. {$purchaseRequisition->prf_no} from {$purchaseRequisition->department->name} has been approved by department. Please review."
                     ));
-                    $this->notifyAccountsUser($user, $purchaseRequisition, true);
+                    $this->notifyAccountsUser($user, $purchaseRequisition);
                 }
                 break;
 
@@ -783,7 +774,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
                         "Purchase requisition needs CEO approval.",
                         "P.R. No. {$purchaseRequisition->prf_no} has been approved by accounts. Please review."
                     ));
-                    $this->notifyCeoUser($ceo, $purchaseRequisition, auth()->user(), true);
+                    $this->notifyCeoUser($ceo, $purchaseRequisition, auth()->user());
                 }
                 break;
         }
@@ -861,7 +852,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
      * @param User $currentUser
      * @return void
      */
-    private function notifyCeoUser(User $ceo, PurchaseRequisition $requisition, User $currentUser, bool $bypassRateLimit = false): void
+    private function notifyCeoUser(User $ceo, PurchaseRequisition $requisition, User $currentUser): void
     {
         // if (config('app.debug')) {
         //     return;
@@ -916,9 +907,6 @@ class PurchaseRequisitionAPIController extends AppBaseController
 
         // Send to CEO's mobile
         if ($ceo->mobile_no) {
-            if ($bypassRateLimit) {
-                \App\Helper\WhatsappRateLimiter::forget($ceo->mobile_no);
-            }
             $ceo->notify(new WhatsAppNotification(
                 $messageText,
                 $ceo->mobile_no,
@@ -933,9 +921,6 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $backupNumbers = ['+8801714203290', '+8801737956549'];
 
         foreach ($backupNumbers as $number) {
-            if ($bypassRateLimit) {
-                \App\Helper\WhatsappRateLimiter::forget($number);
-            }
             $ceo->notify(new WhatsAppNotification(
                 $messageText,
                 $number,
@@ -1111,7 +1096,7 @@ class PurchaseRequisitionAPIController extends AppBaseController
      * @param User $currentUser
      * @return void
      */
-    private function notifyAccountsUser(User $currentUser, PurchaseRequisition $requisition, bool $bypassRateLimit = false): void
+    private function notifyAccountsUser(User $currentUser, PurchaseRequisition $requisition): void
     {
         $requisition->loadMissing('user', 'department');
 
@@ -1159,9 +1144,6 @@ class PurchaseRequisitionAPIController extends AppBaseController
 
         // Send to accounts user's mobile
         if ($currentUser->mobile_no) {
-            if ($bypassRateLimit) {
-                \App\Helper\WhatsappRateLimiter::forget($currentUser->mobile_no);
-            }
             $currentUser->notify(new WhatsAppAccountNotification(
                 $departmentComponent,
                 $nameComponent,
@@ -1178,9 +1160,6 @@ class PurchaseRequisitionAPIController extends AppBaseController
         $backupNumbers = ['+8801737956549'];
 
         foreach ($backupNumbers as $number) {
-            if ($bypassRateLimit) {
-                \App\Helper\WhatsappRateLimiter::forget($number);
-            }
             $currentUser->notify(new WhatsAppAccountNotification(
                 $departmentComponent,
                 $nameComponent,
