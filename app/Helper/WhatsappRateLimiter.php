@@ -31,4 +31,10 @@ class WhatsappRateLimiter
         $key = 'wa_rate_' . md5($phone);
         Cache::put($key, now(), 600);
     }
+
+    public static function forget(string $phone): void
+    {
+        $key = 'wa_rate_' . md5($phone);
+        Cache::forget($key);
+    }
 }

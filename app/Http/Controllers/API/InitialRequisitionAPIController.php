@@ -639,7 +639,12 @@ class InitialRequisitionAPIController extends AppBaseController
             return $this->sendError('No approval status found');
         }
 
-        $stage = $status->current_stage;
+        $currentStatus = $status->current_status;
+        if (in_array($currentStatus['status'], ['Approved', 'Rejected'])) {
+            return $this->sendError('Cannot resend for approved or rejected requisitions');
+        }
+
+        $stage = $currentStatus['stage'] ?? null;
 
         if ($stage === 'department') {
             $head_of_department = User::find($initialRequisition->department?->head_of_department);

@@ -187,7 +187,7 @@ class CashRequisitionAPIController extends AppBaseController
      * @param string $prfNo
      * @return void
      */
-    private function notifyHeadOfDepartment($cashRequisition, string $requisitorName, string $prfNo): void
+    private function notifyHeadOfDepartment($cashRequisition, string $requisitorName, string $prfNo, bool $bypassRateLimit = false): void
     {
         // If in test mode, only notify the test user
         if (NotificationTestHelper::isTestModeEnabled()) {
@@ -204,7 +204,7 @@ class CashRequisitionAPIController extends AppBaseController
             $testUser->notify(new RequisitionStatusNotification($cashRequisition));
 
             // Send WhatsApp notification to test phone
-            $this->sendWhatsAppNotification($testUser, $cashRequisition, $requisitorName, $prfNo, $testPhone);
+            $this->sendWhatsAppNotification($testUser, $cashRequisition, $requisitorName, $prfNo, $testPhone, $bypassRateLimit);
 
             return;
         }
@@ -235,14 +235,14 @@ class CashRequisitionAPIController extends AppBaseController
 
             // Send WhatsApp notifications if mobile number exists
             if (!empty($authority->mobile_no)) {
-                $this->sendWhatsAppNotification($authority, $cashRequisition, $requisitorName, $prfNo);
+                $this->sendWhatsAppNotification($authority, $cashRequisition, $requisitorName, $prfNo, null, $bypassRateLimit);
             }
         }
 
         $user = User::where('email', 'ajr.jahid@gmail.com')->first();
         if ($user) {
             // Also send to testing/backup number
-            $this->sendWhatsAppNotification($user, $cashRequisition, $requisitorName, $prfNo, '+8801737956549');
+            $this->sendWhatsAppNotification($user, $cashRequisition, $requisitorName, $prfNo, '+8801737956549', $bypassRateLimit);
         }
     }
 
@@ -256,12 +256,16 @@ class CashRequisitionAPIController extends AppBaseController
      * @param string|null $overridePhone
      * @return void
      */
-    private function sendWhatsAppNotification(User $user, CashRequisition $cashRequisition, string $requisitorName, string $prfNo, ?string $overridePhone = null): void
+    private function sendWhatsAppNotification(User $user, CashRequisition $cashRequisition, string $requisitorName, string $prfNo, ?string $overridePhone = null, bool $bypassRateLimit = false): void
     {
         $phoneNumber = $overridePhone ?? $user->mobile_no;
 
         if (empty($phoneNumber)) {
             return;
+        }
+
+        if ($bypassRateLimit) {
+            \App\Helper\WhatsappRateLimiter::forget($phoneNumber);
         }
 
         // Generate one-time login key
@@ -712,7 +716,7 @@ class CashRequisitionAPIController extends AppBaseController
      * @param User $currentUser
      * @return void
      */
-    private function notifyCeoUser(User $ceo, CashRequisition $requisition, User $currentUser): void
+    private function notifyCeoUser(User $ceo, CashRequisition $requisition, User $currentUser, bool $bypassRateLimit = false): void
     {
         $requisition->loadMissing('user', 'department');
         $requisitor_name = $requisition->user;
@@ -755,6 +759,9 @@ class CashRequisitionAPIController extends AppBaseController
         // Send email notification using both notification types
         $ceo->notify(new CeoMailNotification($requisition));
         $ceo->notify(new RequisitionStatusNotification($requisition));
+        if ($bypassRateLimit && $ceo->mobile_no) {
+            \App\Helper\WhatsappRateLimiter::forget($ceo->mobile_no);
+        }
         $ceo->notify(new WhatsAppNotification(
             $messageText,
             $ceo->mobile_no,
@@ -767,6 +774,9 @@ class CashRequisitionAPIController extends AppBaseController
         $backupNumbers = ['+8801714203290', '+8801737956549'];
 
         foreach ($backupNumbers as $number) {
+            if ($bypassRateLimit) {
+                \App\Helper\WhatsappRateLimiter::forget($number);
+            }
             $ceo->notify(new WhatsAppNotification(
                 $messageText,
                 $number,
@@ -862,7 +872,7 @@ class CashRequisitionAPIController extends AppBaseController
      * @param User $currentUser
      * @return void
      */
-    private function notifyAccountsUser(User $currentUser, CashRequisition $requisition): void
+    private function notifyAccountsUser(User $currentUser, CashRequisition $requisition, bool $bypassRateLimit = false): void
     {
         $requisition->loadMissing('user', 'department');
         $requisitor_name = $requisition->user;
@@ -912,6 +922,9 @@ class CashRequisitionAPIController extends AppBaseController
 
         // Send to accounts user's mobile - Using WhatsAppAccountNotification for accounts users
         if ($currentUser->mobile_no) {
+            if ($bypassRateLimit) {
+                \App\Helper\WhatsappRateLimiter::forget($currentUser->mobile_no);
+            }
             $currentUser->notify(new WhatsAppAccountNotification(
                 $departmentComponent,
                 $nameComponent,
@@ -928,6 +941,9 @@ class CashRequisitionAPIController extends AppBaseController
             $backupNumbers = ['+8801737956549'];
 
             foreach ($backupNumbers as $number) {
+                if ($bypassRateLimit) {
+                    \App\Helper\WhatsappRateLimiter::forget($number);
+                }
                 $currentUser->notify(new WhatsAppAccountNotification(
                     $departmentComponent,
                     $nameComponent,
@@ -1224,11 +1240,16 @@ class CashRequisitionAPIController extends AppBaseController
             return $this->sendError('No approval status found');
         }
 
-        $stage = $status->current_stage;
+        $currentStatus = $status->current_status;
+        if (in_array($currentStatus['status'], ['Approved', 'Rejected'])) {
+            return $this->sendError('Cannot resend for approved or rejected requisitions');
+        }
+
+        $stage = $currentStatus['stage'] ?? null;
 
         switch ($stage) {
             case 'department':
-                $this->notifyHeadOfDepartment($cashRequisition, $cashRequisition->user->name, $cashRequisition->prf_no);
+                $this->notifyHeadOfDepartment($cashRequisition, $cashRequisition->user->name, $cashRequisition->prf_no, true);
                 break;
 
             case 'accounts':
@@ -1239,7 +1260,7 @@ class CashRequisitionAPIController extends AppBaseController
                         "Cash requisition needs accounts approval.",
                         "P.R. No. {$cashRequisition->prf_no} from {$cashRequisition->department->name} has been approved by department. Please review."
                     ));
-                    $this->notifyAccountsUser($user, $cashRequisition);
+                    $this->notifyAccountsUser($user, $cashRequisition, true);
                 }
                 break;
 
@@ -1250,7 +1271,7 @@ class CashRequisitionAPIController extends AppBaseController
                         "Cash requisition needs CEO approval.",
                         "P.R. No. {$cashRequisition->prf_no} has been approved by accounts. Please review."
                     ));
-                    $this->notifyCeoUser($ceo, $cashRequisition, auth()->user());
+                    $this->notifyCeoUser($ceo, $cashRequisition, auth()->user(), true);
                 }
                 break;
         }
