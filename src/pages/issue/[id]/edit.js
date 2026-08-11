@@ -40,6 +40,7 @@ const Edit = props => {
     } = useEditIssueQuery(router.query.id, {
         skip: !router.query.id,
     })
+    const isLocked = issue?.data?.store_status != 0
     const [items, setItems] = useState([])
     const [originalItems, setOriginalItems] = useState([])
     const [columns, setColumns] = useState([])
@@ -99,55 +100,92 @@ const Edit = props => {
 
     useEffect(() => {
         if (issueISSuccess) {
-            setColumns([
-                {
-                    name: 'Product',
-                    selector: row =>
-                        row.product_title
-                            ? row.product_title +
-                              ' - ' +
-                              row.product_option_name
-                            : row?.product?.title +
-                              ' - ' +
-                              row?.variant?.option_value,
-                    sortable: true,
-                },
-                {
-                    name: 'Qty',
-                    selector: row => <Quantity row={row} />,
-                    sortable: true,
-                },
-                {
-                    name: 'Purpose',
-                    selector: row => <IssueInput value={row.purpose} onChange={value => handleTableInputChange(row, 'purpose', value)} />,
-                    sortable: true,
-                },
-                {
-                    name: 'Uses Area',
-                    selector: row => <IssueInput value={row.uses_area} onChange={value => handleTableInputChange(row, 'uses_area', value)} />,
-                    sortable: true,
-                },
-                {
-                    name: 'Note',
-                    selector: row => <IssueInput value={row.note} onChange={value => handleTableInputChange(row, 'note', value)} />,
-                    sortable: true,
-                },
-                {
-                    name: 'Remove',
-                    cell: row => (
-                        <Button color="failure" size="xs" onClick={() => {
-                            setItems(items => Array.isArray(items) ? items.filter(i => i !== row) : [])
-                        }}>
-                            Remove
-                        </Button>
-                    ),
-                    ignoreRowClick: true,
-                    allowOverflow: true,
-                    button: true,
-                }
-            ])
+            if (isLocked) {
+                setColumns([
+                    {
+                        name: 'Product',
+                        selector: row =>
+                            row.product_title
+                                ? row.product_title +
+                                  ' - ' +
+                                  row.product_option_name
+                                : row?.product?.title +
+                                  ' - ' +
+                                  row?.variant?.option_value,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Qty',
+                        selector: row => row.quantity,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Purpose',
+                        selector: row => row.purpose,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Uses Area',
+                        selector: row => row.uses_area,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Note',
+                        selector: row => row.note,
+                        sortable: true,
+                    },
+                ])
+            } else {
+                setColumns([
+                    {
+                        name: 'Product',
+                        selector: row =>
+                            row.product_title
+                                ? row.product_title +
+                                  ' - ' +
+                                  row.product_option_name
+                                : row?.product?.title +
+                                  ' - ' +
+                                  row?.variant?.option_value,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Qty',
+                        selector: row => <Quantity row={row} />,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Purpose',
+                        selector: row => <IssueInput value={row.purpose} onChange={value => handleTableInputChange(row, 'purpose', value)} />,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Uses Area',
+                        selector: row => <IssueInput value={row.uses_area} onChange={value => handleTableInputChange(row, 'uses_area', value)} />,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Note',
+                        selector: row => <IssueInput value={row.note} onChange={value => handleTableInputChange(row, 'note', value)} />,
+                        sortable: true,
+                    },
+                    {
+                        name: 'Remove',
+                        cell: row => (
+                            <Button color="failure" size="xs" onClick={() => {
+                                setItems(items => Array.isArray(items) ? items.filter(i => i !== row) : [])
+                            }}>
+                                Remove
+                            </Button>
+                        ),
+                        ignoreRowClick: true,
+                        allowOverflow: true,
+                        button: true,
+                    }
+                ])
+            }
         }
-    }, [issueISSuccess, issue])
+    }, [issueISSuccess, issue, isLocked])
 
     useEffect(() => {
         if (isSyncSuccess && !isSyncError && !isSyncLoading) {
@@ -267,11 +305,22 @@ const Edit = props => {
                                     </div>
                                 </div>
                             </div>
+                            {isLocked && (
+                                <div className="flex flex-row items-center gap-2 col-span-2 mt-2 p-3 bg-red-50 rounded border border-red-200">
+                                    <span className="text-sm font-semibold text-red-700">
+                                        {issue?.data?.store_status == 1
+                                            ? 'This issue is approved and issued. It cannot be edited or deleted.'
+                                            : 'This issue has been rejected. It cannot be edited or deleted.'}
+                                    </span>
+                                </div>
+                            )}
                             <div className="flex flex-row justify-between items-center mb-4 mt-8 px-2">
                                 <h3 className="font-semibold text-lg text-gray-700">Items</h3>
-                                <Button color="success" size="sm" className="transition-all" onClick={() => setShowAddForm(v => !v)}>
-                                    {showAddForm ? 'Cancel' : 'Add Item'}
-                                </Button>
+                                {!isLocked && (
+                                    <Button color="success" size="sm" className="transition-all" onClick={() => setShowAddForm(v => !v)}>
+                                        {showAddForm ? 'Cancel' : 'Add Item'}
+                                    </Button>
+                                )}
                             </div>
                             <div
                                 className={`mb-6 p-6 border rounded-lg bg-white shadow flex flex-col gap-2 transition-all duration-300 ${showAddForm ? 'opacity-100 scale-100 max-h-[1000px]' : 'opacity-0 scale-95 max-h-0 pointer-events-none'}`}
@@ -398,7 +447,7 @@ const Edit = props => {
                                     progressPending={issueISLoading}
                                     data={Array.isArray(items) ? items : []}
                                 />
-                                {JSON.stringify(items) !== JSON.stringify(originalItems) && (
+                                {!isLocked && JSON.stringify(items) !== JSON.stringify(originalItems) && (
                                     <div className="flex flex-row justify-end mt-4">
                                         <Button
                                             color="success"

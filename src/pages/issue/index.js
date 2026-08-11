@@ -117,16 +117,12 @@ const ProductIssue = () =>
                             itemId={row.uuid}
                             edit={
                                 isStoreManager &&
-                                    ( !row.store_status ||
-                                        moment().diff(
-                                            moment( row.updated_at ),
-                                            'days',
-                                        ) < 1 )
+                                    row.store_status == 0
                                     ? `/issue/${row.uuid}/edit`
                                     : false
                             }
                             // view={`/issue/${row.uuid}/view`}
-                            destroy={destroy}
+                            destroy={row.store_status == 0 ? destroy : false}
                             print={`/issue/${row.uuid}/print_view`}
                             progressing={destroyResponse.isLoading}
                             permissionModule={`product-issues`}
