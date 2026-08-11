@@ -23,3 +23,4 @@ soketi_supervisor.conf
 /caddy
 frankenphp
 frankenphp-worker.php
+.backup_lite/

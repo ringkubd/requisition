@@ -7,6 +7,7 @@ use App\Helper\NotificationTestHelper;
 use App\Http\Requests\API\UpdatePurchaseRequisitionAPIRequest;
 use App\Http\Resources\InitialRequisitionResource;
 use App\Http\Resources\PurchaseRequisitionIndexResource;
+use App\Http\Resources\PurchaseRequisitionLiteResource;
 use App\Models\Department;
 use App\Models\Designation;
 use App\Models\InitialRequisition;
@@ -250,10 +251,17 @@ class PurchaseRequisitionAPIController extends AppBaseController
             );
         }
 
-        $purchaseRequisition->load(['user', 'department', 'approval_status', 'purchaseRequisitionProducts.product.category', 'purchaseRequisitionProducts.purchase', 'purchaseRequisitionProducts.product_variant']);
+        $purchaseRequisition->load([
+            'user',
+            'department',
+            'approval_status',
+            'purchaseRequisitionProducts.product.category',
+            'purchaseRequisitionProducts.purchase',
+            'purchaseRequisitionProducts.product_variant.option',
+        ]);
 
         return $this->sendResponse(
-            new PurchaseRequisitionResource($purchaseRequisition),
+            new PurchaseRequisitionLiteResource($purchaseRequisition),
             'Purchase Requisition retrieved successfully'
         );
     }
