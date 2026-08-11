@@ -42,9 +42,9 @@ class ProductIssueAPIController extends AppBaseController
 
         $this->middleware('auth:sanctum');
         //        $this->middleware('role_or_permission:Super Admin|view_product-issues', ['only' => ['index']]);
-        $this->middleware('role_or_permission:Super Admin|update_product-issues', ['only' => ['update']]);
+        $this->middleware('role_or_permission:Super Admin|update_product-issues', ['only' => ['update', 'syncProductIssueItems']]);
         $this->middleware('role_or_permission:Super Admin|create_product-issues', ['only' => ['store']]);
-        $this->middleware('role_or_permission:Super Admin|delete_product-issues', ['only' => ['delete']]);
+        $this->middleware('role_or_permission:Super Admin|delete_product-issues', ['only' => ['destroy']]);
         $this->middleware('role_or_permission:Super Admin|Store Manager|update_product-issues', ['only' => ['updateQuantity']]);
     }
 
@@ -247,6 +247,16 @@ class ProductIssueAPIController extends AppBaseController
         $newItems = $request->all();
         // return $request->all();
         $productIssue = ProductIssue::where('uuid', $uuid)->first();
+        if (!$productIssue) {
+            return $this->sendError("Product Issue not found");
+        }
+        if ($productIssue->store_status != 0) {
+            return $this->sendError(
+                $productIssue->store_status == 1
+                    ? "Approved issue cannot be edited."
+                    : "Rejected issue cannot be edited."
+            );
+        }
         // Assume each item in $newItems has 'id' if updating, or no 'id' if new
         $existingItems = $productIssue->items()->get()->keyBy('id');
         $newItemsById = collect($newItems)->filter(fn($item) => !empty($item['id']))->keyBy('id');
@@ -382,6 +392,14 @@ class ProductIssueAPIController extends AppBaseController
         if (empty($productIssues)) {
             return $this->sendError(
                 "Product Issue not found"
+            );
+        }
+
+        if ($productIssues->store_status != 0) {
+            return $this->sendError(
+                $productIssues->store_status == 1
+                    ? "Approved issue cannot be edited."
+                    : "Rejected issue cannot be edited."
             );
         }
         if ($request->has('department')) {
@@ -527,6 +545,14 @@ class ProductIssueAPIController extends AppBaseController
             );
         }
 
+        if ($productIssues->store_status != 0) {
+            return $this->sendError(
+                $productIssues->store_status == 1
+                    ? "Approved issue cannot be deleted."
+                    : "Rejected issue cannot be deleted."
+            );
+        }
+
         DB::transaction(function () use ($productIssues, $uuid) {
             try {
                 if ($productIssues->store_status == 1) {
@@ -573,6 +599,15 @@ class ProductIssueAPIController extends AppBaseController
         if (empty($issue)) {
             return $this->sendError(
                 "Product Issue not found"
+            );
+        }
+
+        $parentStoreStatus = $issue->productIssue?->store_status ?? 0;
+        if ($parentStoreStatus != 0) {
+            return $this->sendError(
+                $parentStoreStatus == 1
+                    ? "Approved issue cannot be edited."
+                    : "Rejected issue cannot be edited."
             );
         }
         DB::transaction(function () use ($request, $id, $issue) {
@@ -706,6 +741,14 @@ class ProductIssueAPIController extends AppBaseController
         $productIssue = ProductIssue::where('uuid', $uuid)->first();
         if (!$productIssue) {
             return $this->sendError('Product Issue not found');
+        }
+
+        if ($productIssue->store_status != 0) {
+            return $this->sendError(
+                $productIssue->store_status == 1
+                    ? "Approved issue cannot be edited."
+                    : "Rejected issue cannot be edited."
+            );
         }
 
         if ($productIssue->department_status != 0) {
