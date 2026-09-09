@@ -37,7 +37,17 @@ export default function SummaryReport() {
     const [selectedCategoryName, setSelectedCategoryName] = useState("");
     const [period, setPeriod] = useState("none");
     const [groupBy, setGroupBy] = useState("department");
+    const [selectedMonth, setSelectedMonth] = useState(moment().month() + 1); // 1-12
+    const [selectedYear, setSelectedYear] = useState(moment().year());
+    const [activeRange, setActiveRange] = useState(null);
     const [rows, setRows] = useState([]);
+
+    const years = useMemo(() => {
+        const list = [];
+        for (let y = 2023; y <= moment().year(); y++) list.push(y);
+        return list;
+    }, []);
+    const monthNames = moment.months();
 
     const { data: departments } = useGetDepartmentByOrganizationBranchQuery();
     const [fetchProductSummary, { isLoading: isLoadingProduct }] =
@@ -51,10 +61,31 @@ export default function SummaryReport() {
             ? "Cash Requisition Summary Report"
             : "Department & Category Wise Summary Report";
 
+    const resolveRange = () => {
+        if (period === "year") {
+            return {
+                start: `${selectedYear}-01-01`,
+                end: `${selectedYear}-12-31`,
+                label: `Year ${selectedYear}`,
+            };
+        }
+        if (period === "month") {
+            const m = moment({ year: selectedYear, month: selectedMonth - 1, day: 1 });
+            return {
+                start: m.startOf("month").format("YYYY-MM-DD"),
+                end: m.endOf("month").format("YYYY-MM-DD"),
+                label: m.format("MMMM YYYY"),
+            };
+        }
+        return { start: dateFrom, end: dateTo, label: null };
+    };
+
     const handleShow = async () => {
+        const range = resolveRange();
+        setActiveRange(range);
         const params = {
-            start_date: dateFrom,
-            end_date: dateTo,
+            start_date: range.start,
+            end_date: range.end,
             period,
         };
         if (department) params.department_id = department;
@@ -229,10 +260,11 @@ export default function SummaryReport() {
                 .join(",");
             csv += "\n";
         }
+        const range = activeRange ?? resolveRange();
         const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `${tab}_summary_report_${dateFrom}_to_${dateTo}.csv`;
+        link.download = `${tab}_summary_report_${range.start}_to_${range.end}.csv`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -287,38 +319,146 @@ export default function SummaryReport() {
                     </div>
 
                     {/* Filters */}
-                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-6 gap-4 p-6 border-b border-gray-200">
-                        <div className="flex flex-wrap gap-4 items-end flex-1">
+                    <div className="p-6 border-b border-gray-200 space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end">
+                            {/* Period */}
                             <div className="flex flex-col">
                                 <Label
-                                    htmlFor="date_range"
-                                    value="Date Range"
+                                    htmlFor="period"
+                                    value="Period"
                                     className="font-semibold text-gray-700 mb-1"
                                 />
-                                <Datepicker
-                                    inputId="date_range"
-                                    inputName="date_range"
-                                    onChange={d => {
-                                        setDateFrom(
-                                            d.startDate
-                                                ? moment(d.startDate).format("YYYY-MM-DD")
-                                                : ""
-                                        );
-                                        setDateTo(
-                                            d.endDate
-                                                ? moment(d.endDate).format("YYYY-MM-DD")
-                                                : ""
-                                        );
-                                    }}
-                                    dateFormat="yyyy-MM-dd"
-                                    className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    placeholderText="Select date range"
-                                    maxDate={new Date()}
-                                    value={{ startDate: dateFrom, endDate: dateTo }}
-                                />
+                                <Select
+                                    id="period"
+                                    value={period}
+                                    onChange={e => setPeriod(e.target.value)}
+                                >
+                                    <option value="none">Date Range</option>
+                                    <option value="month">Monthly</option>
+                                    <option value="year">Yearly</option>
+                                </Select>
                             </div>
 
-                            <div className="flex flex-col min-w-[180px]">
+                            {period === "none" && (
+                                <div className="flex flex-col sm:col-span-2">
+                                    <Label
+                                        htmlFor="date_range"
+                                        value="Date Range"
+                                        className="font-semibold text-gray-700 mb-1"
+                                    />
+                                    <Datepicker
+                                        inputId="date_range"
+                                        inputName="date_range"
+                                        onChange={d => {
+                                            setDateFrom(
+                                                d.startDate
+                                                    ? moment(d.startDate).format("YYYY-MM-DD")
+                                                    : ""
+                                            );
+                                            setDateTo(
+                                                d.endDate
+                                                    ? moment(d.endDate).format("YYYY-MM-DD")
+                                                    : ""
+                                            );
+                                        }}
+                                        dateFormat="yyyy-MM-dd"
+                                        className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholderText="Select date range"
+                                        maxDate={new Date()}
+                                        value={{ startDate: dateFrom, endDate: dateTo }}
+                                    />
+                                </div>
+                            )}
+
+                            {period === "year" && (
+                                <div className="flex flex-col">
+                                    <Label
+                                        htmlFor="select_year"
+                                        value="Year"
+                                        className="font-semibold text-gray-700 mb-1"
+                                    />
+                                    <Select
+                                        id="select_year"
+                                        value={selectedYear}
+                                        onChange={e =>
+                                            setSelectedYear(Number(e.target.value))
+                                        }
+                                    >
+                                        {years.map(y => (
+                                            <option key={y} value={y}>
+                                                {y}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                </div>
+                            )}
+
+                            {period === "month" && (
+                                <>
+                                    <div className="flex flex-col">
+                                        <Label
+                                            htmlFor="select_month"
+                                            value="Month"
+                                            className="font-semibold text-gray-700 mb-1"
+                                        />
+                                        <Select
+                                            id="select_month"
+                                            value={selectedMonth}
+                                            onChange={e =>
+                                                setSelectedMonth(Number(e.target.value))
+                                            }
+                                        >
+                                            {monthNames.map((m, i) => (
+                                                <option key={m} value={i + 1}>
+                                                    {m}
+                                                </option>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <Label
+                                            htmlFor="select_year"
+                                            value="Year"
+                                            className="font-semibold text-gray-700 mb-1"
+                                        />
+                                        <Select
+                                            id="select_year"
+                                            value={selectedYear}
+                                            onChange={e =>
+                                                setSelectedYear(Number(e.target.value))
+                                            }
+                                        >
+                                            {years.map(y => (
+                                                <option key={y} value={y}>
+                                                    {y}
+                                                </option>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Group By */}
+                            {tab === "product" && (
+                                <div className="flex flex-col">
+                                    <Label
+                                        htmlFor="group_by"
+                                        value="Group By"
+                                        className="font-semibold text-gray-700 mb-1"
+                                    />
+                                    <Select
+                                        id="group_by"
+                                        value={groupBy}
+                                        onChange={e => setGroupBy(e.target.value)}
+                                    >
+                                        <option value="department">Department wise</option>
+                                        <option value="category">Category wise</option>
+                                    </Select>
+                                </div>
+                            )}
+
+                            {/* Department */}
+                            <div className="flex flex-col">
                                 <Label
                                     htmlFor="department_id"
                                     value="Department"
@@ -343,8 +483,9 @@ export default function SummaryReport() {
                                 </Select>
                             </div>
 
+                            {/* Category */}
                             {tab === "product" && (
-                                <div className="flex flex-col min-w-[200px]">
+                                <div className="flex flex-col">
                                     <Label
                                         htmlFor="category_id"
                                         value="Category"
@@ -354,10 +495,9 @@ export default function SummaryReport() {
                                         defaultOptions
                                         name="category_id"
                                         id="category_id"
-                                        className="select min-w-[200px]"
+                                        className="select"
                                         classNames={{
-                                            control: () =>
-                                                "border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                                            control: state => "select",
                                         }}
                                         onChange={newValue => {
                                             setCategory(newValue?.value ?? "");
@@ -369,44 +509,9 @@ export default function SummaryReport() {
                                     />
                                 </div>
                             )}
-
-                            <div className="flex flex-col min-w-[140px]">
-                                <Label
-                                    htmlFor="period"
-                                    value="Period"
-                                    className="font-semibold text-gray-700 mb-1"
-                                />
-                                <Select
-                                    id="period"
-                                    value={period}
-                                    onChange={e => setPeriod(e.target.value)}
-                                >
-                                    <option value="none">None</option>
-                                    <option value="month">Monthly</option>
-                                    <option value="year">Yearly</option>
-                                </Select>
-                            </div>
-
-                            {tab === "product" && (
-                                <div className="flex flex-col min-w-[160px]">
-                                    <Label
-                                        htmlFor="group_by"
-                                        value="Group By"
-                                        className="font-semibold text-gray-700 mb-1"
-                                    />
-                                    <Select
-                                        id="group_by"
-                                        value={groupBy}
-                                        onChange={e => setGroupBy(e.target.value)}
-                                    >
-                                        <option value="department">Department wise</option>
-                                        <option value="category">Category wise</option>
-                                    </Select>
-                                </div>
-                            )}
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2 justify-end">
                             <Button
                                 onClick={handleShow}
                                 isProcessing={isLoading}
@@ -460,8 +565,11 @@ export default function SummaryReport() {
                                     : ""}
                             </div>
                             <div className="text-sm text-gray-500">
-                                {dateFrom && dateTo
-                                    ? `Period: ${moment(dateFrom).format("DD MMM YYYY")} - ${moment(dateTo).format("DD MMM YYYY")}`
+                                {activeRange
+                                    ? `Period: ${
+                                          activeRange.label ??
+                                          `${moment(activeRange.start).format("DD MMM YYYY")} - ${moment(activeRange.end).format("DD MMM YYYY")}`
+                                      }`
                                     : ""}
                             </div>
                         </div>
