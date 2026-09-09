@@ -62,7 +62,7 @@ export default function SummaryReport() {
             : "Department & Category Wise Summary Report";
 
     const resolveRange = () => {
-        if (period === "year") {
+        if (period === "year" || period === "year_month") {
             return {
                 start: `${selectedYear}-01-01`,
                 end: `${selectedYear}-12-31`,
@@ -86,7 +86,7 @@ export default function SummaryReport() {
         const params = {
             start_date: range.start,
             end_date: range.end,
-            period,
+            period: period === "year_month" ? "month" : period,
         };
         if (department) params.department_id = department;
         let result;
@@ -279,6 +279,8 @@ export default function SummaryReport() {
             ? "Monthly"
             : period === "year"
             ? "Yearly"
+            : period === "year_month"
+            ? "Yearly (Month wise)"
             : "Summary";
 
     return (
@@ -336,6 +338,7 @@ export default function SummaryReport() {
                                     <option value="none">Date Range</option>
                                     <option value="month">Monthly</option>
                                     <option value="year">Yearly</option>
+                                    <option value="year_month">Yearly (Month wise)</option>
                                 </Select>
                             </div>
 
@@ -370,7 +373,7 @@ export default function SummaryReport() {
                                 </div>
                             )}
 
-                            {period === "year" && (
+                            {(period === "year" || period === "year_month") && (
                                 <div className="flex flex-col">
                                     <Label
                                         htmlFor="select_year"
