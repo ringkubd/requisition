@@ -338,6 +338,14 @@ const Navigation = ({ user }) => {
                                                     Audit Report
                                                 </DropdownLink>
                                                 <DropdownLink
+                                                    href="/report/summary"
+                                                    active={router.pathname
+                                                        .includes("summary")
+                                                        .toString()}
+                                                >
+                                                    Summary Report
+                                                </DropdownLink>
+                                                <DropdownLink
                                                     href="/vehicle/report"
                                                     active={router.pathname
                                                         .includes("vehicle")
@@ -802,6 +810,13 @@ const Navigation = ({ user }) => {
                                                     title="Audit Report"
                                                     active={router.pathname.includes(
                                                         "stock_report"
+                                                    )}
+                                                />
+                                                <MobileSubItem
+                                                    href="/report/summary"
+                                                    title="Summary Report"
+                                                    active={router.pathname.includes(
+                                                        "summary"
                                                     )}
                                                 />
                                                 <MobileSubItem
