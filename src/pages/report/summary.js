@@ -16,6 +16,7 @@ import {
     Bar,
     BarChart,
     CartesianGrid,
+    LabelList,
     Legend,
     ResponsiveContainer,
     Tooltip,
@@ -813,7 +814,7 @@ export default function SummaryReport() {
                                 </div>
                                 <div
                                     className="chart-box"
-                                    style={{ width: "100%", height: 330 }}
+                                    style={{ width: "100%", height: 360 }}
                                 >
                                     <ResponsiveContainer
                                         width="100%"
@@ -875,7 +876,22 @@ export default function SummaryReport() {
                                                     fill={s.color}
                                                     radius={[3, 3, 0, 0]}
                                                     maxBarSize={64}
-                                                />
+                                                >
+                                                    <LabelList
+                                                        dataKey={s.key}
+                                                        position="insideTop"
+                                                        angle={-90}
+                                                        offset={12}
+                                                        fill="#ffffff"
+                                                        fontSize={10}
+                                                        fontWeight={600}
+                                                        formatter={(v) =>
+                                                            Number(v) > 0
+                                                                ? compact(v)
+                                                                : ""
+                                                        }
+                                                    />
+                                                </Bar>
                                             ))}
                                         </BarChart>
                                     </ResponsiveContainer>
@@ -1062,7 +1078,7 @@ export default function SummaryReport() {
                             box-shadow: none !important;
                         }
                         .print-content .chart-box {
-                            height: 240px !important;
+                            height: 300px !important;
                         }
                         .print-content table {
                             font-size: 10px !important;
