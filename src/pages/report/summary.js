@@ -1168,8 +1168,13 @@ function KpiCard({ label, value, color }) {
 }
 
 function BarValueLabel(props) {
-    const { x, y, width, height, value } = props;
-    if (!value || Number(value) <= 0) return null;
+    const { viewBox, value } = props;
+    const x = props.x ?? viewBox?.x;
+    const y = props.y ?? viewBox?.y;
+    const width = props.width ?? viewBox?.width;
+    const height = props.height ?? viewBox?.height;
+    if (!value || Number(value) <= 0 || x == null || height == null)
+        return null;
     const text = fmtInt(value);
     const fontSize = 12;
     const barH = Math.abs(height || 0);
