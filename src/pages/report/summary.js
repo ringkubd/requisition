@@ -808,7 +808,7 @@ export default function SummaryReport() {
                                 </div>
                                 <div
                                     className="chart-box"
-                                    style={{ width: "100%", height: 400 }}
+                                    style={{ width: "100%", height: 440 }}
                                 >
                                     <ResponsiveContainer
                                         width="100%"
@@ -817,10 +817,13 @@ export default function SummaryReport() {
                                         <BarChart
                                             data={chart.data}
                                             margin={{
-                                                top: 8,
+                                                top: 16,
                                                 right: 16,
                                                 left: 8,
-                                                bottom: 8,
+                                                bottom:
+                                                    chart.data.length > 6
+                                                        ? 70
+                                                        : 60,
                                             }}
                                         >
                                             <CartesianGrid
@@ -841,10 +844,15 @@ export default function SummaryReport() {
                                                         ? "end"
                                                         : "middle"
                                                 }
+                                                tickMargin={
+                                                    chart.data.length > 6
+                                                        ? 48
+                                                        : 42
+                                                }
                                                 height={
                                                     chart.data.length > 6
-                                                        ? 60
-                                                        : 30
+                                                        ? 70
+                                                        : 50
                                                 }
                                             />
                                             <YAxis
@@ -873,17 +881,7 @@ export default function SummaryReport() {
                                                 >
                                                     <LabelList
                                                         dataKey={s.key}
-                                                        position="insideTop"
-                                                        angle={-90}
-                                                        offset={12}
-                                                        fill="#ffffff"
-                                                        fontSize={9}
-                                                        fontWeight={600}
-                                                        formatter={(v) =>
-                                                            Number(v) > 0
-                                                                ? fmtInt(v)
-                                                                : ""
-                                                        }
+                                                        content={BarValueLabel}
                                                     />
                                                 </Bar>
                                             ))}
@@ -1072,7 +1070,7 @@ export default function SummaryReport() {
                             box-shadow: none !important;
                         }
                         .print-content .chart-box {
-                            height: 340px !important;
+                            height: 380px !important;
                         }
                         .print-content table {
                             font-size: 10px !important;
@@ -1166,5 +1164,31 @@ function KpiCard({ label, value, color }) {
                 {value}
             </div>
         </div>
+    );
+}
+
+function BarValueLabel(props) {
+    const { x, y, width, height, value } = props;
+    if (!value || Number(value) <= 0) return null;
+    const text = fmtInt(value);
+    const fontSize = 12;
+    const barH = Math.abs(height || 0);
+    const needed = text.length * fontSize * 0.62 + 8;
+    const cx = x + width / 2;
+    const fitsInside = barH >= needed;
+    const ty = fitsInside ? y + barH / 2 : y + barH + 10 + needed / 2;
+    return (
+        <text
+            x={0}
+            y={0}
+            transform={`translate(${cx}, ${ty}) rotate(-90)`}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill={fitsInside ? "#ffffff" : "#374151"}
+            fontSize={fontSize}
+            fontWeight={700}
+        >
+            {text}
+        </text>
     );
 }
