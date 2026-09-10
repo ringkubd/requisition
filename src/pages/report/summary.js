@@ -154,7 +154,6 @@ export default function SummaryReport() {
             alert("Please enable at least one column.");
             return;
         }
-        setPeriods(list);
         const base = {};
         if (department) base.department_id = department;
         if (!isCash && category) base.category_id = category;
@@ -170,8 +169,10 @@ export default function SummaryReport() {
                     }).unwrap()
                 )
             );
+            setPeriods(list);
             setResults(res.map((r) => r?.rows ?? []));
         } catch (e) {
+            setPeriods(list);
             setResults(list.map(() => []));
         }
     };
@@ -756,16 +757,25 @@ export default function SummaryReport() {
                                                     <Fragment key={p.key}>
                                                         <td className="border border-gray-300 px-3 py-2 text-right">
                                                             {
-                                                                comparison
-                                                                    .grand[pi]
+                                                                (
+                                                                    comparison
+                                                                        .grand[
+                                                                        pi
+                                                                    ] ??
+                                                                    emptyCell()
+                                                                )
                                                                     .requisition_count
                                                             }
                                                         </td>
                                                         <td className="border border-gray-300 px-3 py-2 text-right">
                                                             {fmt(
-                                                                comparison
-                                                                    .grand[pi]
-                                                                    .amount
+                                                                (
+                                                                    comparison
+                                                                        .grand[
+                                                                        pi
+                                                                    ] ??
+                                                                    emptyCell()
+                                                                ).amount
                                                             )}
                                                         </td>
                                                     </Fragment>
@@ -776,8 +786,11 @@ export default function SummaryReport() {
                                                             className="border border-gray-300 px-3 py-2 text-right"
                                                         >
                                                             {fmt(
-                                                                comparison
-                                                                    .grand[pi][
+                                                                (comparison
+                                                                    .grand[
+                                                                    pi
+                                                                ] ??
+                                                                    emptyCell())[
                                                                     m.key
                                                                 ]
                                                             )}
@@ -852,10 +865,13 @@ function GroupBlock({ group, periods, isCash, enabledMetrics }) {
                     isCash ? (
                         <Fragment key={p.key}>
                             <td className="border border-gray-300 px-3 py-2 text-right">
-                                {group.totals[pi].requisition_count}
+                                {
+                                    (group.totals[pi] ?? emptyCell())
+                                        .requisition_count
+                                }
                             </td>
                             <td className="border border-gray-300 px-3 py-2 text-right">
-                                {fmt(group.totals[pi].amount)}
+                                {fmt((group.totals[pi] ?? emptyCell()).amount)}
                             </td>
                         </Fragment>
                     ) : (
@@ -864,7 +880,7 @@ function GroupBlock({ group, periods, isCash, enabledMetrics }) {
                                 key={`${p.key}-${m.key}`}
                                 className="border border-gray-300 px-3 py-2 text-right"
                             >
-                                {fmt(group.totals[pi][m.key])}
+                                {fmt((group.totals[pi] ?? emptyCell())[m.key])}
                             </td>
                         ))
                     )
@@ -882,7 +898,7 @@ function GroupBlock({ group, periods, isCash, enabledMetrics }) {
                                     key={`${p.key}-${m.key}`}
                                     className="border border-gray-300 px-3 py-1.5 text-right"
                                 >
-                                    {fmt(s.values[pi][m.key])}
+                                    {fmt((s.values[pi] ?? emptyCell())[m.key])}
                                 </td>
                             ))
                         )}
