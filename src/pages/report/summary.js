@@ -27,14 +27,8 @@ import {
 const fmt = (v) =>
     Number(v || 0).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
-const compact = (v) => {
-    const n = Number(v || 0);
-    const abs = Math.abs(n);
-    if (abs >= 1e7) return `${(n / 1e7).toFixed(2)} Cr`;
-    if (abs >= 1e5) return `${(n / 1e5).toFixed(1)} L`;
-    if (abs >= 1e3) return `${(n / 1e3).toFixed(0)} K`;
-    return n;
-};
+const fmtInt = (v) =>
+    Number(v || 0).toLocaleString("en-US", { maximumFractionDigits: 0 });
 
 const PRODUCT_METRICS = [
     {
@@ -814,7 +808,7 @@ export default function SummaryReport() {
                                 </div>
                                 <div
                                     className="chart-box"
-                                    style={{ width: "100%", height: 360 }}
+                                    style={{ width: "100%", height: 400 }}
                                 >
                                     <ResponsiveContainer
                                         width="100%"
@@ -854,9 +848,9 @@ export default function SummaryReport() {
                                                 }
                                             />
                                             <YAxis
-                                                tickFormatter={compact}
-                                                tick={{ fontSize: 12 }}
-                                                width={64}
+                                                tickFormatter={fmtInt}
+                                                tick={{ fontSize: 11 }}
+                                                width={110}
                                             />
                                             <Tooltip
                                                 formatter={(v) => `৳ ${fmt(v)}`}
@@ -883,11 +877,11 @@ export default function SummaryReport() {
                                                         angle={-90}
                                                         offset={12}
                                                         fill="#ffffff"
-                                                        fontSize={10}
+                                                        fontSize={9}
                                                         fontWeight={600}
                                                         formatter={(v) =>
                                                             Number(v) > 0
-                                                                ? compact(v)
+                                                                ? fmtInt(v)
                                                                 : ""
                                                         }
                                                     />
@@ -1078,7 +1072,7 @@ export default function SummaryReport() {
                             box-shadow: none !important;
                         }
                         .print-content .chart-box {
-                            height: 300px !important;
+                            height: 340px !important;
                         }
                         .print-content table {
                             font-size: 10px !important;
