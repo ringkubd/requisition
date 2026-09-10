@@ -1,6 +1,5 @@
 import AppLayout from "@/components/Layouts/AppLayout";
 import { loadCategory } from "@/lib/initial_requisition";
-import { useAuth } from "@/hooks/auth";
 import {
     useSummaryDepartmentCategoryMutation,
     useSummaryCashMutation,
@@ -91,7 +90,6 @@ export default function SummaryReport() {
     const [results, setResults] = useState([]);
 
     const { data: departments } = useGetDepartmentByOrganizationBranchQuery();
-    const { user } = useAuth({ middleware: "auth" });
     const [
         fetchProductSummary,
         { isLoading: isLoadingProduct },
@@ -735,7 +733,7 @@ export default function SummaryReport() {
 
                     {/* Printable Area */}
                     <div ref={printRef} className="print-content p-6">
-                        <div className="text-center mb-6 p-4">
+                        <div className="print-header text-center mb-6 p-4">
                             <div className="mb-3">
                                 <img
                                     src="/logo.svg"
@@ -769,7 +767,7 @@ export default function SummaryReport() {
                         </div>
 
                         {hasData && (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                            <div className="print-no-break grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
                                 {isCash ? (
                                     <>
                                         <KpiCard
@@ -804,7 +802,7 @@ export default function SummaryReport() {
                         )}
 
                         {hasData && chart.data.length > 0 && (
-                            <div className="mb-6 border border-gray-200 rounded-lg p-4 bg-white">
+                            <div className="print-no-break mb-6 border border-gray-200 rounded-lg p-4 bg-white">
                                 <div className="text-sm font-semibold text-gray-700 mb-2">
                                     {isCash
                                         ? "Approved Amount"
@@ -813,7 +811,10 @@ export default function SummaryReport() {
                                               .join(" vs ")}{" "}
                                     — by {chart.xLabel}
                                 </div>
-                                <div style={{ width: "100%", height: 330 }}>
+                                <div
+                                    className="chart-box"
+                                    style={{ width: "100%", height: 330 }}
+                                >
                                     <ResponsiveContainer
                                         width="100%"
                                         height="100%"
@@ -1008,14 +1009,9 @@ export default function SummaryReport() {
                         )}
 
                         {hasData && (
-                            <div className="mt-6 pt-3 border-t border-gray-300 flex flex-col sm:flex-row justify-between gap-1 text-xs text-gray-500">
-                                <span>
-                                    Generated on{" "}
-                                    {moment().format("DD MMM YYYY, hh:mm A")}
-                                </span>
-                                {user?.name ? (
-                                    <span>By: {user.name}</span>
-                                ) : null}
+                            <div className="mt-6 pt-3 border-t border-gray-300 text-center text-xs text-gray-500">
+                                Generated on{" "}
+                                {moment().format("DD MMM YYYY, hh:mm A")}
                             </div>
                         )}
                     </div>
@@ -1053,11 +1049,34 @@ export default function SummaryReport() {
                         thead {
                             display: table-header-group;
                         }
+                        .print-header {
+                            border-bottom: 2px solid #1f2937;
+                            padding-bottom: 10px !important;
+                            margin-bottom: 14px !important;
+                        }
+                        .print-no-break {
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                        }
+                        .print-content .kpi-card {
+                            box-shadow: none !important;
+                        }
+                        .print-content .chart-box {
+                            height: 240px !important;
+                        }
                         .print-content table {
+                            font-size: 10px !important;
                             width: 100% !important;
                         }
+                        .print-content th,
+                        .print-content td {
+                            padding: 2px 4px !important;
+                        }
+                        .print-content img {
+                            max-height: 56px !important;
+                        }
                         @page {
-                            margin: 0.5in;
+                            margin: 0.4in;
                             size: A4 landscape;
                         }
                     }
@@ -1124,7 +1143,7 @@ function GroupBlock({ group, periods, isCash, enabledMetrics }) {
 function KpiCard({ label, value, color }) {
     return (
         <div
-            className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm"
+            className="kpi-card rounded-lg border border-gray-200 bg-white p-3 shadow-sm"
             style={{ borderLeft: `4px solid ${color}` }}
         >
             <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
