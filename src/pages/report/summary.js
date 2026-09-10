@@ -1,5 +1,6 @@
 import AppLayout from "@/components/Layouts/AppLayout";
 import { loadCategory } from "@/lib/initial_requisition";
+import { useAuth } from "@/hooks/auth";
 import {
     useSummaryDepartmentCategoryMutation,
     useSummaryCashMutation,
@@ -12,14 +13,37 @@ import moment from "moment";
 import { AsyncPaginate } from "react-select-async-paginate";
 import { useReactToPrint } from "react-to-print";
 import { Button, Card, Checkbox, Label, Select } from "flowbite-react";
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Legend,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from "recharts";
 
 const fmt = (v) =>
     Number(v || 0).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
+const compact = (v) => {
+    const n = Number(v || 0);
+    const abs = Math.abs(n);
+    if (abs >= 1e7) return `${(n / 1e7).toFixed(2)} Cr`;
+    if (abs >= 1e5) return `${(n / 1e5).toFixed(1)} L`;
+    if (abs >= 1e3) return `${(n / 1e3).toFixed(0)} K`;
+    return n;
+};
+
 const PRODUCT_METRICS = [
-    { key: "requisition_amount", label: "Requisition Approved" },
-    { key: "purchase_amount", label: "Actual Purchase" },
-    { key: "used_amount", label: "Actual Used" },
+    {
+        key: "requisition_amount",
+        label: "Requisition Approved",
+        color: "#3b82f6",
+    },
+    { key: "purchase_amount", label: "Actual Purchase", color: "#10b981" },
+    { key: "used_amount", label: "Actual Used", color: "#f59e0b" },
 ];
 
 const emptyCell = () => ({
@@ -67,6 +91,7 @@ export default function SummaryReport() {
     const [results, setResults] = useState([]);
 
     const { data: departments } = useGetDepartmentByOrganizationBranchQuery();
+    const { user } = useAuth({ middleware: "auth" });
     const [
         fetchProductSummary,
         { isLoading: isLoadingProduct },
@@ -263,10 +288,68 @@ export default function SummaryReport() {
             g.totals.forEach((t, pi) => addInto(grand[pi], t))
         );
 
-        return { groups, grand };
+        const grandAll = emptyCell();
+        grand.forEach((c) => addInto(grandAll, c));
+
+        return { groups, grand, grandAll };
     }, [results, groupBy, isCash]);
 
     const hasData = comparison.groups.length > 0;
+
+    const chart = useMemo(() => {
+        const byPeriod = periods.length >= 2;
+        if (isCash) {
+            const data = byPeriod
+                ? periods.map((p, pi) => ({
+                      name: p.label,
+                      amount: comparison.grand[pi]?.amount ?? 0,
+                  }))
+                : comparison.groups.map((g) => ({
+                      name: g.name,
+                      amount: g.totals[0]?.amount ?? 0,
+                  }));
+            return {
+                data,
+                series: [
+                    {
+                        key: "amount",
+                        label: "Approved Amount",
+                        color: "#0ea5e9",
+                    },
+                ],
+                xLabel: byPeriod ? "Period" : "Department",
+            };
+        }
+        const data = byPeriod
+            ? periods.map((p, pi) => {
+                  const row = { name: p.label };
+                  enabledMetrics.forEach((m) => {
+                      row[m.key] = comparison.grand[pi]?.[m.key] ?? 0;
+                  });
+                  return row;
+              })
+            : comparison.groups.map((g) => {
+                  const row = { name: g.name };
+                  enabledMetrics.forEach((m) => {
+                      row[m.key] = g.totals[0]?.[m.key] ?? 0;
+                  });
+                  return row;
+              });
+        return {
+            data,
+            series: enabledMetrics.map((m) => ({
+                key: m.key,
+                label: m.label,
+                color: m.color,
+            })),
+            xLabel:
+                periods.length >= 2
+                    ? "Period"
+                    : groupBy === "department"
+                    ? "Department"
+                    : "Category",
+        };
+    }, [periods, comparison, enabledMetrics, isCash, groupBy]);
 
     const handleExportCsv = () => {
         if (!hasData) return;
@@ -685,6 +768,120 @@ export default function SummaryReport() {
                             </div>
                         </div>
 
+                        {hasData && (
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                                {isCash ? (
+                                    <>
+                                        <KpiCard
+                                            label="Total Requisitions"
+                                            value={
+                                                comparison.grandAll
+                                                    .requisition_count
+                                            }
+                                            color="#0ea5e9"
+                                        />
+                                        <KpiCard
+                                            label="Total Approved Amount"
+                                            value={`৳ ${fmt(
+                                                comparison.grandAll.amount
+                                            )}`}
+                                            color="#10b981"
+                                        />
+                                    </>
+                                ) : (
+                                    enabledMetrics.map((m) => (
+                                        <KpiCard
+                                            key={m.key}
+                                            label={`Total ${m.label}`}
+                                            value={`৳ ${fmt(
+                                                comparison.grandAll[m.key]
+                                            )}`}
+                                            color={m.color}
+                                        />
+                                    ))
+                                )}
+                            </div>
+                        )}
+
+                        {hasData && chart.data.length > 0 && (
+                            <div className="mb-6 border border-gray-200 rounded-lg p-4 bg-white">
+                                <div className="text-sm font-semibold text-gray-700 mb-2">
+                                    {isCash
+                                        ? "Approved Amount"
+                                        : enabledMetrics
+                                              .map((m) => m.label)
+                                              .join(" vs ")}{" "}
+                                    — by {chart.xLabel}
+                                </div>
+                                <div style={{ width: "100%", height: 330 }}>
+                                    <ResponsiveContainer
+                                        width="100%"
+                                        height="100%"
+                                    >
+                                        <BarChart
+                                            data={chart.data}
+                                            margin={{
+                                                top: 8,
+                                                right: 16,
+                                                left: 8,
+                                                bottom: 8,
+                                            }}
+                                        >
+                                            <CartesianGrid
+                                                strokeDasharray="3 3"
+                                                stroke="#e5e7eb"
+                                            />
+                                            <XAxis
+                                                dataKey="name"
+                                                tick={{ fontSize: 12 }}
+                                                interval={0}
+                                                angle={
+                                                    chart.data.length > 6
+                                                        ? -30
+                                                        : 0
+                                                }
+                                                textAnchor={
+                                                    chart.data.length > 6
+                                                        ? "end"
+                                                        : "middle"
+                                                }
+                                                height={
+                                                    chart.data.length > 6
+                                                        ? 60
+                                                        : 30
+                                                }
+                                            />
+                                            <YAxis
+                                                tickFormatter={compact}
+                                                tick={{ fontSize: 12 }}
+                                                width={64}
+                                            />
+                                            <Tooltip
+                                                formatter={(v) => `৳ ${fmt(v)}`}
+                                                contentStyle={{
+                                                    fontSize: 12,
+                                                    borderRadius: 8,
+                                                }}
+                                            />
+                                            <Legend
+                                                wrapperStyle={{ fontSize: 12 }}
+                                            />
+                                            {chart.series.map((s) => (
+                                                <Bar
+                                                    key={s.key}
+                                                    dataKey={s.key}
+                                                    name={s.label}
+                                                    fill={s.color}
+                                                    radius={[3, 3, 0, 0]}
+                                                    maxBarSize={64}
+                                                />
+                                            ))}
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        )}
+
                         {hasData ? (
                             <div className="overflow-x-auto">
                                 <table className="min-w-full border-collapse border border-gray-300 text-sm">
@@ -809,10 +1006,26 @@ export default function SummaryReport() {
                                     : "No data. Select filters and press Show Report."}
                             </div>
                         )}
+
+                        {hasData && (
+                            <div className="mt-6 pt-3 border-t border-gray-300 flex flex-col sm:flex-row justify-between gap-1 text-xs text-gray-500">
+                                <span>
+                                    Generated on{" "}
+                                    {moment().format("DD MMM YYYY, hh:mm A")}
+                                </span>
+                                {user?.name ? (
+                                    <span>By: {user.name}</span>
+                                ) : null}
+                            </div>
+                        )}
                     </div>
                 </Card>
 
                 <style jsx global>{`
+                    .print-content td,
+                    .print-content th {
+                        font-variant-numeric: tabular-nums;
+                    }
                     @media print {
                         body * {
                             visibility: hidden;
@@ -905,5 +1118,24 @@ function GroupBlock({ group, periods, isCash, enabledMetrics }) {
                     </tr>
                 ))}
         </>
+    );
+}
+
+function KpiCard({ label, value, color }) {
+    return (
+        <div
+            className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm"
+            style={{ borderLeft: `4px solid ${color}` }}
+        >
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                {label}
+            </div>
+            <div
+                className="text-lg font-bold text-gray-800 mt-1"
+                style={{ fontVariantNumeric: "tabular-nums" }}
+            >
+                {value}
+            </div>
+        </div>
     );
 }
