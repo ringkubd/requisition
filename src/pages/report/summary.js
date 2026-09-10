@@ -6,7 +6,7 @@ import {
 } from "@/store/service/report";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 import Head from "next/head";
-import { Fragment, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment";
 import { AsyncPaginate } from "react-select-async-paginate";
@@ -83,6 +83,8 @@ export default function SummaryReport() {
     });
     const [periods, setPeriods] = useState([]);
     const [results, setResults] = useState([]);
+    const [includeChart, setIncludeChart] = useState(true);
+    const [pendingPrint, setPendingPrint] = useState(false);
 
     const { data: departments } = useGetDepartmentByOrganizationBranchQuery();
     const [
@@ -407,7 +409,25 @@ export default function SummaryReport() {
 
     const handlePrint = useReactToPrint({
         content: () => printRef.current,
+        onAfterPrint: () => setIncludeChart(true),
     });
+
+    const printWithChart = () => {
+        setIncludeChart(true);
+        setPendingPrint(true);
+    };
+
+    const printWithoutChart = () => {
+        setIncludeChart(false);
+        setPendingPrint(true);
+    };
+
+    useEffect(() => {
+        if (!pendingPrint) return;
+        setPendingPrint(false);
+        const t = setTimeout(() => handlePrint(), 60);
+        return () => clearTimeout(t);
+    }, [pendingPrint]);
 
     const periodDescription = periods.length
         ? periods.map((p) => p.label).join(", ")
@@ -710,11 +730,18 @@ export default function SummaryReport() {
                                 Show Report
                             </Button>
                             <Button
-                                onClick={handlePrint}
+                                onClick={printWithChart}
                                 disabled={!hasData}
-                                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md"
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-lg shadow-md"
                             >
-                                Print
+                                Print (with chart)
+                            </Button>
+                            <Button
+                                onClick={printWithoutChart}
+                                disabled={!hasData}
+                                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md"
+                            >
+                                Print (no chart)
                             </Button>
                             <Button
                                 onClick={handleExportCsv}
@@ -796,7 +823,7 @@ export default function SummaryReport() {
                             </div>
                         )}
 
-                        {hasData && chart.data.length > 0 && (
+                        {includeChart && hasData && chart.data.length > 0 && (
                             <div className="print-no-break mb-6 border border-gray-200 rounded-lg p-4 bg-white">
                                 <div className="text-sm font-semibold text-gray-700 mb-2">
                                     {isCash
