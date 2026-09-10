@@ -6,41 +6,78 @@ import {
 } from "@/store/service/report";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 import Head from "next/head";
-import { useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment";
 import { AsyncPaginate } from "react-select-async-paginate";
 import { useReactToPrint } from "react-to-print";
-import { Button, Card, Label, Select } from "flowbite-react";
+import { Button, Card, Checkbox, Label, Select } from "flowbite-react";
 
-const fmt = v =>
+const fmt = (v) =>
     Number(v || 0).toLocaleString("en-US", { maximumFractionDigits: 2 });
+
+const PRODUCT_METRICS = [
+    { key: "requisition_amount", label: "Requisition Approved" },
+    { key: "purchase_amount", label: "Actual Purchase" },
+    { key: "used_amount", label: "Actual Used" },
+];
+
+const emptyCell = () => ({
+    requisition_amount: 0,
+    purchase_amount: 0,
+    used_amount: 0,
+    requisition_count: 0,
+    amount: 0,
+});
+
+const addInto = (target, row) => {
+    target.requisition_amount += Number(row.requisition_amount || 0);
+    target.purchase_amount += Number(row.purchase_amount || 0);
+    target.used_amount += Number(row.used_amount || 0);
+    target.requisition_count += Number(row.requisition_count || 0);
+    target.amount += Number(row.amount || 0);
+};
 
 export default function SummaryReport() {
     const printRef = useRef();
     const [tab, setTab] = useState("product"); // product | cash
+    const [periodMode, setPeriodMode] = useState("none"); // none | month | year
     const [dateFrom, setDateFrom] = useState(
-        moment()
-            .subtract(1, "month")
-            .startOf("month")
-            .format("YYYY-MM-DD")
+        moment().subtract(1, "month").startOf("month").format("YYYY-MM-DD")
     );
     const [dateTo, setDateTo] = useState(
-        moment()
-            .subtract(1, "month")
-            .endOf("month")
-            .format("YYYY-MM-DD")
+        moment().subtract(1, "month").endOf("month").format("YYYY-MM-DD")
     );
+    const [scopeYear, setScopeYear] = useState(moment().year());
+    const [selectedMonths, setSelectedMonths] = useState([
+        moment().month() + 1,
+    ]);
+    const [selectedYears, setSelectedYears] = useState([moment().year()]);
     const [department, setDepartment] = useState("");
     const [selectedDepartmentName, setSelectedDepartmentName] = useState("");
     const [category, setCategory] = useState("");
     const [selectedCategoryName, setSelectedCategoryName] = useState("");
-    const [period, setPeriod] = useState("none");
     const [groupBy, setGroupBy] = useState("department");
-    const [selectedMonth, setSelectedMonth] = useState(moment().month() + 1); // 1-12
-    const [selectedYear, setSelectedYear] = useState(moment().year());
-    const [activeRange, setActiveRange] = useState(null);
-    const [rows, setRows] = useState([]);
+    const [metrics, setMetrics] = useState({
+        requisition_amount: true,
+        purchase_amount: true,
+        used_amount: true,
+    });
+    const [periods, setPeriods] = useState([]);
+    const [results, setResults] = useState([]);
+
+    const { data: departments } = useGetDepartmentByOrganizationBranchQuery();
+    const [
+        fetchProductSummary,
+        { isLoading: isLoadingProduct },
+    ] = useSummaryDepartmentCategoryMutation();
+    const [
+        fetchCashSummary,
+        { isLoading: isLoadingCash },
+    ] = useSummaryCashMutation();
+
+    const isLoading = isLoadingProduct || isLoadingCash;
+    const isCash = tab === "cash";
 
     const years = useMemo(() => {
         const list = [];
@@ -49,222 +86,243 @@ export default function SummaryReport() {
     }, []);
     const monthNames = moment.months();
 
-    const { data: departments } = useGetDepartmentByOrganizationBranchQuery();
-    const [fetchProductSummary, { isLoading: isLoadingProduct }] =
-        useSummaryDepartmentCategoryMutation();
-    const [fetchCashSummary, { isLoading: isLoadingCash }] =
-        useSummaryCashMutation();
+    const enabledMetrics = useMemo(
+        () => PRODUCT_METRICS.filter((m) => metrics[m.key]),
+        [metrics]
+    );
 
-    const isLoading = isLoadingProduct || isLoadingCash;
-    const reportTitle =
-        tab === "cash"
-            ? "Cash Requisition Summary Report"
-            : "Department & Category Wise Summary Report";
+    const reportTitle = isCash
+        ? "Cash Requisition Summary Report"
+        : "Department & Category Wise Summary Report";
 
-    const resolveRange = () => {
-        if (period === "year" || period === "year_month") {
-            return {
-                start: `${selectedYear}-01-01`,
-                end: `${selectedYear}-12-31`,
-                label: `Year ${selectedYear}`,
-            };
+    const buildPeriods = () => {
+        if (periodMode === "month") {
+            return [...selectedMonths]
+                .sort((a, b) => a - b)
+                .map((m) => {
+                    const start = moment({
+                        year: scopeYear,
+                        month: m - 1,
+                        day: 1,
+                    });
+                    return {
+                        key: `${scopeYear}-${String(m).padStart(2, "0")}`,
+                        label: start.format("MMM YYYY"),
+                        start: start
+                            .clone()
+                            .startOf("month")
+                            .format("YYYY-MM-DD"),
+                        end: start.clone().endOf("month").format("YYYY-MM-DD"),
+                        periodParam: "month",
+                    };
+                });
         }
-        if (period === "month") {
-            const m = moment({ year: selectedYear, month: selectedMonth - 1, day: 1 });
-            return {
-                start: m.startOf("month").format("YYYY-MM-DD"),
-                end: m.endOf("month").format("YYYY-MM-DD"),
-                label: m.format("MMMM YYYY"),
-            };
+        if (periodMode === "year") {
+            return [...selectedYears]
+                .sort((a, b) => a - b)
+                .map((y) => ({
+                    key: String(y),
+                    label: String(y),
+                    start: `${y}-01-01`,
+                    end: `${y}-12-31`,
+                    periodParam: "year",
+                }));
         }
-        return { start: dateFrom, end: dateTo, label: null };
+        return [
+            {
+                key: "range",
+                label:
+                    dateFrom && dateTo
+                        ? `${moment(dateFrom).format("DD MMM YY")} - ${moment(
+                              dateTo
+                          ).format("DD MMM YY")}`
+                        : "Date Range",
+                start: dateFrom,
+                end: dateTo,
+                periodParam: "none",
+            },
+        ];
     };
 
     const handleShow = async () => {
-        const range = resolveRange();
-        setActiveRange(range);
-        const params = {
-            start_date: range.start,
-            end_date: range.end,
-            period: period === "year_month" ? "month" : period,
-        };
-        if (department) params.department_id = department;
-        let result;
-        if (tab === "cash") {
-            result = await fetchCashSummary(params).unwrap();
-        } else {
-            if (category) params.category_id = category;
-            result = await fetchProductSummary(params).unwrap();
+        const list = buildPeriods();
+        if (!list.length) {
+            alert("Please select at least one month/year.");
+            return;
         }
-        setRows(result?.rows ?? []);
+        if (!isCash && !enabledMetrics.length) {
+            alert("Please enable at least one column.");
+            return;
+        }
+        setPeriods(list);
+        const base = {};
+        if (department) base.department_id = department;
+        if (!isCash && category) base.category_id = category;
+        const fetcher = isCash ? fetchCashSummary : fetchProductSummary;
+        try {
+            const res = await Promise.all(
+                list.map((p) =>
+                    fetcher({
+                        ...base,
+                        start_date: p.start,
+                        end_date: p.end,
+                        period: p.periodParam,
+                    }).unwrap()
+                )
+            );
+            setResults(res.map((r) => r?.rows ?? []));
+        } catch (e) {
+            setResults(list.map(() => []));
+        }
     };
 
-    const handleTabChange = value => {
+    const handleTabChange = (value) => {
         setTab(value);
-        setRows([]);
+        setPeriods([]);
+        setResults([]);
     };
 
-    const groups = useMemo(() => {
-        const list = [];
-        const index = new Map();
-        rows.forEach(r => {
-            const isCash = tab === "cash";
-            const gId = isCash || groupBy === "department" ? r.department_id : r.category_id;
-            const gName = isCash || groupBy === "department" ? r.department_name : r.category_title;
-            const sName = isCash
-                ? ""
-                : groupBy === "department"
-                ? r.category_title
-                : r.department_name;
-            const gKey = String(gId ?? "0");
-            if (!index.has(gKey)) {
-                const group = {
-                    name: gName || "N/A",
-                    subs: [],
-                    subIndex: new Map(),
-                    totals: {
-                        requisition_amount: 0,
-                        purchase_amount: 0,
-                        used_amount: 0,
-                        requisition_count: 0,
-                        amount: 0,
-                    },
-                };
-                list.push(group);
-                index.set(gKey, group);
+    const toggleMonth = (m) => {
+        setSelectedMonths((prev) => {
+            if (prev.includes(m)) {
+                if (prev.length === 1) return prev;
+                return prev.filter((x) => x !== m);
             }
-            const group = index.get(gKey);
-            if (isCash) {
-                group.totals.requisition_count += Number(r.requisition_count || 0);
-                group.totals.amount += Number(r.amount || 0);
-                const sKey = r.period || "all";
-                if (!group.subIndex.has(sKey)) {
-                    group.subIndex.set(sKey, {
-                        label: r.period || "All",
-                        requisition_count: 0,
-                        amount: 0,
-                    });
-                }
-                const sub = group.subIndex.get(sKey);
-                sub.requisition_count += Number(r.requisition_count || 0);
-                sub.amount += Number(r.amount || 0);
-            } else {
-                group.totals.requisition_amount += Number(r.requisition_amount || 0);
-                group.totals.purchase_amount += Number(r.purchase_amount || 0);
-                group.totals.used_amount += Number(r.used_amount || 0);
-                const baseLabel = sName || "N/A";
-                const sKey = `${sName}|${r.period || ""}`;
-                if (!group.subIndex.has(sKey)) {
-                    group.subIndex.set(sKey, {
-                        label: r.period ? `${baseLabel} (${r.period})` : baseLabel,
-                        requisition_amount: 0,
-                        purchase_amount: 0,
-                        used_amount: 0,
-                    });
-                }
-                const sub = group.subIndex.get(sKey);
-                sub.requisition_amount += Number(r.requisition_amount || 0);
-                sub.purchase_amount += Number(r.purchase_amount || 0);
-                sub.used_amount += Number(r.used_amount || 0);
-            }
-            group.subs = Array.from(group.subIndex.values());
+            if (prev.length >= 12) return prev;
+            return [...prev, m];
         });
-        return list;
-    }, [rows, groupBy, tab]);
+    };
 
-    const grandTotals = useMemo(() => {
-        return groups.reduce(
-            (acc, g) => ({
-                requisition_amount: acc.requisition_amount + g.totals.requisition_amount,
-                purchase_amount: acc.purchase_amount + g.totals.purchase_amount,
-                used_amount: acc.used_amount + g.totals.used_amount,
-                requisition_count: acc.requisition_count + g.totals.requisition_count,
-                amount: acc.amount + g.totals.amount,
-            }),
-            {
-                requisition_amount: 0,
-                purchase_amount: 0,
-                used_amount: 0,
-                requisition_count: 0,
-                amount: 0,
+    const toggleYear = (y) => {
+        setSelectedYears((prev) => {
+            if (prev.includes(y)) {
+                if (prev.length === 1) return prev;
+                return prev.filter((x) => x !== y);
             }
-        );
-    }, [groups]);
+            return [...prev, y];
+        });
+    };
 
-    const hasData = rows.length > 0;
+    // Build grouped comparison structure
+    const comparison = useMemo(() => {
+        const groupIndex = new Map();
+        const groups = [];
+        results.forEach((rows, pi) => {
+            (rows || []).forEach((r) => {
+                const gId =
+                    isCash || groupBy === "department"
+                        ? r.department_id
+                        : r.category_id;
+                const gName =
+                    isCash || groupBy === "department"
+                        ? r.department_name
+                        : r.category_title;
+                const sId = isCash
+                    ? null
+                    : groupBy === "department"
+                    ? r.category_id
+                    : r.department_id;
+                const sName = isCash
+                    ? null
+                    : groupBy === "department"
+                    ? r.category_title
+                    : r.department_name;
+
+                const gKey = String(gId ?? "0");
+                if (!groupIndex.has(gKey)) {
+                    const g = {
+                        key: gKey,
+                        name: gName || "N/A",
+                        totals: results.map(() => emptyCell()),
+                        subs: [],
+                        subIndex: new Map(),
+                    };
+                    groups.push(g);
+                    groupIndex.set(gKey, g);
+                }
+                const g = groupIndex.get(gKey);
+                addInto(g.totals[pi], r);
+
+                const sKey = String(sId ?? "0");
+                if (!g.subIndex.has(sKey)) {
+                    const s = {
+                        key: sKey,
+                        name: sName || "N/A",
+                        values: results.map(() => emptyCell()),
+                    };
+                    g.subs.push(s);
+                    g.subIndex.set(sKey, s);
+                }
+                addInto(g.subIndex.get(sKey).values[pi], r);
+            });
+        });
+
+        const grand = results.map(() => emptyCell());
+        groups.forEach((g) =>
+            g.totals.forEach((t, pi) => addInto(grand[pi], t))
+        );
+
+        return { groups, grand };
+    }, [results, groupBy, isCash]);
+
+    const hasData = comparison.groups.length > 0;
 
     const handleExportCsv = () => {
         if (!hasData) return;
-        const esc = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-        let csv = "\ufeff";
-        if (tab === "cash") {
-            csv += "Department,Period,Requisitions,Approved Amount\n";
-            groups.forEach(g => {
-                if (period === "none") {
-                    csv += [esc(g.name), "", g.totals.requisition_count, g.totals.amount]
+        const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+        const header = [
+            "Group",
+            isCash
+                ? "Department"
+                : groupBy === "department"
+                ? "Category"
+                : "Department",
+        ];
+        periods.forEach((p) => {
+            if (isCash) {
+                header.push(
+                    `${p.label} Requisitions`,
+                    `${p.label} Approved Amount`
+                );
+            } else {
+                enabledMetrics.forEach((m) =>
+                    header.push(`${p.label} ${m.label}`)
+                );
+            }
+        });
+        const rowValues = (cells) =>
+            cells.flatMap((v) =>
+                isCash
+                    ? [v.requisition_count, v.amount]
+                    : enabledMetrics.map((m) => v[m.key])
+            );
+
+        let csv = "\ufeff" + header.map(esc).join(",") + "\n";
+        comparison.groups.forEach((g) => {
+            g.subs.forEach((s) => {
+                csv +=
+                    [g.name, s.name, ...rowValues(s.values)]
                         .map(esc)
-                        .join(",");
-                    csv += "\n";
-                } else {
-                    g.subs.forEach(s => {
-                        csv += [esc(g.name), esc(s.label), s.requisition_count, s.amount]
-                            .map(esc)
-                            .join(",");
-                        csv += "\n";
-                    });
-                }
+                        .join(",") + "\n";
             });
-            csv += [
-                esc("Grand Total"),
-                "",
-                grandTotals.requisition_count,
-                grandTotals.amount,
-            ]
-                .map(esc)
-                .join(",");
-            csv += "\n";
-        } else {
-            csv += `Group,Category/Department,Requisition Approved,Actual Purchase,Actual Used\n`;
-            groups.forEach(g => {
-                g.subs.forEach(s => {
-                    csv += [
-                        esc(g.name),
-                        esc(s.label),
-                        s.requisition_amount,
-                        s.purchase_amount,
-                        s.used_amount,
-                    ]
-                        .map(esc)
-                        .join(",");
-                    csv += "\n";
-                });
-                csv += [
-                    esc(g.name),
-                    esc("Subtotal"),
-                    g.totals.requisition_amount,
-                    g.totals.purchase_amount,
-                    g.totals.used_amount,
-                ]
+            csv +=
+                [g.name, "Subtotal", ...rowValues(g.totals)]
                     .map(esc)
-                    .join(",");
-                csv += "\n";
-            });
-            csv += [
-                esc("Grand Total"),
-                "",
-                grandTotals.requisition_amount,
-                grandTotals.purchase_amount,
-                grandTotals.used_amount,
-            ]
+                    .join(",") + "\n";
+        });
+        csv +=
+            ["Grand Total", "", ...rowValues(comparison.grand)]
                 .map(esc)
-                .join(",");
-            csv += "\n";
-        }
-        const range = activeRange ?? resolveRange();
+                .join(",") + "\n";
+
         const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `${tab}_summary_report_${range.start}_to_${range.end}.csv`;
+        const suffix =
+            periodMode === "none"
+                ? `${dateFrom}_to_${dateTo}`
+                : periods.map((p) => p.key).join("_");
+        link.download = `${tab}_summary_report_${suffix}.csv`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -274,14 +332,9 @@ export default function SummaryReport() {
         content: () => printRef.current,
     });
 
-    const periodLabel =
-        period === "month"
-            ? "Monthly"
-            : period === "year"
-            ? "Yearly"
-            : period === "year_month"
-            ? "Yearly (Month wise)"
-            : "Summary";
+    const periodDescription = periods.length
+        ? periods.map((p) => p.label).join(", ")
+        : "";
 
     return (
         <AppLayout
@@ -297,7 +350,7 @@ export default function SummaryReport() {
             <div className="md:py-8 md:mx-16 mx-auto px-4 sm:px-6 lg:px-8">
                 <Card className="shadow-lg">
                     {/* Tabs */}
-                    <div className="flex gap-2 mb-6 border-b border-gray-200">
+                    <div className="flex gap-2 mb-4 border-b border-gray-200">
                         <button
                             onClick={() => handleTabChange("product")}
                             className={`px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors ${
@@ -323,26 +376,31 @@ export default function SummaryReport() {
                     {/* Filters */}
                     <div className="p-6 border-b border-gray-200 space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end">
-                            {/* Period */}
+                            {/* Period mode */}
                             <div className="flex flex-col">
                                 <Label
-                                    htmlFor="period"
+                                    htmlFor="period_mode"
                                     value="Period"
                                     className="font-semibold text-gray-700 mb-1"
                                 />
                                 <Select
-                                    id="period"
-                                    value={period}
-                                    onChange={e => setPeriod(e.target.value)}
+                                    id="period_mode"
+                                    value={periodMode}
+                                    onChange={(e) =>
+                                        setPeriodMode(e.target.value)
+                                    }
                                 >
                                     <option value="none">Date Range</option>
-                                    <option value="month">Monthly</option>
-                                    <option value="year">Yearly</option>
-                                    <option value="year_month">Yearly (Month wise)</option>
+                                    <option value="month">
+                                        Monthly (compare)
+                                    </option>
+                                    <option value="year">
+                                        Yearly (compare)
+                                    </option>
                                 </Select>
                             </div>
 
-                            {period === "none" && (
+                            {periodMode === "none" && (
                                 <div className="flex flex-col sm:col-span-2">
                                     <Label
                                         htmlFor="date_range"
@@ -352,15 +410,19 @@ export default function SummaryReport() {
                                     <Datepicker
                                         inputId="date_range"
                                         inputName="date_range"
-                                        onChange={d => {
+                                        onChange={(d) => {
                                             setDateFrom(
                                                 d.startDate
-                                                    ? moment(d.startDate).format("YYYY-MM-DD")
+                                                    ? moment(
+                                                          d.startDate
+                                                      ).format("YYYY-MM-DD")
                                                     : ""
                                             );
                                             setDateTo(
                                                 d.endDate
-                                                    ? moment(d.endDate).format("YYYY-MM-DD")
+                                                    ? moment(d.endDate).format(
+                                                          "YYYY-MM-DD"
+                                                      )
                                                     : ""
                                             );
                                         }}
@@ -368,26 +430,29 @@ export default function SummaryReport() {
                                         className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         placeholderText="Select date range"
                                         maxDate={new Date()}
-                                        value={{ startDate: dateFrom, endDate: dateTo }}
+                                        value={{
+                                            startDate: dateFrom,
+                                            endDate: dateTo,
+                                        }}
                                     />
                                 </div>
                             )}
 
-                            {(period === "year" || period === "year_month") && (
+                            {periodMode === "month" && (
                                 <div className="flex flex-col">
                                     <Label
-                                        htmlFor="select_year"
+                                        htmlFor="scope_year"
                                         value="Year"
                                         className="font-semibold text-gray-700 mb-1"
                                     />
                                     <Select
-                                        id="select_year"
-                                        value={selectedYear}
-                                        onChange={e =>
-                                            setSelectedYear(Number(e.target.value))
+                                        id="scope_year"
+                                        value={scopeYear}
+                                        onChange={(e) =>
+                                            setScopeYear(Number(e.target.value))
                                         }
                                     >
-                                        {years.map(y => (
+                                        {years.map((y) => (
                                             <option key={y} value={y}>
                                                 {y}
                                             </option>
@@ -396,53 +461,8 @@ export default function SummaryReport() {
                                 </div>
                             )}
 
-                            {period === "month" && (
-                                <>
-                                    <div className="flex flex-col">
-                                        <Label
-                                            htmlFor="select_month"
-                                            value="Month"
-                                            className="font-semibold text-gray-700 mb-1"
-                                        />
-                                        <Select
-                                            id="select_month"
-                                            value={selectedMonth}
-                                            onChange={e =>
-                                                setSelectedMonth(Number(e.target.value))
-                                            }
-                                        >
-                                            {monthNames.map((m, i) => (
-                                                <option key={m} value={i + 1}>
-                                                    {m}
-                                                </option>
-                                            ))}
-                                        </Select>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <Label
-                                            htmlFor="select_year"
-                                            value="Year"
-                                            className="font-semibold text-gray-700 mb-1"
-                                        />
-                                        <Select
-                                            id="select_year"
-                                            value={selectedYear}
-                                            onChange={e =>
-                                                setSelectedYear(Number(e.target.value))
-                                            }
-                                        >
-                                            {years.map(y => (
-                                                <option key={y} value={y}>
-                                                    {y}
-                                                </option>
-                                            ))}
-                                        </Select>
-                                    </div>
-                                </>
-                            )}
-
                             {/* Group By */}
-                            {tab === "product" && (
+                            {!isCash && (
                                 <div className="flex flex-col">
                                     <Label
                                         htmlFor="group_by"
@@ -452,10 +472,16 @@ export default function SummaryReport() {
                                     <Select
                                         id="group_by"
                                         value={groupBy}
-                                        onChange={e => setGroupBy(e.target.value)}
+                                        onChange={(e) =>
+                                            setGroupBy(e.target.value)
+                                        }
                                     >
-                                        <option value="department">Department wise</option>
-                                        <option value="category">Category wise</option>
+                                        <option value="department">
+                                            Department wise
+                                        </option>
+                                        <option value="category">
+                                            Category wise
+                                        </option>
                                     </Select>
                                 </div>
                             )}
@@ -470,15 +496,16 @@ export default function SummaryReport() {
                                 <Select
                                     id="department_id"
                                     value={department}
-                                    onChange={e => {
+                                    onChange={(e) => {
                                         setDepartment(e.target.value);
                                         setSelectedDepartmentName(
-                                            e.target.selectedOptions[0]?.text || ""
+                                            e.target.selectedOptions[0]?.text ||
+                                                ""
                                         );
                                     }}
                                 >
                                     <option value="">All Departments</option>
-                                    {departments?.data?.map(o => (
+                                    {departments?.data?.map((o) => (
                                         <option key={o.id} value={o.id}>
                                             {o.name}
                                         </option>
@@ -487,7 +514,7 @@ export default function SummaryReport() {
                             </div>
 
                             {/* Category */}
-                            {tab === "product" && (
+                            {!isCash && (
                                 <div className="flex flex-col">
                                     <Label
                                         htmlFor="category_id"
@@ -500,11 +527,13 @@ export default function SummaryReport() {
                                         id="category_id"
                                         className="select"
                                         classNames={{
-                                            control: state => "select",
+                                            control: () => "select",
                                         }}
-                                        onChange={newValue => {
+                                        onChange={(newValue) => {
                                             setCategory(newValue?.value ?? "");
-                                            setSelectedCategoryName(newValue?.label || "");
+                                            setSelectedCategoryName(
+                                                newValue?.label || ""
+                                            );
                                         }}
                                         additional={{ page: 1 }}
                                         loadOptions={loadCategory}
@@ -513,6 +542,87 @@ export default function SummaryReport() {
                                 </div>
                             )}
                         </div>
+
+                        {/* Month multi-select */}
+                        {periodMode === "month" && (
+                            <div className="flex flex-col">
+                                <Label
+                                    value={`Select Months (${selectedMonths.length}/12)`}
+                                    className="font-semibold text-gray-700 mb-2"
+                                />
+                                <div className="flex flex-wrap gap-x-4 gap-y-2">
+                                    {monthNames.map((m, i) => (
+                                        <label
+                                            key={m}
+                                            className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"
+                                        >
+                                            <Checkbox
+                                                checked={selectedMonths.includes(
+                                                    i + 1
+                                                )}
+                                                onChange={() =>
+                                                    toggleMonth(i + 1)
+                                                }
+                                            />
+                                            {m.slice(0, 3)}
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Year multi-select */}
+                        {periodMode === "year" && (
+                            <div className="flex flex-col">
+                                <Label
+                                    value="Select Years"
+                                    className="font-semibold text-gray-700 mb-2"
+                                />
+                                <div className="flex flex-wrap gap-x-4 gap-y-2">
+                                    {years.map((y) => (
+                                        <label
+                                            key={y}
+                                            className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"
+                                        >
+                                            <Checkbox
+                                                checked={selectedYears.includes(
+                                                    y
+                                                )}
+                                                onChange={() => toggleYear(y)}
+                                            />
+                                            {y}
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Metric toggles */}
+                        {!isCash && (
+                            <div className="flex flex-wrap items-center gap-4 pt-1">
+                                <Label
+                                    value="Show Columns:"
+                                    className="font-semibold text-gray-700"
+                                />
+                                {PRODUCT_METRICS.map((m) => (
+                                    <label
+                                        key={m.key}
+                                        className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"
+                                    >
+                                        <Checkbox
+                                            checked={metrics[m.key]}
+                                            onChange={() =>
+                                                setMetrics((prev) => ({
+                                                    ...prev,
+                                                    [m.key]: !prev[m.key],
+                                                }))
+                                            }
+                                        />
+                                        {m.label}
+                                    </label>
+                                ))}
+                            </div>
+                        )}
 
                         <div className="flex flex-wrap gap-2 justify-end">
                             <Button
@@ -550,7 +660,8 @@ export default function SummaryReport() {
                                 />
                             </div>
                             <h2 className="text-xl font-bold text-gray-800 mb-1">
-                                IsDB-Bangladesh Islamic Solidarity Educational Wakf
+                                IsDB-Bangladesh Islamic Solidarity Educational
+                                Wakf
                             </h2>
                             <div className="text-sm text-gray-600 mb-1">
                                 IDB Bhaban (4th Floor), Rokeya Sharanee, Dhaka
@@ -559,115 +670,130 @@ export default function SummaryReport() {
                                 {reportTitle}
                             </div>
                             <div className="text-sm text-gray-600 mb-1">
-                                {periodLabel}
                                 {selectedDepartmentName && department
-                                    ? ` • Department: ${selectedDepartmentName}`
-                                    : ""}
-                                {tab === "product" && selectedCategoryName && category
+                                    ? `Department: ${selectedDepartmentName}`
+                                    : "All Departments"}
+                                {!isCash && selectedCategoryName && category
                                     ? ` • Category: ${selectedCategoryName}`
                                     : ""}
                             </div>
                             <div className="text-sm text-gray-500">
-                                {activeRange
-                                    ? `Period: ${
-                                          activeRange.label ??
-                                          `${moment(activeRange.start).format("DD MMM YYYY")} - ${moment(activeRange.end).format("DD MMM YYYY")}`
-                                      }`
+                                {periodDescription
+                                    ? `Period: ${periodDescription}`
                                     : ""}
                             </div>
                         </div>
 
                         {hasData ? (
                             <div className="overflow-x-auto">
-                                {tab === "cash" ? (
-                                    <table className="min-w-full border-collapse border border-gray-300 text-sm">
-                                        <thead>
-                                            <tr className="bg-gray-100">
-                                                <th className="border border-gray-300 px-3 py-2 text-left font-semibold">
-                                                    Department
+                                <table className="min-w-full border-collapse border border-gray-300 text-sm">
+                                    <thead>
+                                        <tr className="bg-gray-200">
+                                            <th
+                                                className="border border-gray-300 px-3 py-2 text-left font-semibold align-bottom"
+                                                rowSpan={2}
+                                            >
+                                                {isCash
+                                                    ? "Department"
+                                                    : groupBy === "department"
+                                                    ? "Category"
+                                                    : "Department"}
+                                            </th>
+                                            {periods.map((p) => (
+                                                <th
+                                                    key={p.key}
+                                                    colSpan={
+                                                        isCash
+                                                            ? 2
+                                                            : enabledMetrics.length
+                                                    }
+                                                    className="border border-gray-300 px-3 py-2 text-center font-semibold"
+                                                >
+                                                    {p.label}
                                                 </th>
-                                                <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
-                                                    Requisitions
-                                                </th>
-                                                <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
-                                                    Approved Amount
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {groups.map((g, i) => (
-                                                <GroupRows
-                                                    key={i}
-                                                    group={g}
-                                                    tab="cash"
-                                                    period={period}
-                                                />
                                             ))}
-                                            <tr className="bg-gray-200 font-bold">
-                                                <td className="border border-gray-300 px-3 py-2">
-                                                    Grand Total
-                                                </td>
-                                                <td className="border border-gray-300 px-3 py-2 text-right">
-                                                    {grandTotals.requisition_count}
-                                                </td>
-                                                <td className="border border-gray-300 px-3 py-2 text-right">
-                                                    {fmt(grandTotals.amount)}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                ) : (
-                                    <table className="min-w-full border-collapse border border-gray-300 text-sm">
-                                        <thead>
-                                            <tr className="bg-gray-100">
-                                                <th className="border border-gray-300 px-3 py-2 text-left font-semibold">
-                                                    {groupBy === "department"
-                                                        ? "Category"
-                                                        : "Department"}
-                                                </th>
-                                                <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
-                                                    Requisition Approved
-                                                </th>
-                                                <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
-                                                    Actual Purchase
-                                                </th>
-                                                <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
-                                                    Actual Used
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {groups.map((g, i) => (
-                                                <GroupRows
-                                                    key={i}
-                                                    group={g}
-                                                    tab="product"
-                                                    period={period}
-                                                />
-                                            ))}
-                                            <tr className="bg-gray-200 font-bold">
-                                                <td className="border border-gray-300 px-3 py-2">
-                                                    Grand Total
-                                                </td>
-                                                <td className="border border-gray-300 px-3 py-2 text-right">
-                                                    {fmt(grandTotals.requisition_amount)}
-                                                </td>
-                                                <td className="border border-gray-300 px-3 py-2 text-right">
-                                                    {fmt(grandTotals.purchase_amount)}
-                                                </td>
-                                                <td className="border border-gray-300 px-3 py-2 text-right">
-                                                    {fmt(grandTotals.used_amount)}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                )}
+                                        </tr>
+                                        <tr className="bg-gray-100">
+                                            {periods.map((p) =>
+                                                isCash ? (
+                                                    <Fragment key={p.key}>
+                                                        <th className="border border-gray-300 px-2 py-1 text-right text-xs font-medium">
+                                                            Requisitions
+                                                        </th>
+                                                        <th className="border border-gray-300 px-2 py-1 text-right text-xs font-medium">
+                                                            Approved Amt
+                                                        </th>
+                                                    </Fragment>
+                                                ) : (
+                                                    enabledMetrics.map((m) => (
+                                                        <th
+                                                            key={`${p.key}-${m.key}`}
+                                                            className="border border-gray-300 px-2 py-1 text-right text-xs font-medium"
+                                                        >
+                                                            {m.label}
+                                                        </th>
+                                                    ))
+                                                )
+                                            )}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {comparison.groups.map((g) => (
+                                            <GroupBlock
+                                                key={g.key}
+                                                group={g}
+                                                periods={periods}
+                                                isCash={isCash}
+                                                enabledMetrics={enabledMetrics}
+                                            />
+                                        ))}
+                                        <tr className="bg-gray-200 font-bold">
+                                            <td className="border border-gray-300 px-3 py-2">
+                                                Grand Total
+                                            </td>
+                                            {periods.map((p, pi) =>
+                                                isCash ? (
+                                                    <Fragment key={p.key}>
+                                                        <td className="border border-gray-300 px-3 py-2 text-right">
+                                                            {
+                                                                comparison
+                                                                    .grand[pi]
+                                                                    .requisition_count
+                                                            }
+                                                        </td>
+                                                        <td className="border border-gray-300 px-3 py-2 text-right">
+                                                            {fmt(
+                                                                comparison
+                                                                    .grand[pi]
+                                                                    .amount
+                                                            )}
+                                                        </td>
+                                                    </Fragment>
+                                                ) : (
+                                                    enabledMetrics.map((m) => (
+                                                        <td
+                                                            key={`${p.key}-${m.key}`}
+                                                            className="border border-gray-300 px-3 py-2 text-right"
+                                                        >
+                                                            {fmt(
+                                                                comparison
+                                                                    .grand[pi][
+                                                                    m.key
+                                                                ]
+                                                            )}
+                                                        </td>
+                                                    ))
+                                                )
+                                            )}
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         ) : (
                             <div className="text-center text-gray-500 py-10">
                                 {isLoading
                                     ? "Loading report..."
-                                    : "No data found. Select filters and press Show Report."}
+                                    : "No data. Select filters and press Show Report."}
                             </div>
                         )}
                     </div>
@@ -715,68 +841,53 @@ export default function SummaryReport() {
     );
 }
 
-function GroupRows({ group, tab, period }) {
-    if (tab === "cash") {
-        return (
-            <>
-                <tr className="bg-gray-100 font-semibold">
-                    <td className="border border-gray-300 px-3 py-2">
-                        {group.name}
-                    </td>
-                    <td className="border border-gray-300 px-3 py-2 text-right">
-                        {group.totals.requisition_count}
-                    </td>
-                    <td className="border border-gray-300 px-3 py-2 text-right">
-                        {fmt(group.totals.amount)}
-                    </td>
-                </tr>
-                {period !== "none" &&
-                    group.subs.map((s, i) => (
-                        <tr key={i} className="text-gray-700">
-                            <td className="border border-gray-300 px-3 py-1.5 pl-8">
-                                • {s.label}
-                            </td>
-                            <td className="border border-gray-300 px-3 py-1.5 text-right">
-                                {s.requisition_count}
-                            </td>
-                            <td className="border border-gray-300 px-3 py-1.5 text-right">
-                                {fmt(s.amount)}
-                            </td>
-                        </tr>
-                    ))}
-            </>
-        );
-    }
+function GroupBlock({ group, periods, isCash, enabledMetrics }) {
     return (
         <>
             <tr className="bg-gray-100 font-semibold">
-                <td className="border border-gray-300 px-3 py-2">{group.name}</td>
-                <td className="border border-gray-300 px-3 py-2 text-right">
-                    {fmt(group.totals.requisition_amount)}
+                <td className="border border-gray-300 px-3 py-2">
+                    {group.name}
                 </td>
-                <td className="border border-gray-300 px-3 py-2 text-right">
-                    {fmt(group.totals.purchase_amount)}
-                </td>
-                <td className="border border-gray-300 px-3 py-2 text-right">
-                    {fmt(group.totals.used_amount)}
-                </td>
+                {periods.map((p, pi) =>
+                    isCash ? (
+                        <Fragment key={p.key}>
+                            <td className="border border-gray-300 px-3 py-2 text-right">
+                                {group.totals[pi].requisition_count}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 text-right">
+                                {fmt(group.totals[pi].amount)}
+                            </td>
+                        </Fragment>
+                    ) : (
+                        enabledMetrics.map((m) => (
+                            <td
+                                key={`${p.key}-${m.key}`}
+                                className="border border-gray-300 px-3 py-2 text-right"
+                            >
+                                {fmt(group.totals[pi][m.key])}
+                            </td>
+                        ))
+                    )
+                )}
             </tr>
-            {group.subs.map((s, i) => (
-                <tr key={i} className="text-gray-700">
-                    <td className="border border-gray-300 px-3 py-1.5 pl-8">
-                        • {s.label}
-                    </td>
-                    <td className="border border-gray-300 px-3 py-1.5 text-right">
-                        {fmt(s.requisition_amount)}
-                    </td>
-                    <td className="border border-gray-300 px-3 py-1.5 text-right">
-                        {fmt(s.purchase_amount)}
-                    </td>
-                    <td className="border border-gray-300 px-3 py-1.5 text-right">
-                        {fmt(s.used_amount)}
-                    </td>
-                </tr>
-            ))}
+            {!isCash &&
+                group.subs.map((s) => (
+                    <tr key={s.key} className="text-gray-700">
+                        <td className="border border-gray-300 px-3 py-1.5 pl-8">
+                            • {s.name}
+                        </td>
+                        {periods.map((p, pi) =>
+                            enabledMetrics.map((m) => (
+                                <td
+                                    key={`${p.key}-${m.key}`}
+                                    className="border border-gray-300 px-3 py-1.5 text-right"
+                                >
+                                    {fmt(s.values[pi][m.key])}
+                                </td>
+                            ))
+                        )}
+                    </tr>
+                ))}
         </>
     );
 }
