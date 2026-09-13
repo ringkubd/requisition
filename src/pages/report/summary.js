@@ -1642,6 +1642,7 @@ function CashCategoryTab() {
     const [status, setStatus] = useState({
         categories: [],
         pending: 0,
+        total_items: 0,
         total_purposes: 0,
         classified: 0,
     });
@@ -1653,11 +1654,9 @@ function CashCategoryTab() {
 
     const [periodMode, setPeriodMode] = useState("none");
     const [dateFrom, setDateFrom] = useState(
-        moment().subtract(1, "month").startOf("month").format("YYYY-MM-DD")
+        moment().subtract(11, "month").startOf("month").format("YYYY-MM-DD")
     );
-    const [dateTo, setDateTo] = useState(
-        moment().subtract(1, "month").endOf("month").format("YYYY-MM-DD")
-    );
+    const [dateTo, setDateTo] = useState(moment().format("YYYY-MM-DD"));
     const [year, setYear] = useState(moment().year());
     const [month, setMonth] = useState(moment().month() + 1);
     const [department, setDepartment] = useState("");
@@ -1691,6 +1690,20 @@ function CashCategoryTab() {
     useEffect(() => {
         loadStatus();
     }, []);
+
+    const autoLoadedRef = useRef(false);
+    useEffect(() => {
+        if (
+            !autoLoadedRef.current &&
+            !busy &&
+            status.pending === 0 &&
+            (status.categories || []).length > 0 &&
+            !report
+        ) {
+            autoLoadedRef.current = true;
+            handleShow();
+        }
+    }, [busy, status, report]);
 
     // Poll while classifying
     useEffect(() => {
@@ -1862,10 +1875,14 @@ function CashCategoryTab() {
                             <>
                                 Approved categories:{" "}
                                 <b>{status.categories.length}</b> &nbsp;•&nbsp;
-                                Item/purpose pairs:{" "}
-                                <b>{status.total_purposes}</b> &nbsp;•&nbsp;
-                                Classified: <b>{status.classified}</b>{" "}
-                                &nbsp;•&nbsp; Pending:{" "}
+                                Items:{" "}
+                                <b>
+                                    {status.total_items ??
+                                        status.total_purposes}
+                                </b>{" "}
+                                &nbsp;•&nbsp; Classified:{" "}
+                                <b>{status.classified}</b> &nbsp;•&nbsp;
+                                Pending:{" "}
                                 <b
                                     className={
                                         status.pending
