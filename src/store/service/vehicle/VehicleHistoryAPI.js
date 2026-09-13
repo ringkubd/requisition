@@ -87,6 +87,8 @@ export const {
     useDestroyVehicleHistoryMutation,
     useGetVehicleMonthlyReportQuery,
     useGetVehicleYearlyReportQuery,
+    useLazyGetVehicleMonthlyReportQuery,
+    useLazyGetVehicleYearlyReportQuery,
     util: { getRunningQueriesThunk },
 } = VehicleHistoryAPI;
 export const { getVehicleHistory } = VehicleHistoryAPI.endpoints;
