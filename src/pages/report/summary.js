@@ -6,7 +6,7 @@ import {
 } from "@/store/service/report";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 import Head from "next/head";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment";
 import { AsyncPaginate } from "react-select-async-paginate";
@@ -83,8 +83,7 @@ export default function SummaryReport() {
     });
     const [periods, setPeriods] = useState([]);
     const [results, setResults] = useState([]);
-    const [includeChart, setIncludeChart] = useState(true);
-    const [pendingPrint, setPendingPrint] = useState(false);
+    const printChartRef = useRef(true);
 
     const { data: departments } = useGetDepartmentByOrganizationBranchQuery();
     const [
@@ -409,25 +408,29 @@ export default function SummaryReport() {
 
     const handlePrint = useReactToPrint({
         content: () => printRef.current,
-        onAfterPrint: () => setIncludeChart(true),
+        onBeforeGetContent: () => {
+            if (printRef.current) {
+                if (printChartRef.current) {
+                    printRef.current.classList.remove("hide-chart");
+                } else {
+                    printRef.current.classList.add("hide-chart");
+                }
+            }
+        },
+        onAfterPrint: () => {
+            printRef.current?.classList.remove("hide-chart");
+        },
     });
 
     const printWithChart = () => {
-        setIncludeChart(true);
-        setPendingPrint(true);
+        printChartRef.current = true;
+        handlePrint();
     };
 
     const printWithoutChart = () => {
-        setIncludeChart(false);
-        setPendingPrint(true);
+        printChartRef.current = false;
+        handlePrint();
     };
-
-    useEffect(() => {
-        if (!pendingPrint) return;
-        setPendingPrint(false);
-        const t = setTimeout(() => handlePrint(), 60);
-        return () => clearTimeout(t);
-    }, [pendingPrint]);
 
     const periodDescription = periods.length
         ? periods.map((p) => p.label).join(", ")
@@ -823,8 +826,8 @@ export default function SummaryReport() {
                             </div>
                         )}
 
-                        {includeChart && hasData && chart.data.length > 0 && (
-                            <div className="print-no-break mb-6 border border-gray-200 rounded-lg p-4 bg-white">
+                        {hasData && chart.data.length > 0 && (
+                            <div className="chart-section print-no-break mb-6 border border-gray-200 rounded-lg p-4 bg-white">
                                 <div className="text-sm font-semibold text-gray-700 mb-2">
                                     {isCash
                                         ? "Approved Amount"
@@ -1098,6 +1101,9 @@ export default function SummaryReport() {
                         }
                         .print-content .chart-box {
                             height: 380px !important;
+                        }
+                        .print-content.hide-chart .chart-section {
+                            display: none !important;
                         }
                         .print-content table {
                             font-size: 10px !important;
