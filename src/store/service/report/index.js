@@ -71,6 +71,52 @@ export const ReportAPI = GeneralBaseAPI.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        summaryCashCategoryPropose: builder.query({
+            query: arg => ({
+                url: 'report/summary/cash-category/propose',
+                params: arg,
+            }),
+        }),
+        summaryCashCategoryStatus: builder.query({
+            query: () => ({
+                url: 'report/summary/cash-category/status',
+            }),
+        }),
+        summaryCashCategoryApprove: builder.mutation({
+            query: body => ({
+                url: 'report/summary/cash-category/approve',
+                method: 'POST',
+                body,
+            }),
+        }),
+        summaryCashCategoryClassify: builder.mutation({
+            query: arg => ({
+                url: 'report/summary/cash-category/classify',
+                method: 'POST',
+                body: arg || {},
+            }),
+        }),
+        summaryCashCategoryReport: builder.mutation({
+            query: arg => ({
+                url: 'report/summary/cash-category/report',
+                params: arg,
+                method: 'GET',
+            }),
+        }),
+        summaryCashCategoryItems: builder.mutation({
+            query: arg => ({
+                url: 'report/summary/cash-category/items',
+                params: arg,
+                method: 'GET',
+            }),
+        }),
+        summaryCashCategoryOverride: builder.mutation({
+            query: body => ({
+                url: 'report/summary/cash-category/override',
+                method: 'POST',
+                body,
+            }),
+        }),
     }),
 })
 
@@ -85,4 +131,11 @@ export const {
     useSummaryDepartmentCategoryMutation,
     useSummaryCashMutation,
     useSummaryCategoryItemsMutation,
+    useLazySummaryCashCategoryProposeQuery,
+    useLazySummaryCashCategoryStatusQuery,
+    useSummaryCashCategoryApproveMutation,
+    useSummaryCashCategoryClassifyMutation,
+    useSummaryCashCategoryReportMutation,
+    useSummaryCashCategoryItemsMutation,
+    useSummaryCashCategoryOverrideMutation,
 } = ReportAPI

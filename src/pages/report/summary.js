@@ -4,10 +4,16 @@ import {
     useSummaryDepartmentCategoryMutation,
     useSummaryCashMutation,
     useSummaryCategoryItemsMutation,
+    useLazySummaryCashCategoryProposeQuery,
+    useLazySummaryCashCategoryStatusQuery,
+    useSummaryCashCategoryApproveMutation,
+    useSummaryCashCategoryClassifyMutation,
+    useSummaryCashCategoryReportMutation,
+    useSummaryCashCategoryItemsMutation,
 } from "@/store/service/report";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 import Head from "next/head";
-import { Fragment, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment";
 import { AsyncPaginate } from "react-select-async-paginate";
@@ -521,599 +527,673 @@ export default function SummaryReport() {
                         >
                             Cash Summary
                         </button>
+                        <button
+                            onClick={() => handleTabChange("cash_category")}
+                            className={`px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors ${
+                                tab === "cash_category"
+                                    ? "bg-blue-600 text-white"
+                                    : "text-gray-600 hover:bg-gray-100"
+                            }`}
+                        >
+                            Cash Categories (AI)
+                        </button>
                     </div>
 
-                    {/* Filters */}
-                    <div className="p-6 border-b border-gray-200 space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end">
-                            {/* Period mode */}
-                            <div className="flex flex-col">
-                                <Label
-                                    htmlFor="period_mode"
-                                    value="Period"
-                                    className="font-semibold text-gray-700 mb-1"
-                                />
-                                <Select
-                                    id="period_mode"
-                                    value={periodMode}
-                                    onChange={(e) =>
-                                        setPeriodMode(e.target.value)
-                                    }
-                                >
-                                    <option value="none">Date Range</option>
-                                    <option value="month">
-                                        Monthly (compare)
-                                    </option>
-                                    <option value="year">
-                                        Yearly (compare)
-                                    </option>
-                                </Select>
-                            </div>
-
-                            {periodMode === "none" && (
-                                <div className="flex flex-col sm:col-span-2">
-                                    <Label
-                                        htmlFor="date_range"
-                                        value="Date Range"
-                                        className="font-semibold text-gray-700 mb-1"
-                                    />
-                                    <Datepicker
-                                        inputId="date_range"
-                                        inputName="date_range"
-                                        onChange={(d) => {
-                                            setDateFrom(
-                                                d.startDate
-                                                    ? moment(
-                                                          d.startDate
-                                                      ).format("YYYY-MM-DD")
-                                                    : ""
-                                            );
-                                            setDateTo(
-                                                d.endDate
-                                                    ? moment(d.endDate).format(
-                                                          "YYYY-MM-DD"
-                                                      )
-                                                    : ""
-                                            );
-                                        }}
-                                        dateFormat="yyyy-MM-dd"
-                                        className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholderText="Select date range"
-                                        maxDate={new Date()}
-                                        value={{
-                                            startDate: dateFrom,
-                                            endDate: dateTo,
-                                        }}
-                                    />
-                                </div>
-                            )}
-
-                            {periodMode === "month" && (
-                                <div className="flex flex-col">
-                                    <Label
-                                        htmlFor="scope_year"
-                                        value="Year"
-                                        className="font-semibold text-gray-700 mb-1"
-                                    />
-                                    <Select
-                                        id="scope_year"
-                                        value={scopeYear}
-                                        onChange={(e) =>
-                                            setScopeYear(Number(e.target.value))
-                                        }
-                                    >
-                                        {years.map((y) => (
-                                            <option key={y} value={y}>
-                                                {y}
+                    {tab === "cash_category" ? (
+                        <CashCategoryTab />
+                    ) : (
+                        <>
+                            {/* Filters */}
+                            <div className="p-6 border-b border-gray-200 space-y-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end">
+                                    {/* Period mode */}
+                                    <div className="flex flex-col">
+                                        <Label
+                                            htmlFor="period_mode"
+                                            value="Period"
+                                            className="font-semibold text-gray-700 mb-1"
+                                        />
+                                        <Select
+                                            id="period_mode"
+                                            value={periodMode}
+                                            onChange={(e) =>
+                                                setPeriodMode(e.target.value)
+                                            }
+                                        >
+                                            <option value="none">
+                                                Date Range
                                             </option>
-                                        ))}
-                                    </Select>
-                                </div>
-                            )}
+                                            <option value="month">
+                                                Monthly (compare)
+                                            </option>
+                                            <option value="year">
+                                                Yearly (compare)
+                                            </option>
+                                        </Select>
+                                    </div>
 
-                            {/* Group By */}
-                            {!isCash && (
-                                <div className="flex flex-col">
-                                    <Label
-                                        htmlFor="group_by"
-                                        value="Group By"
-                                        className="font-semibold text-gray-700 mb-1"
-                                    />
-                                    <Select
-                                        id="group_by"
-                                        value={groupBy}
-                                        onChange={(e) =>
-                                            setGroupBy(e.target.value)
-                                        }
-                                    >
-                                        <option value="department">
-                                            Department wise
-                                        </option>
-                                        <option value="category">
-                                            Category wise
-                                        </option>
-                                    </Select>
-                                </div>
-                            )}
-
-                            {/* Department */}
-                            <div className="flex flex-col">
-                                <Label
-                                    htmlFor="department_id"
-                                    value="Department"
-                                    className="font-semibold text-gray-700 mb-1"
-                                />
-                                <Select
-                                    id="department_id"
-                                    value={department}
-                                    onChange={(e) => {
-                                        setDepartment(e.target.value);
-                                        setSelectedDepartmentName(
-                                            e.target.selectedOptions[0]?.text ||
-                                                ""
-                                        );
-                                    }}
-                                >
-                                    <option value="">All Departments</option>
-                                    {departments?.data?.map((o) => (
-                                        <option key={o.id} value={o.id}>
-                                            {o.name}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </div>
-
-                            {/* Category */}
-                            {!isCash && (
-                                <div className="flex flex-col">
-                                    <Label
-                                        htmlFor="category_id"
-                                        value="Category"
-                                        className="font-semibold text-gray-700 mb-1"
-                                    />
-                                    <AsyncPaginate
-                                        defaultOptions
-                                        name="category_id"
-                                        id="category_id"
-                                        className="select"
-                                        classNames={{
-                                            control: () => "select",
-                                        }}
-                                        onChange={(newValue) => {
-                                            setCategory(newValue?.value ?? "");
-                                            setSelectedCategoryName(
-                                                newValue?.label || ""
-                                            );
-                                        }}
-                                        additional={{ page: 1 }}
-                                        loadOptions={loadCategory}
-                                        placeholder="Select category..."
-                                    />
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Month multi-select */}
-                        {periodMode === "month" && (
-                            <div className="flex flex-col">
-                                <Label
-                                    value={`Select Months (${selectedMonths.length}/12)`}
-                                    className="font-semibold text-gray-700 mb-2"
-                                />
-                                <div className="flex flex-wrap gap-x-4 gap-y-2">
-                                    {monthNames.map((m, i) => (
-                                        <label
-                                            key={m}
-                                            className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"
-                                        >
-                                            <Checkbox
-                                                checked={selectedMonths.includes(
-                                                    i + 1
-                                                )}
-                                                onChange={() =>
-                                                    toggleMonth(i + 1)
-                                                }
+                                    {periodMode === "none" && (
+                                        <div className="flex flex-col sm:col-span-2">
+                                            <Label
+                                                htmlFor="date_range"
+                                                value="Date Range"
+                                                className="font-semibold text-gray-700 mb-1"
                                             />
-                                            {m.slice(0, 3)}
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Year multi-select */}
-                        {periodMode === "year" && (
-                            <div className="flex flex-col">
-                                <Label
-                                    value="Select Years"
-                                    className="font-semibold text-gray-700 mb-2"
-                                />
-                                <div className="flex flex-wrap gap-x-4 gap-y-2">
-                                    {years.map((y) => (
-                                        <label
-                                            key={y}
-                                            className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"
-                                        >
-                                            <Checkbox
-                                                checked={selectedYears.includes(
-                                                    y
-                                                )}
-                                                onChange={() => toggleYear(y)}
-                                            />
-                                            {y}
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Metric toggles */}
-                        {!isCash && (
-                            <div className="flex flex-wrap items-center gap-4 pt-1">
-                                <Label
-                                    value="Show Columns:"
-                                    className="font-semibold text-gray-700"
-                                />
-                                {PRODUCT_METRICS.map((m) => (
-                                    <label
-                                        key={m.key}
-                                        className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"
-                                    >
-                                        <Checkbox
-                                            checked={metrics[m.key]}
-                                            onChange={() =>
-                                                setMetrics((prev) => ({
-                                                    ...prev,
-                                                    [m.key]: !prev[m.key],
-                                                }))
-                                            }
-                                        />
-                                        {m.label}
-                                    </label>
-                                ))}
-                            </div>
-                        )}
-
-                        {!isCash && hasData && (
-                            <div className="text-xs text-gray-500">
-                                Tip: category name-এ click করলে item-wise
-                                (approved / purchase / used) detail দেখা যাবে।
-                            </div>
-                        )}
-
-                        <div className="flex flex-wrap gap-2 justify-end">
-                            <Button
-                                onClick={handleShow}
-                                isProcessing={isLoading}
-                                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md"
-                            >
-                                Show Report
-                            </Button>
-                            <Button
-                                onClick={printWithChart}
-                                disabled={!hasData}
-                                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-lg shadow-md"
-                            >
-                                Print (with chart)
-                            </Button>
-                            <Button
-                                onClick={printWithoutChart}
-                                disabled={!hasData}
-                                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md"
-                            >
-                                Print (no chart)
-                            </Button>
-                            <Button
-                                onClick={handleExportCsv}
-                                disabled={!hasData}
-                                className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md"
-                            >
-                                Export CSV
-                            </Button>
-                        </div>
-                    </div>
-
-                    {/* Printable Area */}
-                    <div ref={printRef} className="print-content p-6">
-                        <div className="print-header text-center mb-6 p-4">
-                            <div className="mb-3">
-                                <img
-                                    src="/logo.svg"
-                                    alt="Organization Logo"
-                                    className="h-14 mx-auto print:h-10"
-                                />
-                            </div>
-                            <h2 className="text-xl font-bold text-gray-800 mb-1">
-                                IsDB-Bangladesh Islamic Solidarity Educational
-                                Wakf
-                            </h2>
-                            <div className="text-sm text-gray-600 mb-1">
-                                IDB Bhaban (4th Floor), Rokeya Sharanee, Dhaka
-                            </div>
-                            <div className="text-lg font-semibold mt-3 mb-1">
-                                {reportTitle}
-                            </div>
-                            <div className="text-sm text-gray-600 mb-1">
-                                {selectedDepartmentName && department
-                                    ? `Department: ${selectedDepartmentName}`
-                                    : "All Departments"}
-                                {!isCash && selectedCategoryName && category
-                                    ? ` • Category: ${selectedCategoryName}`
-                                    : ""}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                                {periodDescription
-                                    ? `Period: ${periodDescription}`
-                                    : ""}
-                            </div>
-                        </div>
-
-                        {hasData && (
-                            <div className="print-no-break grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-                                {isCash ? (
-                                    <>
-                                        <KpiCard
-                                            label="Total Requisitions"
-                                            value={
-                                                comparison.grandAll
-                                                    .requisition_count
-                                            }
-                                            color="#0ea5e9"
-                                        />
-                                        <KpiCard
-                                            label="Total Approved Amount"
-                                            value={`৳ ${fmt(
-                                                comparison.grandAll.amount
-                                            )}`}
-                                            color="#10b981"
-                                        />
-                                    </>
-                                ) : (
-                                    enabledMetrics.map((m) => (
-                                        <KpiCard
-                                            key={m.key}
-                                            label={`Total ${m.label}`}
-                                            value={`৳ ${fmt(
-                                                comparison.grandAll[m.key]
-                                            )}`}
-                                            color={m.color}
-                                        />
-                                    ))
-                                )}
-                            </div>
-                        )}
-
-                        {hasData && chart.data.length > 0 && (
-                            <div className="chart-section print-no-break mb-6 border border-gray-200 rounded-lg p-4 bg-white">
-                                <div className="text-sm font-semibold text-gray-700 mb-2">
-                                    {isCash
-                                        ? "Approved Amount"
-                                        : enabledMetrics
-                                              .map((m) => m.label)
-                                              .join(" vs ")}{" "}
-                                    — by {chart.xLabel}
-                                </div>
-                                <div
-                                    className="chart-box"
-                                    style={{ width: "100%", height: 440 }}
-                                >
-                                    <ResponsiveContainer
-                                        width="100%"
-                                        height="100%"
-                                    >
-                                        <BarChart
-                                            data={chart.data}
-                                            margin={{
-                                                top: 16,
-                                                right: 16,
-                                                left: 8,
-                                                bottom:
-                                                    chart.data.length > 6
-                                                        ? 70
-                                                        : 60,
-                                            }}
-                                        >
-                                            <CartesianGrid
-                                                strokeDasharray="3 3"
-                                                stroke="#e5e7eb"
-                                            />
-                                            <XAxis
-                                                dataKey="name"
-                                                tick={{ fontSize: 12 }}
-                                                interval={0}
-                                                angle={
-                                                    chart.data.length > 6
-                                                        ? -30
-                                                        : 0
-                                                }
-                                                textAnchor={
-                                                    chart.data.length > 6
-                                                        ? "end"
-                                                        : "middle"
-                                                }
-                                                tickMargin={
-                                                    chart.data.length > 6
-                                                        ? 48
-                                                        : 42
-                                                }
-                                                height={
-                                                    chart.data.length > 6
-                                                        ? 70
-                                                        : 50
-                                                }
-                                            />
-                                            <YAxis
-                                                tickFormatter={fmtInt}
-                                                tick={{ fontSize: 11 }}
-                                                width={110}
-                                            />
-                                            <Tooltip
-                                                formatter={(v) => `৳ ${fmt(v)}`}
-                                                contentStyle={{
-                                                    fontSize: 12,
-                                                    borderRadius: 8,
+                                            <Datepicker
+                                                inputId="date_range"
+                                                inputName="date_range"
+                                                onChange={(d) => {
+                                                    setDateFrom(
+                                                        d.startDate
+                                                            ? moment(
+                                                                  d.startDate
+                                                              ).format(
+                                                                  "YYYY-MM-DD"
+                                                              )
+                                                            : ""
+                                                    );
+                                                    setDateTo(
+                                                        d.endDate
+                                                            ? moment(
+                                                                  d.endDate
+                                                              ).format(
+                                                                  "YYYY-MM-DD"
+                                                              )
+                                                            : ""
+                                                    );
+                                                }}
+                                                dateFormat="yyyy-MM-dd"
+                                                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                placeholderText="Select date range"
+                                                maxDate={new Date()}
+                                                value={{
+                                                    startDate: dateFrom,
+                                                    endDate: dateTo,
                                                 }}
                                             />
-                                            <Legend
-                                                wrapperStyle={{ fontSize: 12 }}
+                                        </div>
+                                    )}
+
+                                    {periodMode === "month" && (
+                                        <div className="flex flex-col">
+                                            <Label
+                                                htmlFor="scope_year"
+                                                value="Year"
+                                                className="font-semibold text-gray-700 mb-1"
                                             />
-                                            {chart.series.map((s) => (
-                                                <Bar
-                                                    key={s.key}
-                                                    dataKey={s.key}
-                                                    name={s.label}
-                                                    fill={s.color}
-                                                    radius={[3, 3, 0, 0]}
-                                                    maxBarSize={64}
-                                                >
-                                                    <LabelList
-                                                        dataKey={s.key}
-                                                        content={BarValueLabel}
-                                                    />
-                                                </Bar>
+                                            <Select
+                                                id="scope_year"
+                                                value={scopeYear}
+                                                onChange={(e) =>
+                                                    setScopeYear(
+                                                        Number(e.target.value)
+                                                    )
+                                                }
+                                            >
+                                                {years.map((y) => (
+                                                    <option key={y} value={y}>
+                                                        {y}
+                                                    </option>
+                                                ))}
+                                            </Select>
+                                        </div>
+                                    )}
+
+                                    {/* Group By */}
+                                    {!isCash && (
+                                        <div className="flex flex-col">
+                                            <Label
+                                                htmlFor="group_by"
+                                                value="Group By"
+                                                className="font-semibold text-gray-700 mb-1"
+                                            />
+                                            <Select
+                                                id="group_by"
+                                                value={groupBy}
+                                                onChange={(e) =>
+                                                    setGroupBy(e.target.value)
+                                                }
+                                            >
+                                                <option value="department">
+                                                    Department wise
+                                                </option>
+                                                <option value="category">
+                                                    Category wise
+                                                </option>
+                                            </Select>
+                                        </div>
+                                    )}
+
+                                    {/* Department */}
+                                    <div className="flex flex-col">
+                                        <Label
+                                            htmlFor="department_id"
+                                            value="Department"
+                                            className="font-semibold text-gray-700 mb-1"
+                                        />
+                                        <Select
+                                            id="department_id"
+                                            value={department}
+                                            onChange={(e) => {
+                                                setDepartment(e.target.value);
+                                                setSelectedDepartmentName(
+                                                    e.target.selectedOptions[0]
+                                                        ?.text || ""
+                                                );
+                                            }}
+                                        >
+                                            <option value="">
+                                                All Departments
+                                            </option>
+                                            {departments?.data?.map((o) => (
+                                                <option key={o.id} value={o.id}>
+                                                    {o.name}
+                                                </option>
                                             ))}
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                                        </Select>
+                                    </div>
+
+                                    {/* Category */}
+                                    {!isCash && (
+                                        <div className="flex flex-col">
+                                            <Label
+                                                htmlFor="category_id"
+                                                value="Category"
+                                                className="font-semibold text-gray-700 mb-1"
+                                            />
+                                            <AsyncPaginate
+                                                defaultOptions
+                                                name="category_id"
+                                                id="category_id"
+                                                className="select"
+                                                classNames={{
+                                                    control: () => "select",
+                                                }}
+                                                onChange={(newValue) => {
+                                                    setCategory(
+                                                        newValue?.value ?? ""
+                                                    );
+                                                    setSelectedCategoryName(
+                                                        newValue?.label || ""
+                                                    );
+                                                }}
+                                                additional={{ page: 1 }}
+                                                loadOptions={loadCategory}
+                                                placeholder="Select category..."
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Month multi-select */}
+                                {periodMode === "month" && (
+                                    <div className="flex flex-col">
+                                        <Label
+                                            value={`Select Months (${selectedMonths.length}/12)`}
+                                            className="font-semibold text-gray-700 mb-2"
+                                        />
+                                        <div className="flex flex-wrap gap-x-4 gap-y-2">
+                                            {monthNames.map((m, i) => (
+                                                <label
+                                                    key={m}
+                                                    className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"
+                                                >
+                                                    <Checkbox
+                                                        checked={selectedMonths.includes(
+                                                            i + 1
+                                                        )}
+                                                        onChange={() =>
+                                                            toggleMonth(i + 1)
+                                                        }
+                                                    />
+                                                    {m.slice(0, 3)}
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Year multi-select */}
+                                {periodMode === "year" && (
+                                    <div className="flex flex-col">
+                                        <Label
+                                            value="Select Years"
+                                            className="font-semibold text-gray-700 mb-2"
+                                        />
+                                        <div className="flex flex-wrap gap-x-4 gap-y-2">
+                                            {years.map((y) => (
+                                                <label
+                                                    key={y}
+                                                    className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"
+                                                >
+                                                    <Checkbox
+                                                        checked={selectedYears.includes(
+                                                            y
+                                                        )}
+                                                        onChange={() =>
+                                                            toggleYear(y)
+                                                        }
+                                                    />
+                                                    {y}
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Metric toggles */}
+                                {!isCash && (
+                                    <div className="flex flex-wrap items-center gap-4 pt-1">
+                                        <Label
+                                            value="Show Columns:"
+                                            className="font-semibold text-gray-700"
+                                        />
+                                        {PRODUCT_METRICS.map((m) => (
+                                            <label
+                                                key={m.key}
+                                                className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"
+                                            >
+                                                <Checkbox
+                                                    checked={metrics[m.key]}
+                                                    onChange={() =>
+                                                        setMetrics((prev) => ({
+                                                            ...prev,
+                                                            [m.key]: !prev[
+                                                                m.key
+                                                            ],
+                                                        }))
+                                                    }
+                                                />
+                                                {m.label}
+                                            </label>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {!isCash && hasData && (
+                                    <div className="text-xs text-gray-500">
+                                        Tip: category name-এ click করলে
+                                        item-wise (approved / purchase / used)
+                                        detail দেখা যাবে।
+                                    </div>
+                                )}
+
+                                <div className="flex flex-wrap gap-2 justify-end">
+                                    <Button
+                                        onClick={handleShow}
+                                        isProcessing={isLoading}
+                                        className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md"
+                                    >
+                                        Show Report
+                                    </Button>
+                                    <Button
+                                        onClick={printWithChart}
+                                        disabled={!hasData}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-lg shadow-md"
+                                    >
+                                        Print (with chart)
+                                    </Button>
+                                    <Button
+                                        onClick={printWithoutChart}
+                                        disabled={!hasData}
+                                        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md"
+                                    >
+                                        Print (no chart)
+                                    </Button>
+                                    <Button
+                                        onClick={handleExportCsv}
+                                        disabled={!hasData}
+                                        className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md"
+                                    >
+                                        Export CSV
+                                    </Button>
                                 </div>
                             </div>
-                        )}
 
-                        {hasData ? (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full border-collapse border border-gray-300 text-sm">
-                                    <thead>
-                                        <tr className="bg-gray-200">
-                                            <th
-                                                className="border border-gray-300 px-3 py-2 text-left font-semibold align-bottom"
-                                                rowSpan={2}
-                                            >
-                                                {isCash
-                                                    ? "Department"
-                                                    : groupBy === "department"
-                                                    ? "Category"
-                                                    : "Department"}
-                                            </th>
-                                            {periods.map((p) => (
-                                                <th
-                                                    key={p.key}
-                                                    colSpan={
-                                                        isCash
-                                                            ? 2
-                                                            : enabledMetrics.length
+                            {/* Printable Area */}
+                            <div ref={printRef} className="print-content p-6">
+                                <div className="print-header text-center mb-6 p-4">
+                                    <div className="mb-3">
+                                        <img
+                                            src="/logo.svg"
+                                            alt="Organization Logo"
+                                            className="h-14 mx-auto print:h-10"
+                                        />
+                                    </div>
+                                    <h2 className="text-xl font-bold text-gray-800 mb-1">
+                                        IsDB-Bangladesh Islamic Solidarity
+                                        Educational Wakf
+                                    </h2>
+                                    <div className="text-sm text-gray-600 mb-1">
+                                        IDB Bhaban (4th Floor), Rokeya Sharanee,
+                                        Dhaka
+                                    </div>
+                                    <div className="text-lg font-semibold mt-3 mb-1">
+                                        {reportTitle}
+                                    </div>
+                                    <div className="text-sm text-gray-600 mb-1">
+                                        {selectedDepartmentName && department
+                                            ? `Department: ${selectedDepartmentName}`
+                                            : "All Departments"}
+                                        {!isCash &&
+                                        selectedCategoryName &&
+                                        category
+                                            ? ` • Category: ${selectedCategoryName}`
+                                            : ""}
+                                    </div>
+                                    <div className="text-sm text-gray-500">
+                                        {periodDescription
+                                            ? `Period: ${periodDescription}`
+                                            : ""}
+                                    </div>
+                                </div>
+
+                                {hasData && (
+                                    <div className="print-no-break grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                                        {isCash ? (
+                                            <>
+                                                <KpiCard
+                                                    label="Total Requisitions"
+                                                    value={
+                                                        comparison.grandAll
+                                                            .requisition_count
                                                     }
-                                                    className="border border-gray-300 px-3 py-2 text-center font-semibold"
-                                                >
-                                                    {p.label}
-                                                </th>
-                                            ))}
-                                        </tr>
-                                        <tr className="bg-gray-100">
-                                            {periods.map((p) =>
-                                                isCash ? (
-                                                    <Fragment key={p.key}>
-                                                        <th className="border border-gray-300 px-2 py-1 text-right text-xs font-medium">
-                                                            Requisitions
-                                                        </th>
-                                                        <th className="border border-gray-300 px-2 py-1 text-right text-xs font-medium">
-                                                            Approved Amt
-                                                        </th>
-                                                    </Fragment>
-                                                ) : (
-                                                    enabledMetrics.map((m) => (
-                                                        <th
-                                                            key={`${p.key}-${m.key}`}
-                                                            className="border border-gray-300 px-2 py-1 text-right text-xs font-medium"
-                                                        >
-                                                            {m.label}
-                                                        </th>
-                                                    ))
-                                                )
-                                            )}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {comparison.groups.map((g) => (
-                                            <GroupBlock
-                                                key={g.key}
-                                                group={g}
-                                                periods={periods}
-                                                isCash={isCash}
-                                                enabledMetrics={enabledMetrics}
-                                                groupBy={groupBy}
-                                                onCategoryClick={
-                                                    openCategoryDetail
-                                                }
-                                            />
-                                        ))}
-                                        <tr className="bg-gray-200 font-bold">
-                                            <td className="border border-gray-300 px-3 py-2">
-                                                Grand Total
-                                            </td>
-                                            {periods.map((p, pi) =>
-                                                isCash ? (
-                                                    <Fragment key={p.key}>
-                                                        <td className="border border-gray-300 px-3 py-2 text-right">
-                                                            {
-                                                                (
-                                                                    comparison
-                                                                        .grand[
-                                                                        pi
-                                                                    ] ??
-                                                                    emptyCell()
-                                                                )
-                                                                    .requisition_count
-                                                            }
-                                                        </td>
-                                                        <td className="border border-gray-300 px-3 py-2 text-right">
-                                                            {fmt(
-                                                                (
-                                                                    comparison
-                                                                        .grand[
-                                                                        pi
-                                                                    ] ??
-                                                                    emptyCell()
-                                                                ).amount
-                                                            )}
-                                                        </td>
-                                                    </Fragment>
-                                                ) : (
-                                                    enabledMetrics.map((m) => (
-                                                        <td
-                                                            key={`${p.key}-${m.key}`}
-                                                            className="border border-gray-300 px-3 py-2 text-right"
-                                                        >
-                                                            {fmt(
-                                                                (comparison
-                                                                    .grand[
-                                                                    pi
-                                                                ] ??
-                                                                    emptyCell())[
-                                                                    m.key
-                                                                ]
-                                                            )}
-                                                        </td>
-                                                    ))
-                                                )
-                                            )}
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : (
-                            <div className="text-center text-gray-500 py-10">
-                                {isLoading
-                                    ? "Loading report..."
-                                    : "No data. Select filters and press Show Report."}
-                            </div>
-                        )}
+                                                    color="#0ea5e9"
+                                                />
+                                                <KpiCard
+                                                    label="Total Approved Amount"
+                                                    value={`৳ ${fmt(
+                                                        comparison.grandAll
+                                                            .amount
+                                                    )}`}
+                                                    color="#10b981"
+                                                />
+                                            </>
+                                        ) : (
+                                            enabledMetrics.map((m) => (
+                                                <KpiCard
+                                                    key={m.key}
+                                                    label={`Total ${m.label}`}
+                                                    value={`৳ ${fmt(
+                                                        comparison.grandAll[
+                                                            m.key
+                                                        ]
+                                                    )}`}
+                                                    color={m.color}
+                                                />
+                                            ))
+                                        )}
+                                    </div>
+                                )}
 
-                        {hasData && (
-                            <div className="mt-6 pt-3 border-t border-gray-300 text-center text-xs text-gray-500">
-                                Generated on{" "}
-                                {moment().format("DD MMM YYYY, hh:mm A")}
+                                {hasData && chart.data.length > 0 && (
+                                    <div className="chart-section print-no-break mb-6 border border-gray-200 rounded-lg p-4 bg-white">
+                                        <div className="text-sm font-semibold text-gray-700 mb-2">
+                                            {isCash
+                                                ? "Approved Amount"
+                                                : enabledMetrics
+                                                      .map((m) => m.label)
+                                                      .join(" vs ")}{" "}
+                                            — by {chart.xLabel}
+                                        </div>
+                                        <div
+                                            className="chart-box"
+                                            style={{
+                                                width: "100%",
+                                                height: 440,
+                                            }}
+                                        >
+                                            <ResponsiveContainer
+                                                width="100%"
+                                                height="100%"
+                                            >
+                                                <BarChart
+                                                    data={chart.data}
+                                                    margin={{
+                                                        top: 16,
+                                                        right: 16,
+                                                        left: 8,
+                                                        bottom:
+                                                            chart.data.length >
+                                                            6
+                                                                ? 70
+                                                                : 60,
+                                                    }}
+                                                >
+                                                    <CartesianGrid
+                                                        strokeDasharray="3 3"
+                                                        stroke="#e5e7eb"
+                                                    />
+                                                    <XAxis
+                                                        dataKey="name"
+                                                        tick={{ fontSize: 12 }}
+                                                        interval={0}
+                                                        angle={
+                                                            chart.data.length >
+                                                            6
+                                                                ? -30
+                                                                : 0
+                                                        }
+                                                        textAnchor={
+                                                            chart.data.length >
+                                                            6
+                                                                ? "end"
+                                                                : "middle"
+                                                        }
+                                                        tickMargin={
+                                                            chart.data.length >
+                                                            6
+                                                                ? 48
+                                                                : 42
+                                                        }
+                                                        height={
+                                                            chart.data.length >
+                                                            6
+                                                                ? 70
+                                                                : 50
+                                                        }
+                                                    />
+                                                    <YAxis
+                                                        tickFormatter={fmtInt}
+                                                        tick={{ fontSize: 11 }}
+                                                        width={110}
+                                                    />
+                                                    <Tooltip
+                                                        formatter={(v) =>
+                                                            `৳ ${fmt(v)}`
+                                                        }
+                                                        contentStyle={{
+                                                            fontSize: 12,
+                                                            borderRadius: 8,
+                                                        }}
+                                                    />
+                                                    <Legend
+                                                        wrapperStyle={{
+                                                            fontSize: 12,
+                                                        }}
+                                                    />
+                                                    {chart.series.map((s) => (
+                                                        <Bar
+                                                            key={s.key}
+                                                            dataKey={s.key}
+                                                            name={s.label}
+                                                            fill={s.color}
+                                                            radius={[
+                                                                3,
+                                                                3,
+                                                                0,
+                                                                0,
+                                                            ]}
+                                                            maxBarSize={64}
+                                                        >
+                                                            <LabelList
+                                                                dataKey={s.key}
+                                                                content={
+                                                                    BarValueLabel
+                                                                }
+                                                            />
+                                                        </Bar>
+                                                    ))}
+                                                </BarChart>
+                                            </ResponsiveContainer>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {hasData ? (
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full border-collapse border border-gray-300 text-sm">
+                                            <thead>
+                                                <tr className="bg-gray-200">
+                                                    <th
+                                                        className="border border-gray-300 px-3 py-2 text-left font-semibold align-bottom"
+                                                        rowSpan={2}
+                                                    >
+                                                        {isCash
+                                                            ? "Department"
+                                                            : groupBy ===
+                                                              "department"
+                                                            ? "Category"
+                                                            : "Department"}
+                                                    </th>
+                                                    {periods.map((p) => (
+                                                        <th
+                                                            key={p.key}
+                                                            colSpan={
+                                                                isCash
+                                                                    ? 2
+                                                                    : enabledMetrics.length
+                                                            }
+                                                            className="border border-gray-300 px-3 py-2 text-center font-semibold"
+                                                        >
+                                                            {p.label}
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                                <tr className="bg-gray-100">
+                                                    {periods.map((p) =>
+                                                        isCash ? (
+                                                            <Fragment
+                                                                key={p.key}
+                                                            >
+                                                                <th className="border border-gray-300 px-2 py-1 text-right text-xs font-medium">
+                                                                    Requisitions
+                                                                </th>
+                                                                <th className="border border-gray-300 px-2 py-1 text-right text-xs font-medium">
+                                                                    Approved Amt
+                                                                </th>
+                                                            </Fragment>
+                                                        ) : (
+                                                            enabledMetrics.map(
+                                                                (m) => (
+                                                                    <th
+                                                                        key={`${p.key}-${m.key}`}
+                                                                        className="border border-gray-300 px-2 py-1 text-right text-xs font-medium"
+                                                                    >
+                                                                        {
+                                                                            m.label
+                                                                        }
+                                                                    </th>
+                                                                )
+                                                            )
+                                                        )
+                                                    )}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {comparison.groups.map((g) => (
+                                                    <GroupBlock
+                                                        key={g.key}
+                                                        group={g}
+                                                        periods={periods}
+                                                        isCash={isCash}
+                                                        enabledMetrics={
+                                                            enabledMetrics
+                                                        }
+                                                        groupBy={groupBy}
+                                                        onCategoryClick={
+                                                            openCategoryDetail
+                                                        }
+                                                    />
+                                                ))}
+                                                <tr className="bg-gray-200 font-bold">
+                                                    <td className="border border-gray-300 px-3 py-2">
+                                                        Grand Total
+                                                    </td>
+                                                    {periods.map((p, pi) =>
+                                                        isCash ? (
+                                                            <Fragment
+                                                                key={p.key}
+                                                            >
+                                                                <td className="border border-gray-300 px-3 py-2 text-right">
+                                                                    {
+                                                                        (
+                                                                            comparison
+                                                                                .grand[
+                                                                                pi
+                                                                            ] ??
+                                                                            emptyCell()
+                                                                        )
+                                                                            .requisition_count
+                                                                    }
+                                                                </td>
+                                                                <td className="border border-gray-300 px-3 py-2 text-right">
+                                                                    {fmt(
+                                                                        (
+                                                                            comparison
+                                                                                .grand[
+                                                                                pi
+                                                                            ] ??
+                                                                            emptyCell()
+                                                                        ).amount
+                                                                    )}
+                                                                </td>
+                                                            </Fragment>
+                                                        ) : (
+                                                            enabledMetrics.map(
+                                                                (m) => (
+                                                                    <td
+                                                                        key={`${p.key}-${m.key}`}
+                                                                        className="border border-gray-300 px-3 py-2 text-right"
+                                                                    >
+                                                                        {fmt(
+                                                                            (comparison
+                                                                                .grand[
+                                                                                pi
+                                                                            ] ??
+                                                                                emptyCell())[
+                                                                                m
+                                                                                    .key
+                                                                            ]
+                                                                        )}
+                                                                    </td>
+                                                                )
+                                                            )
+                                                        )
+                                                    )}
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <div className="text-center text-gray-500 py-10">
+                                        {isLoading
+                                            ? "Loading report..."
+                                            : "No data. Select filters and press Show Report."}
+                                    </div>
+                                )}
+
+                                {hasData && (
+                                    <div className="mt-6 pt-3 border-t border-gray-300 text-center text-xs text-gray-500">
+                                        Generated on{" "}
+                                        {moment().format(
+                                            "DD MMM YYYY, hh:mm A"
+                                        )}
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
+                        </>
+                    )}
                 </Card>
 
                 {detail && (
@@ -1554,5 +1634,706 @@ function ItemDetailModal({ detail, enabledMetrics, onClose }) {
                 </Button>
             </Modal.Footer>
         </Modal>
+    );
+}
+
+function CashCategoryTab() {
+    const printRef = useRef();
+    const [status, setStatus] = useState({
+        categories: [],
+        pending: 0,
+        total_purposes: 0,
+        classified: 0,
+    });
+    const [proposal, setProposal] = useState(null);
+    const [loadingStatus, setLoadingStatus] = useState(true);
+    const [busy, setBusy] = useState("");
+    const [report, setReport] = useState(null);
+    const [drill, setDrill] = useState(null);
+
+    const [periodMode, setPeriodMode] = useState("none");
+    const [dateFrom, setDateFrom] = useState(
+        moment().subtract(1, "month").startOf("month").format("YYYY-MM-DD")
+    );
+    const [dateTo, setDateTo] = useState(
+        moment().subtract(1, "month").endOf("month").format("YYYY-MM-DD")
+    );
+    const [year, setYear] = useState(moment().year());
+    const [month, setMonth] = useState(moment().month() + 1);
+    const [department, setDepartment] = useState("");
+
+    const { data: departments } = useGetDepartmentByOrganizationBranchQuery();
+    const [triggerPropose] = useLazySummaryCashCategoryProposeQuery();
+    const [triggerStatus] = useLazySummaryCashCategoryStatusQuery();
+    const [approve] = useSummaryCashCategoryApproveMutation();
+    const [classify] = useSummaryCashCategoryClassifyMutation();
+    const [fetchReport] = useSummaryCashCategoryReportMutation();
+    const [fetchItems] = useSummaryCashCategoryItemsMutation();
+
+    const months = moment.months();
+    const years = useMemo(() => {
+        const list = [];
+        for (let y = 2023; y <= moment().year(); y++) list.push(y);
+        return list;
+    }, []);
+
+    const loadStatus = async () => {
+        try {
+            const s = await triggerStatus().unwrap();
+            setStatus(s);
+        } catch (e) {
+            // ignore
+        } finally {
+            setLoadingStatus(false);
+        }
+    };
+
+    useEffect(() => {
+        loadStatus();
+    }, []);
+
+    // Poll while classifying
+    useEffect(() => {
+        if (busy !== "classify") return;
+        const t = setInterval(async () => {
+            try {
+                const s = await triggerStatus().unwrap();
+                setStatus(s);
+                if (s.pending === 0) setBusy("");
+            } catch (e) {
+                // keep polling
+            }
+        }, 4000);
+        return () => clearInterval(t);
+    }, [busy]);
+
+    const resolveRange = () => {
+        if (periodMode === "year") {
+            return { start: `${year}-01-01`, end: `${year}-12-31` };
+        }
+        if (periodMode === "month") {
+            const m = moment({ year, month: month - 1, day: 1 });
+            return {
+                start: m.clone().startOf("month").format("YYYY-MM-DD"),
+                end: m.clone().endOf("month").format("YYYY-MM-DD"),
+            };
+        }
+        return { start: dateFrom, end: dateTo };
+    };
+
+    const handleGenerate = async () => {
+        setBusy("propose");
+        try {
+            const res = await triggerPropose({ max: 14 }).unwrap();
+            setProposal(res.categories || []);
+        } catch (e) {
+            alert("Could not generate categories. Please try again.");
+        } finally {
+            setBusy("");
+        }
+    };
+
+    const handleApprove = async () => {
+        const cats = (proposal || []).map((c) => c.trim()).filter(Boolean);
+        if (!cats.length) {
+            alert("Please keep at least one category.");
+            return;
+        }
+        setBusy("approve");
+        try {
+            await approve({ categories: cats }).unwrap();
+            setProposal(null);
+            await loadStatus();
+            setBusy("classify");
+            await classify({}).unwrap();
+        } catch (e) {
+            alert("Could not approve categories.");
+            setBusy("");
+        }
+    };
+
+    const handleClassify = async (force = false) => {
+        setBusy("classify");
+        try {
+            await classify({ force }).unwrap();
+        } catch (e) {
+            alert("Could not start classification.");
+            setBusy("");
+        }
+    };
+
+    const handleShow = async () => {
+        setBusy("report");
+        const range = resolveRange();
+        const params = {
+            start_date: range.start,
+            end_date: range.end,
+            period: periodMode,
+        };
+        if (department) params.department_id = department;
+        try {
+            const r = await fetchReport(params).unwrap();
+            setReport({ ...r, range });
+        } catch (e) {
+            alert("Could not load the report.");
+        } finally {
+            setBusy("");
+        }
+    };
+
+    const openDrill = async (category) => {
+        const range = resolveRange();
+        const params = {
+            category,
+            start_date: range.start,
+            end_date: range.end,
+            period: periodMode,
+        };
+        if (department) params.department_id = department;
+        setDrill({ category, loading: true, rows: [] });
+        try {
+            const r = await fetchItems(params).unwrap();
+            setDrill({ category, loading: false, rows: r.rows || [] });
+        } catch (e) {
+            setDrill({ category, loading: false, rows: [] });
+        }
+    };
+
+    const rows = useMemo(() => {
+        if (!report?.rows) return [];
+        const list = report.rows
+            .filter((r) => r.amount > 0)
+            .map((r) => ({ ...r }))
+            .sort((a, b) => b.amount - a.amount);
+        return list;
+    }, [report]);
+
+    const totalAmount = report?.total_amount ?? 0;
+
+    const chartData = useMemo(() => {
+        const top = rows.slice(0, 11);
+        const rest = rows.slice(11);
+        const data = top.map((r) => ({ name: r.category, amount: r.amount }));
+        if (rest.length) {
+            data.push({
+                name: "Others",
+                amount: rest.reduce((s, r) => s + r.amount, 0),
+            });
+        }
+        return data;
+    }, [rows]);
+
+    const handlePrint = useReactToPrint({ content: () => printRef.current });
+
+    const handleExportCsv = () => {
+        if (!rows.length) return;
+        const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+        let csv = "\ufeffCategory,Requisitions,Amount,% of Total\n";
+        rows.forEach((r) => {
+            const pct = totalAmount
+                ? ((r.amount / totalAmount) * 100).toFixed(1)
+                : "0.0";
+            csv +=
+                [esc(r.category), r.requisition_count, r.amount, pct].join(
+                    ","
+                ) + "\n";
+        });
+        csv += [esc("Total"), "", totalAmount, "100.0"].join(",") + "\n";
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `cash_category_report_${report?.range?.start}_to_${report?.range?.end}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const hasCategories = (status.categories || []).length > 0;
+
+    return (
+        <div className="p-6">
+            {/* Status / setup */}
+            <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="text-sm text-gray-700">
+                        {loadingStatus ? (
+                            "Loading..."
+                        ) : (
+                            <>
+                                Approved categories:{" "}
+                                <b>{status.categories.length}</b> &nbsp;•&nbsp;
+                                Item/purpose pairs:{" "}
+                                <b>{status.total_purposes}</b> &nbsp;•&nbsp;
+                                Classified: <b>{status.classified}</b>{" "}
+                                &nbsp;•&nbsp; Pending:{" "}
+                                <b
+                                    className={
+                                        status.pending
+                                            ? "text-red-600"
+                                            : "text-green-600"
+                                    }
+                                >
+                                    {status.pending}
+                                </b>
+                            </>
+                        )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        <Button
+                            color="light"
+                            size="sm"
+                            onClick={handleGenerate}
+                            isProcessing={busy === "propose"}
+                        >
+                            {hasCategories
+                                ? "Regenerate Categories (AI)"
+                                : "Generate Categories (AI)"}
+                        </Button>
+                        {hasCategories && status.pending > 0 && (
+                            <Button
+                                color="warning"
+                                size="sm"
+                                onClick={() => handleClassify(false)}
+                                isProcessing={busy === "classify"}
+                            >
+                                Classify {status.pending} pairs
+                            </Button>
+                        )}
+                        {hasCategories &&
+                            status.pending === 0 &&
+                            rows.length > 0 && (
+                                <Button
+                                    color="light"
+                                    size="sm"
+                                    onClick={() => handleClassify(true)}
+                                    isProcessing={busy === "classify"}
+                                >
+                                    Re-classify
+                                </Button>
+                            )}
+                    </div>
+                </div>
+
+                {hasCategories && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                        {status.categories.map((c) => (
+                            <span
+                                key={c}
+                                className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800"
+                            >
+                                {c}
+                            </span>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Proposal editor */}
+            {proposal !== null && (
+                <div className="mb-6 rounded-lg border-2 border-blue-300 bg-blue-50 p-4">
+                    <div className="mb-2 font-semibold text-blue-900">
+                        Proposed categories — edit if needed, then approve
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                        {proposal.map((c, i) => (
+                            <div key={i} className="flex items-center gap-2">
+                                <input
+                                    value={c}
+                                    onChange={(e) => {
+                                        const next = [...proposal];
+                                        next[i] = e.target.value;
+                                        setProposal(next);
+                                    }}
+                                    className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                                />
+                                <button
+                                    type="button"
+                                    className="text-red-500 hover:text-red-700"
+                                    onClick={() =>
+                                        setProposal(
+                                            proposal.filter((_, j) => j !== i)
+                                        )
+                                    }
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="mt-3 flex gap-2">
+                        <Button
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                            onClick={handleApprove}
+                            isProcessing={busy === "approve"}
+                        >
+                            Approve & Classify
+                        </Button>
+                        <Button
+                            size="sm"
+                            color="light"
+                            onClick={() => setProposal([...proposal, ""])}
+                        >
+                            + Add category
+                        </Button>
+                        <Button
+                            size="sm"
+                            color="gray"
+                            onClick={() => setProposal(null)}
+                        >
+                            Cancel
+                        </Button>
+                    </div>
+                </div>
+            )}
+
+            {/* Report controls */}
+            {hasCategories && status.pending === 0 && !proposal && (
+                <>
+                    <div className="mb-4 flex flex-wrap items-end gap-3">
+                        <div className="flex flex-col">
+                            <Label
+                                value="Period"
+                                className="font-semibold text-gray-700 mb-1"
+                            />
+                            <Select
+                                value={periodMode}
+                                onChange={(e) => setPeriodMode(e.target.value)}
+                                sizing="sm"
+                            >
+                                <option value="none">Date Range</option>
+                                <option value="month">Monthly</option>
+                                <option value="year">Yearly</option>
+                            </Select>
+                        </div>
+                        {periodMode === "none" && (
+                            <div className="flex flex-col">
+                                <Label
+                                    value="Date Range"
+                                    className="font-semibold text-gray-700 mb-1"
+                                />
+                                <Datepicker
+                                    onChange={(d) => {
+                                        setDateFrom(
+                                            d.startDate
+                                                ? moment(d.startDate).format(
+                                                      "YYYY-MM-DD"
+                                                  )
+                                                : ""
+                                        );
+                                        setDateTo(
+                                            d.endDate
+                                                ? moment(d.endDate).format(
+                                                      "YYYY-MM-DD"
+                                                  )
+                                                : ""
+                                        );
+                                    }}
+                                    dateFormat="yyyy-MM-dd"
+                                    className="border rounded-lg px-3 py-2"
+                                    maxDate={new Date()}
+                                    value={{
+                                        startDate: dateFrom,
+                                        endDate: dateTo,
+                                    }}
+                                />
+                            </div>
+                        )}
+                        {periodMode === "month" && (
+                            <div className="flex flex-col">
+                                <Label
+                                    value="Month"
+                                    className="font-semibold text-gray-700 mb-1"
+                                />
+                                <Select
+                                    value={month}
+                                    onChange={(e) =>
+                                        setMonth(Number(e.target.value))
+                                    }
+                                    sizing="sm"
+                                >
+                                    {months.map((m, i) => (
+                                        <option key={m} value={i + 1}>
+                                            {m}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </div>
+                        )}
+                        {(periodMode === "month" || periodMode === "year") && (
+                            <div className="flex flex-col">
+                                <Label
+                                    value="Year"
+                                    className="font-semibold text-gray-700 mb-1"
+                                />
+                                <Select
+                                    value={year}
+                                    onChange={(e) =>
+                                        setYear(Number(e.target.value))
+                                    }
+                                    sizing="sm"
+                                >
+                                    {years.map((y) => (
+                                        <option key={y} value={y}>
+                                            {y}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </div>
+                        )}
+                        <div className="flex flex-col min-w-[180px]">
+                            <Label
+                                value="Department"
+                                className="font-semibold text-gray-700 mb-1"
+                            />
+                            <Select
+                                value={department}
+                                onChange={(e) => setDepartment(e.target.value)}
+                                sizing="sm"
+                            >
+                                <option value="">All Departments</option>
+                                {departments?.data?.map((o) => (
+                                    <option key={o.id} value={o.id}>
+                                        {o.name}
+                                    </option>
+                                ))}
+                            </Select>
+                        </div>
+                        <Button
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                            onClick={handleShow}
+                            isProcessing={busy === "report"}
+                        >
+                            Show Report
+                        </Button>
+                        <Button
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            disabled={!rows.length}
+                            onClick={handlePrint}
+                        >
+                            Print
+                        </Button>
+                        <Button
+                            size="sm"
+                            color="gray"
+                            disabled={!rows.length}
+                            onClick={handleExportCsv}
+                        >
+                            Export CSV
+                        </Button>
+                    </div>
+                </>
+            )}
+
+            {/* Results */}
+            {report && (
+                <div ref={printRef} className="print-content p-2">
+                    <div className="print-header text-center mb-4">
+                        <h2 className="text-lg font-bold text-gray-800">
+                            IsDB-Bangladesh Islamic Solidarity Educational Wakf
+                        </h2>
+                        <div className="text-base font-semibold mt-1">
+                            Cash Requisition — Expense Category Report
+                        </div>
+                        <div className="text-sm text-gray-500">
+                            Period:{" "}
+                            {moment(report.range.start).format("DD MMM YYYY")} -{" "}
+                            {moment(report.range.end).format("DD MMM YYYY")}
+                        </div>
+                    </div>
+
+                    <div className="print-no-break mb-6 border border-gray-200 rounded-lg p-4">
+                        <div style={{ width: "100%", height: 340 }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                    data={chartData}
+                                    margin={{
+                                        top: 20,
+                                        right: 16,
+                                        left: 20,
+                                        bottom: 90,
+                                    }}
+                                >
+                                    <CartesianGrid
+                                        strokeDasharray="3 3"
+                                        stroke="#e5e7eb"
+                                    />
+                                    <XAxis
+                                        dataKey="name"
+                                        tick={{ fontSize: 11 }}
+                                        interval={0}
+                                        angle={-40}
+                                        textAnchor="end"
+                                        height={90}
+                                    />
+                                    <YAxis
+                                        tickFormatter={fmtInt}
+                                        tick={{ fontSize: 11 }}
+                                        width={110}
+                                    />
+                                    <Tooltip formatter={(v) => `৳ ${fmt(v)}`} />
+                                    <Bar
+                                        dataKey="amount"
+                                        name="Amount"
+                                        fill="#10b981"
+                                        radius={[3, 3, 0, 0]}
+                                    >
+                                        <LabelList
+                                            dataKey="amount"
+                                            content={BarValueLabel}
+                                        />
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full border-collapse border border-gray-300 text-sm">
+                            <thead>
+                                <tr className="bg-gray-100">
+                                    <th className="border border-gray-300 px-3 py-2 text-left font-semibold">
+                                        Category
+                                    </th>
+                                    <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
+                                        Requisitions
+                                    </th>
+                                    <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
+                                        Amount
+                                    </th>
+                                    <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
+                                        % of Total
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {rows.map((r) => (
+                                    <tr key={r.category}>
+                                        <td className="border border-gray-300 px-3 py-1.5">
+                                            {r.category === "Uncategorized" ? (
+                                                r.category
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        openDrill(r.category)
+                                                    }
+                                                    className="text-blue-700 hover:underline print:text-gray-800 print:no-underline"
+                                                >
+                                                    {r.category}
+                                                </button>
+                                            )}
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                            {r.requisition_count}
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                            {fmt(r.amount)}
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                            {totalAmount
+                                                ? (
+                                                      (r.amount / totalAmount) *
+                                                      100
+                                                  ).toFixed(1)
+                                                : "0.0"}
+                                            %
+                                        </td>
+                                    </tr>
+                                ))}
+                                <tr className="bg-gray-200 font-bold">
+                                    <td className="border border-gray-300 px-3 py-2">
+                                        Total
+                                    </td>
+                                    <td className="border border-gray-300 px-3 py-2" />
+                                    <td className="border border-gray-300 px-3 py-2 text-right">
+                                        {fmt(totalAmount)}
+                                    </td>
+                                    <td className="border border-gray-300 px-3 py-2 text-right">
+                                        100.0%
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="mt-4 pt-2 border-t border-gray-300 text-center text-xs text-gray-500">
+                        Generated on {moment().format("DD MMM YYYY, hh:mm A")}
+                    </div>
+                </div>
+            )}
+
+            {/* Drill-down modal */}
+            <Modal show={!!drill} onClose={() => setDrill(null)} size="4xl">
+                <Modal.Header>{drill?.category}</Modal.Header>
+                <Modal.Body>
+                    {drill?.loading ? (
+                        <div className="py-8 text-center text-gray-500">
+                            Loading...
+                        </div>
+                    ) : (
+                        <table className="min-w-full border-collapse border border-gray-300 text-sm">
+                            <thead>
+                                <tr className="bg-gray-100">
+                                    <th className="border border-gray-300 px-3 py-2 text-left">
+                                        Item
+                                    </th>
+                                    <th className="border border-gray-300 px-3 py-2 text-left">
+                                        Unit
+                                    </th>
+                                    <th className="border border-gray-300 px-3 py-2 text-left">
+                                        Purpose
+                                    </th>
+                                    <th className="border border-gray-300 px-3 py-2 text-right">
+                                        Amount
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {(drill?.rows || []).map((r, i) => (
+                                    <tr key={i}>
+                                        <td className="border border-gray-300 px-3 py-1.5">
+                                            {r.item}
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-1.5">
+                                            {r.unit || "-"}
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-1.5">
+                                            {r.purpose}
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                            {fmt(r.amount)}
+                                        </td>
+                                    </tr>
+                                ))}
+                                <tr className="bg-gray-200 font-bold">
+                                    <td
+                                        className="border border-gray-300 px-3 py-2"
+                                        colSpan={3}
+                                    >
+                                        Total
+                                    </td>
+                                    <td className="border border-gray-300 px-3 py-2 text-right">
+                                        {fmt(
+                                            (drill?.rows || []).reduce(
+                                                (s, r) => s + r.amount,
+                                                0
+                                            )
+                                        )}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button color="gray" onClick={() => setDrill(null)}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </div>
     );
 }
