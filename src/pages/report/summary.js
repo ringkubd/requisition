@@ -3,6 +3,7 @@ import { loadCategory } from "@/lib/initial_requisition";
 import {
     useSummaryDepartmentCategoryMutation,
     useSummaryCashMutation,
+    useSummaryCategoryItemsMutation,
 } from "@/store/service/report";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 import Head from "next/head";
@@ -11,7 +12,7 @@ import Datepicker from "react-tailwindcss-datepicker";
 import moment from "moment";
 import { AsyncPaginate } from "react-select-async-paginate";
 import { useReactToPrint } from "react-to-print";
-import { Button, Card, Checkbox, Label, Select } from "flowbite-react";
+import { Button, Card, Checkbox, Label, Modal, Select } from "flowbite-react";
 import {
     Bar,
     BarChart,
@@ -83,6 +84,7 @@ export default function SummaryReport() {
     });
     const [periods, setPeriods] = useState([]);
     const [results, setResults] = useState([]);
+    const [detail, setDetail] = useState(null);
     const printChartRef = useRef(true);
 
     const { data: departments } = useGetDepartmentByOrganizationBranchQuery();
@@ -94,6 +96,7 @@ export default function SummaryReport() {
         fetchCashSummary,
         { isLoading: isLoadingCash },
     ] = useSummaryCashMutation();
+    const [fetchCategoryItems] = useSummaryCategoryItemsMutation();
 
     const isLoading = isLoadingProduct || isLoadingCash;
     const isCash = tab === "cash";
@@ -200,6 +203,53 @@ export default function SummaryReport() {
         setTab(value);
         setPeriods([]);
         setResults([]);
+    };
+
+    const openCategoryDetail = async ({
+        categoryId,
+        categoryName,
+        departmentId,
+        departmentName,
+    }) => {
+        if (!categoryId || categoryId === "0") return;
+        const list = periods.length ? periods : buildPeriods();
+        setDetail({
+            categoryId,
+            categoryName,
+            departmentId: departmentId || department || null,
+            departmentName: departmentName || selectedDepartmentName || null,
+            loading: true,
+            periods: list,
+            rows: [],
+        });
+        const base = { category_id: categoryId };
+        const dept = departmentId || department;
+        if (dept) base.department_id = dept;
+        try {
+            const res = await Promise.all(
+                list.map((p) =>
+                    fetchCategoryItems({
+                        ...base,
+                        start_date: p.start,
+                        end_date: p.end,
+                        period: p.periodParam,
+                    }).unwrap()
+                )
+            );
+            setDetail((d) =>
+                d
+                    ? {
+                          ...d,
+                          loading: false,
+                          rows: res.map((r) => r?.rows ?? []),
+                      }
+                    : d
+            );
+        } catch (e) {
+            setDetail((d) =>
+                d ? { ...d, loading: false, rows: list.map(() => []) } : d
+            );
+        }
     };
 
     const toggleMonth = (m) => {
@@ -724,6 +774,13 @@ export default function SummaryReport() {
                             </div>
                         )}
 
+                        {!isCash && hasData && (
+                            <div className="text-xs text-gray-500">
+                                Tip: category name-এ click করলে item-wise
+                                (approved / purchase / used) detail দেখা যাবে।
+                            </div>
+                        )}
+
                         <div className="flex flex-wrap gap-2 justify-end">
                             <Button
                                 onClick={handleShow}
@@ -982,6 +1039,10 @@ export default function SummaryReport() {
                                                 periods={periods}
                                                 isCash={isCash}
                                                 enabledMetrics={enabledMetrics}
+                                                groupBy={groupBy}
+                                                onCategoryClick={
+                                                    openCategoryDetail
+                                                }
                                             />
                                         ))}
                                         <tr className="bg-gray-200 font-bold">
@@ -1055,6 +1116,14 @@ export default function SummaryReport() {
                     </div>
                 </Card>
 
+                {detail && (
+                    <ItemDetailModal
+                        detail={detail}
+                        enabledMetrics={enabledMetrics}
+                        onClose={() => setDetail(null)}
+                    />
+                )}
+
                 <style jsx global>{`
                     .print-content td,
                     .print-content th {
@@ -1127,12 +1196,38 @@ export default function SummaryReport() {
     );
 }
 
-function GroupBlock({ group, periods, isCash, enabledMetrics }) {
+function GroupBlock({
+    group,
+    periods,
+    isCash,
+    enabledMetrics,
+    groupBy,
+    onCategoryClick,
+}) {
+    const groupClickable =
+        !isCash && groupBy === "category" && group.key !== "0";
+    const subClickable = !isCash && groupBy === "department";
     return (
         <>
             <tr className="bg-gray-100 font-semibold">
                 <td className="border border-gray-300 px-3 py-2">
-                    {group.name}
+                    {groupClickable ? (
+                        <button
+                            type="button"
+                            onClick={() =>
+                                onCategoryClick({
+                                    categoryId: group.key,
+                                    categoryName: group.name,
+                                })
+                            }
+                            className="text-blue-700 hover:underline print:text-gray-800 print:no-underline"
+                            title="Click to see item details"
+                        >
+                            {group.name}
+                        </button>
+                    ) : (
+                        group.name
+                    )}
                 </td>
                 {periods.map((p, pi) =>
                     isCash ? (
@@ -1163,7 +1258,26 @@ function GroupBlock({ group, periods, isCash, enabledMetrics }) {
                 group.subs.map((s) => (
                     <tr key={s.key} className="text-gray-700">
                         <td className="border border-gray-300 px-3 py-1.5 pl-8">
-                            • {s.name}
+                            <span className="text-gray-400">•</span>{" "}
+                            {subClickable && s.key !== "0" ? (
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        onCategoryClick({
+                                            categoryId: s.key,
+                                            categoryName: s.name,
+                                            departmentId: group.key,
+                                            departmentName: group.name,
+                                        })
+                                    }
+                                    className="text-blue-700 hover:underline print:text-gray-700 print:no-underline"
+                                    title="Click to see item details"
+                                >
+                                    {s.name}
+                                </button>
+                            ) : (
+                                s.name
+                            )}
                         </td>
                         {periods.map((p, pi) =>
                             enabledMetrics.map((m) => (
@@ -1228,5 +1342,217 @@ function BarValueLabel(props) {
         >
             {text}
         </text>
+    );
+}
+
+function ItemDetailModal({ detail, enabledMetrics, onClose }) {
+    const printRef = useRef();
+    const handlePrint = useReactToPrint({
+        content: () => printRef.current,
+    });
+    const cols = enabledMetrics.length ? enabledMetrics : PRODUCT_METRICS;
+
+    const combined = useMemo(() => {
+        const periods = detail.periods || [];
+        const map = new Map();
+        (detail.rows || []).forEach((rows, pi) => {
+            (rows || []).forEach((r) => {
+                const key = String(r.product_id ?? "0");
+                if (!map.has(key)) {
+                    map.set(key, {
+                        product_id: r.product_id,
+                        product_title: r.product_title || "N/A",
+                        values: periods.map(() => ({
+                            requisition_amount: 0,
+                            purchase_amount: 0,
+                            used_amount: 0,
+                        })),
+                    });
+                }
+                const cell = map.get(key).values[pi];
+                if (cell) {
+                    cell.requisition_amount += Number(
+                        r.requisition_amount || 0
+                    );
+                    cell.purchase_amount += Number(r.purchase_amount || 0);
+                    cell.used_amount += Number(r.used_amount || 0);
+                }
+            });
+        });
+        const rows = Array.from(map.values()).sort((a, b) =>
+            a.product_title.localeCompare(b.product_title)
+        );
+        const totals = periods.map((_, pi) => {
+            const t = {
+                requisition_amount: 0,
+                purchase_amount: 0,
+                used_amount: 0,
+            };
+            rows.forEach((r) => {
+                const c = r.values[pi];
+                if (c) {
+                    t.requisition_amount += c.requisition_amount;
+                    t.purchase_amount += c.purchase_amount;
+                    t.used_amount += c.used_amount;
+                }
+            });
+            return t;
+        });
+        return { rows, totals };
+    }, [detail]);
+
+    const periodDescription = (detail.periods || [])
+        .map((p) => p.label)
+        .join(", ");
+
+    return (
+        <Modal show onClose={onClose} size="5xl">
+            <Modal.Header>
+                <span className="text-base font-semibold">
+                    {detail.categoryName}
+                    {detail.departmentName ? ` · ${detail.departmentName}` : ""}
+                </span>
+            </Modal.Header>
+            <Modal.Body>
+                <div ref={printRef} className="print-content p-2">
+                    <div className="print-header text-center mb-4 p-2">
+                        <img
+                            src="/logo.svg"
+                            alt="Organization Logo"
+                            className="h-12 mx-auto mb-2"
+                        />
+                        <h2 className="text-lg font-bold text-gray-800">
+                            IsDB-Bangladesh Islamic Solidarity Educational Wakf
+                        </h2>
+                        <div className="text-sm text-gray-600">
+                            IDB Bhaban (4th Floor), Rokeya Sharanee, Dhaka
+                        </div>
+                        <div className="text-base font-semibold mt-2">
+                            Category Item Detail
+                        </div>
+                        <div className="text-sm text-gray-600">
+                            Category: {detail.categoryName}
+                            {detail.departmentName
+                                ? ` • Department: ${detail.departmentName}`
+                                : ""}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                            {periodDescription
+                                ? `Period: ${periodDescription}`
+                                : ""}
+                        </div>
+                    </div>
+
+                    {detail.loading ? (
+                        <div className="text-center text-gray-500 py-8">
+                            Loading items...
+                        </div>
+                    ) : combined.rows.length ? (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full border-collapse border border-gray-300 text-sm">
+                                <thead>
+                                    <tr className="bg-gray-200">
+                                        <th
+                                            className="border border-gray-300 px-3 py-2 text-left font-semibold align-bottom"
+                                            rowSpan={2}
+                                        >
+                                            Item
+                                        </th>
+                                        {(detail.periods || []).map((p) => (
+                                            <th
+                                                key={p.key}
+                                                colSpan={cols.length}
+                                                className="border border-gray-300 px-3 py-2 text-center font-semibold"
+                                            >
+                                                {p.label}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                    <tr className="bg-gray-100">
+                                        {(detail.periods || []).map((p) =>
+                                            cols.map((m) => (
+                                                <th
+                                                    key={`${p.key}-${m.key}`}
+                                                    className="border border-gray-300 px-2 py-1 text-right text-xs font-medium"
+                                                >
+                                                    {m.label}
+                                                </th>
+                                            ))
+                                        )}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {combined.rows.map((r) => (
+                                        <tr
+                                            key={
+                                                r.product_id ?? r.product_title
+                                            }
+                                        >
+                                            <td className="border border-gray-300 px-3 py-1.5">
+                                                {r.product_title}
+                                            </td>
+                                            {(detail.periods || []).map(
+                                                (p, pi) =>
+                                                    cols.map((m) => (
+                                                        <td
+                                                            key={`${p.key}-${m.key}`}
+                                                            className="border border-gray-300 px-3 py-1.5 text-right"
+                                                        >
+                                                            {fmt(
+                                                                r.values[pi]?.[
+                                                                    m.key
+                                                                ]
+                                                            )}
+                                                        </td>
+                                                    ))
+                                            )}
+                                        </tr>
+                                    ))}
+                                    <tr className="bg-gray-200 font-bold">
+                                        <td className="border border-gray-300 px-3 py-2">
+                                            Total
+                                        </td>
+                                        {(detail.periods || []).map((p, pi) =>
+                                            cols.map((m) => (
+                                                <td
+                                                    key={`${p.key}-${m.key}`}
+                                                    className="border border-gray-300 px-3 py-2 text-right"
+                                                >
+                                                    {fmt(
+                                                        combined.totals[pi]?.[
+                                                            m.key
+                                                        ]
+                                                    )}
+                                                </td>
+                                            ))
+                                        )}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="text-center text-gray-500 py-8">
+                            No items found.
+                        </div>
+                    )}
+
+                    <div className="mt-4 pt-2 border-t border-gray-300 text-center text-xs text-gray-500">
+                        Generated on {moment().format("DD MMM YYYY, hh:mm A")}
+                    </div>
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button
+                    onClick={handlePrint}
+                    disabled={detail.loading || !combined.rows.length}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                >
+                    Print
+                </Button>
+                <Button color="gray" onClick={onClose}>
+                    Close
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 }

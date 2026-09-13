@@ -64,6 +64,13 @@ export const ReportAPI = GeneralBaseAPI.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        summaryCategoryItems: builder.mutation({
+            query: arg => ({
+                url: 'report/summary/category-items',
+                params: arg,
+                method: 'GET',
+            }),
+        }),
     }),
 })
 
@@ -77,4 +84,5 @@ export const {
     useAuditReportQuery,
     useSummaryDepartmentCategoryMutation,
     useSummaryCashMutation,
+    useSummaryCategoryItemsMutation,
 } = ReportAPI
