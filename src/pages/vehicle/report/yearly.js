@@ -19,8 +19,8 @@ import { useReactToPrint } from "react-to-print";
 
 const YEARLY_METRICS = [
     { key: "quantity", label: "Quantity (ltr)", type: "sum" },
-    { key: "cost", label: "Cost", type: "sum" },
     { key: "millage", label: "Mileage", type: "sum" },
+    { key: "cost", label: "Cost", type: "sum" },
     { key: "average_rate", label: "Avg Rate", type: "avg" },
     { key: "average_monthly_cost", label: "Avg Monthly Cost", type: "avg" },
     { key: "entries", label: "Entries", type: "sum" },
@@ -243,8 +243,8 @@ const Yearly = () => {
                                     metricConfig={YEARLY_METRICS}
                                     defaultMetrics={[
                                         "quantity",
-                                        "cost",
                                         "millage",
+                                        "cost",
                                         "average_rate",
                                         "average_monthly_cost",
                                     ]}

@@ -19,8 +19,8 @@ import { useReactToPrint } from "react-to-print";
 
 const MONTHLY_METRICS = [
     { key: "quantity", label: "Quantity (ltr)", type: "sum" },
-    { key: "cost", label: "Cost", type: "sum" },
     { key: "millage", label: "Mileage", type: "sum" },
+    { key: "cost", label: "Cost", type: "sum" },
 ];
 
 const Monthly = () => {
@@ -245,8 +245,8 @@ const Monthly = () => {
                                     metricConfig={MONTHLY_METRICS}
                                     defaultMetrics={[
                                         "quantity",
-                                        "cost",
                                         "millage",
+                                        "cost",
                                     ]}
                                     isLoading={isLoadingCompare}
                                 />
