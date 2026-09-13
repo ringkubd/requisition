@@ -193,6 +193,17 @@ Route::prefix('report')->group(function () {
     Route::get('summary/department-category', [\App\Http\Controllers\API\SummaryReportAPIController::class, 'departmentCategory']);
     Route::get('summary/category-items', [\App\Http\Controllers\API\SummaryReportAPIController::class, 'categoryItems']);
     Route::get('summary/cash', [\App\Http\Controllers\API\SummaryReportAPIController::class, 'cash']);
+
+    // Cash requisition purpose -> category (LLM) report
+    Route::prefix('summary/cash-category')->group(function () {
+        Route::get('propose', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'propose']);
+        Route::post('approve', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'approve']);
+        Route::post('classify', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'classify']);
+        Route::get('status', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'status']);
+        Route::get('report', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'report']);
+        Route::get('items', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'items']);
+        Route::post('override', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'override']);
+    });
 });
 
 // ML Forecasting routes

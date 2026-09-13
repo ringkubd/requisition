@@ -45,4 +45,12 @@ return [
         'timeout' => env('ML_SERVICE_TIMEOUT', 60),
     ],
 
+    // LiteLLM proxy (OpenAI compatible)
+    'litellm' => [
+        'base_url' => env('LITELLM_BASE_URL', 'http://127.0.0.1:4000'),
+        'api_key' => env('LITELLM_API_KEY'),
+        'model' => env('LITELLM_MODEL', 'balanced'),
+        'timeout' => env('LITELLM_TIMEOUT', 180),
+    ],
+
 ];
