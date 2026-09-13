@@ -237,6 +237,162 @@ class CashCategoryReportAPIController extends Controller
     }
 
     /**
+     * Exact vehicle fuel taken from vehicle_histories (linked to approved cash items),
+     * with cash estimate reconciliation.
+     */
+    public function fuel(Request $request): JsonResponse
+    {
+        $rows = $this->linkedFuelRows($request);
+
+        $byVehicle = [];
+        $totals = ['quantity' => 0.0, 'cost' => 0.0, 'mileage' => 0.0, 'entries' => 0];
+        $estimate = 0.0;
+        $estimatedItems = [];
+
+        foreach ($rows as $r) {
+            $qty = (float) $r->quantity;
+            $cost = $qty * (float) $r->rate;
+            $mileage = (float) $r->current_mileage - (float) $r->last_mileage;
+
+            $key = (string) ($r->vehicle_id ?? '0');
+            if (!isset($byVehicle[$key])) {
+                $name = trim(($r->brand ?? '') . ' (' . ($r->reg_no ?? '') . ')');
+                $byVehicle[$key] = [
+                    'vehicle_id' => $r->vehicle_id,
+                    'vehicle' => $name !== '' && $name !== '()' ? $name : 'N/A',
+                    'entries' => 0,
+                    'quantity' => 0.0,
+                    'cost' => 0.0,
+                    'mileage' => 0.0,
+                ];
+            }
+            $byVehicle[$key]['entries']++;
+            $byVehicle[$key]['quantity'] += $qty;
+            $byVehicle[$key]['cost'] += $cost;
+            $byVehicle[$key]['mileage'] += $mileage;
+
+            $totals['quantity'] += $qty;
+            $totals['cost'] += $cost;
+            $totals['mileage'] += $mileage;
+            $totals['entries']++;
+
+            if (!isset($estimatedItems[$r->item_id])) {
+                $estimatedItems[$r->item_id] = true;
+                $estimate += (float) $r->required_unit * (float) $r->unit_price;
+            }
+        }
+
+        $rows = array_values(array_map(function ($v) {
+            $v['quantity'] = round($v['quantity'], 2);
+            $v['cost'] = round($v['cost'], 2);
+            $v['mileage'] = round($v['mileage'], 2);
+            $v['average_rate'] = $v['quantity'] > 0 ? round($v['cost'] / $v['quantity'], 2) : 0;
+
+            return $v;
+        }, $byVehicle));
+
+        usort($rows, fn ($a, $b) => strcmp($a['vehicle'], $b['vehicle']));
+
+        $totalPayload = [
+            'quantity' => round($totals['quantity'], 2),
+            'cost' => round($totals['cost'], 2),
+            'mileage' => round($totals['mileage'], 2),
+            'entries' => $totals['entries'],
+            'average_rate' => $totals['quantity'] > 0 ? round($totals['cost'] / $totals['quantity'], 2) : 0,
+        ];
+
+        return response()->json([
+            'rows' => $rows,
+            'totals' => $totalPayload,
+            'cash_estimate' => round($estimate, 2),
+            'variance' => round($estimate - $totals['cost'], 2),
+            'start_date' => $this->first($request),
+            'end_date' => $this->last($request),
+        ]);
+    }
+
+    /**
+     * Per refuel detail for the vehicle fuel (actual) drill-down.
+     */
+    public function fuelItems(Request $request): JsonResponse
+    {
+        $rows = $this->linkedFuelRows($request);
+
+        $items = $rows->map(function ($r) {
+            $name = trim(($r->brand ?? '') . ' (' . ($r->reg_no ?? '') . ')');
+
+            return [
+                'vehicle' => $name !== '' && $name !== '()' ? $name : 'N/A',
+                'refuel_date' => $r->refuel_date ? Carbon::parse($r->refuel_date)->toDateString() : null,
+                'item' => $r->item,
+                'purpose' => $r->purpose,
+                'quantity' => round((float) $r->quantity, 2),
+                'rate' => round((float) $r->rate, 2),
+                'cost' => round((float) $r->quantity * (float) $r->rate, 2),
+                'mileage' => round((float) $r->current_mileage - (float) $r->last_mileage, 2),
+                'bill_no' => $r->bill_no,
+            ];
+        })->sortBy([['vehicle', 'asc'], ['refuel_date', 'asc']])->values();
+
+        return response()->json([
+            'rows' => $items,
+            'start_date' => $this->first($request),
+            'end_date' => $this->last($request),
+        ]);
+    }
+
+    /**
+     * Base collection of vehicle_histories linked to approved cash requisition items.
+     */
+    protected function linkedFuelRows(Request $request)
+    {
+        $first = $this->first($request);
+        $last = $this->last($request);
+        $branchId = auth_branch_id();
+
+        $latestCashStatus = DB::table('requisition_statuses')
+            ->selectRaw('MAX(id) as id')
+            ->where('requisition_type', CashRequisition::class)
+            ->whereNull('deleted_at')
+            ->groupBy('requisition_id');
+
+        return DB::table('vehicle_histories as vh')
+            ->join('cash_requisition_items as i', 'vh.cash_requisition_item_id', '=', 'i.id')
+            ->join('cash_requisitions as cr', 'i.cash_requisition_id', '=', 'cr.id')
+            ->join('requisition_statuses as rs', 'rs.requisition_id', '=', 'cr.id')
+            ->joinSub($latestCashStatus, 'ls', 'ls.id', '=', 'rs.id')
+            ->leftJoin('vehicles as v', 'v.id', '=', 'vh.vehicle_id')
+            ->where('rs.requisition_type', CashRequisition::class)
+            ->where('rs.ceo_status', 2)
+            ->whereNotNull('rs.ceo_approved_at')
+            ->whereNull('rs.deleted_at')
+            ->whereBetween('rs.ceo_approved_at', [$first, $last])
+            ->where('cr.branch_id', $branchId)
+            ->whereNull('cr.deleted_at')
+            ->whereNull('i.deleted_at')
+            ->whereNull('vh.deleted_at')
+            ->when($request->department_id, fn ($q, $v) => $q->where('cr.department_id', $v))
+            ->select([
+                'vh.id as history_id',
+                'vh.vehicle_id',
+                'vh.refuel_date',
+                'vh.quantity',
+                'vh.rate',
+                'vh.bill_no',
+                'vh.current_mileage',
+                'vh.last_mileage',
+                'i.id as item_id',
+                'i.item',
+                'i.purpose',
+                'i.required_unit',
+                'i.unit_price',
+                'v.brand',
+                'v.reg_no',
+            ])
+            ->get();
+    }
+
+    /**
      * Approved cash requisition item rows in the requested period.
      */
     protected function approvedItems(Request $request)

@@ -202,6 +202,8 @@ Route::prefix('report')->group(function () {
         Route::get('status', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'status']);
         Route::get('report', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'report']);
         Route::get('items', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'items']);
+        Route::get('fuel', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'fuel']);
+        Route::get('fuel-items', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'fuelItems']);
         Route::post('override', [\App\Http\Controllers\API\CashCategoryReportAPIController::class, 'override']);
     });
 });
