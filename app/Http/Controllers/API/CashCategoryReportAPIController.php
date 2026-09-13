@@ -84,11 +84,12 @@ class CashCategoryReportAPIController extends Controller
      */
     public function status(): JsonResponse
     {
-        $total = count($this->classifier->distinctPurposes());
+        $total = count($this->classifier->distinctItems());
         $pending = $this->classifier->pendingCount();
 
         return response()->json([
             'categories' => $this->classifier->approvedCategories(),
+            'total_items' => $total,
             'total_purposes' => $total,
             'pending' => $pending,
             'classified' => max(0, $total - $pending),
