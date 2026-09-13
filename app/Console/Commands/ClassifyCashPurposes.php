@@ -19,7 +19,7 @@ class ClassifyCashPurposes extends Command
 
     public function handle(CashPurposeClassifierService $classifier): int
     {
-        $total = count($classifier->distinctPairs());
+        $total = count($classifier->distinctItems());
         $pending = $classifier->pendingCount();
 
         if (empty($classifier->approvedCategories())) {
@@ -28,7 +28,7 @@ class ClassifyCashPurposes extends Command
             return self::FAILURE;
         }
 
-        $this->info("Total distinct item/purpose pairs: {$total}; pending: {$pending}");
+        $this->info("Total distinct items: {$total}; pending: {$pending}");
 
         $result = $classifier->classifyPending((bool) $this->option('force'));
 

@@ -19,31 +19,98 @@ class CashPurposeClassifierService
     }
 
     /**
-     * Distinct (item, purpose) pairs of cash requisition items.
-     *
-     * @return array<int,array{item:string,purpose:string}>
+     * Normalise an item name: drop parenthetical qualifiers (vehicle/serial numbers)
+     * so variants such as "Octane (53-7477)" and "Octane" classify consistently.
      */
-    public function distinctPairs(): array
+    public function baseItem(string $item): string
     {
-        return DB::table('cash_requisition_items')
+        $s = preg_replace('/\([^)]*\)/u', ' ', (string) $item);
+        $s = preg_replace('/\s+/u', ' ', (string) $s);
+        $s = trim((string) $s, " \t\n\r\0\x0B,-/");
+
+        return $s === '' ? trim((string) $item) : $s;
+    }
+
+    /**
+     * Distinct base items with a few representative (ditto-resolved) purposes as context.
+     *
+     * @return array<int,array{item:string,purposes:array<int,string>,count:int}>
+     */
+    public function distinctItems(int $purposeSample = 3): array
+    {
+        $rows = DB::table('cash_requisition_items')
             ->whereNull('deleted_at')
-            ->where(function ($q) {
-                $q->where(function ($q) {
-                    $q->whereNotNull('item')->where('item', '!=', '');
-                })->orWhere(function ($q) {
-                    $q->whereNotNull('purpose')->where('purpose', '!=', '');
-                });
-            })
-            ->select('item', 'purpose')
-            ->distinct()
-            ->get()
-            ->map(fn ($r) => [
-                'item' => trim((string) $r->item),
-                'purpose' => trim((string) $r->purpose),
-            ])
-            ->unique(fn ($r) => $r['item'] . '||' . $r['purpose'])
-            ->values()
-            ->all();
+            ->orderBy('cash_requisition_id')
+            ->orderBy('id')
+            ->select('cash_requisition_id', 'id', 'item', 'purpose')
+            ->get();
+
+        $lastPurpose = [];
+        $items = [];
+
+        foreach ($rows as $row) {
+            $item = $this->baseItem((string) $row->item);
+            $purpose = trim((string) $row->purpose);
+
+            if ($this->isDitto($purpose)) {
+                $purpose = $lastPurpose[$row->cash_requisition_id] ?? '';
+            } else {
+                $lastPurpose[$row->cash_requisition_id] = $purpose;
+            }
+
+            if ($item === '') {
+                continue;
+            }
+
+            if (!isset($items[$item])) {
+                $items[$item] = ['item' => $item, 'purposes' => [], 'count' => 0];
+            }
+            $items[$item]['count']++;
+            if (
+                $purpose !== ''
+                && !in_array($purpose, $items[$item]['purposes'], true)
+                && count($items[$item]['purposes']) < $purposeSample
+            ) {
+                $items[$item]['purposes'][] = $purpose;
+            }
+        }
+
+        return array_values($items);
+    }
+
+    /**
+     * Resolve effective purposes for a set of item rows.
+     * Rows must include id, cash_requisition_id and purpose, ordered by requisition then id.
+     *
+     * @return array<int,string> map of item row id => effective purpose
+     */
+    public function resolveEffectivePurposes($rows): array
+    {
+        $map = [];
+        $lastPurpose = [];
+
+        foreach ($rows as $row) {
+            $purpose = trim((string) $row->purpose);
+            if ($this->isDitto($purpose)) {
+                $purpose = $lastPurpose[$row->cash_requisition_id] ?? '';
+            } else {
+                $lastPurpose[$row->cash_requisition_id] = $purpose;
+            }
+            $map[$row->item_row_id ?? $row->id] = $purpose;
+        }
+
+        return $map;
+    }
+
+    /**
+     * Whether a purpose is a "ditto" placeholder meaning "same as above".
+     */
+    public function isDitto(string $purpose): bool
+    {
+        $p = mb_strtolower(trim($purpose));
+        $p = rtrim($p, ". \t\n\r\0\x0B");
+
+        return in_array($p, ['do', 'ditto', 'as above', 'same', 'same as above', '-do-'], true);
     }
 
     /**
@@ -169,7 +236,17 @@ class CashPurposeClassifierService
     }
 
     /**
-     * Classify all uncached (item, purpose) pairs into the approved categories.
+     * Stable hash for an item name (classification is per item for consistency).
+     */
+    public function hashItem(string $item): string
+    {
+        $normalize = fn ($v) => mb_strtolower(trim(preg_replace('/\s+/u', ' ', (string) $v)));
+
+        return sha1($normalize($this->baseItem($item)));
+    }
+
+    /**
+     * Classify all uncached items into the approved categories.
      *
      * @return array{total:int,classified:int,failed:int,pending:int}
      */
@@ -180,10 +257,10 @@ class CashPurposeClassifierService
             return ['total' => 0, 'classified' => 0, 'failed' => 0, 'pending' => 0];
         }
 
-        $pairs = $this->distinctPairs();
+        $items = $this->distinctItems();
         $hashes = [];
-        foreach ($pairs as $pair) {
-            $hashes[$this->hashPair($pair['item'], $pair['purpose'])] = $pair;
+        foreach ($items as $item) {
+            $hashes[$this->hashItem($item['item'])] = $item;
         }
 
         $existing = CashPurposeCategory::query()
@@ -204,16 +281,16 @@ class CashPurposeClassifierService
                 $map = $this->classifyBatch($batch, $categories);
                 $now = now();
                 $rows = [];
-                foreach (array_values($batch) as $index => $pair) {
+                foreach (array_values($batch) as $index => $item) {
                     $category = $map[$index] ?? null;
                     if (!$category || !in_array($category, $categories, true)) {
                         $failed++;
                         continue;
                     }
                     $rows[] = [
-                        'purpose_hash' => $this->hashPair($pair['item'], $pair['purpose']),
-                        'item' => $pair['item'],
-                        'purpose' => $pair['purpose'],
+                        'purpose_hash' => $this->hashItem($item['item']),
+                        'item' => $item['item'],
+                        'purpose' => implode(' ; ', $item['purposes'] ?? []),
                         'category' => $category,
                         'category_id' => null,
                         'confidence' => null,
@@ -234,7 +311,7 @@ class CashPurposeClassifierService
                     );
                 }
             } catch (\Throwable $e) {
-                Log::warning('Cash purpose classification batch failed', [
+                Log::warning('Cash item classification batch failed', [
                     'error' => $e->getMessage(),
                 ]);
                 $failed += count($batch);
@@ -242,30 +319,43 @@ class CashPurposeClassifierService
         }
 
         return [
-            'total' => count($pairs),
+            'total' => count($items),
             'classified' => $classified,
             'failed' => $failed,
-            'pending' => max(0, count($pairs) - count($existing) - $classified),
+            'pending' => max(0, count($items) - count($existing) - $classified),
         ];
     }
 
     /**
-     * Classify one batch of pairs. Keys of the returned map are the input indices.
+     * Classify one batch of items. Keys of the returned map are the input indices.
      *
-     * @param  array<int,array{item:string,purpose:string}>  $pairs
+     * @param  array<int,array{item:string,purposes?:array<int,string>}>  $items
      * @return array<int,string>
      */
-    public function classifyBatch(array $pairs, array $categories): array
+    public function classifyBatch(array $items, array $categories): array
     {
         $list = [];
-        foreach (array_values($pairs) as $i => $pair) {
-            $list[] = ($i + 1) . '. Item: ' . $pair['item'] . ' | Purpose: ' . $pair['purpose'];
+        foreach (array_values($items) as $i => $item) {
+            $ctx = !empty($item['purposes'])
+                ? ' | example purposes: ' . implode(' ; ', $item['purposes'])
+                : '';
+            $list[] = ($i + 1) . '. Item: ' . $item['item'] . $ctx;
         }
 
-        $system = 'You are an expense classifier for cash requisitions (petty cash). Every entry MUST be '
-            . 'assigned to exactly one category from this exact list: [' . implode(', ', $categories) . ']. '
-            . 'Use BOTH the item name and the purpose to decide. Reply with ONLY a JSON object mapping each '
-            . 'entry number (as a string) to one category name from the list. Do not invent categories.';
+        $system = 'You are an expense classifier for cash requisitions (petty cash) of IsDB-BISEW, Bangladesh. '
+            . 'Every item MUST be assigned to exactly one category from this exact list: ['
+            . implode(', ', $categories) . ']. '
+            . 'Guidance: octane/petrol/diesel/CNG/fuel -> Fuel; vehicle servicing, spare parts, tyres, engine work '
+            . '-> Vehicle Maintenance; tax token, toll, fare, bus/train/air ticket, taxi -> Transportation; '
+            . 'mobile bill/allowance, internet, SIM, recharge -> Mobile & Internet; electricity, water, gas bills '
+            . '-> Utilities; printing, stationery, photocopy -> Printing & Stationery; building/equipment repair, '
+            . 'renovation, servicing -> Repairs & Maintenance; food, snacks, tea, meeting refreshment -> '
+            . 'Entertainment & Refreshment; training, workshop, seminar -> Training & Workshop; salary, allowance, '
+            . 'Eid, staff welfare -> Staff Welfare & Allowance; office supplies, stationery, small equipment -> '
+            . 'Office Supplies; professional fees, legal, audit, consultancy, service bills -> Professional & '
+            . 'Service Bills; medicine, treatment -> Medical & Healthcare; anything unclear -> Miscellaneous. '
+            . 'Reply with ONLY a JSON object mapping each item number (as a string) to one category name from the '
+            . 'list. Do not invent categories.';
 
         $user = implode("\n", $list)
             . "\n\nReturn a JSON object like {\"1\": \"Fuel\", \"2\": \"Mobile & Internet\"}.";
@@ -329,13 +419,13 @@ class CashPurposeClassifierService
     }
 
     /**
-     * Pending (uncached) pair count, for progress UI.
+     * Pending (uncached) item count, for progress UI.
      */
     public function pendingCount(): int
     {
-        $pairs = $this->distinctPairs();
+        $items = $this->distinctItems();
         $hashes = array_values(array_unique(
-            array_map(fn ($p) => $this->hashPair($p['item'], $p['purpose']), $pairs)
+            array_map(fn ($p) => $this->hashItem($p['item']), $items)
         ));
         if (empty($hashes)) {
             return 0;

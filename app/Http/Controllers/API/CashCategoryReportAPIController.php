@@ -101,7 +101,8 @@ class CashCategoryReportAPIController extends Controller
     public function report(Request $request): JsonResponse
     {
         $items = $this->approvedItems($request);
-        $categoryMap = $this->categoryMap($items);
+        $purposeByRow = $this->classifier->resolveEffectivePurposes($items);
+        $categoryMap = $this->categoryMap($items, $purposeByRow);
         $period = in_array($request->period, ['month', 'year']) ? $request->period : 'none';
 
         $rows = [];
@@ -110,7 +111,7 @@ class CashCategoryReportAPIController extends Controller
 
         foreach ($items as $item) {
             $amount = (float) $item->required_unit * (float) $item->unit_price;
-            $hash = $this->classifier->hashPair((string) $item->item, (string) $item->purpose);
+            $hash = $this->classifier->hashItem((string) $item->item);
             $category = $categoryMap[$hash] ?? 'Uncategorized';
             if ($category === 'Uncategorized') {
                 $uncategorized += $amount;
@@ -160,24 +161,27 @@ class CashCategoryReportAPIController extends Controller
     {
         $category = (string) $request->category;
         $items = $this->approvedItems($request);
-        $categoryMap = $this->categoryMap($items);
+        $purposeByRow = $this->classifier->resolveEffectivePurposes($items);
+        $categoryMap = $this->categoryMap($items, $purposeByRow);
         $period = in_array($request->period, ['month', 'year']) ? $request->period : 'none';
 
         $rows = [];
         foreach ($items as $item) {
-            $hash = $this->classifier->hashPair((string) $item->item, (string) $item->purpose);
+            $purpose = $purposeByRow[$item->item_row_id] ?? (string) $item->purpose;
+            $hash = $this->classifier->hashItem((string) $item->item);
             $cat = $categoryMap[$hash] ?? 'Uncategorized';
             if ($cat !== $category) {
                 continue;
             }
             $amount = (float) $item->required_unit * (float) $item->unit_price;
             $bucket = $this->bucket($item->ceo_approved_at, $period);
-            $key = $item->item . '|' . $item->purpose . '|' . $bucket;
+            $key = $item->item . '|' . $purpose . '|' . $item->unit . '|' . $bucket;
 
             if (!isset($rows[$key])) {
                 $rows[$key] = [
                     'item' => $item->item,
-                    'purpose' => $item->purpose,
+                    'unit' => $item->unit,
+                    'purpose' => $purpose,
                     'period' => $bucket === '' ? null : $bucket,
                     'item_count' => 0,
                     'amount' => 0,
@@ -206,7 +210,7 @@ class CashCategoryReportAPIController extends Controller
     {
         $data = $request->validate([
             'item' => 'required|string',
-            'purpose' => 'required|string',
+            'purpose' => 'nullable|string',
             'category' => 'required|string|max:120',
         ]);
 
@@ -214,13 +218,13 @@ class CashCategoryReportAPIController extends Controller
             return response()->json(['message' => 'Unknown category.'], 422);
         }
 
-        $hash = $this->classifier->hashPair($data['item'], $data['purpose']);
+        $hash = $this->classifier->hashItem($data['item']);
 
         CashPurposeCategory::updateOrCreate(
             ['purpose_hash' => $hash],
             [
                 'item' => $data['item'],
-                'purpose' => $data['purpose'],
+                'purpose' => $data['purpose'] ?? '',
                 'category' => $data['category'],
                 'is_manual' => true,
                 'model' => 'manual',
@@ -260,7 +264,10 @@ class CashCategoryReportAPIController extends Controller
             ->whereNull('i.deleted_at')
             ->when($request->department_id, fn ($q, $v) => $q->where('cr.department_id', $v))
             ->select([
+                'i.id as item_row_id',
+                'i.cash_requisition_id',
                 'i.item',
+                'i.unit',
                 'i.purpose',
                 'i.required_unit',
                 'i.unit_price',
@@ -268,16 +275,18 @@ class CashCategoryReportAPIController extends Controller
                 'cr.department_id',
                 'rs.ceo_approved_at',
             ])
+            ->orderBy('i.cash_requisition_id')
+            ->orderBy('i.id')
             ->get();
     }
 
     /**
      * Map of purpose_hash => category for the given purposes (uncategorized => null).
      */
-    protected function categoryMap($items): array
+    protected function categoryMap($items, array $purposeByRow = []): array
     {
         $hashes = collect($items)
-            ->map(fn ($r) => $this->classifier->hashPair((string) $r->item, (string) $r->purpose))
+            ->map(fn ($r) => $this->classifier->hashItem((string) $r->item))
             ->unique()
             ->values()
             ->all();
