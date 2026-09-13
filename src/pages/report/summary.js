@@ -10,6 +10,8 @@ import {
     useSummaryCashCategoryClassifyMutation,
     useSummaryCashCategoryReportMutation,
     useSummaryCashCategoryItemsMutation,
+    useSummaryCashCategoryFuelMutation,
+    useSummaryCashCategoryFuelItemsMutation,
 } from "@/store/service/report";
 import { useGetDepartmentByOrganizationBranchQuery } from "@/store/service/deparment";
 import Head from "next/head";
@@ -1650,7 +1652,9 @@ function CashCategoryTab() {
     const [loadingStatus, setLoadingStatus] = useState(true);
     const [busy, setBusy] = useState("");
     const [report, setReport] = useState(null);
+    const [fuel, setFuel] = useState(null);
     const [drill, setDrill] = useState(null);
+    const [fuelDrill, setFuelDrill] = useState(null);
 
     const [periodMode, setPeriodMode] = useState("none");
     const [dateFrom, setDateFrom] = useState(
@@ -1668,6 +1672,8 @@ function CashCategoryTab() {
     const [classify] = useSummaryCashCategoryClassifyMutation();
     const [fetchReport] = useSummaryCashCategoryReportMutation();
     const [fetchItems] = useSummaryCashCategoryItemsMutation();
+    const [fetchFuel] = useSummaryCashCategoryFuelMutation();
+    const [fetchFuelItems] = useSummaryCashCategoryFuelItemsMutation();
 
     const months = moment.months();
     const years = useMemo(() => {
@@ -1785,8 +1791,14 @@ function CashCategoryTab() {
         };
         if (department) params.department_id = department;
         try {
-            const r = await fetchReport(params).unwrap();
+            const [r, f] = await Promise.all([
+                fetchReport(params).unwrap(),
+                fetchFuel(params)
+                    .unwrap()
+                    .catch(() => null),
+            ]);
             setReport({ ...r, range });
+            setFuel(f);
         } catch (e) {
             alert("Could not load the report.");
         } finally {
@@ -1809,6 +1821,22 @@ function CashCategoryTab() {
             setDrill({ category, loading: false, rows: r.rows || [] });
         } catch (e) {
             setDrill({ category, loading: false, rows: [] });
+        }
+    };
+
+    const openFuelDrill = async () => {
+        const range = resolveRange();
+        const params = {
+            start_date: range.start,
+            end_date: range.end,
+        };
+        if (department) params.department_id = department;
+        setFuelDrill({ loading: true, rows: [] });
+        try {
+            const r = await fetchFuelItems(params).unwrap();
+            setFuelDrill({ loading: false, rows: r.rows || [] });
+        } catch (e) {
+            setFuelDrill({ loading: false, rows: [] });
         }
     };
 
@@ -1852,6 +1880,55 @@ function CashCategoryTab() {
                 ) + "\n";
         });
         csv += [esc("Total"), "", totalAmount, "100.0"].join(",") + "\n";
+
+        if (fuel && fuel.rows && fuel.rows.length) {
+            csv += "\n";
+            csv +=
+                [
+                    "Vehicle Fuel (Actual)",
+                    "Entries",
+                    "Quantity (ltr)",
+                    "Avg Rate",
+                    "Cost",
+                    "Mileage (km)",
+                ]
+                    .map(esc)
+                    .join(",") + "\n";
+            fuel.rows.forEach((v) => {
+                csv +=
+                    [
+                        esc(v.vehicle),
+                        v.entries,
+                        v.quantity,
+                        v.average_rate,
+                        v.cost,
+                        v.mileage,
+                    ].join(",") + "\n";
+            });
+            csv +=
+                [
+                    esc("Total"),
+                    fuel.totals.entries,
+                    fuel.totals.quantity,
+                    fuel.totals.average_rate,
+                    fuel.totals.cost,
+                    fuel.totals.mileage,
+                ].join(",") + "\n";
+            csv +=
+                [esc("Cash estimate"), "", "", "", fuel.cash_estimate, ""].join(
+                    ","
+                ) + "\n";
+            csv +=
+                [
+                    esc("Variance (estimate - actual)"),
+                    "",
+                    "",
+                    "",
+                    fuel.variance,
+                    "",
+                ].join(",") + "\n";
+        }
+
         const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
@@ -2235,7 +2312,11 @@ function CashCategoryTab() {
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        openDrill(r.category)
+                                                        r.category === "Fuel"
+                                                            ? openFuelDrill()
+                                                            : openDrill(
+                                                                  r.category
+                                                              )
                                                     }
                                                     className="text-blue-700 hover:underline print:text-gray-800 print:no-underline"
                                                 >
@@ -2275,6 +2356,88 @@ function CashCategoryTab() {
                             </tbody>
                         </table>
                     </div>
+
+                    {fuel && fuel.rows && fuel.rows.length > 0 && (
+                        <div className="mt-6 print-no-break">
+                            <div className="text-sm font-semibold text-gray-700 mb-2">
+                                Vehicle Fuel (Actual) — from refuel records
+                                (vehicle_histories)
+                            </div>
+                            <table className="min-w-full border-collapse border border-gray-300 text-sm">
+                                <thead>
+                                    <tr className="bg-gray-100">
+                                        <th className="border border-gray-300 px-3 py-2 text-left font-semibold">
+                                            Vehicle
+                                        </th>
+                                        <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
+                                            Entries
+                                        </th>
+                                        <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
+                                            Quantity (ltr)
+                                        </th>
+                                        <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
+                                            Avg Rate
+                                        </th>
+                                        <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
+                                            Cost
+                                        </th>
+                                        <th className="border border-gray-300 px-3 py-2 text-right font-semibold">
+                                            Mileage (km)
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {fuel.rows.map((v) => (
+                                        <tr key={v.vehicle_id ?? v.vehicle}>
+                                            <td className="border border-gray-300 px-3 py-1.5">
+                                                {v.vehicle}
+                                            </td>
+                                            <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                                {v.entries}
+                                            </td>
+                                            <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                                {fmt(v.quantity)}
+                                            </td>
+                                            <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                                {fmt(v.average_rate)}
+                                            </td>
+                                            <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                                {fmt(v.cost)}
+                                            </td>
+                                            <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                                {fmt(v.mileage)}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    <tr className="bg-gray-200 font-bold">
+                                        <td className="border border-gray-300 px-3 py-2">
+                                            Total
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-2 text-right">
+                                            {fuel.totals.entries}
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-2 text-right">
+                                            {fmt(fuel.totals.quantity)}
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-2 text-right">
+                                            {fmt(fuel.totals.average_rate)}
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-2 text-right">
+                                            {fmt(fuel.totals.cost)}
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-2 text-right">
+                                            {fmt(fuel.totals.mileage)}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div className="mt-2 text-xs text-gray-600">
+                                Cash estimate: ৳ {fmt(fuel.cash_estimate)} |
+                                Actual fuel cost: ৳ {fmt(fuel.totals.cost)} |
+                                Variance: ৳ {fmt(fuel.variance)}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="mt-4 pt-2 border-t border-gray-300 text-center text-xs text-gray-500">
                         Generated on {moment().format("DD MMM YYYY, hh:mm A")}
@@ -2347,6 +2510,122 @@ function CashCategoryTab() {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button color="gray" onClick={() => setDrill(null)}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Vehicle fuel (actual) drill-down modal */}
+            <Modal
+                show={!!fuelDrill}
+                onClose={() => setFuelDrill(null)}
+                size="5xl"
+            >
+                <Modal.Header>Vehicle Fuel (Actual)</Modal.Header>
+                <Modal.Body>
+                    {fuelDrill?.loading ? (
+                        <div className="py-8 text-center text-gray-500">
+                            Loading...
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full border-collapse border border-gray-300 text-sm">
+                                <thead>
+                                    <tr className="bg-gray-100">
+                                        <th className="border border-gray-300 px-3 py-2 text-left">
+                                            Vehicle
+                                        </th>
+                                        <th className="border border-gray-300 px-3 py-2 text-left">
+                                            Date
+                                        </th>
+                                        <th className="border border-gray-300 px-3 py-2 text-left">
+                                            Cash Item
+                                        </th>
+                                        <th className="border border-gray-300 px-3 py-2 text-right">
+                                            Quantity (ltr)
+                                        </th>
+                                        <th className="border border-gray-300 px-3 py-2 text-right">
+                                            Rate
+                                        </th>
+                                        <th className="border border-gray-300 px-3 py-2 text-right">
+                                            Cost
+                                        </th>
+                                        <th className="border border-gray-300 px-3 py-2 text-right">
+                                            Mileage (km)
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {(fuelDrill?.rows || []).map((r, i) => (
+                                        <tr key={i}>
+                                            <td className="border border-gray-300 px-3 py-1.5">
+                                                {r.vehicle}
+                                            </td>
+                                            <td className="border border-gray-300 px-3 py-1.5">
+                                                {r.refuel_date}
+                                            </td>
+                                            <td className="border border-gray-300 px-3 py-1.5">
+                                                {r.item}
+                                            </td>
+                                            <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                                {fmt(r.quantity)}
+                                            </td>
+                                            <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                                {fmt(r.rate)}
+                                            </td>
+                                            <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                                {fmt(r.cost)}
+                                            </td>
+                                            <td className="border border-gray-300 px-3 py-1.5 text-right">
+                                                {fmt(r.mileage)}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    <tr className="bg-gray-200 font-bold">
+                                        <td
+                                            className="border border-gray-300 px-3 py-2"
+                                            colSpan={3}
+                                        >
+                                            Total
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-2 text-right">
+                                            {fmt(
+                                                (fuelDrill?.rows || []).reduce(
+                                                    (s, r) =>
+                                                        s +
+                                                        Number(r.quantity || 0),
+                                                    0
+                                                )
+                                            )}
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-2" />
+                                        <td className="border border-gray-300 px-3 py-2 text-right">
+                                            {fmt(
+                                                (fuelDrill?.rows || []).reduce(
+                                                    (s, r) =>
+                                                        s + Number(r.cost || 0),
+                                                    0
+                                                )
+                                            )}
+                                        </td>
+                                        <td className="border border-gray-300 px-3 py-2 text-right">
+                                            {fmt(
+                                                (fuelDrill?.rows || []).reduce(
+                                                    (s, r) =>
+                                                        s +
+                                                        Number(r.mileage || 0),
+                                                    0
+                                                )
+                                            )}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button color="gray" onClick={() => setFuelDrill(null)}>
                         Close
                     </Button>
                 </Modal.Footer>

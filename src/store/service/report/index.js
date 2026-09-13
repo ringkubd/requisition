@@ -1,124 +1,138 @@
-import { GeneralBaseAPI } from '@/store/generalBaseAPI'
+import { GeneralBaseAPI } from "@/store/generalBaseAPI";
 
 export const ReportAPI = GeneralBaseAPI.injectEndpoints({
-    endpoints: builder => ({
+    endpoints: (builder) => ({
         daily: builder.query({
-            query: arg => ({
-                url: 'daily',
+            query: (arg) => ({
+                url: "daily",
                 params: arg,
             }),
         }),
         purchaseReport: builder.mutation({
-            query: arg => ({
-                url: 'report/purchase',
+            query: (arg) => ({
+                url: "report/purchase",
                 params: arg,
-                method: 'GET',
+                method: "GET",
             }),
         }),
         issuesReport: builder.mutation({
-            query: arg => ({
-                url: 'report/issues',
+            query: (arg) => ({
+                url: "report/issues",
                 params: arg,
-                method: 'GET',
+                method: "GET",
             }),
         }),
         bothReport: builder.mutation({
-            query: arg => ({
-                url: 'report/both',
+            query: (arg) => ({
+                url: "report/both",
                 params: arg,
-                method: 'GET',
+                method: "GET",
             }),
         }),
         productCurrentBalance: builder.mutation({
-            query: arg => ({
-                url: 'report/product-current-balance',
+            query: (arg) => ({
+                url: "report/product-current-balance",
                 params: arg,
-                method: 'GET',
+                method: "GET",
             }),
         }),
         productCurrentBalanceOption: builder.mutation({
-            query: arg => ({
-                url: 'report/product-current-balance-option',
+            query: (arg) => ({
+                url: "report/product-current-balance-option",
                 params: arg,
-                method: 'GET',
+                method: "GET",
             }),
         }),
         auditReport: builder.query({
-            query: arg => ({
-                url: 'report/audit-report',
+            query: (arg) => ({
+                url: "report/audit-report",
                 params: arg,
-                method: 'GET',
+                method: "GET",
             }),
         }),
         summaryDepartmentCategory: builder.mutation({
-            query: arg => ({
-                url: 'report/summary/department-category',
+            query: (arg) => ({
+                url: "report/summary/department-category",
                 params: arg,
-                method: 'GET',
+                method: "GET",
             }),
         }),
         summaryCash: builder.mutation({
-            query: arg => ({
-                url: 'report/summary/cash',
+            query: (arg) => ({
+                url: "report/summary/cash",
                 params: arg,
-                method: 'GET',
+                method: "GET",
             }),
         }),
         summaryCategoryItems: builder.mutation({
-            query: arg => ({
-                url: 'report/summary/category-items',
+            query: (arg) => ({
+                url: "report/summary/category-items",
                 params: arg,
-                method: 'GET',
+                method: "GET",
             }),
         }),
         summaryCashCategoryPropose: builder.query({
-            query: arg => ({
-                url: 'report/summary/cash-category/propose',
+            query: (arg) => ({
+                url: "report/summary/cash-category/propose",
                 params: arg,
             }),
         }),
         summaryCashCategoryStatus: builder.query({
             query: () => ({
-                url: 'report/summary/cash-category/status',
+                url: "report/summary/cash-category/status",
             }),
         }),
         summaryCashCategoryApprove: builder.mutation({
-            query: body => ({
-                url: 'report/summary/cash-category/approve',
-                method: 'POST',
+            query: (body) => ({
+                url: "report/summary/cash-category/approve",
+                method: "POST",
                 body,
             }),
         }),
         summaryCashCategoryClassify: builder.mutation({
-            query: arg => ({
-                url: 'report/summary/cash-category/classify',
-                method: 'POST',
+            query: (arg) => ({
+                url: "report/summary/cash-category/classify",
+                method: "POST",
                 body: arg || {},
             }),
         }),
         summaryCashCategoryReport: builder.mutation({
-            query: arg => ({
-                url: 'report/summary/cash-category/report',
+            query: (arg) => ({
+                url: "report/summary/cash-category/report",
                 params: arg,
-                method: 'GET',
+                method: "GET",
             }),
         }),
         summaryCashCategoryItems: builder.mutation({
-            query: arg => ({
-                url: 'report/summary/cash-category/items',
+            query: (arg) => ({
+                url: "report/summary/cash-category/items",
                 params: arg,
-                method: 'GET',
+                method: "GET",
             }),
         }),
         summaryCashCategoryOverride: builder.mutation({
-            query: body => ({
-                url: 'report/summary/cash-category/override',
-                method: 'POST',
+            query: (body) => ({
+                url: "report/summary/cash-category/override",
+                method: "POST",
                 body,
             }),
         }),
+        summaryCashCategoryFuel: builder.mutation({
+            query: (arg) => ({
+                url: "report/summary/cash-category/fuel",
+                params: arg,
+                method: "GET",
+            }),
+        }),
+        summaryCashCategoryFuelItems: builder.mutation({
+            query: (arg) => ({
+                url: "report/summary/cash-category/fuel-items",
+                params: arg,
+                method: "GET",
+            }),
+        }),
     }),
-})
+});
 
 export const {
     useDailyQuery,
@@ -138,4 +152,6 @@ export const {
     useSummaryCashCategoryReportMutation,
     useSummaryCashCategoryItemsMutation,
     useSummaryCashCategoryOverrideMutation,
-} = ReportAPI
+    useSummaryCashCategoryFuelMutation,
+    useSummaryCashCategoryFuelItemsMutation,
+} = ReportAPI;
