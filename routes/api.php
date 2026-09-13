@@ -191,6 +191,7 @@ Route::prefix('report')->group(function () {
 
     // Summary report (department/category wise approved vs purchase vs used)
     Route::get('summary/department-category', [\App\Http\Controllers\API\SummaryReportAPIController::class, 'departmentCategory']);
+    Route::get('summary/category-items', [\App\Http\Controllers\API\SummaryReportAPIController::class, 'categoryItems']);
     Route::get('summary/cash', [\App\Http\Controllers\API\SummaryReportAPIController::class, 'cash']);
 });
 

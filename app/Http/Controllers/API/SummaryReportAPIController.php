@@ -222,6 +222,137 @@ class SummaryReportAPIController extends Controller
     }
 
     /**
+     * Item (product) level detail for a category:
+     * requisition approved vs actual purchase vs actual used.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function categoryItems(Request $request): JsonResponse
+    {
+        $first = $request->start_date
+            ? Carbon::parse($request->start_date)->toDateString()
+            : Carbon::now()->subMonthNoOverflow()->firstOfMonth()->toDateString();
+
+        $last = $request->end_date
+            ? Carbon::parse($request->end_date)->toDateString()
+            : Carbon::now()->subMonthNoOverflow()->lastOfMonth()->toDateString();
+
+        $period = in_array($request->period, ['month', 'year']) ? $request->period : 'none';
+        $branchId = auth_branch_id();
+        $categoryId = $request->category_id;
+        $departmentId = $request->department_id;
+
+        $latestPrStatus = DB::table('requisition_statuses')
+            ->selectRaw('MAX(id) as id')
+            ->where('requisition_type', PurchaseRequisition::class)
+            ->whereNull('deleted_at')
+            ->groupBy('requisition_id');
+
+        $reqPeriodExpr = $this->periodExpression('rs.ceo_approved_at', $period);
+        $purPeriodExpr = $this->periodExpression('pu.purchase_date', $period);
+        $usePeriodExpr = $this->periodExpression('pii.use_date', $period);
+
+        // 1) Requisition approved (CEO approved purchase requisition lines)
+        $requisitionApproved = DB::table('purchase_requisition_products as prp')
+            ->join('purchase_requisitions as pr', 'prp.purchase_requisition_id', '=', 'pr.id')
+            ->join('requisition_statuses as rs', function ($j) use ($first, $last) {
+                $j->on('rs.requisition_id', '=', 'pr.id')
+                    ->where('rs.requisition_type', PurchaseRequisition::class)
+                    ->where('rs.ceo_status', 2)
+                    ->whereNotNull('rs.ceo_approved_at')
+                    ->whereNull('rs.deleted_at')
+                    ->whereBetween('rs.ceo_approved_at', [$first, $last]);
+            })
+            ->whereIn('rs.id', $latestPrStatus)
+            ->leftJoin('products as p', 'p.id', '=', 'prp.product_id')
+            ->where('pr.branch_id', $branchId)
+            ->whereNull('pr.deleted_at')
+            ->whereNull('prp.deleted_at')
+            ->where('p.category_id', $categoryId)
+            ->when($departmentId, fn ($q, $v) => $q->where('pr.department_id', $v))
+            ->selectRaw("p.id as product_id, p.title as product_title, {$reqPeriodExpr} as period, SUM(prp.required_quantity * prp.unit_price) as amount")
+            ->when($period !== 'none', fn ($q) => $q->groupBy(DB::raw('p.id, p.title, ' . $reqPeriodExpr)), fn ($q) => $q->groupBy(DB::raw('p.id, p.title')))
+            ->get();
+
+        // 2) Actual purchase
+        $actualPurchase = DB::table('purchases as pu')
+            ->join('purchase_requisitions as pr', 'pu.purchase_requisition_id', '=', 'pr.id')
+            ->leftJoin('products as p', 'p.id', '=', 'pu.product_id')
+            ->where('pr.branch_id', $branchId)
+            ->whereNull('pu.deleted_at')
+            ->whereNull('pr.deleted_at')
+            ->whereBetween('pu.purchase_date', [$first, $last])
+            ->where('p.category_id', $categoryId)
+            ->when($departmentId, fn ($q, $v) => $q->where('pr.department_id', $v))
+            ->selectRaw("p.id as product_id, p.title as product_title, {$purPeriodExpr} as period, SUM(pu.total_price) as amount")
+            ->when($period !== 'none', fn ($q) => $q->groupBy(DB::raw('p.id, p.title, ' . $purPeriodExpr)), fn ($q) => $q->groupBy(DB::raw('p.id, p.title')))
+            ->get();
+
+        // 3) Actual used (store approved issues, FIFO consumed value)
+        $actualUsed = DB::table('issue_purchase_logs as ipl')
+            ->join('product_issue_items as pii', 'ipl.product_issue_items_id', '=', 'pii.id')
+            ->join('product_issues as pi', 'pii.product_issue_id', '=', 'pi.id')
+            ->leftJoin('products as p', 'p.id', '=', 'pii.product_id')
+            ->where('pi.store_status', 1)
+            ->where('pi.issuer_branch_id', $branchId)
+            ->whereNull('pi.deleted_at')
+            ->whereNull('pii.deleted_at')
+            ->whereNull('ipl.deleted_at')
+            ->whereBetween('pii.use_date', [$first, $last])
+            ->whereRaw('COALESCE(pii.use_in_category, p.category_id) = ?', [$categoryId])
+            ->when($departmentId, fn ($q, $v) => $q->where('pi.issuer_department_id', $v))
+            ->selectRaw("p.id as product_id, p.title as product_title, {$usePeriodExpr} as period, SUM(ipl.total_price) as amount")
+            ->when($period !== 'none', fn ($q) => $q->groupBy(DB::raw('p.id, p.title, ' . $usePeriodExpr)), fn ($q) => $q->groupBy(DB::raw('p.id, p.title')))
+            ->get();
+
+        $rows = [];
+        $merge = function ($items, string $amountKey) use (&$rows) {
+            foreach ($items as $item) {
+                $key = (string) ($item->product_id ?? '0');
+                if (!isset($rows[$key])) {
+                    $rows[$key] = [
+                        'product_id' => $item->product_id,
+                        'product_title' => $item->product_title,
+                        'requisition_amount' => 0,
+                        'purchase_amount' => 0,
+                        'used_amount' => 0,
+                    ];
+                }
+                if ($item->product_title) {
+                    $rows[$key]['product_title'] = $item->product_title;
+                }
+                $rows[$key][$amountKey] = round($rows[$key][$amountKey] + $item->amount, 2);
+            }
+        };
+
+        $merge($requisitionApproved, 'requisition_amount');
+        $merge($actualPurchase, 'purchase_amount');
+        $merge($actualUsed, 'used_amount');
+
+        $rows = array_values($rows);
+        foreach ($rows as &$row) {
+            $row['product_title'] = $row['product_title'] ?: 'N/A';
+            $row['total_amount'] = round($row['purchase_amount'] + $row['used_amount'], 2);
+        }
+        unset($row);
+
+        usort($rows, fn ($a, $b) => strcasecmp($a['product_title'], $b['product_title']));
+
+        $category = $categoryId
+            ? Category::withTrashed()->find($categoryId)
+            : null;
+
+        return response()->json([
+            'rows' => $rows,
+            'category_title' => $category?->title,
+            'start_date' => $first,
+            'end_date' => $last,
+            'period' => $period,
+        ]);
+    }
+
+    /**
      * SQL expression for period bucketing.
      */
     private function periodExpression(string $column, string $period): string
